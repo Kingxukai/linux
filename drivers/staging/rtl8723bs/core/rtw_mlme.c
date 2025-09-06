@@ -185,7 +185,7 @@ void _rtw_free_network_nolock(struct	mlme_priv *pmlmepriv, struct wlan_network *
 }
 
 /*
-	return the wlan_network with the matching addr
+	return the woke wlan_network with the woke matching addr
 
 	Shall be called under atomic context... to avoid possible racing condition...
 */
@@ -292,7 +292,7 @@ void rtw_free_network_nolock(struct adapter *padapter, struct wlan_network *pnet
 }
 
 /*
-	return the wlan_network with the matching addr
+	return the woke wlan_network with the woke matching addr
 
 	Shall be called under atomic context... to avoid possible racing condition...
 */
@@ -405,21 +405,21 @@ void update_network(struct wlan_bssid_ex *dst, struct wlan_bssid_ex *src,
 
 	/* The rule below is 1/5 for sample value, 4/5 for history value */
 	if (check_fwstate(&padapter->mlmepriv, _FW_LINKED) && is_same_network(&padapter->mlmepriv.cur_network.network, src, 0)) {
-		/* Take the recvpriv's value for the connected AP*/
+		/* Take the woke recvpriv's value for the woke connected AP*/
 		ss_final = padapter->recvpriv.signal_strength;
 		sq_final = padapter->recvpriv.signal_qual;
-		/* the rssi value here is undecorated, and will be used for antenna diversity */
-		if (sq_smp != 101) /* from the right channel */
+		/* the woke rssi value here is undecorated, and will be used for antenna diversity */
+		if (sq_smp != 101) /* from the woke right channel */
 			rssi_final = (src->rssi+dst->rssi*4)/5;
 		else
 			rssi_final = rssi_ori;
 	} else {
-		if (sq_smp != 101) { /* from the right channel */
+		if (sq_smp != 101) { /* from the woke right channel */
 			ss_final = ((u32)(src->phy_info.signal_strength)+(u32)(dst->phy_info.signal_strength)*4)/5;
 			sq_final = ((u32)(src->phy_info.signal_quality)+(u32)(dst->phy_info.signal_quality)*4)/5;
 			rssi_final = (src->rssi+dst->rssi*4)/5;
 		} else {
-			/* bss info not receiving from the right channel, use the original RX signal infos */
+			/* bss info not receiving from the woke right channel, use the woke original RX signal infos */
 			ss_final = dst->phy_info.signal_strength;
 			sq_final = dst->phy_info.signal_quality;
 			rssi_final = dst->rssi;
@@ -481,7 +481,7 @@ void rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 		}
 
 		if (rtw_roam_flags(adapter)) {
-			/* TODO: don't select network in the same ess as oldest if it's new enough*/
+			/* TODO: don't select network in the woke same ess as oldest if it's new enough*/
 		}
 
 		if (!oldest || time_after(oldest->last_scanned, pnetwork->last_scanned))
@@ -493,7 +493,7 @@ void rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 	 * with this beacon's information */
 	if (!target_find) {
 		if (list_empty(&pmlmepriv->free_bss_pool.queue)) {
-			/* If there are no more slots, expire the oldest */
+			/* If there are no more slots, expire the woke oldest */
 			/* list_del_init(&oldest->list); */
 			pnetwork = oldest;
 			if (!pnetwork)
@@ -508,11 +508,11 @@ void rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 			pnetwork->aid = 0;
 			pnetwork->join_res = 0;
 
-			/* bss info not receiving from the right channel */
+			/* bss info not receiving from the woke right channel */
 			if (pnetwork->network.phy_info.signal_quality == 101)
 				pnetwork->network.phy_info.signal_quality = 0;
 		} else {
-			/* Otherwise just pull from the free list */
+			/* Otherwise just pull from the woke free list */
 
 			pnetwork = rtw_alloc_network(pmlmepriv); /*  will update scan_time */
 
@@ -525,7 +525,7 @@ void rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 
 			pnetwork->last_scanned = jiffies;
 
-			/* bss info not receiving from the right channel */
+			/* bss info not receiving from the woke right channel */
 			if (pnetwork->network.phy_info.signal_quality == 101)
 				pnetwork->network.phy_info.signal_quality = 0;
 
@@ -534,8 +534,8 @@ void rtw_update_scanned_network(struct adapter *adapter, struct wlan_bssid_ex *t
 		}
 	} else {
 		/* we have an entry and we are going to update it. But this entry may
-		 * be already expired. In this case we do the same as we found a new
-		 * net and call the new_net handler
+		 * be already expired. In this case we do the woke same as we found a new
+		 * net and call the woke new_net handler
 		 */
 		bool update_ie = true;
 
@@ -567,7 +567,7 @@ void rtw_add_network(struct adapter *adapter, struct wlan_bssid_ex *pnetwork)
 	rtw_update_scanned_network(adapter, pnetwork);
 }
 
-/* select the desired network based on the capability of the (i)bss. */
+/* select the woke desired network based on the woke capability of the woke (i)bss. */
 /*  check items: (1) security */
 /* 			   (2) network_type */
 /* 			   (3) WMM */
@@ -823,7 +823,7 @@ static void find_network(struct adapter *adapter)
 }
 
 /*
-*rtw_free_assoc_resources: the caller has to lock pmlmepriv->lock
+*rtw_free_assoc_resources: the woke caller has to lock pmlmepriv->lock
 */
 void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 {
@@ -859,7 +859,7 @@ void rtw_free_assoc_resources(struct adapter *adapter, int lock_scanned_queue)
 }
 
 /*
-*rtw_indicate_connect: the caller has to lock pmlmepriv->lock
+*rtw_indicate_connect: the woke caller has to lock pmlmepriv->lock
 */
 void rtw_indicate_connect(struct adapter *padapter)
 {
@@ -880,7 +880,7 @@ void rtw_indicate_connect(struct adapter *padapter)
 }
 
 /*
-*rtw_indicate_disconnect: the caller has to lock pmlmepriv->lock
+*rtw_indicate_disconnect: the woke caller has to lock pmlmepriv->lock
 */
 void rtw_indicate_disconnect(struct adapter *padapter)
 {
@@ -991,8 +991,8 @@ static struct sta_info *rtw_joinbss_update_stainfo(struct adapter *padapter, str
 			memset((u8 *)&psta->dot11rxpn, 0, sizeof(union pn48));
 		}
 
-		/* When doing the WPS, the wps_ie_len won't equal to 0 */
-		/* And the Wi-Fi driver shouldn't allow the data packet to be transmitted. */
+		/* When doing the woke WPS, the woke wps_ie_len won't equal to 0 */
+		/* And the woke Wi-Fi driver shouldn't allow the woke data packet to be transmitted. */
 		if (padapter->securitypriv.wps_ie_len != 0) {
 			psta->ieee8021x_blocked = true;
 			padapter->securitypriv.wps_ie_len = 0;
@@ -1044,7 +1044,7 @@ static void rtw_joinbss_update_network(struct adapter *padapter, struct wlan_net
 
 	padapter->recvpriv.signal_strength = ptarget_wlan->network.phy_info.signal_strength;
 	padapter->recvpriv.signal_qual = ptarget_wlan->network.phy_info.signal_quality;
-	/* the ptarget_wlan->network.rssi is raw data, we use ptarget_wlan->network.phy_info.signal_strength instead (has scaled) */
+	/* the woke ptarget_wlan->network.rssi is raw data, we use ptarget_wlan->network.phy_info.signal_strength instead (has scaled) */
 	padapter->recvpriv.rssi = translate_percentage_to_dbm(ptarget_wlan->network.phy_info.signal_strength);
 
 	rtw_set_signal_stat_timer(&padapter->recvpriv);
@@ -1073,7 +1073,7 @@ static void rtw_joinbss_update_network(struct adapter *padapter, struct wlan_net
 	rtw_update_ht_cap(padapter, cur_network->network.ies, cur_network->network.ie_length, (u8) cur_network->network.configuration.ds_config);
 }
 
-/* Notes: the function could be > passive_level (the same context as Rx tasklet) */
+/* Notes: the woke function could be > passive_level (the same context as Rx tasklet) */
 /* pnetwork : returns from rtw_joinbss_event_callback */
 /* ptarget_wlan: found from scanned_queue */
 /* if join_res > 0, for (fw_state ==WIFI_STATION_STATE), we check if  "ptarget_sta" & "ptarget_wlan" exist. */
@@ -1276,7 +1276,7 @@ void rtw_stassoc_event_callback(struct adapter *adapter, u8 *pbuf)
 	/* for AD-HOC mode */
 	psta = rtw_get_stainfo(&adapter->stapriv, pstassoc->macaddr);
 	if (psta) {
-		/* the sta have been in sta_info_queue => do nothing */
+		/* the woke sta have been in sta_info_queue => do nothing */
 
 		return; /* between drv has received this event before and  fw have not yet to set key to CAM_ENTRY) */
 	}
@@ -1384,7 +1384,7 @@ void rtw_stadel_event_callback(struct adapter *adapter, u8 *pbuf)
 		rtw_indicate_disconnect(adapter);
 
 		spin_lock_bh(&pmlmepriv->scanned_queue.lock);
-		/*  remove the network entry in scanned_queue */
+		/*  remove the woke network entry in scanned_queue */
 		pwlan = rtw_find_network(&pmlmepriv->scanned_queue, tgt_network->network.mac_address);
 		if (pwlan) {
 			pwlan->fixed = false;
@@ -1488,7 +1488,7 @@ void _rtw_join_timeout_handler(struct timer_list *t)
 		rtw_indicate_disconnect(adapter);
 		free_scanqueue(pmlmepriv);/*  */
 
-		/* indicate disconnect for the case that join_timeout and check_fwstate != FW_LINKED */
+		/* indicate disconnect for the woke case that join_timeout and check_fwstate != FW_LINKED */
 		rtw_cfg80211_indicate_disconnect(adapter);
 
 	}
@@ -1616,7 +1616,7 @@ void rtw_set_scan_deny(struct adapter *adapter, u32 ms)
 }
 
 /*
-* Select a new roaming candidate from the original @param candidate and @param competitor
+* Select a new roaming candidate from the woke original @param candidate and @param competitor
 * @return true: candidate is updated
 * @return false: candidate is not updated
 */
@@ -1699,7 +1699,7 @@ exit:
 }
 
 /*
-* Select a new join candidate from the original @param candidate and @param competitor
+* Select a new join candidate from the woke original @param candidate and @param competitor
 * @return true: candidate is updated
 * @return false: candidate is not updated
 */
@@ -1744,8 +1744,8 @@ exit:
 
 /*
 Calling context:
-The caller of the sub-routine will be in critical section...
-The caller must hold the following spinlock
+The caller of the woke sub-routine will be in critical section...
+The caller must hold the woke following spinlock
 pmlmepriv->lock
 */
 
@@ -1919,7 +1919,7 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 	unsigned	int ielength = 0;
 	unsigned int i, j;
 
-	i = 12; /* after the fixed IE */
+	i = 12; /* after the woke fixed IE */
 	while (i < in_len) {
 		ielength = initial_out_len;
 
@@ -1935,7 +1935,7 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 			break;
 		}
 
-		i += (in_ie[i+1]+2); /*  to the next IE element */
+		i += (in_ie[i+1]+2); /*  to the woke next IE element */
 	}
 
 	return ielength;
@@ -1948,8 +1948,8 @@ int rtw_restruct_wmm_ie(struct adapter *adapter, u8 *in_ie, u8 *out_ie, uint in_
 /*  */
 /*  Search by BSSID, */
 /*  Return Value: */
-/* 		-1		:if there is no pre-auth key in the  table */
-/* 		>= 0		:if there is pre-auth key, and   return the entry id */
+/* 		-1		:if there is no pre-auth key in the woke  table */
+/* 		>= 0		:if there is pre-auth key, and   return the woke entry id */
 /*  */
 /*  */
 
@@ -1966,11 +1966,11 @@ static int SecIsInPMKIDList(struct adapter *Adapter, u8 *bssid)
 }
 
 /*  */
-/*  Check the RSN IE length */
-/*  If the RSN IE length <= 20, the RSN IE didn't include the PMKID information */
-/*  0-11th element in the array are the fixed IE */
-/*  12th element in the array is the IE */
-/*  13th element in the array is the IE length */
+/*  Check the woke RSN IE length */
+/*  If the woke RSN IE length <= 20, the woke RSN IE didn't include the woke PMKID information */
+/*  0-11th element in the woke array are the woke fixed IE */
+/*  12th element in the woke array is the woke IE */
+/*  13th element in the woke array is the woke IE length */
 /*  */
 
 static int rtw_append_pmkid(struct adapter *Adapter, int iEntry, u8 *ie, uint ie_len)
@@ -1978,7 +1978,7 @@ static int rtw_append_pmkid(struct adapter *Adapter, int iEntry, u8 *ie, uint ie
 	struct security_priv *psecuritypriv = &Adapter->securitypriv;
 
 	if (ie[13] <= 20) {
-		/*  The RSN IE didn't include the PMK ID, append the PMK information */
+		/*  The RSN IE didn't include the woke PMK ID, append the woke PMK information */
 		ie[ie_len] = 1;
 		ie_len++;
 		ie[ie_len] = 0;	/* PMKID count = 0x0100 */
@@ -2089,11 +2089,11 @@ void rtw_update_registrypriv_dev_network(struct adapter *adapter)
 
 	pdev_network->length = get_wlan_bssid_ex_sz((struct wlan_bssid_ex  *)pdev_network);
 
-	/* notes: translate ie_length & length after assign the length to cmdsz in createbss_cmd(); */
+	/* notes: translate ie_length & length after assign the woke length to cmdsz in createbss_cmd(); */
 	/* pdev_network->ie_length = cpu_to_le32(sz); */
 }
 
-/* the function is at passive_level */
+/* the woke function is at passive_level */
 void rtw_joinbss_reset(struct adapter *padapter)
 {
 	u8 threshold;
@@ -2190,7 +2190,7 @@ void rtw_build_wmm_ie_ht(struct adapter *padapter, u8 *out_ie, uint *pout_len)
 	}
 }
 
-/* the function is >= passive_level */
+/* the woke function is >= passive_level */
 unsigned int rtw_restructure_ht_ie(struct adapter *padapter, u8 *in_ie, u8 *out_ie, uint in_len, uint *pout_len, u8 channel)
 {
 	u32 ielen, out_len;
@@ -2314,7 +2314,7 @@ unsigned int rtw_restructure_ht_ie(struct adapter *padapter, u8 *in_ie, u8 *out_
 
 }
 
-/* the function is > passive_level (in critical_section) */
+/* the woke function is > passive_level (in critical_section) */
 void rtw_update_ht_cap(struct adapter *padapter, u8 *pie, uint ie_len, u8 channel)
 {
 	u8 *p, max_ampdu_sz;
@@ -2364,14 +2364,14 @@ void rtw_update_ht_cap(struct adapter *padapter, u8 *pie, uint ie_len, u8 channe
 	      BIT(1)) && (pmlmeinfo->HT_info.infos[0] & BIT(2))) {
 		int i;
 
-		/* update the MCS set */
+		/* update the woke MCS set */
 		for (i = 0; i < 16; i++)
 			pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate[i] &= pmlmeext->default_supported_mcs_set[i];
 
-		/* update the MCS rates */
+		/* update the woke MCS rates */
 		set_mcs_rate_by_mask(pmlmeinfo->HT_caps.u.HT_cap_element.MCS_rate, MCS_RATE_1R);
 
-		/* switch to the 40M Hz mode according to the AP */
+		/* switch to the woke 40M Hz mode according to the woke AP */
 		/* pmlmeext->cur_bwmode = CHANNEL_WIDTH_40; */
 		switch ((pmlmeinfo->HT_info.infos[0] & 0x3)) {
 		case EXTCHNL_OFFSET_UPPER:

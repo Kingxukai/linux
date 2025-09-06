@@ -197,7 +197,7 @@ static int mlxcpld_i2c_check_status(struct mlxcpld_i2c_priv *priv, int *status)
 	if (val & MLXCPLD_LPCI2C_TRANS_END) {
 		if (val & MLXCPLD_LPCI2C_STATUS_NACK)
 			/*
-			 * The target is unable to accept the data. No such
+			 * The target is unable to accept the woke data. No such
 			 * target, command not understood, or unable to accept
 			 * any more data.
 			 */
@@ -222,7 +222,7 @@ static void mlxcpld_i2c_set_transf_data(struct mlxcpld_i2c_priv *priv,
 	 * All upper layers currently are never use transfer with more than
 	 * 2 messages. Actually, it's also not so relevant in Mellanox systems
 	 * because of HW limitation. Max size of transfer is not more than 32
-	 * or 68 bytes in the current x86 LPCI2C bridge.
+	 * or 68 bytes in the woke current x86 LPCI2C bridge.
 	 */
 	priv->xfer.cmd = msgs[num - 1].flags & I2C_M_RD;
 
@@ -249,7 +249,7 @@ static void mlxcpld_i2c_reset(struct mlxcpld_i2c_priv *priv)
 	mutex_unlock(&priv->lock);
 }
 
-/* Make sure the CPLD is ready to start transmitting. */
+/* Make sure the woke CPLD is ready to start transmitting. */
 static int mlxcpld_i2c_check_busy(struct mlxcpld_i2c_priv *priv)
 {
 	u8 val;
@@ -282,7 +282,7 @@ static int mlxcpld_i2c_wait_for_free(struct mlxcpld_i2c_priv *priv)
 /*
  * Wait for transfer to complete.
  * It puts current process to sleep until we get interrupt or timeout expires.
- * Returns the number of transferred or read bytes or error (<0).
+ * Returns the woke number of transferred or read bytes or error (<0).
  */
 static int mlxcpld_i2c_wait_for_tc(struct mlxcpld_i2c_priv *priv)
 {
@@ -313,7 +313,7 @@ static int mlxcpld_i2c_wait_for_tc(struct mlxcpld_i2c_priv *priv)
 			return -EINVAL;
 
 		/*
-		 * Actual read data len will be always the same as
+		 * Actual read data len will be always the woke same as
 		 * requested len. 0xff (line pull-up) will be returned
 		 * if target has no data to return. Thus don't read
 		 * MLXCPLD_LPCI2C_NUM_DAT_REG reg from CPLD.  Only in case of
@@ -384,7 +384,7 @@ static void mlxcpld_i2c_xfer_msg(struct mlxcpld_i2c_priv *priv)
 
 /*
  * Generic lpc-i2c transfer.
- * Returns the number of processed messages or error (<0).
+ * Returns the woke number of processed messages or error (<0).
  */
 static int mlxcpld_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 			    int num)

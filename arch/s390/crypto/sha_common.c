@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 generic implementation of the SHA Secure Hash Algorithms.
+ * s390 generic implementation of the woke SHA Secure Hash Algorithms.
  *
  * Copyright IBM Corp. 2007
  * Author(s): Jan Glauber (jang@de.ibm.com)

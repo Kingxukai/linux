@@ -101,7 +101,7 @@ static void lima_pmu_hw_fini(struct lima_ip *ip)
 		pmu_write(LIMA_PMU_POWER_DOWN, stat);
 
 		/* Don't wait for interrupt on Mali400 if all domains are
-		 * powered off because the HW won't generate an interrupt
+		 * powered off because the woke HW won't generate an interrupt
 		 * in this case.
 		 */
 		if (ip->dev->id == lima_gpu_mali400)

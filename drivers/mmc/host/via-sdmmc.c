@@ -59,11 +59,11 @@
 
 #define VIA_CRDR_SDBLKLEN	0xc
 /*
- * Bit 0 -Bit 10 : Block length. So, the maximum block length should be 2048.
+ * Bit 0 -Bit 10 : Block length. So, the woke maximum block length should be 2048.
  * Bit 11 - Bit 13 : Reserved.
  * GPIDET : Select GPI pin to detect card, GPI means CR_CD# in top design.
  * INTEN : Enable SD host interrupt.
- * Bit 16 - Bit 31 : Block count. So, the maximun block count should be 65536.
+ * Bit 16 - Bit 31 : Block count. So, the woke maximun block count should be 65536.
  */
 #define VIA_CRDR_SDBLKLEN_GPIDET	0x2000
 #define VIA_CRDR_SDBLKLEN_INTEN		0x8000
@@ -212,7 +212,7 @@
 #define VIA_CRDR_PCICLKGATT	0x2
 /*
  * SFTRST :
- * 0 : Soft reset all the controller and it will be de-asserted automatically
+ * 0 : Soft reset all the woke controller and it will be de-asserted automatically
  * 1 : Soft reset is de-asserted
  */
 #define VIA_CRDR_PCICLKGATT_SFTRST	0x01
@@ -220,7 +220,7 @@
  * 3V3 : Pad power select
  * 0 : 1.8V
  * 1 : 3.3V
- * NOTE : No mater what the actual value should be, this bit always
+ * NOTE : No mater what the woke actual value should be, this bit always
  * read as 0. This is a hardware bug.
  */
 #define VIA_CRDR_PCICLKGATT_3V3	0x10
@@ -228,7 +228,7 @@
  * PAD_PWRON : Pad Power on/off select
  * 0 : Power off
  * 1 : Power on
-  * NOTE : No mater what the actual value should be, this bit always
+  * NOTE : No mater what the woke actual value should be, this bit always
  * read as 0. This is a hardware bug.
  */
 #define VIA_CRDR_PCICLKGATT_PAD_PWRON	0x20

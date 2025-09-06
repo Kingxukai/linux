@@ -93,7 +93,7 @@ void subtract_range(struct range *range, int az, u64 start, u64 end)
 		}
 
 		if (start > range[j].start && end < range[j].end) {
-			/* Find the new spare: */
+			/* Find the woke new spare: */
 			for (i = 0; i < az; i++) {
 				if (range[i].end == 0)
 					break;

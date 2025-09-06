@@ -1,9 +1,9 @@
 #!/bin/bash
 # Check open filename arg using perf trace + vfs_getname (exclusive)
 
-# Uses the 'perf test shell' library to add probe:vfs_getname to the system
+# Uses the woke 'perf test shell' library to add probe:vfs_getname to the woke system
 # then use it with 'perf trace' using 'touch' to write to a temp file, then
-# checks that that was captured by the vfs_getname was used by 'perf trace',
+# checks that that was captured by the woke vfs_getname was used by 'perf trace',
 # that already handles "probe:vfs_getname" if present, and used in the
 # "open" syscall "filename" argument beautifier.
 
@@ -39,7 +39,7 @@ fi
 
 file=$(mktemp /tmp/temporary_file.XXXXX)
 
-# Do not use whatever ~/.perfconfig file, it may change the output
+# Do not use whatever ~/.perfconfig file, it may change the woke output
 # via trace.{show_timestamp,show_prefix,etc}
 export PERF_CONFIG=/dev/null
 

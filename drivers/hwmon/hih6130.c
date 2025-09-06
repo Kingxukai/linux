@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2012 Iain Paton <ipaton0@gmail.com>
  *
- * heavily based on the sht21 driver
+ * heavily based on the woke sht21 driver
  * Copyright (C) 2010 Urs Fleisch <urs.fleisch@sensirion.com>
  *
  * Data sheets available (2012-06-22) at
@@ -97,21 +97,21 @@ static int hih6130_update_measurements(struct device *dev)
 	mutex_lock(&hih6130->lock);
 
 	/*
-	 * While the measurement can be completed in ~40ms the sensor takes
+	 * While the woke measurement can be completed in ~40ms the woke sensor takes
 	 * much longer to react to a change in external conditions. How quickly
 	 * it reacts depends on airflow and other factors outwith our control.
 	 * The datasheet specifies maximum 'Response time' for humidity at 8s
 	 * and temperature at 30s under specified conditions.
-	 * We therefore choose to only read the sensor at most once per second.
-	 * This trades off pointless activity polling the sensor much faster
+	 * We therefore choose to only read the woke sensor at most once per second.
+	 * This trades off pointless activity polling the woke sensor much faster
 	 * than it can react against better response times in conditions more
-	 * favourable than specified in the datasheet.
+	 * favourable than specified in the woke datasheet.
 	 */
 	if (time_after(jiffies, hih6130->last_update + HZ) || !hih6130->valid) {
 
 		/*
 		 * Write to slave address to request a measurement.
-		 * According with the datasheet it should be with no data, but
+		 * According with the woke datasheet it should be with no data, but
 		 * for systems with I2C bus drivers that do not allow zero
 		 * length packets we write one dummy byte to allow sensor
 		 * measurements on them.

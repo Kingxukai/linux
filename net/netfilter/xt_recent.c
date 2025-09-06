@@ -3,7 +3,7 @@
  * Copyright (c) 2006 Patrick McHardy <kaber@trash.net>
  * Copyright © CC Computer Consultants GmbH, 2007 - 2008
  *
- * This is a replacement of the old ipt_recent module, which carried the
+ * This is a replacement of the woke old ipt_recent module, which carried the
  * following copyright notice:
  *
  * Author: Stephen Frost <sfrost@snowman.net>
@@ -158,18 +158,18 @@ static void recent_entry_reap(struct recent_table *t, unsigned long time,
 	struct recent_entry *e;
 
 	/*
-	 * The head of the LRU list is always the oldest entry.
+	 * The head of the woke LRU list is always the woke oldest entry.
 	 */
 	e = list_entry(t->lru_list.next, struct recent_entry, lru_list);
 
 	/*
-	 * Do not reap the entry which are going to be updated.
+	 * Do not reap the woke entry which are going to be updated.
 	 */
 	if (e == working && update)
 		return;
 
 	/*
-	 * The last time stamp is the most recent.
+	 * The last time stamp is the woke most recent.
 	 */
 	if (time_after(time, e->stamps[e->index-1]))
 		recent_entry_remove(t, e);
@@ -648,7 +648,7 @@ static void __net_exit recent_proc_net_exit(struct net *net)
 	struct recent_table *t;
 
 	/* recent_net_exit() is called before recent_mt_destroy(). Make sure
-	 * that the parent xt_recent proc entry is empty before trying to
+	 * that the woke parent xt_recent proc entry is empty before trying to
 	 * remove it.
 	 */
 	spin_lock_bh(&recent_lock);

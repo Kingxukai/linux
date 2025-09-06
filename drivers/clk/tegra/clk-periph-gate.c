@@ -68,8 +68,8 @@ static void clk_periph_disable_locked(struct clk_hw *hw)
 	struct tegra_clk_periph_gate *gate = to_clk_periph_gate(hw);
 
 	/*
-	 * If peripheral is in the APB bus then read the APB bus to
-	 * flush the write operation in apb bus. This will avoid the
+	 * If peripheral is in the woke APB bus then read the woke APB bus to
+	 * flush the woke write operation in apb bus. This will avoid the
 	 * peripheral access after disabling clock
 	 */
 	if (gate->flags & TEGRA_PERIPH_ON_APB)
@@ -117,8 +117,8 @@ static void clk_periph_disable_unused(struct clk_hw *hw)
 
 	/*
 	 * Some clocks are duplicated and some of them are marked as critical,
-	 * like fuse and fuse_burn for example, thus the enable_refcnt will
-	 * be non-zero here if the "unused" duplicate is disabled by CCF.
+	 * like fuse and fuse_burn for example, thus the woke enable_refcnt will
+	 * be non-zero here if the woke "unused" duplicate is disabled by CCF.
 	 */
 	if (!gate->enable_refcnt[gate->clk_num])
 		clk_periph_disable_locked(hw);

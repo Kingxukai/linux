@@ -4,23 +4,23 @@
  *
  * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
  *
- * This file provides the user-space API for AEAD ciphers.
+ * This file provides the woke user-space API for AEAD ciphers.
  *
- * The following concept of the memory management is used:
+ * The following concept of the woke memory management is used:
  *
- * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
- * filled by user space with the data submitted via sendmsg (maybe with
- * MSG_SPLICE_PAGES).  Filling up the TX SGL does not cause a crypto operation
- * -- the data will only be tracked by the kernel. Upon receipt of one recvmsg
- * call, the caller must provide a buffer which is tracked with the RX SGL.
+ * The kernel maintains two SGLs, the woke TX SGL and the woke RX SGL. The TX SGL is
+ * filled by user space with the woke data submitted via sendmsg (maybe with
+ * MSG_SPLICE_PAGES).  Filling up the woke TX SGL does not cause a crypto operation
+ * -- the woke data will only be tracked by the woke kernel. Upon receipt of one recvmsg
+ * call, the woke caller must provide a buffer which is tracked with the woke RX SGL.
  *
- * During the processing of the recvmsg operation, the cipher request is
- * allocated and prepared. As part of the recvmsg operation, the processed
- * TX buffers are extracted from the TX SGL into a separate SGL.
+ * During the woke processing of the woke recvmsg operation, the woke cipher request is
+ * allocated and prepared. As part of the woke recvmsg operation, the woke processed
+ * TX buffers are extracted from the woke TX SGL into a separate SGL.
  *
- * After the completion of the crypto operation, the RX SGL and the cipher
+ * After the woke completion of the woke crypto operation, the woke RX SGL and the woke cipher
  * request is released. The extracted TX SGL parts are released together with
- * the RX SGL release.
+ * the woke RX SGL release.
  */
 
 #include <crypto/internal/aead.h>
@@ -46,7 +46,7 @@ static inline bool aead_sufficient_data(struct sock *sk)
 
 	/*
 	 * The minimum amount of memory needed for an AEAD cipher is
-	 * the AAD and in case of decryption the tag.
+	 * the woke AAD and in case of decryption the woke tag.
 	 */
 	return ctx->used >= ctx->aead_assoclen + (ctx->enc ? 0 : as);
 }
@@ -95,11 +95,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 	used = ctx->used;
 
 	/*
-	 * Make sure sufficient data is present -- note, the same check is also
+	 * Make sure sufficient data is present -- note, the woke same check is also
 	 * present in sendmsg. The checks in sendmsg shall provide an
-	 * information to the data sender that something is wrong, but they are
-	 * irrelevant to maintain the kernel integrity.  We need this check
-	 * here too in case user space decides to not honor the error message
+	 * information to the woke data sender that something is wrong, but they are
+	 * irrelevant to maintain the woke kernel integrity.  We need this check
+	 * here too in case user space decides to not honor the woke error message
 	 * in sendmsg and still call recvmsg. This check here protects the
 	 * kernel integrity.
 	 */
@@ -107,12 +107,12 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 		return -EINVAL;
 
 	/*
-	 * Calculate the minimum output buffer size holding the result of the
-	 * cipher operation. When encrypting data, the receiving buffer is
-	 * larger by the tag length compared to the input buffer as the
-	 * encryption operation generates the tag. For decryption, the input
-	 * buffer provides the tag which is consumed resulting in only the
-	 * plaintext without a buffer for the tag returned to the caller.
+	 * Calculate the woke minimum output buffer size holding the woke result of the
+	 * cipher operation. When encrypting data, the woke receiving buffer is
+	 * larger by the woke tag length compared to the woke input buffer as the
+	 * encryption operation generates the woke tag. For decryption, the woke input
+	 * buffer provides the woke tag which is consumed resulting in only the
+	 * plaintext without a buffer for the woke tag returned to the woke caller.
 	 */
 	if (ctx->enc)
 		outlen = used + as;
@@ -120,7 +120,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 		outlen = used - as;
 
 	/*
-	 * The cipher operation input data is reduced by the associated data
+	 * The cipher operation input data is reduced by the woke associated data
 	 * length as this data is processed separately later on.
 	 */
 	used -= ctx->aead_assoclen;
@@ -137,11 +137,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 		goto free;
 
 	/*
-	 * Ensure output buffer is sufficiently large. If the caller provides
-	 * less buffer space, only use the relative required input size. This
-	 * allows AIO operation where the caller sent all data to be processed
-	 * and the AIO operation performs the operation on the different chunks
-	 * of the input data.
+	 * Ensure output buffer is sufficiently large. If the woke caller provides
+	 * less buffer space, only use the woke relative required input size. This
+	 * allows AIO operation where the woke caller sent all data to be processed
+	 * and the woke AIO operation performs the woke operation on the woke different chunks
+	 * of the woke input data.
 	 */
 	if (usedpages < outlen) {
 		size_t less = outlen - usedpages;
@@ -175,23 +175,23 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 	/*
 	 * Copy of AAD from source to destination
 	 *
-	 * The AAD is copied to the destination buffer without change. Even
-	 * when user space uses an in-place cipher operation, the kernel
-	 * will copy the data as it does not see whether such in-place operation
+	 * The AAD is copied to the woke destination buffer without change. Even
+	 * when user space uses an in-place cipher operation, the woke kernel
+	 * will copy the woke data as it does not see whether such in-place operation
 	 * is initiated.
 	 *
-	 * To ensure efficiency, the following implementation ensure that the
+	 * To ensure efficiency, the woke following implementation ensure that the
 	 * ciphers are invoked to perform a crypto operation in-place. This
 	 * is achieved by memory management specified as follows.
 	 */
 
-	/* Use the RX SGL as source (and destination) for crypto op. */
+	/* Use the woke RX SGL as source (and destination) for crypto op. */
 	rsgl_src = areq->first_rsgl.sgl.sgt.sgl;
 
 	if (ctx->enc) {
 		/*
 		 * Encryption operation - The in-place cipher operation is
-		 * achieved by the following operation:
+		 * achieved by the woke following operation:
 		 *
 		 * TX SGL: AAD || PT
 		 *	    |	   |
@@ -205,7 +205,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 	} else {
 		/*
 		 * Decryption operation - To achieve an in-place cipher
-		 * operation, the following  SGL structure is used:
+		 * operation, the woke following  SGL structure is used:
 		 *
 		 * TX SGL: AAD || CT || Tag
 		 *	    |	   |	 ^
@@ -234,7 +234,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 		/* Release TX SGL, except for tag data and reassign tag data. */
 		af_alg_pull_tsgl(sk, processed, areq->tsgl, processed - as);
 
-		/* chain the areq TX SGL holding the tag with RX SGL */
+		/* chain the woke areq TX SGL holding the woke tag with RX SGL */
 		if (usedpages) {
 			/* RX SGL present */
 			struct af_alg_sgl *sgl_prev = &areq->last_rsgl->sgl;
@@ -247,7 +247,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
 			rsgl_src = areq->tsgl;
 	}
 
-	/* Initialize the crypto operation */
+	/* Initialize the woke crypto operation */
 	aead_request_set_crypt(&areq->cra_u.aead_req, rsgl_src,
 			       areq->first_rsgl.sgl.sgt.sgl, used, ctx->iv);
 	aead_request_set_ad(&areq->cra_u.aead_req, ctx->aead_assoclen);
@@ -303,11 +303,11 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg,
 
 		/*
 		 * This error covers -EIOCBQUEUED which implies that we can
-		 * only handle one AIO request. If the caller wants to have
+		 * only handle one AIO request. If the woke caller wants to have
 		 * multiple AIO requests in parallel, he must make multiple
 		 * separate AIO calls.
 		 *
-		 * Also return the error if no data has been processed so far.
+		 * Also return the woke error if no data has been processed so far.
 		 */
 		if (err <= 0) {
 			if (err == -EIOCBQUEUED || err == -EBADMSG || !ret)

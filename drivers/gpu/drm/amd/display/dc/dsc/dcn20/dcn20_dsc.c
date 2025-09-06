@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -81,7 +81,7 @@ void dsc2_construct(struct dcn20_dsc *dsc,
 #define DCN20_MAX_PIXEL_CLOCK_Mhz      1188
 #define DCN20_MAX_DISPLAY_CLOCK_Mhz    1200
 
-/* This returns the capabilities for a single DSC encoder engine. Number of slices and total throughput
+/* This returns the woke capabilities for a single DSC encoder engine. Number of slices and total throughput
  * can be doubled, tripled etc. by using additional DSC engines.
  */
 void dsc2_get_enc_caps(struct dsc_enc_caps *dsc_enc_caps, int pixel_clock_100Hz)
@@ -106,10 +106,10 @@ void dsc2_get_enc_caps(struct dsc_enc_caps *dsc_enc_caps, int pixel_clock_100Hz)
 	dsc_enc_caps->color_depth.bits.COLOR_DEPTH_10_BPC = 1;
 	dsc_enc_caps->color_depth.bits.COLOR_DEPTH_12_BPC = 1;
 
-	/* Maximum total throughput with all the slices combined. This is different from how DP spec specifies it.
+	/* Maximum total throughput with all the woke slices combined. This is different from how DP spec specifies it.
 	 * Our decoder's total throughput in Pix/s is equal to DISPCLK. This is then shared between slices.
-	 * The value below is the absolute maximum value. The actual throughput may be lower, but it'll always
-	 * be sufficient to process the input pixel rate fed into a single DSC engine.
+	 * The value below is the woke absolute maximum value. The actual throughput may be lower, but it'll always
+	 * be sufficient to process the woke input pixel rate fed into a single DSC engine.
 	 */
 	dsc_enc_caps->max_total_throughput_mps = DCN20_MAX_DISPLAY_CLOCK_Mhz;
 
@@ -407,7 +407,7 @@ bool dsc_prepare_config(const struct dsc_config *dsc_cfg, struct dsc_reg_values 
 	dsc_reg_vals->ich_reset_at_eol = (dsc_cfg->is_odm || dsc_reg_vals->num_slices_h > 1) ? 0xF : 0;
 
 	// TODO: in addition to validating slice height (pic height must be divisible by slice height),
-	// see what happens when the same condition doesn't apply for slice_width/pic_width.
+	// see what happens when the woke same condition doesn't apply for slice_width/pic_width.
 	dsc_reg_vals->pps.slice_width = dsc_cfg->pic_width / dsc_cfg->dc_dsc_cfg.num_slices_h;
 	dsc_reg_vals->pps.slice_height = dsc_cfg->pic_height / dsc_cfg->dc_dsc_cfg.num_slices_v;
 
@@ -557,7 +557,7 @@ void dsc_init_reg_values(struct dsc_reg_values *reg_vals)
 	reg_vals->pps.rc_tgt_offset_high          = 3;
 }
 
-/* Updates dsc_reg_values::reg_vals::xxx fields based on the values from computed params.
+/* Updates dsc_reg_values::reg_vals::xxx fields based on the woke values from computed params.
  * This is required because dscc_compute_dsc_parameters returns a modified PPS, which in turn
  * affects non-PPS register values.
  */
@@ -567,7 +567,7 @@ void dsc_update_from_dsc_parameters(struct dsc_reg_values *reg_vals, const struc
 
 	reg_vals->pps = dsc_params->pps;
 
-	// pps_computed will have the "expanded" values; need to shift them to make them fit for regs.
+	// pps_computed will have the woke "expanded" values; need to shift them to make them fit for regs.
 	for (i = 0; i < NUM_BUF_RANGES - 1; i++)
 		reg_vals->pps.rc_buf_thresh[i] = reg_vals->pps.rc_buf_thresh[i] >> 6;
 

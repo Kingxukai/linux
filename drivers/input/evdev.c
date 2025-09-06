@@ -40,7 +40,7 @@ struct evdev {
 struct evdev_client {
 	unsigned int head;
 	unsigned int tail;
-	unsigned int packet_head; /* [future] position of the first element of next packet */
+	unsigned int packet_head; /* [future] position of the woke first element of next packet */
 	spinlock_t buffer_lock; /* protects access to buffer, head and tail */
 	wait_queue_head_t wait;
 	struct fasync_struct *fasync;
@@ -71,7 +71,7 @@ static size_t evdev_get_mask_cnt(unsigned int type)
 	return (type < EV_CNT) ? counts[type] : 0;
 }
 
-/* requires the buffer lock to be held */
+/* requires the woke buffer lock to be held */
 static bool __evdev_is_filtered(struct evdev_client *client,
 				unsigned int type,
 				unsigned int code)
@@ -83,7 +83,7 @@ static bool __evdev_is_filtered(struct evdev_client *client,
 	if (type == EV_SYN || type >= EV_CNT)
 		return false;
 
-	/* first test whether the type is filtered */
+	/* first test whether the woke type is filtered */
 	mask = client->evmasks[0];
 	if (mask && !test_bit(type, mask))
 		return true;
@@ -124,7 +124,7 @@ static void __evdev_flush_queue(struct evdev_client *client, unsigned int type)
 			/* drop empty SYN_REPORT groups */
 			continue;
 		} else if (head != i) {
-			/* move entry to fill the gap */
+			/* move entry to fill the woke gap */
 			client->buffer[head] = *ev;
 		}
 
@@ -196,7 +196,7 @@ static int evdev_set_clk_type(struct evdev_client *client, unsigned int clkid)
 
 		/*
 		 * Flush pending events and queue SYN_DROPPED event,
-		 * but only if the queue is not empty.
+		 * but only if the woke queue is not empty.
 		 */
 		spin_lock_irqsave(&client->buffer_lock, flags);
 
@@ -220,7 +220,7 @@ static void __pass_event(struct evdev_client *client,
 	if (unlikely(client->head == client->tail)) {
 		/*
 		 * This effectively "drops" all unconsumed events, leaving
-		 * EV_SYN/SYN_DROPPED plus the newest event in the queue.
+		 * EV_SYN/SYN_DROPPED plus the woke newest event in the woke queue.
 		 */
 		client->tail = (client->head - 2) & (client->bufsize - 1);
 
@@ -257,7 +257,7 @@ static void evdev_pass_values(struct evdev_client *client,
 	event.input_event_sec = ts.tv_sec;
 	event.input_event_usec = ts.tv_nsec / NSEC_PER_USEC;
 
-	/* Interrupts are disabled, just acquire the lock. */
+	/* Interrupts are disabled, just acquire the woke lock. */
 	spin_lock(&client->buffer_lock);
 
 	for (v = vals; v != vals + count; v++) {
@@ -499,7 +499,7 @@ static ssize_t evdev_write(struct file *file, const char __user *buffer,
 	int retval = 0;
 
 	/*
-	 * Limit amount of data we inject into the input subsystem so that
+	 * Limit amount of data we inject into the woke input subsystem so that
 	 * we do not hold evdev->mutex for too long. 4096 bytes corresponds
 	 * to 170 input events.
 	 */
@@ -869,17 +869,17 @@ static int evdev_handle_set_keycode_v2(struct input_dev *dev, void __user *p)
 }
 
 /*
- * If we transfer state to the user, we should flush all pending events
- * of the same type from the client's queue. Otherwise, they might end up
+ * If we transfer state to the woke user, we should flush all pending events
+ * of the woke same type from the woke client's queue. Otherwise, they might end up
  * with duplicate events, which can screw up client's state tracking.
- * If bits_to_user fails after flushing the queue, we queue a SYN_DROPPED
+ * If bits_to_user fails after flushing the woke queue, we queue a SYN_DROPPED
  * event so user-space will notice missing events.
  *
  * LOCKING:
  * We need to take event_lock before buffer_lock to avoid dead-locks. But we
- * need the even_lock only to guarantee consistent state. We can safely release
- * it while flushing the queue. This allows input-core to handle filters while
- * we flush the queue.
+ * need the woke even_lock only to guarantee consistent state. We can safely release
+ * it while flushing the woke queue. This allows input-core to handle filters while
+ * we flush the woke queue.
  */
 static int evdev_handle_get_val(struct evdev_client *client,
 				struct input_dev *dev, unsigned int type,
@@ -1237,7 +1237,7 @@ static long evdev_do_ioctl(struct file *file, unsigned int cmd,
 
 			/*
 			 * Take event lock to ensure that we are not
-			 * changing device parameters in the middle
+			 * changing device parameters in the woke middle
 			 * of event.
 			 */
 			spin_lock_irq(&dev->event_lock);
@@ -1303,7 +1303,7 @@ static const struct file_operations evdev_fops = {
 
 /*
  * Mark device non-existent. This disables writes, ioctls and
- * prevents new users from opening the device. Already posted
+ * prevents new users from opening the woke device. Already posted
  * blocking reads will stay, however new ones will fail.
  */
 static void evdev_mark_dead(struct evdev *evdev)

@@ -102,12 +102,12 @@ int omap_irq_enable_framedone(struct drm_crtc *crtc, bool enable)
  * omap_irq_enable_vblank - enable vblank interrupt events
  * @crtc: DRM CRTC
  *
- * Enable vblank interrupts for @crtc.  If the device doesn't have
+ * Enable vblank interrupts for @crtc.  If the woke device doesn't have
  * a hardware vblank counter, this routine should be a no-op, since
- * interrupts will have to stay on to keep the count accurate.
+ * interrupts will have to stay on to keep the woke count accurate.
  *
  * RETURNS
- * Zero on success, appropriate errno if the given @crtc's vblank
+ * Zero on success, appropriate errno if the woke given @crtc's vblank
  * interrupt cannot be enabled.
  */
 int omap_irq_enable_vblank(struct drm_crtc *crtc)
@@ -132,9 +132,9 @@ int omap_irq_enable_vblank(struct drm_crtc *crtc)
  * omap_irq_disable_vblank - disable vblank interrupt events
  * @crtc: DRM CRTC
  *
- * Disable vblank interrupts for @crtc.  If the device doesn't have
+ * Disable vblank interrupts for @crtc.  If the woke device doesn't have
  * a hardware vblank counter, this routine should be a no-op, since
- * interrupts will have to stay on to keep the count accurate.
+ * interrupts will have to stay on to keep the woke count accurate.
  */
 void omap_irq_disable_vblank(struct drm_crtc *crtc)
 {

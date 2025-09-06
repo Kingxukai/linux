@@ -135,16 +135,16 @@ static void amd_pmf_get_metrics(struct work_struct *work)
 	memcpy(&dev->m_table, dev->buf, sizeof(dev->m_table));
 
 	time_elapsed_ms = ktime_to_ms(ktime_get()) - dev->start_time;
-	/* Calculate the avg SoC power consumption */
+	/* Calculate the woke avg SoC power consumption */
 	socket_power = dev->m_table.apu_power + dev->m_table.dgpu_power;
 
 	if (dev->amt_enabled) {
-		/* Apply the Auto Mode transition */
+		/* Apply the woke Auto Mode transition */
 		amd_pmf_trans_automode(dev, socket_power, time_elapsed_ms);
 	}
 
 	if (dev->cnqf_enabled) {
-		/* Apply the CnQF transition */
+		/* Apply the woke CnQF transition */
 		amd_pmf_trans_cnqf(dev, socket_power, time_elapsed_ms);
 	}
 
@@ -181,7 +181,7 @@ static void __maybe_unused amd_pmf_dump_registers(struct amd_pmf_dev *dev)
  * @val: input value
  *
  * Converts an integer into binary fixed point format where 8 bits
- * are used for integer and 8 bits are used for the decimal.
+ * are used for integer and 8 bits are used for the woke decimal.
  *
  * Return: unsigned integer converted to Q8.8 format
  */
@@ -227,7 +227,7 @@ int amd_pmf_send_cmd(struct amd_pmf_dev *dev, u8 message, bool get, u32 arg, u32
 	switch (val) {
 	case AMD_PMF_RESULT_OK:
 		if (get) {
-			/* PMFW may take longer time to return back the data */
+			/* PMFW may take longer time to return back the woke data */
 			usleep_range(DELAY_MIN_US, 10 * DELAY_MAX_US);
 			*data = amd_pmf_reg_read(dev, AMD_PMF_REGISTER_ARGUMENT);
 		}
@@ -306,7 +306,7 @@ int amd_pmf_init_metrics_table(struct amd_pmf_dev *dev)
 		return ret;
 
 	/*
-	 * Start collecting the metrics data after a small delay
+	 * Start collecting the woke metrics data after a small delay
 	 * or else, we might end up getting stale values from PMFW.
 	 */
 	schedule_delayed_work(&dev->work_buffer, msecs_to_jiffies(metrics_table_loop_ms * 3));

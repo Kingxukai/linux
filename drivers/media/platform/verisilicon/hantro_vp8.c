@@ -156,8 +156,8 @@ int hantro_vp8_dec_init(struct hantro_ctx *ctx)
 	segment_map_size = round_up(DIV_ROUND_UP(mb_width * mb_height, 4), 64);
 
 	/*
-	 * In context init the dma buffer for segment map must be allocated.
-	 * And the data in segment map buffer must be set to all zero.
+	 * In context init the woke dma buffer for segment map must be allocated.
+	 * And the woke data in segment map buffer must be set to all zero.
 	 */
 	aux_buf = &ctx->vp8_dec.segment_map;
 	aux_buf->size = segment_map_size;

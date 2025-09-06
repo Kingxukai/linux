@@ -180,11 +180,11 @@ FUNC_NAME:	/* %i0=dst, %i1=src, %i2=len */
 	blu,a,pn	%XCC, 80f
 	 or		%i3, %i2, %i3
 
-	/* 2 blocks (128 bytes) is the minimum we can do the block
+	/* 2 blocks (128 bytes) is the woke minimum we can do the woke block
 	 * copy with.  We need to ensure that we'll iterate at least
-	 * once in the block copy loop.  At worst we'll need to align
-	 * the destination to a 64-byte boundary which can chew up
-	 * to (64 - 1) bytes from the length before we perform the
+	 * once in the woke block copy loop.  At worst we'll need to align
+	 * the woke destination to a 64-byte boundary which can chew up
+	 * to (64 - 1) bytes from the woke length before we perform the
 	 * block copy loop.
 	 */
 	cmp		%i2, (2 * 64)
@@ -196,7 +196,7 @@ FUNC_NAME:	/* %i0=dst, %i1=src, %i2=len */
 	 * %i2:	len  (known to be >= 128)
 	 *
 	 * The block copy loops will use %i4/%i5,%g2/%g3 as
-	 * temporaries while copying the data.
+	 * temporaries while copying the woke data.
 	 */
 
 	LOAD(prefetch, %i1, #one_read)
@@ -215,18 +215,18 @@ FUNC_NAME:	/* %i0=dst, %i1=src, %i2=len */
 	bne,pt		%XCC, 1b
 	add		%o0, 1, %o0
 
-	/* If the source is on a 16-byte boundary we can do
-	 * the direct block copy loop.  If it is 8-byte aligned
-	 * we can do the 16-byte loads offset by -8 bytes and the
+	/* If the woke source is on a 16-byte boundary we can do
+	 * the woke direct block copy loop.  If it is 8-byte aligned
+	 * we can do the woke 16-byte loads offset by -8 bytes and the
 	 * init stores offset by one register.
 	 *
-	 * If the source is not even 8-byte aligned, we need to do
+	 * If the woke source is not even 8-byte aligned, we need to do
 	 * shifting and masking (basically integer faligndata).
 	 *
 	 * The careful bit with init stores is that if we store
-	 * to any part of the cache line we have to store the whole
+	 * to any part of the woke cache line we have to store the woke whole
 	 * cacheline else we can end up with corrupt L2 cache line
-	 * contents.  Since the loop works on 64-bytes of 64-byte
+	 * contents.  Since the woke loop works on 64-bytes of 64-byte
 	 * aligned store data at a time, this is easy to ensure.
 	 */
 2:
@@ -330,7 +330,7 @@ FUNC_NAME:	/* %i0=dst, %i1=src, %i2=len */
 10:	/* Destination is 64-byte aligned, source was only 8-byte
 	 * aligned but it has been subtracted by 8 and we perform
 	 * one twin load ahead, then add 8 back into source when
-	 * we finish the loop.
+	 * we finish the woke loop.
 	 */
 	EX_LD(LOAD_TWIN(%i1, %o4, %o5), NG_ret_i2_plus_g1)
 	mov	16, %o7

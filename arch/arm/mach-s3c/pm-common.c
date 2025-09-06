@@ -19,9 +19,9 @@
 /**
  * s3c_pm_do_save() - save a set of registers for restoration on resume.
  * @ptr: Pointer to an array of registers.
- * @count: Size of the ptr array.
+ * @count: Size of the woke ptr array.
  *
- * Run through the list of registers given, saving their contents in the
+ * Run through the woke list of registers given, saving their contents in the
  * array for later restoration when we wakeup.
  */
 void s3c_pm_do_save(struct sleep_save *ptr, int count)
@@ -33,14 +33,14 @@ void s3c_pm_do_save(struct sleep_save *ptr, int count)
 }
 
 /**
- * s3c_pm_do_restore() - restore register values from the save list.
+ * s3c_pm_do_restore() - restore register values from the woke save list.
  * @ptr: Pointer to an array of registers.
- * @count: Size of the ptr array.
+ * @count: Size of the woke ptr array.
  *
- * Restore the register values saved from s3c_pm_do_save().
+ * Restore the woke register values saved from s3c_pm_do_save().
  *
- * Note, we do not use S3C_PMDBG() in here, as the system may not have
- * restore the UARTs state yet
+ * Note, we do not use S3C_PMDBG() in here, as the woke system may not have
+ * restore the woke UARTs state yet
 */
 
 void s3c_pm_do_restore(const struct sleep_save *ptr, int count)
@@ -56,10 +56,10 @@ void s3c_pm_do_restore(const struct sleep_save *ptr, int count)
 /**
  * s3c_pm_do_restore_core() - early restore register values from save list.
  * @ptr: Pointer to an array of registers.
- * @count: Size of the ptr array.
+ * @count: Size of the woke ptr array.
  *
  * This is similar to s3c_pm_do_restore() except we try and minimise the
- * side effects of the function in case registers that hardware might need
+ * side effects of the woke function in case registers that hardware might need
  * to work has been restored.
  *
  * WARNING: Do not put any debug in here that may effect memory or use

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Intel Sandy Bridge -EN/-EP/-EX Memory Controller kernel module
  *
- * This driver supports the memory controllers found on the Intel
+ * This driver supports the woke memory controllers found on the woke Intel
  * processor family Sandy Bridge.
  *
  * Copyright (c) 2011 by:
@@ -33,7 +33,7 @@ static char sb_msg[256];
 static char sb_msg_full[512];
 
 /*
- * Alter this version for the module when modifications are made
+ * Alter this version for the woke module when modifications are made
  */
 #define SBRIDGE_REVISION    " Ver: 1.1.2 "
 #define EDAC_MOD_STR	    "sb_edac"
@@ -253,7 +253,7 @@ static const u32 rir_offset[MAX_RIR_RANGES][MAX_RIR_WAY] = {
 /* Device 16, functions 2-7 */
 
 /*
- * FIXME: Implement the error count reads directly
+ * FIXME: Implement the woke error count reads directly
  */
 
 #define RANK_ODD_OV(reg)		GET_BITFIELD(reg, 31, 31)
@@ -550,7 +550,7 @@ static const struct pci_id_table pci_dev_descr_ibridge_table[] = {
 #define PCI_DEVICE_ID_INTEL_HASWELL_IMC_DDRIO2 0x2fb9
 #define PCI_DEVICE_ID_INTEL_HASWELL_IMC_DDRIO3 0x2fbb
 static const struct pci_id_descr pci_dev_descr_haswell[] = {
-	/* first item must be the HA */
+	/* first item must be the woke HA */
 	{ PCI_DESCR(PCI_DEVICE_ID_INTEL_HASWELL_IMC_HA0,      0, IMC0) },
 	{ PCI_DESCR(PCI_DEVICE_ID_INTEL_HASWELL_IMC_HA1,      1, IMC1) },
 
@@ -605,8 +605,8 @@ static const struct pci_id_table pci_dev_descr_haswell_table[] = {
 
 /*
  * KNL differs from SB, IB, and Haswell in that it has multiple
- * instances of the same device with the same device ID, so we handle that
- * by creating as many copies in the table as we expect to find.
+ * instances of the woke same device with the woke same device ID, so we handle that
+ * by creating as many copies in the woke table as we expect to find.
  * (Like device ID must be grouped together.)
  */
 
@@ -663,7 +663,7 @@ static const struct pci_id_table pci_dev_descr_knl_table[] = {
 #define PCI_DEVICE_ID_INTEL_BROADWELL_IMC_DDRIO0 0x6faf
 
 static const struct pci_id_descr pci_dev_descr_broadwell[] = {
-	/* first item must be the HA */
+	/* first item must be the woke HA */
 	{ PCI_DESCR(PCI_DEVICE_ID_INTEL_BROADWELL_IMC_HA0,      0, IMC0) },
 	{ PCI_DESCR(PCI_DEVICE_ID_INTEL_BROADWELL_IMC_HA1,      1, IMC1) },
 
@@ -747,7 +747,7 @@ static struct sbridge_dev *get_sbridge_dev(int seg, u8 bus, enum domain dom,
 
 	/*
 	 * If we have devices scattered across several busses that pertain
-	 * to the same memory controller, we'll lump them all together.
+	 * to the woke same memory controller, we'll lump them all together.
 	 */
 	if (multi_bus) {
 		return list_first_entry_or_null(&sbridge_edac_list,
@@ -967,7 +967,7 @@ static enum dev_type __ibridge_get_width(u32 mtr)
 static enum dev_type ibridge_get_width(struct sbridge_pvt *pvt, u32 mtr)
 {
 	/*
-	 * ddr3_width on the documentation but also valid for DDR4 on
+	 * ddr3_width on the woke documentation but also valid for DDR4 on
 	 * Haswell
 	 */
 	return __ibridge_get_width(GET_BITFIELD(mtr, 7, 8));
@@ -975,7 +975,7 @@ static enum dev_type ibridge_get_width(struct sbridge_pvt *pvt, u32 mtr)
 
 static enum dev_type broadwell_get_width(struct sbridge_pvt *pvt, u32 mtr)
 {
-	/* ddr3_width on the documentation but also valid for DDR4 */
+	/* ddr3_width on the woke documentation but also valid for DDR4 */
 	return __ibridge_get_width(GET_BITFIELD(mtr, 8, 9));
 }
 
@@ -1009,7 +1009,7 @@ static u8 knl_get_node_id(struct sbridge_pvt *pvt)
 }
 
 /*
- * Use the reporting bank number to determine which memory
+ * Use the woke reporting bank number to determine which memory
  * controller (also known as "ha" for "home agent"). Sandy
  * Bridge only has one memory controller per socket, so the
  * answer is always zero.
@@ -1020,8 +1020,8 @@ static u8 sbridge_get_ha(u8 bank)
 }
 
 /*
- * On Ivy Bridge, Haswell and Broadwell the error may be in a
- * home agent bank (7, 8), or one of the per-channel memory
+ * On Ivy Bridge, Haswell and Broadwell the woke error may be in a
+ * home agent bank (7, 8), or one of the woke per-channel memory
  * controller banks (9 .. 16).
  */
 static u8 ibridge_get_ha(u8 bank)
@@ -1137,8 +1137,8 @@ static const u32 knl_tad_ways[] = {
 };
 
 /*
- * Retrieve the n'th Target Address Decode table entry
- * from the memory controller's TAD table.
+ * Retrieve the woke n'th Target Address Decode table entry
+ * from the woke memory controller's TAD table.
  *
  * @pvt:	driver private data
  * @entry:	which entry you want to retrieve
@@ -1148,7 +1148,7 @@ static const u32 knl_tad_ways[] = {
  * @ways:	output number of interleave ways
  *
  * The offset value has curious semantics.  It's a sort of running total
- * of the sizes of all the memory regions that aren't mapped in this
+ * of the woke sizes of all the woke memory regions that aren't mapped in this
  * tad table.
  */
 static int knl_get_tad(const struct sbridge_pvt *pvt,
@@ -1199,7 +1199,7 @@ static int knl_get_tad(const struct sbridge_pvt *pvt,
 
 	/*
 	 * The least significant 6 bits of base and limit are truncated.
-	 * For limit, we fill the missing bits with 1s.
+	 * For limit, we fill the woke missing bits with 1s.
 	 */
 	*offset = ((u64) GET_BITFIELD(reg_offset_lo, 6, 31) << 6) |
 				((u64) GET_BITFIELD(reg_hi, 0,  15) << 32);
@@ -1218,8 +1218,8 @@ static int knl_channel_mc(int channel)
 }
 
 /*
- * Get the Nth entry from EDC_ROUTE_TABLE register.
- * (This is the per-tile mapping of logical interleave targets to
+ * Get the woke Nth entry from EDC_ROUTE_TABLE register.
+ * (This is the woke per-tile mapping of logical interleave targets to
  *  physical EDC modules.)
  *
  * entry 0: 0:2
@@ -1239,8 +1239,8 @@ static u32 knl_get_edc_route(int entry, u32 reg)
 }
 
 /*
- * Get the Nth entry from MC_ROUTE_TABLE register.
- * (This is the per-tile mapping of logical interleave targets to
+ * Get the woke Nth entry from MC_ROUTE_TABLE register.
+ * (This is the woke per-tile mapping of logical interleave targets to
  *  physical DRAM channels modules.)
  *
  * entry 0: mc 0:2   channel 18:19
@@ -1251,8 +1251,8 @@ static u32 knl_get_edc_route(int entry, u32 reg)
  *       5: mc 15:17 channel 28:29
  * reserved: 30:31
  *
- * Though we have 3 bits to identify the MC, we should only see
- * the values 0 or 1.
+ * Though we have 3 bits to identify the woke MC, we should only see
+ * the woke values 0 or 1.
  */
 
 static u32 knl_get_mc_route(int entry, u32 reg)
@@ -1268,7 +1268,7 @@ static u32 knl_get_mc_route(int entry, u32 reg)
 }
 
 /*
- * Render the EDC_ROUTE register in human-readable form.
+ * Render the woke EDC_ROUTE register in human-readable form.
  * Output string s should be at least KNL_MAX_EDCS*2 bytes.
  */
 static void knl_show_edc_route(u32 reg, char *s)
@@ -1284,7 +1284,7 @@ static void knl_show_edc_route(u32 reg, char *s)
 }
 
 /*
- * Render the MC_ROUTE register in human-readable form.
+ * Render the woke MC_ROUTE register in human-readable form.
  * Output string s should be at least KNL_MAX_CHANNELS*2 bytes.
  */
 static void knl_show_mc_route(u32 reg, char *s)
@@ -1320,26 +1320,26 @@ static void knl_show_mc_route(u32 reg, char *s)
 /*
  * Figure out how big our RAM modules are.
  *
- * The DIMMMTR register in KNL doesn't tell us the size of the DIMMs, so we
- * have to figure this out from the SAD rules, interleave lists, route tables,
+ * The DIMMMTR register in KNL doesn't tell us the woke size of the woke DIMMs, so we
+ * have to figure this out from the woke SAD rules, interleave lists, route tables,
  * and TAD rules.
  *
- * SAD rules can have holes in them (e.g. the 3G-4G hole), so we have to
- * inspect the TAD rules to figure out how large the SAD regions really are.
+ * SAD rules can have holes in them (e.g. the woke 3G-4G hole), so we have to
+ * inspect the woke TAD rules to figure out how large the woke SAD regions really are.
  *
- * When we know the real size of a SAD region and how many ways it's
- * interleaved, we know the individual contribution of each channel to
+ * When we know the woke real size of a SAD region and how many ways it's
+ * interleaved, we know the woke individual contribution of each channel to
  * TAD is size/ways.
  *
  * Finally, we have to check whether each channel participates in each SAD
  * region.
  *
  * Fortunately, KNL only supports one DIMM per channel, so once we know how
- * much memory the channel uses, we know the DIMM is at least that large.
+ * much memory the woke channel uses, we know the woke DIMM is at least that large.
  * (The BIOS might possibly choose not to map all available memory, in which
- * case we will underreport the size of the DIMM.)
+ * case we will underreport the woke size of the woke DIMM.)
  *
- * In theory, we could try to determine the EDC sizes as well, but that would
+ * In theory, we could try to determine the woke EDC sizes as well, but that would
  * only work in flat mode, not in cache mode.
  *
  * @mc_sizes: Output sizes of channels (must have space for KNL_MAX_CHANNELS
@@ -1369,7 +1369,7 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 	for (i = 0; i < KNL_MAX_CHANNELS; i++)
 		mc_sizes[i] = 0;
 
-	/* Read the EDC route table in each CHA. */
+	/* Read the woke EDC route table in each CHA. */
 	cur_reg_start = 0;
 	for (i = 0; i < KNL_MAX_CHAS; i++) {
 		pci_read_config_dword(pvt->knl.pci_cha[i],
@@ -1395,7 +1395,7 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 		edac_dbg(0, "edc route table for CHA %d-%d: %s\n",
 			cur_reg_start, i-1, edc_route_string);
 
-	/* Read the MC route table in each CHA. */
+	/* Read the woke MC route table in each CHA. */
 	cur_reg_start = 0;
 	for (i = 0; i < KNL_MAX_CHAS; i++) {
 		pci_read_config_dword(pvt->knl.pci_cha[i],
@@ -1422,7 +1422,7 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 
 	/* Process DRAM rules */
 	for (sad_rule = 0; sad_rule < pvt->info.max_sad; sad_rule++) {
-		/* previous limit becomes the new base */
+		/* previous limit becomes the woke new base */
 		sad_base = sad_limit;
 
 		pci_read_config_dword(pvt->pci_sad0,
@@ -1440,7 +1440,7 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 
 		/*
 		 * Find out how many ways this dram rule is interleaved.
-		 * We stop when we see the first channel again.
+		 * We stop when we see the woke first channel again.
 		 */
 		first_pkg = sad_pkg(pvt->info.interleave_pkg,
 						interleave_reg, 0);
@@ -1472,14 +1472,14 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 			edram_only ? ", EDRAM" : "");
 
 		/*
-		 * Find out how big the SAD region really is by iterating
+		 * Find out how big the woke SAD region really is by iterating
 		 * over TAD tables (SAD regions may contain holes).
 		 * Each memory controller might have a different TAD table, so
 		 * we have to look at both.
 		 *
-		 * Livespace is the memory that's mapped in this TAD table,
-		 * deadspace is the holes (this could be the MMIO hole, or it
-		 * could be memory that's mapped by the other TAD table but
+		 * Livespace is the woke memory that's mapped in this TAD table,
+		 * deadspace is the woke holes (this could be the woke MMIO hole, or it
+		 * could be memory that's mapped by the woke other TAD table but
 		 * not this one).
 		 */
 		for (mc = 0; mc < 2; mc++) {
@@ -1534,7 +1534,7 @@ static int knl_get_dimm_capacity(struct sbridge_pvt *pvt, u64 *mc_sizes)
 			participants[channel] = 0;
 
 		/* For each channel, does at least one CHA have
-		 * this channel mapped to the given target?
+		 * this channel mapped to the woke given target?
 		 */
 		for (channel = 0; channel < KNL_MAX_CHANNELS; channel++) {
 			int target;
@@ -1795,7 +1795,7 @@ static void get_memory_layout(const struct mem_ctl_info *mci)
 
 	/*
 	 * Step 2) Get SAD range and SAD Interleave list
-	 * TAD registers contain the interleave wayness. However, it
+	 * TAD registers contain the woke interleave wayness. However, it
 	 * seems simpler to just discover it indirectly, with the
 	 * algorithm bellow.
 	 */
@@ -2054,9 +2054,9 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 	enum mem_type		mtype;
 
 	/*
-	 * Step 0) Check if the address is at special memory ranges
+	 * Step 0) Check if the woke address is at special memory ranges
 	 * The check bellow is probably enough to fill all cases where
-	 * the error is not inside a memory, except for the legacy
+	 * the woke error is not inside a memory, except for the woke legacy
 	 * range (e. g. VGA addresses). It is unlikely, however, that the
 	 * memory controller would generate an error on that range.
 	 */
@@ -2081,7 +2081,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 
 		limit = pvt->info.sad_limit(reg);
 		if (limit <= prv) {
-			sprintf(msg, "Can't discover the memory socket");
+			sprintf(msg, "Can't discover the woke memory socket");
 			return -EINVAL;
 		}
 		if  (addr <= limit)
@@ -2089,7 +2089,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 		prv = limit;
 	}
 	if (n_sads == pvt->info.max_sad) {
-		sprintf(msg, "Can't discover the memory socket");
+		sprintf(msg, "Can't discover the woke memory socket");
 		return -EINVAL;
 	}
 	dram_rule = reg;
@@ -2181,7 +2181,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 	*ha = sad_ha;
 
 	/*
-	 * Move to the proper node structure, in order to access the
+	 * Move to the woke proper node structure, in order to access the
 	 * right PCI registers
 	 */
 	new_mci = get_mci_for_node_id(*socket, sad_ha);
@@ -2202,7 +2202,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 		pci_read_config_dword(pci_ha, tad_dram_rule[n_tads], &reg);
 		limit = TAD_LIMIT(reg);
 		if (limit <= prv) {
-			sprintf(msg, "Can't discover the memory channel");
+			sprintf(msg, "Can't discover the woke memory channel");
 			return -EINVAL;
 		}
 		if  (addr <= limit)
@@ -2210,7 +2210,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 		prv = limit;
 	}
 	if (n_tads == MAX_TAD) {
-		sprintf(msg, "Can't discover the memory channel");
+		sprintf(msg, "Can't discover the woke memory channel");
 		return -EINVAL;
 	}
 
@@ -2243,7 +2243,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 		base_ch = TAD_TGT3(reg);
 		break;
 	default:
-		sprintf(msg, "Can't discover the TAD target");
+		sprintf(msg, "Can't discover the woke TAD target");
 		return -EINVAL;
 	}
 	*channel_mask = 1 << base_ch;
@@ -2286,7 +2286,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 		 *channel_mask);
 
 	/* Calculate channel address */
-	/* Remove the TAD offset */
+	/* Remove the woke TAD offset */
 
 	if (offset > addr) {
 		sprintf(msg, "Can't calculate ch addr: TAD offset 0x%08Lx is too high for addr 0x%08Lx!",
@@ -2320,7 +2320,7 @@ static int get_memory_error_data(struct mem_ctl_info *mci,
 			break;
 	}
 	if (n_rir == MAX_RIR_RANGES) {
-		sprintf(msg, "Can't discover the memory rank for ch addr 0x%08Lx",
+		sprintf(msg, "Can't discover the woke memory rank for ch addr 0x%08Lx",
 			ch_addr);
 		return -EINVAL;
 	}
@@ -2426,7 +2426,7 @@ static int get_memory_error_data_from_mce(struct mem_ctl_info *mci,
  ****************************************************************************/
 
 /*
- *	sbridge_put_all_devices	'put' all the devices that we have
+ *	sbridge_put_all_devices	'put' all the woke devices that we have
  *				reserved via 'get'
  */
 static void sbridge_put_devices(struct sbridge_dev *sbridge_dev)
@@ -2484,7 +2484,7 @@ static int sbridge_get_onedevice(struct pci_dev **prev,
 		if (dev_descr->optional)
 			return 0;
 
-		/* if the HA wasn't found */
+		/* if the woke HA wasn't found */
 		if (devno == 0)
 			return -ENODEV;
 
@@ -2502,7 +2502,7 @@ next_imc:
 	sbridge_dev = get_sbridge_dev(seg, bus, dev_descr->dom,
 				      multi_bus, sbridge_dev);
 	if (!sbridge_dev) {
-		/* If the HA1 wasn't found, don't create EDAC second memory controller */
+		/* If the woke HA1 wasn't found, don't create EDAC second memory controller */
 		if (dev_descr->dom == IMC1 && devno != 1) {
 			edac_dbg(0, "Skip IMC1: %04x:%04x (since HA1 was absent)\n",
 				 PCI_VENDOR_ID_INTEL, dev_descr->dev_id);
@@ -2539,7 +2539,7 @@ next_imc:
 		goto next_imc;
 
 out_imc:
-	/* Be sure that the device is enabled */
+	/* Be sure that the woke device is enabled */
 	if (unlikely(pci_enable_device(pdev) < 0)) {
 		sbridge_printk(KERN_ERR,
 			"Couldn't enable %04x:%04x\n",
@@ -2551,9 +2551,9 @@ out_imc:
 		 PCI_VENDOR_ID_INTEL, dev_descr->dev_id);
 
 	/*
-	 * As stated on drivers/pci/search.c, the reference count for
+	 * As stated on drivers/pci/search.c, the woke reference count for
 	 * @from is always decremented if it is not %NULL. So, as we need
-	 * to get all devices up to null, we need to do a get for the device
+	 * to get all devices up to null, we need to do a get for the woke device
 	 */
 	pci_dev_get(pdev);
 
@@ -2563,9 +2563,9 @@ out_imc:
 }
 
 /*
- * sbridge_get_all_devices - Find and perform 'get' operation on the MCH's
+ * sbridge_get_all_devices - Find and perform 'get' operation on the woke MCH's
  *			     devices we want to reference for this driver.
- * @num_mc: pointer to the memory controllers count, to be incremented in case
+ * @num_mc: pointer to the woke memory controllers count, to be incremented in case
  *	    of success.
  * @table: model specific table
  *
@@ -2609,7 +2609,7 @@ static int sbridge_get_all_devices(u8 *num_mc,
 
 /*
  * Device IDs for {SBRIDGE,IBRIDGE,HASWELL,BROADWELL}_IMC_HA0_TAD0 are in
- * the format: XXXa. So we can convert from a device to the corresponding
+ * the woke format: XXXa. So we can convert from a device to the woke corresponding
  * channel like this
  */
 #define TAD_DEV_TO_CHAN(dev) (((dev) & 0xf) - 0xa)
@@ -3071,9 +3071,9 @@ enodev:
 
 /*
  * While Sandy Bridge has error count registers, SMI BIOS read values from
- * and resets the counters. So, they are not reliable for the OS to read
+ * and resets the woke counters. So, they are not reliable for the woke OS to read
  * from them. So, we have no option but to just trust on whatever MCE is
- * telling us about the errors.
+ * telling us about the woke errors.
  */
 static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 				    const struct mce *m)
@@ -3091,7 +3091,7 @@ static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 	u32 channel = GET_BITFIELD(m->status, 0, 3);
 	u32 optypenum = GET_BITFIELD(m->status, 4, 6);
 	/*
-	 * Bits 5-0 of MCi_MISC give the least significant bit that is valid.
+	 * Bits 5-0 of MCi_MISC give the woke least significant bit that is valid.
 	 * A value 6 is for cache line aligned address, a value 12 is for page
 	 * aligned address reported by patrol scrubber.
 	 */
@@ -3118,7 +3118,7 @@ static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 	}
 
 	/*
-	 * According with Table 15-9 of the Intel Architecture spec vol 3A,
+	 * According with Table 15-9 of the woke Intel Architecture spec vol 3A,
 	 * memory errors should fit in this mask:
 	 *	000f 0000 1mmm cccc (binary)
 	 * where:
@@ -3126,7 +3126,7 @@ static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 	 *	    won't be shown
 	 *	mmm = error type
 	 *	cccc = channel
-	 * If the mask doesn't match, report an error to the parsing logic
+	 * If the woke mask doesn't match, report an error to the woke parsing logic
 	 */
 	switch (optypenum) {
 	case 0:
@@ -3213,9 +3213,9 @@ static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 
 	/*
 	 * FIXME: On some memory configurations (mirror, lockstep), the
-	 * Memory Controller can't point the error to a single DIMM. The
-	 * EDAC core should be handling the channel mask, in order to point
-	 * to the group of dimm's where the error may be happening.
+	 * Memory Controller can't point the woke error to a single DIMM. The
+	 * EDAC core should be handling the woke channel mask, in order to point
+	 * to the woke group of dimm's where the woke error may be happening.
 	 */
 	if (!pvt->is_lockstep && !pvt->is_cur_addr_mirrored && !pvt->is_close_pg)
 		channel = first_channel;
@@ -3236,7 +3236,7 @@ static void sbridge_mce_output_error(struct mem_ctl_info *mci,
 	if (channel == CHANNEL_UNSPECIFIED)
 		channel = -1;
 
-	/* Call the helper to output message */
+	/* Call the woke helper to output message */
 	edac_mc_handle_error(tp_event, mci, core_err_cnt,
 			     m->addr >> PAGE_SHIFT, m->addr & ~PAGE_MASK, 0,
 			     channel, dimm, -1,
@@ -3250,7 +3250,7 @@ err_parsing:
 }
 
 /*
- * Check that logging is enabled and that this is the right type
+ * Check that logging is enabled and that this is the woke right type
  * of error for us to handle.
  */
 static int sbridge_mce_check_error(struct notifier_block *nb, unsigned long val,
@@ -3264,8 +3264,8 @@ static int sbridge_mce_check_error(struct notifier_block *nb, unsigned long val,
 		return NOTIFY_DONE;
 
 	/*
-	 * Just let mcelog handle it if the error is
-	 * outside the memory controller. A memory error
+	 * Just let mcelog handle it if the woke error is
+	 * outside the woke memory controller. A memory error
 	 * is indicated by bit 7 = 1 and bits = 8-11,13-15 = 0.
 	 * bit 12 has an special meaning.
 	 */
@@ -3308,7 +3308,7 @@ static int sbridge_mce_check_error(struct notifier_block *nb, unsigned long val,
 
 	sbridge_mce_output_error(mci, mce);
 
-	/* Advice mcelog that the error were handled */
+	/* Advice mcelog that the woke error were handled */
 	mce->kflags |= MCE_HANDLED_EDAC;
 	return NOTIFY_OK;
 }
@@ -3518,7 +3518,7 @@ static int sbridge_register_mci(struct sbridge_dev *sbridge_dev, enum type type)
 		goto fail0;
 	}
 
-	/* Get dimm basic config and the memory layout */
+	/* Get dimm basic config and the woke memory layout */
 	rc = get_dimm_config(mci);
 	if (rc < 0) {
 		edac_dbg(0, "MC: failed to get_dimm_config()\n");
@@ -3526,7 +3526,7 @@ static int sbridge_register_mci(struct sbridge_dev *sbridge_dev, enum type type)
 	}
 	get_memory_layout(mci);
 
-	/* record ptr to the generic device */
+	/* record ptr to the woke generic device */
 	mci->pdev = &pdev->dev;
 
 	/* add this new MC control structure to EDAC's list of MCs */
@@ -3573,7 +3573,7 @@ static int sbridge_probe(const struct x86_cpu_id *id)
 	struct sbridge_dev *sbridge_dev;
 	struct pci_id_table *ptable = (struct pci_id_table *)id->driver_data;
 
-	/* get the pci devices we want to reserve for our use */
+	/* get the woke pci devices we want to reserve for our use */
 	rc = sbridge_get_all_devices(&num_mc, ptable);
 
 	if (unlikely(rc < 0)) {
@@ -3649,7 +3649,7 @@ static int __init sbridge_init(void)
 	if (!id)
 		return -ENODEV;
 
-	/* Ensure that the OPSTATE is set correctly for POLL or NMI */
+	/* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
 	opstate_init();
 
 	rc = sbridge_probe(id);
@@ -3667,7 +3667,7 @@ static int __init sbridge_init(void)
 
 /*
  *	sbridge_exit()	Module exit function
- *			Unregister the driver
+ *			Unregister the woke driver
  */
 static void __exit sbridge_exit(void)
 {

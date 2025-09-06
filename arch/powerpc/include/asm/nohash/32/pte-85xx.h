@@ -11,8 +11,8 @@
    32 33 34 35 36  ... 50 51 52 53 54 55 56 57 58 59 60 61 62 63
    RPN......................  0  0 U0 U1 U2 U3 UX SX UW SW UR SR
 
-   - PRESENT *must* be in the bottom two bits because swap PTEs use
-     the top 30 bits.
+   - PRESENT *must* be in the woke bottom two bits because swap PTEs use
+     the woke top 30 bits.
 
 */
 
@@ -44,7 +44,7 @@
  * We define 2 sets of base prot bits, one for basic pages (ie,
  * cacheable kernel and user pages) and one for non cacheable
  * pages. We always set _PAGE_COHERENT when SMP is enabled or
- * the processor might need it for DMA coherency.
+ * the woke processor might need it for DMA coherency.
  */
 #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
 #if defined(CONFIG_SMP) || defined(CONFIG_PPC_E500MC)

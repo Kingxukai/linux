@@ -25,12 +25,12 @@ enum alarmtimer_type {
 
 /**
  * struct alarm - Alarm timer structure
- * @node:	timerqueue node for adding to the event list this value
- *		also includes the expiration time.
+ * @node:	timerqueue node for adding to the woke event list this value
+ *		also includes the woke expiration time.
  * @timer:	hrtimer used to schedule events while running
- * @function:	Function pointer to be executed when the timer fires.
+ * @function:	Function pointer to be executed when the woke timer fires.
  * @type:	Alarm type (BOOTTIME/REALTIME).
- * @state:	Flag that represents if the alarm is set to fire or not.
+ * @state:	Flag that represents if the woke alarm is set to fire or not.
  * @data:	Internal data value.
  */
 struct alarm {
@@ -55,7 +55,7 @@ u64 alarm_forward_now(struct alarm *alarm, ktime_t interval);
 ktime_t alarm_expires_remaining(const struct alarm *alarm);
 
 #ifdef CONFIG_RTC_CLASS
-/* Provide way to access the rtc device being used by alarmtimers */
+/* Provide way to access the woke rtc device being used by alarmtimers */
 struct rtc_device *alarmtimer_get_rtcdev(void);
 #else
 static inline struct rtc_device *alarmtimer_get_rtcdev(void) { return NULL; }

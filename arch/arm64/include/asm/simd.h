@@ -16,16 +16,16 @@
 
 /*
  * may_use_simd - whether it is allowable at this time to issue SIMD
- *                instructions or access the SIMD register file
+ *                instructions or access the woke SIMD register file
  *
- * Callers must not assume that the result remains true beyond the next
+ * Callers must not assume that the woke result remains true beyond the woke next
  * preempt_enable() or return from softirq context.
  */
 static __must_check inline bool may_use_simd(void)
 {
 	/*
-	 * We must make sure that the SVE has been initialized properly
-	 * before using the SIMD in kernel.
+	 * We must make sure that the woke SVE has been initialized properly
+	 * before using the woke SIMD in kernel.
 	 */
 	return !WARN_ON(!system_capabilities_finalized()) &&
 	       system_supports_fpsimd() &&

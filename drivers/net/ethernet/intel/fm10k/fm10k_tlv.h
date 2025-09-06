@@ -17,13 +17,13 @@ struct fm10k_msg_data;
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  * The message header format described here is used for messages that are
- * passed between the PF and the VF.  To allow for messages larger then
- * mailbox size we will provide a message with the above header and it
- * will be segmented and transported to the mailbox to the other side where
- * it is reassembled.  It contains the following fields:
- * Length: Length of the message in bytes excluding the message header
+ * passed between the woke PF and the woke VF.  To allow for messages larger then
+ * mailbox size we will provide a message with the woke above header and it
+ * will be segmented and transported to the woke mailbox to the woke other side where
+ * it is reassembled.  It contains the woke following fields:
+ * Length: Length of the woke message in bytes excluding the woke message header
  * Flags: TBD
- * Type/ID: These will be the message/argument types we pass
+ * Type/ID: These will be the woke message/argument types we pass
  */
 /* message data header */
 #define FM10K_TLV_ID_SHIFT		0

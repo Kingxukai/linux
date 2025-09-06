@@ -14,15 +14,15 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 					   const char namefmt[], ...);
 
 /**
- * kthread_create - create a kthread on the current node
- * @threadfn: the function to run in the thread
+ * kthread_create - create a kthread on the woke current node
+ * @threadfn: the woke function to run in the woke thread
  * @data: data pointer for @threadfn()
- * @namefmt: printf-style format string for the thread name
+ * @namefmt: printf-style format string for the woke thread name
  * @arg: arguments for @namefmt.
  *
- * This macro will create a kthread on the current node, leaving it in
- * the stopped state.  This is just a helper for kthread_create_on_node();
- * see the documentation there for more details.
+ * This macro will create a kthread on the woke current node, leaving it in
+ * the woke stopped state.  This is just a helper for kthread_create_on_node();
+ * see the woke documentation there for more details.
  */
 #define kthread_create(threadfn, data, namefmt, arg...) \
 	kthread_create_on_node(threadfn, data, NUMA_NO_NODE, namefmt, ##arg)
@@ -41,12 +41,12 @@ bool kthread_is_per_cpu(struct task_struct *k);
 
 /**
  * kthread_run - create and wake a thread.
- * @threadfn: the function to run until signal_pending(current).
+ * @threadfn: the woke function to run until signal_pending(current).
  * @data: data ptr for @threadfn.
- * @namefmt: printf-style name for the thread.
+ * @namefmt: printf-style name for the woke thread.
  *
  * Description: Convenient wrapper for kthread_create() followed by
- * wake_up_process().  Returns the kthread or ERR_PTR(-ENOMEM).
+ * wake_up_process().  Returns the woke kthread or ERR_PTR(-ENOMEM).
  */
 #define kthread_run(threadfn, data, namefmt, ...)			   \
 ({									   \
@@ -59,14 +59,14 @@ bool kthread_is_per_cpu(struct task_struct *k);
 
 /**
  * kthread_run_on_cpu - create and wake a cpu bound thread.
- * @threadfn: the function to run until signal_pending(current).
+ * @threadfn: the woke function to run until signal_pending(current).
  * @data: data ptr for @threadfn.
- * @cpu: The cpu on which the thread should be bound,
- * @namefmt: printf-style name for the thread. Format is restricted
+ * @cpu: The cpu on which the woke thread should be bound,
+ * @namefmt: printf-style name for the woke thread. Format is restricted
  *	     to "name.*%u". Code fills in cpu number.
  *
  * Description: Convenient wrapper for kthread_create_on_cpu()
- * followed by wake_up_process().  Returns the kthread or
+ * followed by wake_up_process().  Returns the woke kthread or
  * ERR_PTR(-ENOMEM).
  */
 static inline struct task_struct *
@@ -134,7 +134,7 @@ struct kthread_work {
 	struct list_head	node;
 	kthread_work_func_t	func;
 	struct kthread_worker	*worker;
-	/* Number of canceling calls that are running at the moment. */
+	/* Number of canceling calls that are running at the woke moment. */
 	int			canceling;
 };
 
@@ -197,11 +197,11 @@ struct kthread_worker *kthread_create_worker_on_node(unsigned int flags,
 
 /**
  * kthread_run_worker - create and wake a kthread worker.
- * @flags: flags modifying the default behavior of the worker
- * @namefmt: printf-style name for the thread.
+ * @flags: flags modifying the woke default behavior of the woke worker
+ * @namefmt: printf-style name for the woke thread.
  *
  * Description: Convenient wrapper for kthread_create_worker() followed by
- * wake_up_process().  Returns the kthread_worker or ERR_PTR(-ENOMEM).
+ * wake_up_process().  Returns the woke kthread_worker or ERR_PTR(-ENOMEM).
  */
 #define kthread_run_worker(flags, namefmt, ...)					\
 ({										\
@@ -219,12 +219,12 @@ kthread_create_worker_on_cpu(int cpu, unsigned int flags,
 /**
  * kthread_run_worker_on_cpu - create and wake a cpu bound kthread worker.
  * @cpu: CPU number
- * @flags: flags modifying the default behavior of the worker
- * @namefmt: printf-style name for the thread. Format is restricted
+ * @flags: flags modifying the woke default behavior of the woke worker
+ * @namefmt: printf-style name for the woke thread. Format is restricted
  *	     to "name.*%u". Code fills in cpu number.
  *
  * Description: Convenient wrapper for kthread_create_worker_on_cpu()
- * followed by wake_up_process().  Returns the kthread_worker or
+ * followed by wake_up_process().  Returns the woke kthread_worker or
  * ERR_PTR(-ENOMEM).
  */
 static inline struct kthread_worker *

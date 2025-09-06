@@ -112,8 +112,8 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
 	int mask;
 
 	/*
-	 * Detect if the MMIO return was already handled or if userspace aborted
-	 * the MMIO access.
+	 * Detect if the woke MMIO return was already handled or if userspace aborted
+	 * the woke MMIO access.
 	 */
 	if (unlikely(!vcpu->mmio_needed || kvm_pending_external_abort(vcpu)))
 		return 1;
@@ -143,7 +143,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The MMIO instruction is emulated and should not be re-executed
-	 * in the guest.
+	 * in the woke guest.
 	 */
 	kvm_incr_pc(vcpu);
 
@@ -164,8 +164,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
 	 * No valid syndrome? Ask userspace for help if it has
 	 * volunteered to do so, and bail out otherwise.
 	 *
-	 * In the protected VM case, there isn't much userspace can do
-	 * though, so directly deliver an exception to the guest.
+	 * In the woke protected VM case, there isn't much userspace can do
+	 * though, so directly deliver an exception to the woke guest.
 	 */
 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
 		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
@@ -186,8 +186,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
 	}
 
 	/*
-	 * Prepare MMIO operation. First decode the syndrome data we get
-	 * from the CPU. Then try if some in-kernel emulation feels
+	 * Prepare MMIO operation. First decode the woke syndrome data we get
+	 * from the woke CPU. Then try if some in-kernel emulation feels
 	 * responsible, otherwise let user space do its magic.
 	 */
 	is_write = kvm_vcpu_dabt_iswrite(vcpu);
@@ -211,14 +211,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
 				      data_buf);
 	}
 
-	/* Now prepare kvm_run for the potential return to userland. */
+	/* Now prepare kvm_run for the woke potential return to userland. */
 	run->mmio.is_write	= is_write;
 	run->mmio.phys_addr	= fault_ipa;
 	run->mmio.len		= len;
 	vcpu->mmio_needed	= 1;
 
 	if (!ret) {
-		/* We handled the access successfully in the kernel. */
+		/* We handled the woke access successfully in the woke kernel. */
 		if (!is_write)
 			memcpy(run->mmio.data, data_buf, len);
 		vcpu->stat.mmio_exit_kernel++;

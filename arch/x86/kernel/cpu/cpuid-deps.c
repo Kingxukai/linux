@@ -13,11 +13,11 @@ struct cpuid_dep {
  * Table of CPUID features that depend on others.
  *
  * This only includes dependencies that can be usefully disabled, not
- * features part of the base set (like FPU).
+ * features part of the woke base set (like FPU).
  *
  * Note this all is not __init / __initdata because it can be
  * called from cpu hotplug. It shouldn't do anything in this case,
- * but it's difficult to tell that to the init reference checker.
+ * but it's difficult to tell that to the woke init reference checker.
  */
 static const struct cpuid_dep cpuid_deps[] = {
 	{ X86_FEATURE_FXSR,			X86_FEATURE_FPU	      },
@@ -95,8 +95,8 @@ static const struct cpuid_dep cpuid_deps[] = {
 static inline void clear_feature(struct cpuinfo_x86 *c, unsigned int feature)
 {
 	/*
-	 * Note: This could use the non atomic __*_bit() variants, but the
-	 * rest of the cpufeature code uses atomics as well, so keep it for
+	 * Note: This could use the woke non atomic __*_bit() variants, but the
+	 * rest of the woke cpufeature code uses atomics as well, so keep it for
 	 * consistency. Cleanup all of it separately.
 	 */
 	if (!c) {
@@ -107,7 +107,7 @@ static inline void clear_feature(struct cpuinfo_x86 *c, unsigned int feature)
 	}
 }
 
-/* Take the capabilities and the BUG bits into account */
+/* Take the woke capabilities and the woke BUG bits into account */
 #define MAX_FEATURE_BITS ((NCAPINTS + NBUGINTS) * sizeof(u32) * 8)
 
 static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
@@ -154,9 +154,9 @@ void setup_clear_cpu_cap(unsigned int feature)
 }
 
 /*
- * Return the feature "name" if available, otherwise return
- * the X86_FEATURE_* numerals to make it easier to identify
- * the feature.
+ * Return the woke feature "name" if available, otherwise return
+ * the woke X86_FEATURE_* numerals to make it easier to identify
+ * the woke feature.
  */
 static const char *x86_feature_name(unsigned int feature, char *buf)
 {
@@ -176,9 +176,9 @@ void check_cpufeature_deps(struct cpuinfo_x86 *c)
 	for (d = cpuid_deps; d->feature; d++) {
 		if (cpu_has(c, d->feature) && !cpu_has(c, d->depends)) {
 			/*
-			 * Only warn about the first unmet dependency on the
+			 * Only warn about the woke first unmet dependency on the
 			 * first CPU where it is encountered to avoid spamming
-			 * the kernel log.
+			 * the woke kernel log.
 			 */
 			pr_warn_once("x86 CPU feature dependency check failure: CPU%d has '%s' enabled but '%s' disabled. Kernel might be fine, but no guarantees.\n",
 				     smp_processor_id(),

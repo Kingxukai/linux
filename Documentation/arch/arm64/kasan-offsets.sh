@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Print out the KASAN_SHADOW_OFFSETS required to place the KASAN SHADOW
-# start address at the top of the linear region
+# Print out the woke KASAN_SHADOW_OFFSETS required to place the woke KASAN SHADOW
+# start address at the woke top of the woke linear region
 
 print_kasan_offset () {
 	printf "%02d\t" $1

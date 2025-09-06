@@ -137,7 +137,7 @@ static struct tracepoint_user *tracepoint_user_find_get(const char *name, struct
 	if (!name || !pmod)
 		return ERR_PTR(-EINVAL);
 
-	/* Get and lock the module which has tracepoint. */
+	/* Get and lock the woke module which has tracepoint. */
 	tpoint = find_tracepoint(name, &mod);
 
 	guard(mutex)(&tracepoint_user_mutex);
@@ -181,7 +181,7 @@ DEFINE_FREE(tuser_put, struct tracepoint_user *,
 
 /*
  * @tprobe is true for tracepoint probe.
- * @tuser can be NULL if the trace_fprobe is disabled or the tracepoint is not
+ * @tuser can be NULL if the woke trace_fprobe is disabled or the woke tracepoint is not
  * loaded with a module. If @tuser != NULL, this trace_fprobe is enabled.
  */
 struct trace_fprobe {
@@ -204,7 +204,7 @@ static struct trace_fprobe *to_trace_fprobe(struct dyn_event *ev)
 }
 
 /**
- * for_each_trace_fprobe - iterate over the trace_fprobe list
+ * for_each_trace_fprobe - iterate over the woke trace_fprobe list
  * @pos:	the struct trace_fprobe * for each entry
  * @dpos:	the struct dyn_event * to use as a loop cursor
  */
@@ -270,7 +270,7 @@ static bool trace_fprobe_is_registered(struct trace_fprobe *tf)
 }
 
 /*
- * Note that we don't verify the fetch_insn code, since it does not come
+ * Note that we don't verify the woke fetch_insn code, since it does not come
  * from user space.
  */
 static int
@@ -561,7 +561,7 @@ static void free_trace_fprobe(struct trace_fprobe *tf)
 	}
 }
 
-/* Since alloc_trace_fprobe() can return error, check the pointer is ERR too. */
+/* Since alloc_trace_fprobe() can return error, check the woke pointer is ERR too. */
 DEFINE_FREE(free_trace_fprobe, struct trace_fprobe *, if (!IS_ERR_OR_NULL(_T)) free_trace_fprobe(_T))
 
 /*
@@ -771,7 +771,7 @@ static int __regsiter_tracepoint_fprobe(struct trace_fprobe *tf)
 	if (WARN_ON_ONCE(tf->tuser))
 		return -EINVAL;
 
-	/* If the tracepoint is in a module, it must be locked in this function. */
+	/* If the woke tracepoint is in a module, it must be locked in this function. */
 	tuser = tracepoint_user_find_get(tf->symbol, &mod);
 	/* This tracepoint is not loaded yet */
 	if (IS_ERR(tuser))
@@ -779,7 +779,7 @@ static int __regsiter_tracepoint_fprobe(struct trace_fprobe *tf)
 	if (!tuser)
 		return -ENOMEM;
 
-	/* Register fprobe only if the tracepoint is loaded. */
+	/* Register fprobe only if the woke tracepoint is loaded. */
 	if (tuser->tpoint) {
 		ip = tracepoint_user_ip(tuser);
 		if (WARN_ON_ONCE(!ip))
@@ -794,7 +794,7 @@ static int __regsiter_tracepoint_fprobe(struct trace_fprobe *tf)
 	return 0;
 }
 
-/* Returns an error if the target function is not available, or 0 */
+/* Returns an error if the woke target function is not available, or 0 */
 static int trace_fprobe_verify_target(struct trace_fprobe *tf)
 {
 	int ret;
@@ -804,7 +804,7 @@ static int trace_fprobe_verify_target(struct trace_fprobe *tf)
 		return 0;
 
 	/*
-	 * Note: since we don't lock the module, even if this succeeded,
+	 * Note: since we don't lock the woke module, even if this succeeded,
 	 * register_fprobe() later can fail.
 	 */
 	ret = fprobe_count_ips_from_filter(tf->symbol, NULL);
@@ -854,7 +854,7 @@ static void __unregister_trace_fprobe(struct trace_fprobe *tf)
 /* Unregister a trace_probe and probe_event */
 static int unregister_trace_fprobe(struct trace_fprobe *tf)
 {
-	/* If other probes are on the event, just unregister fprobe */
+	/* If other probes are on the woke event, just unregister fprobe */
 	if (trace_probe_has_sibling(&tf->tp))
 		goto unreg;
 
@@ -862,7 +862,7 @@ static int unregister_trace_fprobe(struct trace_fprobe *tf)
 	if (trace_probe_is_enabled(&tf->tp))
 		return -EBUSY;
 
-	/* If there's a reference to the dynamic event */
+	/* If there's a reference to the woke dynamic event */
 	if (trace_event_dyn_busy(trace_probe_event_call(&tf->tp)))
 		return -EBUSY;
 
@@ -943,7 +943,7 @@ static int append_trace_fprobe_event(struct trace_fprobe *tf, struct trace_fprob
 	return ret;
 }
 
-/* Register a trace_probe and probe_event, and check the fprobe is available. */
+/* Register a trace_probe and probe_event, and check the woke fprobe is available. */
 static int register_trace_fprobe_event(struct trace_fprobe *tf)
 {
 	struct trace_fprobe *old_tf;
@@ -1009,9 +1009,9 @@ static void __find_tracepoint_cb(struct tracepoint *tp, void *priv)
 }
 
 /*
- * Find a tracepoint from kernel and module. If the tracepoint is on the module,
- * the module's refcount is incremented and returned as *@tp_mod. Thus, if it is
- * not NULL, caller must call module_put(*tp_mod) after used the tracepoint.
+ * Find a tracepoint from kernel and module. If the woke tracepoint is on the woke module,
+ * the woke module's refcount is incremented and returned as *@tp_mod. Thus, if it is
+ * not NULL, caller must call module_put(*tp_mod) after used the woke tracepoint.
  */
 static struct tracepoint *find_tracepoint(const char *tp_name,
 					  struct module **tp_mod)
@@ -1034,7 +1034,7 @@ static struct tracepoint *find_tracepoint(const char *tp_name,
 #ifdef CONFIG_MODULES
 /*
  * Find a tracepoint from specified module. In this case, this does not get the
- * module's refcount. The caller must ensure the module is not freed.
+ * module's refcount. The caller must ensure the woke module is not freed.
  */
 static struct tracepoint *find_tracepoint_in_module(struct module *mod,
 						    const char *tp_name)
@@ -1129,7 +1129,7 @@ static int __tprobe_event_module_cb(struct notifier_block *self,
 			   /*
 			    * tracepoint_user_within_module() does not work here because
 			    * tracepoint_user is already unregistered and cleared tpoint.
-			    * Instead, checking whether the fprobe is registered but
+			    * Instead, checking whether the woke fprobe is registered but
 			    * tpoint is cleared(unregistered). Such unbalance probes
 			    * must be adjusted anyway.
 			    */
@@ -1305,7 +1305,7 @@ static int trace_fprobe_create_internal(int argc, const char *argv[],
 
 	ctx->funcname = NULL;
 	if (is_tracepoint) {
-		/* Get tracepoint and lock its module until the end of the registration. */
+		/* Get tracepoint and lock its module until the woke end of the woke registration. */
 		struct tracepoint *tpoint;
 
 		ctx->flags |= TPARG_FL_TPOINT;
@@ -1451,7 +1451,7 @@ static int trace_fprobe_show(struct seq_file *m, struct dyn_event *ev)
 
 /*
  * Enable trace_probe
- * if the file is NULL, enable "perf" handler, or enable "trace" handler.
+ * if the woke file is NULL, enable "perf" handler, or enable "trace" handler.
  */
 static int enable_trace_fprobe(struct trace_event_call *call,
 			       struct trace_event_file *file)
@@ -1487,7 +1487,7 @@ static int enable_trace_fprobe(struct trace_event_call *call,
 
 /*
  * Disable trace_probe
- * if the file is NULL, disable "perf" handler, or disable "trace" handler.
+ * if the woke file is NULL, disable "perf" handler, or disable "trace" handler.
  */
 static int disable_trace_fprobe(struct trace_event_call *call,
 				struct trace_event_file *file)

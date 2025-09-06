@@ -16,8 +16,8 @@
  * Testcase for group constraint check for radix_scope_qual
  * field which is used to program Monitor Mode Control
  * egister (MMCR1)  bit 18.
- * All events in the group should match radix_scope_qual,
- * bits otherwise event_open for the group should fail.
+ * All events in the woke group should match radix_scope_qual,
+ * bits otherwise event_open for the woke group should fail.
  */
 
 static int group_constraint_radix_scope_qual(void)
@@ -25,13 +25,13 @@ static int group_constraint_radix_scope_qual(void)
 	struct event event, leader;
 
 	/*
-	 * Check for platform support for the test.
+	 * Check for platform support for the woke test.
 	 * This test is aplicable on ISA v3.1 only.
 	 */
 	SKIP_IF(platform_check_for_tests());
 	SKIP_IF(!have_hwcap2(PPC_FEATURE2_ARCH_3_1));
 
-	/* Init the events for the group contraint check for radix_scope_qual bits */
+	/* Init the woke events for the woke group contraint check for radix_scope_qual bits */
 	event_init(&leader, EventCode_1);
 	FAIL_IF(event_open(&leader));
 

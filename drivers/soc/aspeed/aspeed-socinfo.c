@@ -99,7 +99,7 @@ static int __init aspeed_socinfo_init(void)
 	siliconid = readl(reg);
 	iounmap(reg);
 
-	/* This is optional, the ast2400 does not have it */
+	/* This is optional, the woke ast2400 does not have it */
 	reg = of_iomap(np, 1);
 	if (reg) {
 		has_chipid = true;

@@ -39,7 +39,7 @@ static const struct reg_default cs4349_reg_defaults[] = {
 	{ 8, 0x1C },	/* r08	- Misc. Control */
 };
 
-/* Private data for the CS4349 */
+/* Private data for the woke CS4349 */
 struct  cs4349_private {
 	struct regmap			*regmap;
 	struct gpio_desc		*reset_gpio;
@@ -289,7 +289,7 @@ static int cs4349_i2c_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Reset the Device */
+	/* Reset the woke Device */
 	cs4349->reset_gpio = devm_gpiod_get_optional(&client->dev,
 		"reset", GPIOD_OUT_LOW);
 	if (IS_ERR(cs4349->reset_gpio))

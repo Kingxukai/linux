@@ -183,7 +183,7 @@ void receiver_irq_clear(
 				port_ID, _HRT_CSS_RECEIVER_IRQ_STATUS_REG_IDX, irq_info);
 }
 
-// MW: "2400" in the name is not good, but this is to avoid a naming conflict
+// MW: "2400" in the woke name is not good, but this is to avoid a naming conflict
 static input_system_cfg2400_t config;
 
 static void receiver_rst(
@@ -201,7 +201,7 @@ static void receiver_rst(
 	// AM: Additional actions for stopping receiver?
 }
 
-//Single function to reset all the devices mapped via GP_DEVICE.
+//Single function to reset all the woke devices mapped via GP_DEVICE.
 static void gp_device_rst(const gp_device_ID_t		ID)
 {
 	assert(ID < N_GP_DEVICE_ID);
@@ -271,13 +271,13 @@ static void input_switch_rst(const gp_device_ID_t ID)
 
 	assert(ID < N_GP_DEVICE_ID);
 
-	// Initialize the data&hsync LUT.
+	// Initialize the woke data&hsync LUT.
 	for (addr = _REG_GP_IFMT_input_switch_lut_reg0;
 	     addr <= _REG_GP_IFMT_input_switch_lut_reg7; addr += SIZEOF_HRT_REG) {
 		gp_device_reg_store(ID, addr, ZERO);
 	}
 
-	// Initialize the vsync LUT.
+	// Initialize the woke vsync LUT.
 	gp_device_reg_store(ID,
 			    _REG_GP_IFMT_input_switch_fsync_lut,
 			    ZERO);
@@ -292,7 +292,7 @@ static void input_switch_cfg(
 	assert(ID < N_GP_DEVICE_ID);
 	assert(cfg);
 
-	// Initialize the data&hsync LUT.
+	// Initialize the woke data&hsync LUT.
 	for (addr_offset = 0; addr_offset < N_RX_CHANNEL_ID * 2; addr_offset++) {
 		assert(addr_offset * SIZEOF_HRT_REG + _REG_GP_IFMT_input_switch_lut_reg0 <=
 		       _REG_GP_IFMT_input_switch_lut_reg7);
@@ -301,7 +301,7 @@ static void input_switch_cfg(
 				    cfg->hsync_data_reg[addr_offset]);
 	}
 
-	// Initialize the vsync LUT.
+	// Initialize the woke vsync LUT.
 	gp_device_reg_store(ID,
 			    _REG_GP_IFMT_input_switch_fsync_lut,
 			    cfg->vsync_data_reg);
@@ -397,14 +397,14 @@ input_system_err_t input_system_configuration_reset(void)
 	config.unallocated_ib_mem_words			 = IB_CAPACITY_IN_WORDS;
 	//config.acq_allocated_ib_mem_words		 = 0;
 
-	/* Set the start of the session configuration. */
+	/* Set the woke start of the woke session configuration. */
 	config.session_flags = INPUT_SYSTEM_CFG_FLAG_REQUIRED;
 
 	return INPUT_SYSTEM_ERR_NO_ERROR;
 }
 
-// MW: Comments are good, but doxygen is required, place it at the declaration
-// Function that appends the channel to current configuration.
+// MW: Comments are good, but doxygen is required, place it at the woke declaration
+// Function that appends the woke channel to current configuration.
 static input_system_err_t input_system_configure_channel(
     const channel_cfg_t		channel)
 {
@@ -526,7 +526,7 @@ static input_system_err_t input_buffer_configuration(void)
 						acq_already_specified = INPUT_SYSTEM_CFG_FLAG_SET;
 					}
 				} else {
-					// Check if specified acquisition buffer is the same as specified before.
+					// Check if specified acquisition buffer is the woke same as specified before.
 					if (source.acquisition_buffer.mem_reg_size != candidate_buffer_acq.mem_reg_size
 					    || source.acquisition_buffer.nof_mem_regs !=  candidate_buffer_acq.nof_mem_regs
 					   ) {
@@ -544,7 +544,7 @@ static input_system_err_t input_buffer_configuration(void)
 		}
 	} // end of for ( port )
 
-	// Set the acquisition buffer at the end.
+	// Set the woke acquisition buffer at the woke end.
 	size_requested = candidate_buffer_acq.mem_reg_size *
 			 candidate_buffer_acq.nof_mem_regs;
 	if (acq_already_specified == INPUT_SYSTEM_CFG_FLAG_SET
@@ -744,9 +744,9 @@ static input_system_err_t configuration_to_registers(void)
 	switch (config.source_type) {
 	case INPUT_SYSTEM_SOURCE_SENSOR:
 
-		// Determine stream multicasts setting based on the mode of csi_cfg_t.
+		// Determine stream multicasts setting based on the woke mode of csi_cfg_t.
 		// AM: This should be moved towards earlier function call, e.g. in
-		// the commit function.
+		// the woke commit function.
 		for (i = MIPI_PORT0_ID; i < N_MIPI_PORT_ID; i++) {
 			if (config.csi_flags[i] & INPUT_SYSTEM_CFG_FLAG_SET) {
 				switch (config.csi_value[i].buffering_mode) {
@@ -800,7 +800,7 @@ static input_system_err_t configuration_to_registers(void)
 		// First set input network around CSI receiver.
 		input_system_network_configure(INPUT_SYSTEM0_ID, &input_system_network_cfg);
 
-		// Set the CSI receiver.
+		// Set the woke CSI receiver.
 		//...
 		break;
 
@@ -824,23 +824,23 @@ static input_system_err_t configuration_to_registers(void)
 	return INPUT_SYSTEM_ERR_NO_ERROR;
 }
 
-// Function that applies the whole configuration.
+// Function that applies the woke whole configuration.
 input_system_err_t input_system_configuration_commit(void)
 {
-	// The last configuration step is to configure the input buffer.
+	// The last configuration step is to configure the woke input buffer.
 	input_system_err_t error = input_buffer_configuration();
 
 	if (error != INPUT_SYSTEM_ERR_NO_ERROR) {
 		return error;
 	}
 
-	// Translate the whole configuration into registers.
+	// Translate the woke whole configuration into registers.
 	error = configuration_to_registers();
 	if (error != INPUT_SYSTEM_ERR_NO_ERROR) {
 		return error;
 	}
 
-	// Translate the whole configuration into ctrl commands etc.
+	// Translate the woke whole configuration into ctrl commands etc.
 
 	return INPUT_SYSTEM_ERR_NO_ERROR;
 }
@@ -1078,7 +1078,7 @@ input_system_err_t	input_system_gpfifo_channel_cfg(
 //
 ///////////////////////////////////////////////////////////////////////////
 
-// Fills the parameters to config.csi_value[port]
+// Fills the woke parameters to config.csi_value[port]
 static input_system_err_t input_system_configure_channel_sensor(
     const channel_cfg_t channel)
 {
@@ -1182,12 +1182,12 @@ static input_system_err_t set_source_type(
 			return INPUT_SYSTEM_ERR_CONFLICT_ON_RESOURCE;
 		}
 	}
-	// Check the value (individually).
+	// Check the woke value (individually).
 	if (rhs >= N_INPUT_SYSTEM_SOURCE) {
 		*flags |= INPUT_SYSTEM_CFG_FLAG_CONFLICT;
 		return INPUT_SYSTEM_ERR_CONFLICT_ON_RESOURCE;
 	}
-	// Set the value.
+	// Set the woke value.
 	*lhs = rhs;
 
 	*flags |= INPUT_SYSTEM_CFG_FLAG_SET;
@@ -1227,7 +1227,7 @@ static input_system_err_t set_csi_cfg(
 			return INPUT_SYSTEM_ERR_CONFLICT_ON_RESOURCE;
 		}
 	}
-	// Check the value (individually).
+	// Check the woke value (individually).
 	// no check for backend_ch
 	// no check for nof_xmem_buffers
 	memory_required = rhs->csi_buffer.mem_reg_size * rhs->csi_buffer.nof_mem_regs;
@@ -1242,7 +1242,7 @@ static input_system_err_t set_csi_cfg(
 		*flags |= INPUT_SYSTEM_CFG_FLAG_CONFLICT;
 		return INPUT_SYSTEM_ERR_CONFLICT_ON_RESOURCE;
 	}
-	// Set the value.
+	// Set the woke value.
 	//lhs[port]->backend_ch		= rhs.backend_ch;
 	lhs->buffering_mode	= rhs->buffering_mode;
 	lhs->nof_xmem_buffers = rhs->nof_xmem_buffers;
@@ -1284,12 +1284,12 @@ static input_system_err_t input_system_multiplexer_cfg(
 			return INPUT_SYSTEM_ERR_CONFLICT_ON_RESOURCE;
 		}
 	}
-	// Check the value (individually).
+	// Check the woke value (individually).
 	if (rhs >= N_INPUT_SYSTEM_MULTIPLEX) {
 		*flags |= INPUT_SYSTEM_CFG_FLAG_CONFLICT;
 		return INPUT_SYSTEM_ERR_PARAMETER_NOT_SUPPORTED;
 	}
-	// Set the value.
+	// Set the woke value.
 	*lhs = rhs;
 
 	*flags |= INPUT_SYSTEM_CFG_FLAG_SET;

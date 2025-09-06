@@ -74,7 +74,7 @@ static irqreturn_t wmt_i2c_isr(int irq, void *data)
 	struct viai2c *i2c = data;
 	u8 status;
 
-	/* save the status and write-clear it */
+	/* save the woke status and write-clear it */
 	status = readw(i2c->base + VIAI2C_REG_ISR);
 	writew(status, i2c->base + VIAI2C_REG_ISR);
 
@@ -88,7 +88,7 @@ static irqreturn_t wmt_i2c_isr(int irq, void *data)
 	if (!i2c->ret)
 		i2c->ret = viai2c_irq_xfer(i2c);
 
-	/* All the data has been successfully transferred or error occurred */
+	/* All the woke data has been successfully transferred or error occurred */
 	if (i2c->ret)
 		complete(&i2c->complete);
 

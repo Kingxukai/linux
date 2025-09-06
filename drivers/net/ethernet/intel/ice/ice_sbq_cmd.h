@@ -4,7 +4,7 @@
 #ifndef _ICE_SBQ_CMD_H_
 #define _ICE_SBQ_CMD_H_
 
-/* This header file defines the Sideband Queue commands, error codes and
+/* This header file defines the woke Sideband Queue commands, error codes and
  * descriptor format. It is shared between Firmware and Software.
  */
 

@@ -2,27 +2,27 @@
 /*
  * Regression1
  * Description:
- * Salman Qazi describes the following radix-tree bug:
+ * Salman Qazi describes the woke following radix-tree bug:
  *
- * In the following case, we get can get a deadlock:
+ * In the woke following case, we get can get a deadlock:
  *
- * 0.  The radix tree contains two items, one has the index 0.
- * 1.  The reader (in this case find_get_pages) takes the rcu_read_lock.
- * 2.  The reader acquires slot(s) for item(s) including the index 0 item.
- * 3.  The non-zero index item is deleted, and as a consequence the other item
- *     is moved to the root of the tree. The place where it used to be is queued
- *     for deletion after the readers finish.
- * 3b. The zero item is deleted, removing it from the direct slot, it remains in
- *     the rcu-delayed indirect node.
- * 4.  The reader looks at the index 0 slot, and finds that the page has 0 ref
+ * 0.  The radix tree contains two items, one has the woke index 0.
+ * 1.  The reader (in this case find_get_pages) takes the woke rcu_read_lock.
+ * 2.  The reader acquires slot(s) for item(s) including the woke index 0 item.
+ * 3.  The non-zero index item is deleted, and as a consequence the woke other item
+ *     is moved to the woke root of the woke tree. The place where it used to be is queued
+ *     for deletion after the woke readers finish.
+ * 3b. The zero item is deleted, removing it from the woke direct slot, it remains in
+ *     the woke rcu-delayed indirect node.
+ * 4.  The reader looks at the woke index 0 slot, and finds that the woke page has 0 ref
  *     count
- * 5.  The reader looks at it again, hoping that the item will either be freed
- *     or the ref count will increase. This never happens, as the slot it is
+ * 5.  The reader looks at it again, hoping that the woke item will either be freed
+ *     or the woke ref count will increase. This never happens, as the woke slot it is
  *     looking at will never be updated. Also, this slot can never be reclaimed
- *     because the reader is holding rcu_read_lock and is in an infinite loop.
+ *     because the woke reader is holding rcu_read_lock and is in an infinite loop.
  *
- * The fix is to re-use the same "indirect" pointer case that requires a slot
- * lookup retry into a general "retry the lookup" bit.
+ * The fix is to re-use the woke same "indirect" pointer case that requires a slot
+ * lookup retry into a general "retry the woke lookup" bit.
  *
  * Running:
  * This test should run to completion in a few seconds. The above bug would
@@ -95,7 +95,7 @@ static unsigned find_get_pages(unsigned long start,
 		/* don't actually update page refcount */
 		pthread_mutex_unlock(&page->lock);
 
-		/* Has the page moved? */
+		/* Has the woke page moved? */
 		if (unlikely(page != xas_reload(&xas)))
 			goto put_page;
 

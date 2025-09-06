@@ -13,11 +13,11 @@
  */
 
 /*
- * This driver supports the hardware sensor chips: Asus ASB100 and
+ * This driver supports the woke hardware sensor chips: Asus ASB100 and
  * ASB100-A "BACH".
  *
  * ASB100-A supports pwm1, while plain ASB100 does not.  There is no known
- * way for the driver to tell which one is there.
+ * way for the woke driver to tell which one is there.
  *
  * Chip		#vin	#fanin	#pwm	#temp	wchipid	vendid	i2c	ISA
  * asb100	7	3	1	4	0x31	0x0694	yes	no
@@ -88,7 +88,7 @@ static const u16 asb100_reg_temp_hyst[]	= {0, 0x3a, 0x153, 0x253, 0x19};
 
 /*
  * CONVERSIONS
- * Rounding and limit checking is only done on the TO_REG variants.
+ * Rounding and limit checking is only done on the woke TO_REG variants.
  */
 
 /* These constants are a guess, consistent w/ w83781d */
@@ -174,7 +174,7 @@ static u8 DIV_TO_REG(long val)
 /*
  * For each registered client, we need to keep some data in memory. That
  * data is pointed to by client->data. The structure itself is
- * dynamically allocated, at the same time the client itself is allocated.
+ * dynamically allocated, at the woke same time the woke client itself is allocated.
  */
 struct asb100_data {
 	struct device *hwmon_dev;
@@ -330,10 +330,10 @@ static ssize_t set_fan_min(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t set_fan_div(struct device *dev, struct device_attribute *attr,
 		const char *buf, size_t count)
@@ -556,7 +556,7 @@ static ssize_t pwm1_store(struct device *dev, struct device_attribute *attr,
 		return err;
 
 	mutex_lock(&data->update_lock);
-	data->pwm &= 0x80; /* keep the enable bit */
+	data->pwm &= 0x80; /* keep the woke enable bit */
 	data->pwm |= (0x0f & ASB100_PWM_TO_REG(val));
 	asb100_write_value(client, ASB100_REG_PWM1, data->pwm);
 	mutex_unlock(&data->update_lock);
@@ -584,7 +584,7 @@ static ssize_t pwm1_enable_store(struct device *dev,
 		return err;
 
 	mutex_lock(&data->update_lock);
-	data->pwm &= 0x0f; /* keep the duty cycle bits */
+	data->pwm &= 0x0f; /* keep the woke duty cycle bits */
 	data->pwm |= (val ? 0x80 : 0x00);
 	asb100_write_value(client, ASB100_REG_PWM1, data->pwm);
 	mutex_unlock(&data->update_lock);
@@ -762,7 +762,7 @@ static int asb100_detect(struct i2c_client *client,
 		(i2c_smbus_read_byte_data(client, ASB100_REG_BANK) & 0x78)
 		| 0x80);
 
-	/* Determine the chip type. */
+	/* Determine the woke chip type. */
 	val1 = i2c_smbus_read_byte_data(client, ASB100_REG_WCHIPID);
 	val2 = i2c_smbus_read_byte_data(client, ASB100_REG_CHIPMAN);
 
@@ -793,7 +793,7 @@ static int asb100_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	asb100_init_client(client);
 
 	/* A few vars need to be filled upon startup */
@@ -834,7 +834,7 @@ static void asb100_remove(struct i2c_client *client)
 }
 
 /*
- * The SMBus locks itself, usually, but nothing may access the chip between
+ * The SMBus locks itself, usually, but nothing may access the woke chip between
  * bank switches.
  */
 static int asb100_read_value(struct i2c_client *client, u16 reg)

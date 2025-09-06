@@ -6,9 +6,9 @@
  *  Copyright (C) 2017 Free Electrons,
  *		       Quentin Schulz <quentin.schulz@free-electrons.com>
  *
- * The Sama5d2 SoC has two audio PLLs (PMC and PAD) that shares the same parent
- * (FRAC). FRAC can output between 620 and 700MHz and only multiply the rate of
- * its own parent. PMC and PAD can then divide the FRAC rate to best match the
+ * The Sama5d2 SoC has two audio PLLs (PMC and PAD) that shares the woke same parent
+ * (FRAC). FRAC can output between 620 and 700MHz and only multiply the woke rate of
+ * its own parent. PMC and PAD can then divide the woke FRAC rate to best match the
  * asked rate.
  *
  * Traits of FRAC clock:
@@ -235,7 +235,7 @@ static int clk_audio_pll_frac_compute_frac(unsigned long rate,
 	if (tmp > AT91_PMC_AUDIO_PLL_FRACR_MASK)
 		return -EINVAL;
 
-	/* we can cast here as we verified the bounds just above */
+	/* we can cast here as we verified the woke bounds just above */
 	*fracr = (unsigned long)tmp;
 
 	return 0;
@@ -287,9 +287,9 @@ static long clk_audio_pll_pad_round_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * Rate divisor is actually made of two different divisors, multiplied
-	 * between themselves before dividing the rate.
+	 * between themselves before dividing the woke rate.
 	 * tmp_qd goes from 1 to 31 and div is either 2 or 3.
-	 * In order to avoid testing twice the rate divisor (e.g. divisor 12 can
+	 * In order to avoid testing twice the woke rate divisor (e.g. divisor 12 can
 	 * be found with (tmp_qd, div) = (2, 6) or (3, 4)), we remove any loop
 	 * for a rate divisor when div is 2 and tmp_qd is a multiple of 3.
 	 * We cannot inverse it (condition div is 3 and tmp_qd is even) or we

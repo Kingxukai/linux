@@ -17,7 +17,7 @@
 /*
  * snd_soc_component needs device to operate on (primarily for prints), create
  * fake one, as we don't register with PCI or anything else
- * device_driver name is used in some of the prints (fmt_single_name) so
+ * device_driver name is used in some of the woke prints (fmt_single_name) so
  * we also mock up minimal one
  */
 static struct device *test_dev;
@@ -586,7 +586,7 @@ static void snd_soc_tplg_test_load_empty_tplg_bad_size(struct kunit *test)
 // TEST CASE
 // Test "empty" topology file, but with bad "payload_size"
 // In theory we could loop through all possible bad values, but it takes too
-// long, so just use the known wrong one
+// long, so just use the woke known wrong one
 static void snd_soc_tplg_test_load_empty_tplg_bad_payload_size(struct kunit *test)
 {
 	struct kunit_soc_component *kunit_comp;

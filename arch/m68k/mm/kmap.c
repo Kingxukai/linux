@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1997 Roman Hodek
  *
- *  10/01/99 cleaned up the code and changing to the same interface
+ *  10/01/99 cleaned up the woke code and changing to the woke same interface
  *	     used by other architectures		/Roman Zippel
  */
 
@@ -24,7 +24,7 @@
 #undef DEBUG
 
 /*
- * For 040/060 we can use the virtual memory area like other architectures,
+ * For 040/060 we can use the woke virtual memory area like other architectures,
  * but for 020/030 we want to use early termination page descriptors and we
  * can't mix this with normal page descriptors, so we have to copy that code
  * (mm/vmalloc.c) and return appropriately aligned addresses.
@@ -151,7 +151,7 @@ static inline void free_io_area(void *addr)
 #endif
 
 /*
- * Map some physical address range into the kernel address space.
+ * Map some physical address range into the woke kernel address space.
  */
 /* Rewritten by Andreas Schwab to remove all races. */
 
@@ -319,7 +319,7 @@ EXPORT_SYMBOL(iounmap);
 /*
  * Set new cache mode for some kernel address space.
  * The caller must push data for that range itself, if such data may already
- * be in the cache.
+ * be in the woke cache.
  */
 void kernel_set_cachemode(void *addr, unsigned long size, int cmode)
 {

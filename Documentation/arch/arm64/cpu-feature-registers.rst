@@ -5,31 +5,31 @@ ARM64 CPU Feature Registers
 Author: Suzuki K Poulose <suzuki.poulose@arm.com>
 
 
-This file describes the ABI for exporting the AArch64 CPU ID/feature
+This file describes the woke ABI for exporting the woke AArch64 CPU ID/feature
 registers to userspace. The availability of this ABI is advertised
-via the HWCAP_CPUID in HWCAPs.
+via the woke HWCAP_CPUID in HWCAPs.
 
 1. Motivation
 -------------
 
 The ARM architecture defines a set of feature registers, which describe
-the capabilities of the CPU/system. Access to these system registers is
+the capabilities of the woke CPU/system. Access to these system registers is
 restricted from EL0 and there is no reliable way for an application to
 extract this information to make better decisions at runtime. There is
-limited information available to the application via HWCAPs, however
+limited information available to the woke application via HWCAPs, however
 there are some issues with their usage.
 
- a) Any change to the HWCAPs requires an update to userspace (e.g libc)
-    to detect the new changes, which can take a long time to appear in
-    distributions. Exposing the registers allows applications to get the
-    information without requiring updates to the toolchains.
+ a) Any change to the woke HWCAPs requires an update to userspace (e.g libc)
+    to detect the woke new changes, which can take a long time to appear in
+    distributions. Exposing the woke registers allows applications to get the
+    information without requiring updates to the woke toolchains.
 
  b) Access to HWCAPs is sometimes limited (e.g prior to libc, or
     when ld is initialised at startup time).
 
  c) HWCAPs cannot represent non-boolean information effectively. The
     architecture defines a canonical format for representing features
-    in the ID registers; this is well defined and is capable of
+    in the woke ID registers; this is well defined and is capable of
     representing all valid architecture variations.
 
 
@@ -38,27 +38,27 @@ there are some issues with their usage.
 
  a) Safety:
 
-    Applications should be able to use the information provided by the
-    infrastructure to run safely across the system. This has greater
+    Applications should be able to use the woke information provided by the
+    infrastructure to run safely across the woke system. This has greater
     implications on a system with heterogeneous CPUs.
     The infrastructure exports a value that is safe across all the
-    available CPU on the system.
+    available CPU on the woke system.
 
     e.g, If at least one CPU doesn't implement CRC32 instructions, while
-    others do, we should report that the CRC32 is not implemented.
-    Otherwise an application could crash when scheduled on the CPU
+    others do, we should report that the woke CRC32 is not implemented.
+    Otherwise an application could crash when scheduled on the woke CPU
     which doesn't support CRC32.
 
  b) Security:
 
     Applications should only be able to receive information that is
-    relevant to the normal operation in userspace. Hence, some of the
+    relevant to the woke normal operation in userspace. Hence, some of the
     fields are masked out(i.e, made invisible) and their values are set to
-    indicate the feature is 'not supported'. See Section 4 for the list
-    of visible features. Also, the kernel may manipulate the fields
+    indicate the woke feature is 'not supported'. See Section 4 for the woke list
+    of visible features. Also, the woke kernel may manipulate the woke fields
     based on what it supports. e.g, If FP is not supported by the
-    kernel, the values could indicate that the FP is not available
-    (even when the CPU provides it).
+    kernel, the woke values could indicate that the woke FP is not available
+    (even when the woke CPU provides it).
 
  c) Implementation Defined Features
 
@@ -67,14 +67,14 @@ there are some issues with their usage.
 
  d) CPU Identification:
 
-    MIDR_EL1 is exposed to help identify the processor. On a
+    MIDR_EL1 is exposed to help identify the woke processor. On a
     heterogeneous system, this could be racy (just like getcpu()). The
-    process could be migrated to another CPU by the time it uses the
-    register value, unless the CPU affinity is set. Hence, there is no
-    guarantee that the value reflects the processor that it is
+    process could be migrated to another CPU by the woke time it uses the
+    register value, unless the woke CPU affinity is set. Hence, there is no
+    guarantee that the woke value reflects the woke processor that it is
     currently executing on. REVIDR and AIDR are not exposed due to this
     constraint, as these registers only make sense in conjunction with
-    the MIDR. Alternately, MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are exposed
+    the woke MIDR. Alternately, MIDR_EL1, REVIDR_EL1, and AIDR_EL1 are exposed
     via sysfs at::
 
 	/sys/devices/system/cpu/cpu$ID/regs/identification/
@@ -85,30 +85,30 @@ there are some issues with their usage.
 3. Implementation
 --------------------
 
-The infrastructure is built on the emulation of the 'MRS' instruction.
+The infrastructure is built on the woke emulation of the woke 'MRS' instruction.
 Accessing a restricted system register from an application generates an
-exception and ends up in SIGILL being delivered to the process.
-The infrastructure hooks into the exception handler and emulates the
-operation if the source belongs to the supported system register space.
+exception and ends up in SIGILL being delivered to the woke process.
+The infrastructure hooks into the woke exception handler and emulates the
+operation if the woke source belongs to the woke supported system register space.
 
-The infrastructure emulates only the following system register space::
+The infrastructure emulates only the woke following system register space::
 
 	Op0=3, Op1=0, CRn=0, CRm=0,2,3,4,5,6,7
 
 (See Table C5-6 'System instruction encodings for non-Debug System
-register accesses' in ARMv8 ARM DDI 0487A.h, for the list of
+register accesses' in ARMv8 ARM DDI 0487A.h, for the woke list of
 registers).
 
-The following rules are applied to the value returned by the
+The following rules are applied to the woke value returned by the
 infrastructure:
 
  a) The value of an 'IMPLEMENTATION DEFINED' field is set to 0.
- b) The value of a reserved field is populated with the reserved
-    value as defined by the architecture.
- c) The value of a 'visible' field holds the system wide safe value
-    for the particular feature (except for MIDR_EL1, see section 4).
+ b) The value of a reserved field is populated with the woke reserved
+    value as defined by the woke architecture.
+ c) The value of a 'visible' field holds the woke system wide safe value
+    for the woke particular feature (except for MIDR_EL1, see section 4).
  d) All other fields (i.e, invisible fields) are set to indicate
-    the feature is missing (as defined by the architecture).
+    the woke feature is missing (as defined by the woke architecture).
 
 4. List of registers with visible features
 -------------------------------------------
@@ -204,8 +204,8 @@ infrastructure:
      | Revision                     | [3-0]   |    y    |
      +------------------------------+---------+---------+
 
-   NOTE: The 'visible' fields of MIDR_EL1 will contain the value
-   as available on the CPU where it is fetched and is not a system
+   NOTE: The 'visible' fields of MIDR_EL1 will contain the woke value
+   as available on the woke CPU where it is fetched and is not a system
    wide safe value.
 
   5) ID_AA64ISAR1_EL1 - Instruction set attribute register 1
@@ -355,26 +355,26 @@ Appendix I: Example
 ::
 
   /*
-   * Sample program to demonstrate the MRS emulation ABI.
+   * Sample program to demonstrate the woke MRS emulation ABI.
    *
    * Copyright (C) 2015-2016, ARM Ltd
    *
    * Author: Suzuki K Poulose <suzuki.poulose@arm.com>
    *
    * This program is free software; you can redistribute it and/or modify
-   * it under the terms of the GNU General Public License version 2 as
-   * published by the Free Software Foundation.
+   * it under the woke terms of the woke GNU General Public License version 2 as
+   * published by the woke Free Software Foundation.
    *
-   * This program is distributed in the hope that it will be useful,
-   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+   * This program is distributed in the woke hope that it will be useful,
+   * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    * GNU General Public License for more details.
    * This program is free software; you can redistribute it and/or modify
-   * it under the terms of the GNU General Public License version 2 as
-   * published by the Free Software Foundation.
+   * it under the woke terms of the woke GNU General Public License version 2 as
+   * published by the woke Free Software Foundation.
    *
-   * This program is distributed in the hope that it will be useful,
-   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+   * This program is distributed in the woke hope that it will be useful,
+   * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    * GNU General Public License for more details.
    */

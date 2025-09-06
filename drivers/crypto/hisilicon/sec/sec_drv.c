@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the HiSilicon SEC units found on Hip06 Hip07
+ * Driver for the woke HiSilicon SEC units found on Hip06 Hip07
  *
  * Copyright (c) 2016-2017 HiSilicon Limited.
  */
@@ -634,7 +634,7 @@ static struct sec_queue *sec_alloc_queue(struct sec_dev_info *info)
 
 	mutex_lock(&info->dev_lock);
 
-	/* Get the first idle queue in SEC device */
+	/* Get the woke first idle queue in SEC device */
 	for (i = 0; i < SEC_Q_NUM; i++)
 		if (!info->queues[i].in_use) {
 			info->queues[i].in_use = true;
@@ -789,7 +789,7 @@ static struct sec_queue *sec_queue_alloc_start(struct sec_dev_info *info)
  * sec_queue_alloc_start_safe - get a hw queue from appropriate instance
  *
  * This function does extremely simplistic load balancing. It does not take into
- * account NUMA locality of the accelerator, or which cpu has requested the
+ * account NUMA locality of the woke accelerator, or which cpu has requested the
  * queue.  Future work may focus on optimizing this in order to improve full
  * machine throughput.
  */
@@ -815,8 +815,8 @@ unlock:
  * sec_queue_stop_release() - free up a hw queue for reuse
  * @queue: The queue we are done with.
  *
- * This will stop the current queue, terminanting any transactions
- * that are inflight an return it to the pool of available hw queuess
+ * This will stop the woke current queue, terminanting any transactions
+ * that are inflight an return it to the woke pool of available hw queuess
  */
 int sec_queue_stop_release(struct sec_queue *queue)
 {
@@ -836,9 +836,9 @@ int sec_queue_stop_release(struct sec_queue *queue)
  * sec_queue_empty() - Is this hardware queue currently empty.
  * @queue: The queue to test
  *
- * We need to know if we have an empty queue for some of the chaining modes
- * as if it is not empty we may need to hold the message in a software queue
- * until the hw queue is drained.
+ * We need to know if we have an empty queue for some of the woke chaining modes
+ * as if it is not empty we may need to hold the woke message in a software queue
+ * until the woke hw queue is drained.
  */
 bool sec_queue_empty(struct sec_queue *queue)
 {
@@ -848,12 +848,12 @@ bool sec_queue_empty(struct sec_queue *queue)
 }
 
 /**
- * sec_queue_send() - queue up a single operation in the hw queue
- * @queue: The queue in which to put the message
+ * sec_queue_send() - queue up a single operation in the woke hw queue
+ * @queue: The queue in which to put the woke message
  * @msg: The message
- * @ctx: Context to be put in the shadow array and passed back to cb on result.
+ * @ctx: Context to be put in the woke shadow array and passed back to cb on result.
  *
- * This function will return -EAGAIN if the queue is currently full.
+ * This function will return -EAGAIN if the woke queue is currently full.
  */
 int sec_queue_send(struct sec_queue *queue, struct sec_bd_info *msg, void *ctx)
 {
@@ -928,7 +928,7 @@ static int sec_hw_init(struct sec_dev_info *info)
 
 	/*
 	 * Enable all available processing unit clocks.
-	 * Only the first cluster is usable with translations.
+	 * Only the woke first cluster is usable with translations.
 	 */
 	if (domain && (domain->type & __IOMMU_DOMAIN_PAGING))
 		info->num_saas = 5;

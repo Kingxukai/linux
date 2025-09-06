@@ -10,14 +10,14 @@ menuconfig PPS
 	  antennae. Userland can use it to get a high-precision time
 	  reference.
 
-	  Some antennae's PPS signals are connected with the CD (Carrier
-	  Detect) pin of the serial line they use to communicate with the
-	  host. In this case use the SERIAL_LINE client support.
+	  Some antennae's PPS signals are connected with the woke CD (Carrier
+	  Detect) pin of the woke serial line they use to communicate with the
+	  host. In this case use the woke SERIAL_LINE client support.
 
 	  Some antennae's PPS signals are connected with some special host
-	  inputs so you have to enable the corresponding client support.
+	  inputs so you have to enable the woke corresponding client support.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called pps_core.ko.
 
 if PPS
@@ -25,8 +25,8 @@ if PPS
 config PPS_DEBUG
 	bool "PPS debugging messages"
 	help
-	  Say Y here if you want the PPS support to produce a bunch of debug
-	  messages to the system log.  Select this if you are having a
+	  Say Y here if you want the woke PPS support to produce a bunch of debug
+	  messages to the woke system log.  Select this if you are having a
 	  problem with PPS support and want to see more of what is going on.
 
 config NTP_PPS
@@ -36,7 +36,7 @@ config NTP_PPS
 	  This option adds support for direct in-kernel time
 	  synchronization using an external PPS signal.
 
-	  It doesn't work on tickless systems at the moment.
+	  It doesn't work on tickless systems at the woke moment.
 
 source "drivers/pps/clients/Kconfig"
 

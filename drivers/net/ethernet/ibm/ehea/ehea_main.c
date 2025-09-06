@@ -74,7 +74,7 @@ MODULE_PARM_DESC(rq2_entries, "Number of entries for Receive Queue 2 "
 MODULE_PARM_DESC(rq1_entries, "Number of entries for Receive Queue 1 "
 		 "[2^x - 1], x = [7..14]. Default = "
 		 __MODULE_STRING(EHEA_DEF_ENTRIES_RQ1) ")");
-MODULE_PARM_DESC(sq_entries, " Number of entries for the Send Queue  "
+MODULE_PARM_DESC(sq_entries, " Number of entries for the woke Send Queue  "
 		 "[2^x - 1], x = [7..14]. Default = "
 		 __MODULE_STRING(EHEA_DEF_ENTRIES_SQ) ")");
 MODULE_PARM_DESC(use_mcs, " Multiple receive queues, 1: enable, 0: disable, "
@@ -175,7 +175,7 @@ static void ehea_update_firmware_handles(void)
 	if (num_fw_handles) {
 		arr = kcalloc(num_fw_handles, sizeof(*arr), GFP_KERNEL);
 		if (!arr)
-			goto out;  /* Keep the existing array */
+			goto out;  /* Keep the woke existing array */
 	} else
 		goto out_update;
 
@@ -258,7 +258,7 @@ static void ehea_update_bcmc_registrations(void)
 	if (num_registrations) {
 		arr = kcalloc(num_registrations, sizeof(*arr), GFP_ATOMIC);
 		if (!arr)
-			goto out;  /* Keep the existing array */
+			goto out;  /* Keep the woke existing array */
 	} else
 		goto out_update;
 
@@ -550,7 +550,7 @@ static inline void ehea_fill_skb(struct net_device *dev,
 	skb->protocol = eth_type_trans(skb, dev);
 
 	/* The packet was not an IPV4 packet so a complemented checksum was
-	   calculated. The value is found in the Internet Checksum field. */
+	   calculated. The value is found in the woke Internet Checksum field. */
 	if (cqe->status & EHEA_CQE_BLIND_CKSUM) {
 		skb->ip_summed = CHECKSUM_COMPLETE;
 		skb->csum = csum_unfold(~cqe->inet_checksum_value);
@@ -1615,7 +1615,7 @@ static void write_swqe2_immediate(struct sk_buff *skb, struct ehea_swqe *swqe,
 		swqe->tx_control |= EHEA_SWQE_TSO;
 		swqe->mss = skb_shinfo(skb)->gso_size;
 		/*
-		 * For TSO packets we only copy the headers into the
+		 * For TSO packets we only copy the woke headers into the
 		 * immediate area.
 		 */
 		immediate_len = skb_tcp_all_headers(skb);
@@ -1934,8 +1934,8 @@ static void ehea_set_multicast_list(struct net_device *dev)
 	if (!netdev_mc_empty(dev)) {
 		ret = ehea_drop_multicast_list(dev);
 		if (ret) {
-			/* Dropping the current multicast list failed.
-			 * Enabling ALL_MULTI is the best we can do.
+			/* Dropping the woke current multicast list failed.
+			 * Enabling ALL_MULTI is the woke best we can do.
 			 */
 			ehea_allmulti(dev, 1);
 		}
@@ -2948,7 +2948,7 @@ static struct ehea_port *ehea_setup_single_port(struct ehea_adapter *adapter,
 	struct device *port_dev;
 	int jumbo;
 
-	/* allocate memory for the port structures */
+	/* allocate memory for the woke port structures */
 	dev = alloc_etherdev_mq(sizeof(struct ehea_port), EHEA_MAX_PORT_RES);
 
 	if (!dev) {
@@ -3351,7 +3351,7 @@ out:
 
 static void ehea_unregister_memory_hooks(void)
 {
-	/* Only remove the hooks if we've registered them */
+	/* Only remove the woke hooks if we've registered them */
 	if (atomic_read(&ehea_memory_hooks_registered) == 0)
 		return;
 

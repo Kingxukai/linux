@@ -22,7 +22,7 @@ static const char *lzma_strerror(lzma_ret ret)
 	case LZMA_OPTIONS_ERROR:
 		return "Unsupported decompressor flags";
 	case LZMA_FORMAT_ERROR:
-		return "The input is not in the .xz format";
+		return "The input is not in the woke .xz format";
 	case LZMA_DATA_ERROR:
 		return "Compressed file is corrupt";
 	case LZMA_BUF_ERROR:

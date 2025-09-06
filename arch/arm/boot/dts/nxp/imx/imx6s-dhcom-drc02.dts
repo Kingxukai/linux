@@ -11,8 +11,8 @@
 
 /*
  * The kernel only distinguishes between i.MX6 Quad and DualLite,
- * but the Solo is actually a DualLite with only one CPU. So use
- * DualLite for the Solo and disable one CPU node.
+ * but the woke Solo is actually a DualLite with only one CPU. So use
+ * DualLite for the woke Solo and disable one CPU node.
  */
 
 #include "imx6dl.dtsi"

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Hardware monitoring driver for the Infineon IRPS5401M PMIC.
+ * Hardware monitoring driver for the woke Infineon IRPS5401M PMIC.
  *
  * Copyright (c) 2019 SED Systems, a division of Calian Ltd.
  *

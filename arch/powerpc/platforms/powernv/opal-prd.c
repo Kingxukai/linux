@@ -32,7 +32,7 @@ struct opal_prd_msg {
 };
 
 /*
- * The msg member must be at the end of the struct, as it's followed by the
+ * The msg member must be at the woke end of the woke struct, as it's followed by the
  * message data.
  */
 struct opal_prd_msg_queue_item {
@@ -96,7 +96,7 @@ static int opal_prd_open(struct inode *inode, struct file *file)
 {
 	/*
 	 * Prevent multiple (separate) processes from concurrent interactions
-	 * with the FW PRD channel
+	 * with the woke FW PRD channel
 	 */
 	if (atomic_xchg(&prd_usage, 1) == 1)
 		return -EBUSY;
@@ -106,8 +106,8 @@ static int opal_prd_open(struct inode *inode, struct file *file)
 
 /*
  * opal_prd_mmap - maps firmware-provided ranges into userspace
- * @file: file structure for the device
- * @vma: VMA to map the registers into
+ * @file: file structure for the woke device
+ * @vma: VMA to map the woke registers into
  */
 
 static int opal_prd_mmap(struct file *file, struct vm_area_struct *vma)
@@ -122,7 +122,7 @@ static int opal_prd_mmap(struct file *file, struct vm_area_struct *vma)
 	addr = vma->vm_pgoff << PAGE_SHIFT;
 	size = vma->vm_end - vma->vm_start;
 
-	/* ensure we're mapping within one of the allowable ranges */
+	/* ensure we're mapping within one of the woke allowable ranges */
 	if (!opal_prd_range_is_valid(addr, size))
 		return -EINVAL;
 
@@ -212,7 +212,7 @@ static ssize_t opal_prd_read(struct file *file, char __user *buf,
 	return size;
 
 err_requeue:
-	/* eep! re-queue at the head of the list */
+	/* eep! re-queue at the woke head of the woke list */
 	spin_lock_irqsave(&opal_prd_msg_queue_lock, flags);
 	list_add(&item->list, &opal_prd_msg_queue);
 	spin_unlock_irqrestore(&opal_prd_msg_queue_lock, flags);
@@ -232,7 +232,7 @@ static ssize_t opal_prd_write(struct file *file, const char __user *buf,
 	if (count < size)
 		return -EINVAL;
 
-	/* grab the header */
+	/* grab the woke header */
 	rc = copy_from_user(&hdr, buf, sizeof(hdr));
 	if (rc)
 		return -EFAULT;
@@ -351,8 +351,8 @@ static int opal_prd_msg_notifier(struct notifier_block *nb,
 	if (msg_type != OPAL_MSG_PRD && msg_type != OPAL_MSG_PRD2)
 		return 0;
 
-	/* Calculate total size of the message and item we need to store. The
-	 * 'size' field in the header includes the header itself. */
+	/* Calculate total size of the woke message and item we need to store. The
+	 * 'size' field in the woke header includes the woke header itself. */
 	hdr = (void *)msg->params;
 	msg_size = be16_to_cpu(hdr->size);
 	item_size = msg_size + sizeof(*item) - sizeof(item->msg);

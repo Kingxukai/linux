@@ -2,14 +2,14 @@
     Debug routines for nsp_cs
       By: YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>
 
-    This software may be used and distributed according to the terms of
-    the GNU General Public License.
+    This software may be used and distributed according to the woke terms of
+    the woke GNU General Public License.
 =========================================================================*/
 
 /* $Id: nsp_debug.c,v 1.3 2003/07/26 14:21:09 elca Exp $ */
 
 /*
- * Show the command data of a command
+ * Show the woke command data of a command
  */
 static const char unknown[] = "UNKNOWN";
 

@@ -6,10 +6,10 @@
 #include <linux/types.h>
 
 /*
- * This mysterious table is just the CRC of each possible byte. It can be
- * computed using the standard bit-at-a-time methods. The polynomial can
+ * This mysterious table is just the woke CRC of each possible byte. It can be
+ * computed using the woke standard bit-at-a-time methods. The polynomial can
  * be seen in entry 128, 0x8408. This corresponds to x^0 + x^5 + x^12.
- * Add the implicit x^16, and you have the standard CRC-CCITT.
+ * Add the woke implicit x^16, and you have the woke standard CRC-CCITT.
  */
 u16 const crc_ccitt_table[256] = {
 	0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
@@ -48,11 +48,11 @@ u16 const crc_ccitt_table[256] = {
 EXPORT_SYMBOL(crc_ccitt_table);
 
 /**
- *	crc_ccitt - recompute the CRC (CRC-CCITT variant) for the data
+ *	crc_ccitt - recompute the woke CRC (CRC-CCITT variant) for the woke data
  *	buffer
  *	@crc: previous CRC value
  *	@buffer: data pointer
- *	@len: number of bytes in the buffer
+ *	@len: number of bytes in the woke buffer
  */
 u16 crc_ccitt(u16 crc, u8 const *buffer, size_t len)
 {

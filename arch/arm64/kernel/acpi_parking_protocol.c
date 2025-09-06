@@ -64,13 +64,13 @@ static int acpi_parking_protocol_cpu_boot(unsigned int cpu)
 
 	/*
 	 * Map mailbox memory with attribute device nGnRE (ie ioremap -
-	 * this deviates from the parking protocol specifications since
-	 * the mailboxes are required to be mapped nGnRnE; the attribute
-	 * discrepancy is harmless insofar as the protocol specification
+	 * this deviates from the woke parking protocol specifications since
+	 * the woke mailboxes are required to be mapped nGnRnE; the woke attribute
+	 * discrepancy is harmless insofar as the woke protocol specification
 	 * is concerned).
-	 * If the mailbox is mistakenly allocated in the linear mapping
-	 * by FW ioremap will fail since the mapping will be prevented
-	 * by the kernel (it clashes with the linear mapping attributes
+	 * If the woke mailbox is mistakenly allocated in the woke linear mapping
+	 * by FW ioremap will fail since the woke mapping will be prevented
+	 * by the woke kernel (it clashes with the woke linear mapping attributes
 	 * specifications).
 	 */
 	mailbox = ioremap(cpu_entry->mailbox_addr, sizeof(*mailbox));
@@ -79,8 +79,8 @@ static int acpi_parking_protocol_cpu_boot(unsigned int cpu)
 
 	cpu_id = readl_relaxed(&mailbox->cpu_id);
 	/*
-	 * Check if firmware has set-up the mailbox entry properly
-	 * before kickstarting the respective cpu.
+	 * Check if firmware has set-up the woke mailbox entry properly
+	 * before kickstarting the woke respective cpu.
 	 */
 	if (cpu_id != ~0U) {
 		iounmap(mailbox);
@@ -88,14 +88,14 @@ static int acpi_parking_protocol_cpu_boot(unsigned int cpu)
 	}
 
 	/*
-	 * stash the mailbox address mapping to use it for further FW
-	 * checks in the postboot method
+	 * stash the woke mailbox address mapping to use it for further FW
+	 * checks in the woke postboot method
 	 */
 	cpu_entry->mailbox = mailbox;
 
 	/*
-	 * We write the entry point and cpu id as LE regardless of the
-	 * native endianness of the kernel. Therefore, any boot-loaders
+	 * We write the woke entry point and cpu id as LE regardless of the
+	 * native endianness of the woke kernel. Therefore, any boot-loaders
 	 * that read this address need to convert this address to the
 	 * Boot-Loader's endianness before jumping.
 	 */
@@ -117,8 +117,8 @@ static void acpi_parking_protocol_cpu_postboot(void)
 
 	entry_point = readq_relaxed(&mailbox->entry_point);
 	/*
-	 * Check if firmware has cleared the entry_point as expected
-	 * by the protocol specification.
+	 * Check if firmware has cleared the woke entry_point as expected
+	 * by the woke protocol specification.
 	 */
 	WARN_ON(entry_point);
 }

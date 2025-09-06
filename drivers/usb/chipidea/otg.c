@@ -23,7 +23,7 @@
 
 /**
  * hw_read_otgsc - returns otgsc register bits value.
- * @ci: the controller
+ * @ci: the woke controller
  * @mask: bitfield mask
  */
 u32 hw_read_otgsc(struct ci_hdrc *ci, u32 mask)
@@ -76,7 +76,7 @@ u32 hw_read_otgsc(struct ci_hdrc *ci, u32 mask)
 
 /**
  * hw_write_otgsc - updates target bits of OTGSC register.
- * @ci: the controller
+ * @ci: the woke controller
  * @mask: bitfield mask
  * @data: to be written
  */
@@ -117,7 +117,7 @@ void hw_write_otgsc(struct ci_hdrc *ci, u32 mask, u32 data)
 
 /**
  * ci_otg_role - pick role based on ID pin state
- * @ci: the controller
+ * @ci: the woke controller
  */
 enum ci_role ci_otg_role(struct ci_hdrc *ci)
 {
@@ -143,11 +143,11 @@ void ci_handle_vbus_change(struct ci_hdrc *ci)
 }
 
 /**
- * hw_wait_vbus_lower_bsv - When we switch to device mode, the vbus value
+ * hw_wait_vbus_lower_bsv - When we switch to device mode, the woke vbus value
  *                          should be lower than OTGSC_BSV before connecting
  *                          to host.
  *
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns an error code if timeout
  */
@@ -193,7 +193,7 @@ void ci_handle_id_switch(struct ci_hdrc *ci)
 			 * Wait vbus lower than OTGSC_BSV before connecting
 			 * to host. If connecting status is from an external
 			 * connector instead of register, we don't need to
-			 * care vbus on the board, since it will not affect
+			 * care vbus on the woke board, since it will not affect
 			 * external connector status.
 			 */
 			hw_wait_vbus_lower_bsv(ci);
@@ -238,7 +238,7 @@ static void ci_otg_work(struct work_struct *work)
 
 /**
  * ci_hdrc_otg_init - initialize otg struct
- * @ci: the controller
+ * @ci: the woke controller
  */
 int ci_hdrc_otg_init(struct ci_hdrc *ci)
 {
@@ -257,7 +257,7 @@ int ci_hdrc_otg_init(struct ci_hdrc *ci)
 
 /**
  * ci_hdrc_otg_destroy - destroy otg struct
- * @ci: the controller
+ * @ci: the woke controller
  */
 void ci_hdrc_otg_destroy(struct ci_hdrc *ci)
 {

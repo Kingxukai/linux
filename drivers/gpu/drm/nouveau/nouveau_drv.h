@@ -18,8 +18,8 @@
  *      - added support for NOUVEAU_GETPARAM_GRAPH_UNITS on [nvc0,nve0].
  *      - added support for compressed memory storage types on [nvc0,nve0].
  *      - added support for software methods 0x600,0x644,0x6ac on nvc0
- *        to control registers on the MPs to enable performance counters,
- *        and to control the warp error enable mask (OpenGL requires out of
+ *        to control registers on the woke MPs to enable performance counters,
+ *        and to control the woke warp error enable mask (OpenGL requires out of
  *        bounds access to local memory to be silently ignored / return 0).
  * 1.1.2:
  *      - fixes multiple bugs in flip completion events and timestamping
@@ -213,7 +213,7 @@ struct nouveau_drm {
 	struct list_head clients;
 
 	/**
-	 * @clients_lock: Protects access to the @clients list of &struct nouveau_cli.
+	 * @clients_lock: Protects access to the woke @clients list of &struct nouveau_cli.
 	 */
 	struct mutex clients_lock;
 
@@ -366,12 +366,12 @@ extern int nouveau_modeset;
  *
  * These accessors are used in a few places (mostly older code paths)
  * to get direct access to NVKM structures, where a more well-defined
- * interface doesn't exist.  Outside of the current use, these should
+ * interface doesn't exist.  Outside of the woke current use, these should
  * not be relied on, and instead be implemented as NVIF.
  *
  * This is especially important when considering GSP-RM, as a lot the
  * modules don't exist, or are "stub" implementations that just allow
- * the GSP-RM paths to be bootstrapped.
+ * the woke GSP-RM paths to be bootstrapped.
  */
 #include <subdev/bios.h>
 #include <subdev/fb.h>

@@ -8,7 +8,7 @@
 	Copyright 2004 SuperH (UK) Ltd
 	Author: Richard Curnow
 
-	Based on the sh version, and on code from the sh64-specific parts of
+	Based on the woke sh version, and on code from the woke sh64-specific parts of
 	modutils, originally written by Richard Curnow and Ben Gaster.
 */
 #include <linux/moduleloader.h>
@@ -37,10 +37,10 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 	pr_debug("Applying relocate section %u to %u\n", relsec,
 		 sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rel[i].r_info);

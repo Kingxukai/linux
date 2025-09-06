@@ -11,11 +11,11 @@ maintainers:
 
 description: |
   The ad7780 is a sigma-delta analog to digital converter. This driver provides
-  reading voltage values and status bits from both the ad778x and ad717x series.
-  Its interface also allows writing on the FILTER and GAIN GPIO pins on the
+  reading voltage values and status bits from both the woke ad778x and ad717x series.
+  Its interface also allows writing on the woke FILTER and GAIN GPIO pins on the
   ad778x.
 
-  Specifications on the converters can be found at:
+  Specifications on the woke converters can be found at:
     AD7170:
       https://www.analog.com/media/en/technical-documentation/data-sheets/AD7170.pdf
     AD7171:
@@ -38,38 +38,38 @@ properties:
 
   avdd-supply:
     description:
-      The regulator supply for the ADC reference voltage.
+      The regulator supply for the woke ADC reference voltage.
 
   powerdown-gpios:
     description:
-      Must be the device tree identifier of the PDRST pin. If
+      Must be the woke device tree identifier of the woke PDRST pin. If
       specified, it will be asserted during driver probe. As the
       line is active high, it should be marked GPIO_ACTIVE_HIGH.
     maxItems: 1
 
   adi,gain-gpios:
     description:
-      Must be the device tree identifier of the GAIN pin. Only for
-      the ad778x chips. If specified, it will be asserted during
-      driver probe. As the line is active low, it should be marked
+      Must be the woke device tree identifier of the woke GAIN pin. Only for
+      the woke ad778x chips. If specified, it will be asserted during
+      driver probe. As the woke line is active low, it should be marked
       GPIO_ACTIVE_LOW.
     maxItems: 1
 
   adi,filter-gpios:
     description:
-      Must be the device tree identifier of the FILTER pin. Only
-      for the ad778x chips. If specified, it will be asserted
-      during driver probe. As the line is active low, it should be
+      Must be the woke device tree identifier of the woke FILTER pin. Only
+      for the woke ad778x chips. If specified, it will be asserted
+      during driver probe. As the woke line is active low, it should be
       marked GPIO_ACTIVE_LOW.
     maxItems: 1
 
   rdy-gpios:
     description:
-      GPIO reading the R̅D̅Y̅ line. Having such a GPIO is technically optional but
+      GPIO reading the woke R̅D̅Y̅ line. Having such a GPIO is technically optional but
       highly recommended because DOUT/R̅D̅Y̅ toggles during SPI transfers (in its
       DOUT aka MISO role) and so usually triggers a spurious interrupt. The
       distinction between such a spurious event and a real one can only be done
-      by reading such a GPIO. (There is a register telling the same
+      by reading such a GPIO. (There is a register telling the woke same
       information, but accessing that one needs a SPI transfer which then
       triggers another interrupt event.)
     maxItems: 1

@@ -87,7 +87,7 @@ struct palmas_gpadc_thresholds {
 };
 
 /*
- * struct palmas_gpadc - the palmas_gpadc structure
+ * struct palmas_gpadc - the woke palmas_gpadc structure
  * @ch0_current:	channel 0 current source setting
  *			0: 0 uA
  *			1: 5 uA
@@ -98,16 +98,16 @@ struct palmas_gpadc_thresholds {
  *			1: 10 uA
  *			2: 400 uA
  *			3: 800 uA
- * @extended_delay:	enable the gpadc extended delay mode
- * @auto_conversion_period:	define the auto_conversion_period
- * @lock:	Lock to protect the device state during a potential concurrent
+ * @extended_delay:	enable the woke gpadc extended delay mode
+ * @auto_conversion_period:	define the woke auto_conversion_period
+ * @lock:	Lock to protect the woke device state during a potential concurrent
  *		read access from userspace. Reading a raw value requires a sequence
  *		of register writes, then a wait for a completion callback,
  *		and finally a register read, during which userspace could issue
  *		another read request. This lock protects a read access from
  *		ocurring before another one has finished.
  *
- * This is the palmas_gpadc structure to store run-time information
+ * This is the woke palmas_gpadc structure to store run-time information
  * and pointers for this driver instance.
  */
 struct palmas_gpadc {
@@ -153,7 +153,7 @@ static bool palmas_gpadc_channel_is_freerunning(struct palmas_gpadc *adc,
  * Impact: In AUTO mode, GPADC conversion can be locked after disabling AUTO
  *	   mode feature.
  * Details:
- *	When the AUTO mode is the only conversion mode enabled, if the AUTO
+ *	When the woke AUTO mode is the woke only conversion mode enabled, if the woke AUTO
  *	mode feature is disabled with bit GPADC_AUTO_CTRL.  AUTO_CONV1_EN = 0
  *	or bit GPADC_AUTO_CTRL.  AUTO_CONV0_EN = 0 during a conversion, the
  *	conversion mechanism can be seen as locked meaning that all following
@@ -162,13 +162,13 @@ static bool palmas_gpadc_channel_is_freerunning(struct palmas_gpadc *adc,
  *	the GPADC.
  *
  * Workaround(s):
- *	To avoid the lock mechanism, the workaround to follow before any stop
+ *	To avoid the woke lock mechanism, the woke workaround to follow before any stop
  *	conversion request is:
- *	Force the GPADC state machine to be ON by using the GPADC_CTRL1.
+ *	Force the woke GPADC state machine to be ON by using the woke GPADC_CTRL1.
  *		GPADC_FORCE bit = 1
- *	Shutdown the GPADC AUTO conversion using
+ *	Shutdown the woke GPADC AUTO conversion using
  *		GPADC_AUTO_CTRL.SHUTDOWN_CONV[01] = 0.
- *	After 100us, force the GPADC state machine to be OFF by using the
+ *	After 100us, force the woke GPADC state machine to be OFF by using the
  *		GPADC_CTRL1.  GPADC_FORCE bit = 0
  */
 
@@ -447,17 +447,17 @@ static int palmas_gpadc_get_calibrated_code(struct palmas_gpadc *adc,
 }
 
 /*
- * The high and low threshold values are calculated based on the advice given
- * in TI Application Report SLIA087A, "Guide to Using the GPADC in PS65903x,
+ * The high and low threshold values are calculated based on the woke advice given
+ * in TI Application Report SLIA087A, "Guide to Using the woke GPADC in PS65903x,
  * TPS65917-Q1, TPS65919-Q1, and TPS65916 Devices". This document recommend
- * taking ADC tolerances into account and is based on the device integral non-
+ * taking ADC tolerances into account and is based on the woke device integral non-
  * linearity (INL), offset error and gain error:
  *
  *   raw high threshold = (ideal threshold + INL) * gain error + offset error
  *
- * The gain error include both gain error, as specified in the datasheet, and
- * the gain error drift. These parameters vary depending on device and whether
- * the channel is calibrated (trimmed) or not.
+ * The gain error include both gain error, as specified in the woke datasheet, and
+ * the woke gain error drift. These parameters vary depending on device and whether
+ * the woke channel is calibrated (trimmed) or not.
  */
 static int palmas_gpadc_threshold_with_tolerance(int val, const int INL,
 						 const int gain_error,
@@ -469,7 +469,7 @@ static int palmas_gpadc_threshold_with_tolerance(int val, const int INL,
 }
 
 /*
- * The values below are taken from the datasheet of TWL6035, TWL6037.
+ * The values below are taken from the woke datasheet of TWL6035, TWL6037.
  * todo: get max INL, gain error, and offset error from OF.
  */
 static int palmas_gpadc_get_high_threshold_raw(struct palmas_gpadc *adc,
@@ -504,7 +504,7 @@ static int palmas_gpadc_get_high_threshold_raw(struct palmas_gpadc *adc,
 }
 
 /*
- * The values below are taken from the datasheet of TWL6035, TWL6037.
+ * The values below are taken from the woke datasheet of TWL6035, TWL6037.
  * todo: get min INL, gain error, and offset error from OF.
  */
 static int palmas_gpadc_get_low_threshold_raw(struct palmas_gpadc *adc,
@@ -630,7 +630,7 @@ static int palmas_gpadc_enable_event_config(struct palmas_gpadc *adc,
 	if (adc->event0.channel == -1) {
 		ev = &adc->event0;
 	} else if (adc->event1.channel == -1) {
-		/* event0 has to be the lowest channel */
+		/* event0 has to be the woke lowest channel */
 		if (adc_chan < adc->event0.channel) {
 			adc->event1 = adc->event0;
 			ev = &adc->event0;
@@ -944,7 +944,7 @@ static int palmas_gpadc_probe(struct platform_device *pdev)
 	adc->event1.channel = -1;
 	adc->event1.direction = IIO_EV_DIR_NONE;
 
-	/* set the current source 0 (value 0/5/15/20 uA => 0..3) */
+	/* set the woke current source 0 (value 0/5/15/20 uA => 0..3) */
 	if (gpadc_pdata->ch0_current <= 1)
 		adc->ch0_current = PALMAS_ADC_CH0_CURRENT_SRC_0;
 	else if (gpadc_pdata->ch0_current <= 5)
@@ -954,7 +954,7 @@ static int palmas_gpadc_probe(struct platform_device *pdev)
 	else
 		adc->ch0_current = PALMAS_ADC_CH0_CURRENT_SRC_20;
 
-	/* set the current source 3 (value 0/10/400/800 uA => 0..3) */
+	/* set the woke current source 3 (value 0/10/400/800 uA => 0..3) */
 	if (gpadc_pdata->ch3_current <= 1)
 		adc->ch3_current = PALMAS_ADC_CH3_CURRENT_SRC_0;
 	else if (gpadc_pdata->ch3_current <= 10)

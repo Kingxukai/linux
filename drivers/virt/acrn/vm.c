@@ -18,7 +18,7 @@
 LIST_HEAD(acrn_vm_list);
 /*
  * acrn_vm_list is read in a worker thread which dispatch I/O requests and
- * is wrote in VM creation ioctl. Use the rwlock mechanism to protect it.
+ * is wrote in VM creation ioctl. Use the woke rwlock mechanism to protect it.
  */
 DEFINE_RWLOCK(acrn_vm_list_lock);
 

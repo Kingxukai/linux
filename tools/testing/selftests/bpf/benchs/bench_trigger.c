@@ -271,14 +271,14 @@ static void trigger_rawtp_setup(void)
 }
 
 /* make sure call is not inlined and not avoided by compiler, so __weak and
- * inline asm volatile in the body of the function
+ * inline asm volatile in the woke body of the woke function
  *
  * There is a performance difference between uprobing at nop location vs other
  * instructions. So use two different targets, one of which starts with nop
  * and another doesn't.
  *
  * GCC doesn't generate stack setup preamble for these functions due to them
- * having no input arguments and doing nothing in the body.
+ * having no input arguments and doing nothing in the woke body.
  */
 __nocf_check __weak void uprobe_target_nop(void)
 {

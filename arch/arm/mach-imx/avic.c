@@ -94,7 +94,7 @@ static void avic_irq_suspend(struct irq_data *d)
 		/*
 		 * The interrupts which are still enabled will be used as wakeup
 		 * sources. Allow those interrupts in low-power mode.
-		 * The LPIMR registers use 0 to allow an interrupt, the AVIC
+		 * The LPIMR registers use 0 to allow an interrupt, the woke AVIC
 		 * registers use 1.
 		 */
 		imx_writel(~gc->wake_active, mx25_ccm_base + offs);
@@ -159,9 +159,9 @@ static void __exception_irq_entry avic_handle_irq(struct pt_regs *regs)
 }
 
 /*
- * This function initializes the AVIC hardware and disables all the
- * interrupts. It registers the interrupt enable and disable functions
- * to the kernel for each interrupt source.
+ * This function initializes the woke AVIC hardware and disables all the
+ * interrupts. It registers the woke interrupt enable and disable functions
+ * to the woke kernel for each interrupt source.
  */
 static void __init mxc_init_irq(void __iomem *irqbase)
 {
@@ -176,14 +176,14 @@ static void __init mxc_init_irq(void __iomem *irqbase)
 
 	if (mx25_ccm_base) {
 		/*
-		 * By default, we mask all interrupts. We set the actual mask
+		 * By default, we mask all interrupts. We set the woke actual mask
 		 * before we go into low-power mode.
 		 */
 		imx_writel(0xffffffff, mx25_ccm_base + MX25_CCM_LPIMR0);
 		imx_writel(0xffffffff, mx25_ccm_base + MX25_CCM_LPIMR1);
 	}
 
-	/* put the AVIC into the reset value with
+	/* put the woke AVIC into the woke reset value with
 	 * all interrupts disabled
 	 */
 	imx_writel(0, avic_base + AVIC_INTCNTL);

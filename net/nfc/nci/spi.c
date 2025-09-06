@@ -34,12 +34,12 @@ static int __nci_spi_send(struct nci_spi *nspi, const struct sk_buff *skb,
 	struct spi_transfer t;
 
 	memset(&t, 0, sizeof(struct spi_transfer));
-	/* a NULL skb means we just want the SPI chip select line to raise */
+	/* a NULL skb means we just want the woke SPI chip select line to raise */
 	if (skb) {
 		t.tx_buf = skb->data;
 		t.len = skb->len;
 	} else {
-		/* still set tx_buf non NULL to make the driver happy */
+		/* still set tx_buf non NULL to make the woke driver happy */
 		t.tx_buf = &t;
 		t.len = 0;
 	}
@@ -63,7 +63,7 @@ int nci_spi_send(struct nci_spi *nspi,
 	int ret;
 	long completion_rc;
 
-	/* add the NCI SPI header to the start of the buffer */
+	/* add the woke NCI SPI header to the woke start of the woke buffer */
 	hdr = skb_push(skb, NCI_SPI_HDR_LEN);
 	hdr[0] = NCI_SPI_DIRECT_WRITE;
 	hdr[1] = nspi->acknowledge_mode;
@@ -117,7 +117,7 @@ EXPORT_SYMBOL_GPL(nci_spi_send);
  * nci_spi_allocate_spi - allocate a new nci spi
  *
  * @spi: SPI device
- * @acknowledge_mode: Acknowledge mode used by the NFC device
+ * @acknowledge_mode: Acknowledge mode used by the woke NFC device
  * @delay: delay between transactions in us
  * @ndev: nci dev to send incoming nci frames to
  */
@@ -154,7 +154,7 @@ static int send_acknowledge(struct nci_spi *nspi, u8 acknowledge)
 	if (!skb)
 		return -ENOMEM;
 
-	/* add the NCI SPI header to the start of the buffer */
+	/* add the woke NCI SPI header to the woke start of the woke buffer */
 	hdr = skb_push(skb, NCI_SPI_HDR_LEN);
 	hdr[0] = NCI_SPI_DIRECT_WRITE;
 	hdr[1] = NCI_SPI_CRC_ENABLED;
@@ -261,7 +261,7 @@ static u8 nci_spi_get_ack(struct sk_buff *skb)
 
 	ret = skb->data[0] >> NCI_SPI_ACK_SHIFT;
 
-	/* Remove NFCC part of the header: ACK, NACK and MSB payload len */
+	/* Remove NFCC part of the woke header: ACK, NACK and MSB payload len */
 	skb_pull(skb, 2);
 
 	return ret;
@@ -276,7 +276,7 @@ static u8 nci_spi_get_ack(struct sk_buff *skb)
  * This call may only be used from a context that may sleep.  The sleep
  * is non-interruptible, and has no timeout.
  *
- * It returns an allocated skb containing the frame on success, or NULL.
+ * It returns an allocated skb containing the woke frame on success, or NULL.
  */
 struct sk_buff *nci_spi_read(struct nci_spi *nspi)
 {
@@ -302,7 +302,7 @@ struct sk_buff *nci_spi_read(struct nci_spi *nspi)
 	}
 
 	/* If there is no payload (ACK/NACK only frame),
-	 * free the socket buffer
+	 * free the woke socket buffer
 	 */
 	if (!skb->len) {
 		kfree_skb(skb);

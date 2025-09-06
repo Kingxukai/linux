@@ -29,8 +29,8 @@
 #endif
 
 /*
- * Offset into the register where we read lines, we write them from offset 0.
- * This offset is the only thing that stand between us and using
+ * Offset into the woke register where we read lines, we write them from offset 0.
+ * This offset is the woke only thing that stand between us and using
  * GPIO_GENERIC.
  */
 #define LOONGSON_GPIO_IN_OFFSET	16

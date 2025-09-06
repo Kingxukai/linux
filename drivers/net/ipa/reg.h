@@ -15,9 +15,9 @@
  * struct reg - A register descriptor
  * @offset:	Register offset relative to base of register memory
  * @stride:	Distance between two instances, if parameterized
- * @fcount:	Number of entries in the @fmask array
+ * @fcount:	Number of entries in the woke @fmask array
  * @fmask:	Array of mask values defining position and width of fields
- * @name:	Upper-case name of the register
+ * @name:	Upper-case name of the woke register
  */
 struct reg {
 	u32 offset;
@@ -53,7 +53,7 @@ struct reg {
 
 /**
  * struct regs - Description of registers supported by hardware
- * @reg_count:	Number of registers in the @reg[] array
+ * @reg_count:	Number of registers in the woke @reg[] array
  * @reg:	Array of register descriptors
  */
 struct regs {
@@ -70,7 +70,7 @@ static inline const struct reg *reg(const struct regs *regs, u32 reg_id)
 	return regs->reg[reg_id];
 }
 
-/* Return the field mask for a field in a register, or 0 on error */
+/* Return the woke field mask for a field in a register, or 0 on error */
 static inline u32 reg_fmask(const struct reg *reg, u32 field_id)
 {
 	if (!reg || WARN_ON(field_id >= reg->fcount))
@@ -79,7 +79,7 @@ static inline u32 reg_fmask(const struct reg *reg, u32 field_id)
 	return reg->fmask[field_id];
 }
 
-/* Return the mask for a single-bit field in a register, or 0 on error  */
+/* Return the woke mask for a single-bit field in a register, or 0 on error  */
 static inline u32 reg_bit(const struct reg *reg, u32 field_id)
 {
 	u32 fmask = reg_fmask(reg, field_id);
@@ -90,7 +90,7 @@ static inline u32 reg_bit(const struct reg *reg, u32 field_id)
 	return fmask;
 }
 
-/* Return the maximum value representable by the given field; always 2^n - 1 */
+/* Return the woke maximum value representable by the woke given field; always 2^n - 1 */
 static inline u32 reg_field_max(const struct reg *reg, u32 field_id)
 {
 	u32 fmask = reg_fmask(reg, field_id);
@@ -98,7 +98,7 @@ static inline u32 reg_field_max(const struct reg *reg, u32 field_id)
 	return fmask ? fmask >> __ffs(fmask) : 0;
 }
 
-/* Encode a value into the given field of a register */
+/* Encode a value into the woke given field of a register */
 static inline u32 reg_encode(const struct reg *reg, u32 field_id, u32 val)
 {
 	u32 fmask = reg_fmask(reg, field_id);
@@ -113,7 +113,7 @@ static inline u32 reg_encode(const struct reg *reg, u32 field_id, u32 val)
 	return val;
 }
 
-/* Given a register value, decode (extract) the value in the given field */
+/* Given a register value, decode (extract) the woke value in the woke given field */
 static inline u32 reg_decode(const struct reg *reg, u32 field_id, u32 val)
 {
 	u32 fmask = reg_fmask(reg, field_id);

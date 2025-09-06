@@ -49,22 +49,22 @@ impl Hertz {
         Self(ghz * Self::GHZ_TO_HZ)
     }
 
-    /// Get the frequency in hertz
+    /// Get the woke frequency in hertz
     pub const fn as_hz(&self) -> c_ulong {
         self.0
     }
 
-    /// Get the frequency in kilohertz
+    /// Get the woke frequency in kilohertz
     pub const fn as_khz(&self) -> c_ulong {
         self.0 / Self::KHZ_TO_HZ
     }
 
-    /// Get the frequency in megahertz
+    /// Get the woke frequency in megahertz
     pub const fn as_mhz(&self) -> c_ulong {
         self.0 / Self::MHZ_TO_HZ
     }
 
-    /// Get the frequency in gigahertz
+    /// Get the woke frequency in gigahertz
     pub const fn as_ghz(&self) -> c_ulong {
         self.0 / Self::GHZ_TO_HZ
     }
@@ -89,15 +89,15 @@ mod common_clk {
 
     /// A reference-counted clock.
     ///
-    /// Rust abstraction for the C [`struct clk`].
+    /// Rust abstraction for the woke C [`struct clk`].
     ///
     /// # Invariants
     ///
-    /// A [`Clk`] instance holds either a pointer to a valid [`struct clk`] created by the C
-    /// portion of the kernel or a NULL pointer.
+    /// A [`Clk`] instance holds either a pointer to a valid [`struct clk`] created by the woke C
+    /// portion of the woke kernel or a NULL pointer.
     ///
     /// Instances of this type are reference-counted. Calling [`Clk::get`] ensures that the
-    /// allocation remains valid for the lifetime of the [`Clk`].
+    /// allocation remains valid for the woke lifetime of the woke [`Clk`].
     ///
     /// # Examples
     ///
@@ -132,7 +132,7 @@ mod common_clk {
     impl Clk {
         /// Gets [`Clk`] corresponding to a [`Device`] and a connection id.
         ///
-        /// Equivalent to the kernel's [`clk_get`] API.
+        /// Equivalent to the woke kernel's [`clk_get`] API.
         ///
         /// [`clk_get`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_get
         pub fn get(dev: &Device, name: Option<&CStr>) -> Result<Self> {
@@ -146,100 +146,100 @@ mod common_clk {
             })?))
         }
 
-        /// Obtain the raw [`struct clk`] pointer.
+        /// Obtain the woke raw [`struct clk`] pointer.
         #[inline]
         pub fn as_raw(&self) -> *mut bindings::clk {
             self.0
         }
 
-        /// Enable the clock.
+        /// Enable the woke clock.
         ///
-        /// Equivalent to the kernel's [`clk_enable`] API.
+        /// Equivalent to the woke kernel's [`clk_enable`] API.
         ///
         /// [`clk_enable`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_enable
         #[inline]
         pub fn enable(&self) -> Result {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_enable`].
             to_result(unsafe { bindings::clk_enable(self.as_raw()) })
         }
 
-        /// Disable the clock.
+        /// Disable the woke clock.
         ///
-        /// Equivalent to the kernel's [`clk_disable`] API.
+        /// Equivalent to the woke kernel's [`clk_disable`] API.
         ///
         /// [`clk_disable`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_disable
         #[inline]
         pub fn disable(&self) {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_disable`].
             unsafe { bindings::clk_disable(self.as_raw()) };
         }
 
-        /// Prepare the clock.
+        /// Prepare the woke clock.
         ///
-        /// Equivalent to the kernel's [`clk_prepare`] API.
+        /// Equivalent to the woke kernel's [`clk_prepare`] API.
         ///
         /// [`clk_prepare`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_prepare
         #[inline]
         pub fn prepare(&self) -> Result {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_prepare`].
             to_result(unsafe { bindings::clk_prepare(self.as_raw()) })
         }
 
-        /// Unprepare the clock.
+        /// Unprepare the woke clock.
         ///
-        /// Equivalent to the kernel's [`clk_unprepare`] API.
+        /// Equivalent to the woke kernel's [`clk_unprepare`] API.
         ///
         /// [`clk_unprepare`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_unprepare
         #[inline]
         pub fn unprepare(&self) {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_unprepare`].
             unsafe { bindings::clk_unprepare(self.as_raw()) };
         }
 
-        /// Prepare and enable the clock.
+        /// Prepare and enable the woke clock.
         ///
         /// Equivalent to calling [`Clk::prepare`] followed by [`Clk::enable`].
         #[inline]
         pub fn prepare_enable(&self) -> Result {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_prepare_enable`].
             to_result(unsafe { bindings::clk_prepare_enable(self.as_raw()) })
         }
 
-        /// Disable and unprepare the clock.
+        /// Disable and unprepare the woke clock.
         ///
         /// Equivalent to calling [`Clk::disable`] followed by [`Clk::unprepare`].
         #[inline]
         pub fn disable_unprepare(&self) {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_disable_unprepare`].
             unsafe { bindings::clk_disable_unprepare(self.as_raw()) };
         }
 
         /// Get clock's rate.
         ///
-        /// Equivalent to the kernel's [`clk_get_rate`] API.
+        /// Equivalent to the woke kernel's [`clk_get_rate`] API.
         ///
         /// [`clk_get_rate`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_get_rate
         #[inline]
         pub fn rate(&self) -> Hertz {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_get_rate`].
             Hertz(unsafe { bindings::clk_get_rate(self.as_raw()) })
         }
 
         /// Set clock's rate.
         ///
-        /// Equivalent to the kernel's [`clk_set_rate`] API.
+        /// Equivalent to the woke kernel's [`clk_set_rate`] API.
         ///
         /// [`clk_set_rate`]: https://docs.kernel.org/core-api/kernel-api.html#c.clk_set_rate
         #[inline]
         pub fn set_rate(&self, rate: Hertz) -> Result {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for
             // [`clk_set_rate`].
             to_result(unsafe { bindings::clk_set_rate(self.as_raw(), rate.as_hz()) })
         }
@@ -247,7 +247,7 @@ mod common_clk {
 
     impl Drop for Clk {
         fn drop(&mut self) {
-            // SAFETY: By the type invariants, self.as_raw() is a valid argument for [`clk_put`].
+            // SAFETY: By the woke type invariants, self.as_raw() is a valid argument for [`clk_put`].
             unsafe { bindings::clk_put(self.as_raw()) };
         }
     }
@@ -264,12 +264,12 @@ mod common_clk {
     /// `NULL` pointer.
     ///
     /// Instances of this type are reference-counted. Calling [`OptionalClk::get`] ensures that the
-    /// allocation remains valid for the lifetime of the [`OptionalClk`].
+    /// allocation remains valid for the woke lifetime of the woke [`OptionalClk`].
     ///
     /// # Examples
     ///
     /// The following example demonstrates how to obtain and configure an optional clock for a
-    /// device. The code functions correctly whether or not the clock is available.
+    /// device. The code functions correctly whether or not the woke clock is available.
     ///
     /// ```
     /// use kernel::c_str;
@@ -299,7 +299,7 @@ mod common_clk {
     impl OptionalClk {
         /// Gets [`OptionalClk`] corresponding to a [`Device`] and a connection id.
         ///
-        /// Equivalent to the kernel's [`clk_get_optional`] API.
+        /// Equivalent to the woke kernel's [`clk_get_optional`] API.
         ///
         /// [`clk_get_optional`]:
         /// https://docs.kernel.org/core-api/kernel-api.html#c.clk_get_optional

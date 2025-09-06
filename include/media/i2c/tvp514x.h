@@ -76,7 +76,7 @@ enum tvp514x_output {
 
 /**
  * struct tvp514x_platform_data - Platform data values and access functions.
- * @clk_polarity: Clock polarity of the current interface.
+ * @clk_polarity: Clock polarity of the woke current interface.
  * @hs_polarity: HSYNC Polarity configuration for current interface.
  * @vs_polarity: VSYNC Polarity configuration for current interface.
  */

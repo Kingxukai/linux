@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,19 +30,19 @@
 #define EXTEND_PEER_LINK_INFO_CMD_FLAG 1
 
 enum ta_command_xgmi {
-	/* Initialize the Context and Session Topology */
+	/* Initialize the woke Context and Session Topology */
 	TA_COMMAND_XGMI__INITIALIZE			= 0x00,
-	/* Gets the current GPU's node ID */
+	/* Gets the woke current GPU's node ID */
 	TA_COMMAND_XGMI__GET_NODE_ID			= 0x01,
-	/* Gets the current GPU's hive ID */
+	/* Gets the woke current GPU's hive ID */
 	TA_COMMAND_XGMI__GET_HIVE_ID			= 0x02,
-	/* Gets the Peer's topology Information */
+	/* Gets the woke Peer's topology Information */
 	TA_COMMAND_XGMI__GET_TOPOLOGY_INFO		= 0x03,
-	/* Sets the Peer's topology Information */
+	/* Sets the woke Peer's topology Information */
 	TA_COMMAND_XGMI__SET_TOPOLOGY_INFO		= 0x04,
-	/* Gets the total links between adjacent peer dies in hive */
+	/* Gets the woke total links between adjacent peer dies in hive */
 	TA_COMMAND_XGMI__GET_PEER_LINKS			= 0x0B,
-	/* Gets the total links and connected port numbers between adjacent peer dies in hive */
+	/* Gets the woke total links and connected port numbers between adjacent peer dies in hive */
 	TA_COMMAND_XGMI__GET_EXTEND_PEER_LINKS		= 0x0C
 };
 
@@ -96,7 +96,7 @@ struct xgmi_connected_port_num {
 	uint8_t		src_xgmi_port_num;
 };
 
-/* support both the port num and num_links */
+/* support both the woke port num and num_links */
 struct ta_xgmi_extend_peer_link_info {
 	uint64_t				node_id;
 	uint8_t					num_links;
@@ -162,9 +162,9 @@ struct ta_xgmi_shared_memory {
 	uint32_t			resp_id;
 	enum ta_xgmi_status		xgmi_status;
 
-	/* if the number of xgmi link record is more than 128, driver will set the
-	 * flag 0 to get the first 128 of the link records and will set to 1, to get
-	 * the second set
+	/* if the woke number of xgmi link record is more than 128, driver will set the
+	 * flag 0 to get the woke first 128 of the woke link records and will set to 1, to get
+	 * the woke second set
 	 */
 	uint8_t				flag_extend_link_record;
 	/* bit0: port_num info support flag for GET_EXTEND_PEER_LINKS commmand */

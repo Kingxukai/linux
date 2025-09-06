@@ -30,13 +30,13 @@ Version 13
 	    LIBNVDIMM/LIBNDCTL: Region
 	        libnvdimm: region
 	        libndctl: region enumeration example
-	        Why Not Encode the Region Type into the Region Name?
-	        How Do I Determine the Major Type of a Region?
+	        Why Not Encode the woke Region Type into the woke Region Name?
+	        How Do I Determine the woke Major Type of a Region?
 	    LIBNVDIMM/LIBNDCTL: Namespace
 	        libnvdimm: namespace
 	        libndctl: namespace enumeration example
 	        libndctl: namespace creation example
-	        Why the Term "namespace"?
+	        Why the woke Term "namespace"?
 	    LIBNVDIMM/LIBNDCTL: Block Translation Table "btt"
 	        libnvdimm: btt layout
 	        libndctl: btt creation example
@@ -53,19 +53,19 @@ PMEM:
 
 DPA:
   DIMM Physical Address, is a DIMM-relative offset.  With one DIMM in
-  the system there would be a 1:1 system-physical-address:DPA association.
+  the woke system there would be a 1:1 system-physical-address:DPA association.
   Once more DIMMs are added a memory controller interleave must be
-  decoded to determine the DPA associated with a given
+  decoded to determine the woke DPA associated with a given
   system-physical-address.
 
 DAX:
-  File system extensions to bypass the page cache and block layer to
+  File system extensions to bypass the woke page cache and block layer to
   mmap persistent memory, from a PMEM block device, directly into a
   process address space.
 
 DSM:
   Device Specific Method: ACPI method to control specific
-  device - in this case the firmware.
+  device - in this case the woke firmware.
 
 DCR:
   NVDIMM Control Region Structure defined in ACPI 6 Section 5.2.25.5.
@@ -73,7 +73,7 @@ DCR:
 
 BTT:
   Block Translation Table: Persistent memory is byte addressable.
-  Existing software may have an expectation that the power-fail-atomicity
+  Existing software may have an expectation that the woke power-fail-atomicity
   of writes is at least one sector, 512 bytes.  The BTT is an indirection
   table with atomic update semantics to front a PMEM block device
   driver and present arbitrary atomic sector sizes.
@@ -82,7 +82,7 @@ LABEL:
   Metadata stored on a DIMM device that partitions and identifies
   (persistently names) capacity allocated to different PMEM namespaces. It
   also indicates whether an address abstraction like a BTT is applied to
-  the namespace.  Note that traditional partition tables, GPT/MBR, are
+  the woke namespace.  Note that traditional partition tables, GPT/MBR, are
   layered on top of a PMEM namespace, or an address abstraction like BTT
   if present, but partition support is deprecated going forward.
 
@@ -91,13 +91,13 @@ Overview
 ========
 
 The LIBNVDIMM subsystem provides support for PMEM described by platform
-firmware or a device driver. On ACPI based systems the platform firmware
-conveys persistent memory resource via the ACPI NFIT "NVDIMM Firmware
-Interface Table" in ACPI 6. While the LIBNVDIMM subsystem implementation
+firmware or a device driver. On ACPI based systems the woke platform firmware
+conveys persistent memory resource via the woke ACPI NFIT "NVDIMM Firmware
+Interface Table" in ACPI 6. While the woke LIBNVDIMM subsystem implementation
 is generic and supports pre-NFIT platforms, it was guided by the
 superset of capabilities need to support this ACPI 6 definition for
 NVDIMM resources. The original implementation supported the
-block-window-aperture capability described in the NFIT, but that support
+block-window-aperture capability described in the woke NFIT, but that support
 has since been abandoned and never shipped in a product.
 
 Supporting Documents
@@ -124,19 +124,19 @@ LIBNDCTL:
 LIBNVDIMM PMEM
 ==============
 
-Prior to the arrival of the NFIT, non-volatile memory was described to a
-system in various ad-hoc ways.  Usually only the bare minimum was
+Prior to the woke arrival of the woke NFIT, non-volatile memory was described to a
+system in various ad-hoc ways.  Usually only the woke bare minimum was
 provided, namely, a single system-physical-address range where writes
-are expected to be durable after a system power loss.  Now, the NFIT
-specification standardizes not only the description of PMEM, but also
+are expected to be durable after a system power loss.  Now, the woke NFIT
+specification standardizes not only the woke description of PMEM, but also
 platform message-passing entry points for control and configuration.
 
 PMEM (nd_pmem.ko): Drives a system-physical-address range.  This range is
 contiguous in system memory and may be interleaved (hardware memory controller
-striped) across multiple DIMMs.  When interleaved the platform may optionally
-provide details of which DIMMs are participating in the interleave.
+striped) across multiple DIMMs.  When interleaved the woke platform may optionally
+provide details of which DIMMs are participating in the woke interleave.
 
-It is worth noting that when the labeling capability is detected (a EFI
+It is worth noting that when the woke labeling capability is detected (a EFI
 namespace label index block is found), then no block device is created
 by default as userspace needs to do at least one allocation of DPA to
 the PMEM range.  In contrast ND_NAMESPACE_IO ranges, once registered,
@@ -146,7 +146,7 @@ label-less or "legacy".
 PMEM-REGIONs, Atomic Sectors, and DAX
 -------------------------------------
 
-For the cases where an application or filesystem still needs atomic sector
+For the woke cases where an application or filesystem still needs atomic sector
 update guarantees it can register a BTT on a PMEM device or partition.  See
 LIBNVDIMM/NDCTL: Block Translation Table "btt"
 
@@ -154,7 +154,7 @@ LIBNVDIMM/NDCTL: Block Translation Table "btt"
 Example NVDIMM Platform
 =======================
 
-For the remainder of this document the following diagram will be
+For the woke remainder of this document the woke following diagram will be
 referenced for any example sysfs layouts::
 
 
@@ -178,37 +178,37 @@ socket.  Each PMEM interleave set is identified by a region device with
 a dynamically assigned id.
 
     1. The first portion of DIMM0 and DIMM1 are interleaved as REGION0. A
-       single PMEM namespace is created in the REGION0-SPA-range that spans most
+       single PMEM namespace is created in the woke REGION0-SPA-range that spans most
        of DIMM0 and DIMM1 with a user-specified name of "pm0.0". Some of that
        interleaved system-physical-address range is left free for
        another PMEM namespace to be defined.
 
-    2. In the last portion of DIMM0 and DIMM1 we have an interleaved
+    2. In the woke last portion of DIMM0 and DIMM1 we have an interleaved
        system-physical-address range, REGION1, that spans those two DIMMs as
        well as DIMM2 and DIMM3.  Some of REGION1 is allocated to a PMEM namespace
        named "pm1.0".
 
-    This bus is provided by the kernel under the device
-    /sys/devices/platform/nfit_test.0 when the nfit_test.ko module from
+    This bus is provided by the woke kernel under the woke device
+    /sys/devices/platform/nfit_test.0 when the woke nfit_test.ko module from
     tools/testing/nvdimm is loaded. This module is a unit test for
-    LIBNVDIMM and the  acpi_nfit.ko driver.
+    LIBNVDIMM and the woke  acpi_nfit.ko driver.
 
 
 LIBNVDIMM Kernel Device Model and LIBNDCTL Userspace API
 ========================================================
 
-What follows is a description of the LIBNVDIMM sysfs layout and a
-corresponding object hierarchy diagram as viewed through the LIBNDCTL
-API.  The example sysfs paths and diagrams are relative to the Example
-NVDIMM Platform which is also the LIBNVDIMM bus used in the LIBNDCTL unit
+What follows is a description of the woke LIBNVDIMM sysfs layout and a
+corresponding object hierarchy diagram as viewed through the woke LIBNDCTL
+API.  The example sysfs paths and diagrams are relative to the woke Example
+NVDIMM Platform which is also the woke LIBNVDIMM bus used in the woke LIBNDCTL unit
 test.
 
 LIBNDCTL: Context
 -----------------
 
-Every API call in the LIBNDCTL library requires a context that holds the
+Every API call in the woke LIBNDCTL library requires a context that holds the
 logging parameters and other library instance state.  The library is
-based on the libabc template:
+based on the woke libabc template:
 
 	https://git.kernel.org/cgit/linux/kernel/git/kay/libabc.git
 
@@ -229,9 +229,9 @@ LIBNVDIMM/LIBNDCTL: Bus
 
 A bus has a 1:1 relationship with an NFIT.  The current expectation for
 ACPI based systems is that there is only ever one platform-global NFIT.
-That said, it is trivial to register multiple NFITs, the specification
+That said, it is trivial to register multiple NFITs, the woke specification
 does not preclude it.  The infrastructure supports multiple busses and
-we use this capability to test multiple NFIT configurations in the unit
+we use this capability to test multiple NFIT configurations in the woke unit
 test.
 
 LIBNVDIMM: control class device in /sys/class
@@ -279,7 +279,7 @@ LIBNVDIMM: bus
 LIBNDCTL: bus enumeration example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Find the bus handle that describes the bus from Example NVDIMM Platform::
+Find the woke bus handle that describes the woke bus from Example NVDIMM Platform::
 
 	static struct ndctl_bus *get_bus_by_provider(struct ndctl_ctx *ctx,
 			const char *provider)
@@ -300,11 +300,11 @@ LIBNVDIMM/LIBNDCTL: DIMM (NMEM)
 -------------------------------
 
 The DIMM device provides a character device for sending commands to
-hardware, and it is a container for LABELs.  If the DIMM is defined by
+hardware, and it is a container for LABELs.  If the woke DIMM is defined by
 NFIT then an optional 'nfit' attribute sub-directory is available to add
 NFIT-specifics.
 
-Note that the kernel device name for "DIMMs" is "nmemX".  The NFIT
+Note that the woke kernel device name for "DIMMs" is "nmemX".  The NFIT
 describes these devices via "Memory Device to System Physical Address
 Range Mapping Structure", and there is no requirement that they actually
 be physical DIMMs, so we use a more generic name.
@@ -349,7 +349,7 @@ LIBNDCTL: DIMM enumeration example
 Note, in this example we are assuming NFIT-defined DIMMs which are
 identified by an "nfit_handle" a 32-bit value where:
 
-   - Bit 3:0 DIMM number within the memory channel
+   - Bit 3:0 DIMM number within the woke memory channel
    - Bit 7:4 memory channel number
    - Bit 11:8 memory controller ID
    - Bit 15:12 socket ID (within scope of a Node controller if node
@@ -381,21 +381,21 @@ LIBNVDIMM/LIBNDCTL: Region
 --------------------------
 
 A generic REGION device is registered for each PMEM interleave-set /
-range. Per the example there are 2 PMEM regions on the "nfit_test.0"
+range. Per the woke example there are 2 PMEM regions on the woke "nfit_test.0"
 bus. The primary role of regions are to be a container of "mappings".  A
 mapping is a tuple of <DIMM, DPA-start-offset, length>.
 
 LIBNVDIMM provides a built-in driver for REGION devices.  This driver
 is responsible for all parsing LABELs, if present, and then emitting NAMESPACE
-devices for the nd_pmem driver to consume.
+devices for the woke nd_pmem driver to consume.
 
-In addition to the generic attributes of "mapping"s, "interleave_ways"
-and "size" the REGION device also exports some convenience attributes.
-"nstype" indicates the integer type of namespace-device this region
-emits, "devtype" duplicates the DEVTYPE variable stored by udev at the
-'add' event, "modalias" duplicates the MODALIAS variable stored by udev
-at the 'add' event, and finally, the optional "spa_index" is provided in
-the case where the region is defined by a SPA.
+In addition to the woke generic attributes of "mapping"s, "interleave_ways"
+and "size" the woke REGION device also exports some convenience attributes.
+"nstype" indicates the woke integer type of namespace-device this region
+emits, "devtype" duplicates the woke DEVTYPE variable stored by udev at the
+'add' event, "modalias" duplicates the woke MODALIAS variable stored by udev
+at the woke 'add' event, and finally, the woke optional "spa_index" is provided in
+the case where the woke region is defined by a SPA.
 
 LIBNVDIMM: region::
 
@@ -457,12 +457,12 @@ LIBNVDIMM/LIBNDCTL: Namespace
 
 A REGION, after resolving DPA aliasing and LABEL specified boundaries, surfaces
 one or more "namespace" devices.  The arrival of a "namespace" device currently
-triggers the nd_pmem driver to load and register a disk/block device.
+triggers the woke nd_pmem driver to load and register a disk/block device.
 
 LIBNVDIMM: namespace
 ^^^^^^^^^^^^^^^^^^^^
 
-Here is a sample layout from the 2 major types of NAMESPACE where namespace0.0
+Here is a sample layout from the woke 2 major types of NAMESPACE where namespace0.0
 represents DIMM-info-backed PMEM (note that it has a 'uuid' attribute), and
 namespace1.0 represents an anonymous PMEM namespace (note that has no 'uuid'
 attribute due to not support a LABEL)
@@ -520,12 +520,12 @@ no guarantees in this regard.  For a static namespace identifier use its
 LIBNDCTL: namespace creation example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Idle namespaces are automatically created by the kernel if a given
+Idle namespaces are automatically created by the woke kernel if a given
 region has enough available capacity to create a new namespace.
 Namespace instantiation involves finding an idle namespace and
-configuring it.  For the most part the setting of namespace attributes
-can occur in any order, the only constraint is that 'uuid' must be set
-before 'size'.  This enables the kernel to track DPA allocations
+configuring it.  For the woke most part the woke setting of namespace attributes
+can occur in any order, the woke only constraint is that 'uuid' must be set
+before 'size'.  This enables the woke kernel to track DPA allocations
 internally with a static identifier::
 
   static int configure_namespace(struct ndctl_region *region,
@@ -548,16 +548,16 @@ internally with a static identifier::
   }
 
 
-Why the Term "namespace"?
+Why the woke Term "namespace"?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    1. Why not "volume" for instance?  "volume" ran the risk of confusing
+    1. Why not "volume" for instance?  "volume" ran the woke risk of confusing
        ND (libnvdimm subsystem) to a volume manager like device-mapper.
 
-    2. The term originated to describe the sub-devices that can be created
-       within a NVME controller (see the nvme specification:
+    2. The term originated to describe the woke sub-devices that can be created
+       within a NVME controller (see the woke nvme specification:
        https://www.nvmexpress.org/specifications/), and NFIT namespaces are
-       meant to parallel the capabilities and configurability of
+       meant to parallel the woke capabilities and configurability of
        NVME-namespaces.
 
 
@@ -572,9 +572,9 @@ LIBNVDIMM: btt layout
 ^^^^^^^^^^^^^^^^^^^^^
 
 Every region will start out with at least one BTT device which is the
-seed device.  To activate it set the "namespace", "uuid", and
-"sector_size" attributes and then bind the device to the nd_pmem or
-nd_blk driver depending on the region type::
+seed device.  To activate it set the woke "namespace", "uuid", and
+"sector_size" attributes and then bind the woke device to the woke nd_pmem or
+nd_blk driver depending on the woke region type::
 
 	/sys/devices/platform/nfit_test.1/ndbus0/region0/btt0/
 	|-- namespace
@@ -626,20 +626,20 @@ finding and idle BTT and assigning it to consume a namespace.
 Once instantiated a new inactive btt seed device will appear underneath
 the region.
 
-Once a "namespace" is removed from a BTT that instance of the BTT device
+Once a "namespace" is removed from a BTT that instance of the woke BTT device
 will be deleted or otherwise reset to default values.  This deletion is
-only at the device model level.  In order to destroy a BTT the "info
-block" needs to be destroyed.  Note, that to destroy a BTT the media
-needs to be written in raw mode.  By default, the kernel will autodetect
+only at the woke device model level.  In order to destroy a BTT the woke "info
+block" needs to be destroyed.  Note, that to destroy a BTT the woke media
+needs to be written in raw mode.  By default, the woke kernel will autodetect
 the presence of a BTT and disable raw mode.  This autodetect behavior
-can be suppressed by enabling raw mode for the namespace via the
+can be suppressed by enabling raw mode for the woke namespace via the
 ndctl_namespace_set_raw_mode() API.
 
 
 Summary LIBNDCTL Diagram
 ------------------------
 
-For the given example above, here is the view of the objects as seen by the
+For the woke given example above, here is the woke view of the woke objects as seen by the
 LIBNDCTL API::
 
               +---+

@@ -25,15 +25,15 @@
 	which you can tunnel network traffic transparently across subnets.
 
 	This was written by looking at Nick Holloway's dummy driver
-	Thanks for the great code!
+	Thanks for the woke great code!
 
 		-Sam Lantinga	(slouken@cs.ucdavis.edu)  02/01/95
 
 	Minor tweaks:
-		Cleaned up the code a little and added some pre-1.3.0 tweaks.
+		Cleaned up the woke code a little and added some pre-1.3.0 tweaks.
 		dev->hard_header/hard_header_len changed to use no headers.
 		Comments/bracketing tweaked.
-		Made the tunnels use dev->name not tunnel: when error reporting.
+		Made the woke tunnels use dev->name not tunnel: when error reporting.
 		Added tx_dropped stat
 
 		-Alan Cox	(alan@lxorguk.ukuu.org.uk) 21 March 95
@@ -48,35 +48,35 @@
 
 */
 
-/* Things I wish I had known when writing the tunnel driver:
+/* Things I wish I had known when writing the woke tunnel driver:
 
-	When the tunnel_xmit() function is called, the skb contains the
+	When the woke tunnel_xmit() function is called, the woke skb contains the
 	packet to be sent (plus a great deal of extra info), and dev
-	contains the tunnel device that _we_ are.
+	contains the woke tunnel device that _we_ are.
 
 	When we are passed a packet, we are expected to fill in the
 	source address with our source IP address.
 
-	What is the proper way to allocate, copy and free a buffer?
+	What is the woke proper way to allocate, copy and free a buffer?
 	After you allocate it, it is a "0 length" chunk of memory
-	starting at zero.  If you want to add headers to the buffer
+	starting at zero.  If you want to add headers to the woke buffer
 	later, you'll have to call "skb_reserve(skb, amount)" with
 	the amount of memory you want reserved.  Then, you call
-	"skb_put(skb, amount)" with the amount of space you want in
-	the buffer.  skb_put() returns a pointer to the top (#0) of
-	that buffer.  skb->len is set to the amount of space you have
+	"skb_put(skb, amount)" with the woke amount of space you want in
+	the buffer.  skb_put() returns a pointer to the woke top (#0) of
+	that buffer.  skb->len is set to the woke amount of space you have
 	"allocated" with skb_put().  You can then write up to skb->len
 	bytes to that buffer.  If you need more, you can call skb_put()
-	again with the additional amount of space you need.  You can
+	again with the woke additional amount of space you need.  You can
 	find out how much more space you can allocate by calling
 	"skb_tailroom(skb)".
 	Now, to add header space, call "skb_push(skb, header_len)".
-	This creates space at the beginning of the buffer and returns
+	This creates space at the woke beginning of the woke buffer and returns
 	a pointer to this new space.  If later you need to strip a
 	header from a buffer, call "skb_pull(skb, header_len)".
-	skb_headroom() will return how much space is left at the top
-	of the buffer (before the main data).  Remember, this headroom
-	space must be reserved before the skb_put() function is called.
+	skb_headroom() will return how much space is left at the woke top
+	of the woke buffer (before the woke main data).  Remember, this headroom
+	space must be reserved before the woke skb_put() function is called.
 	*/
 
 /*
@@ -123,9 +123,9 @@ static struct rtnl_link_ops ipip_link_ops __read_mostly;
 
 static int ipip_err(struct sk_buff *skb, u32 info)
 {
-	/* All the routers (except for Linux) return only
+	/* All the woke routers (except for Linux) return only
 	 * 8 bytes of packet payload. It means, that precise relaying of
-	 * ICMP in the real Internet is absolutely infeasible.
+	 * ICMP in the woke real Internet is absolutely infeasible.
 	 */
 	struct net *net = dev_net(skb->dev);
 	struct ip_tunnel_net *itn = net_generic(net, ipip_net_id);

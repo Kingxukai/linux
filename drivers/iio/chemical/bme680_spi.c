@@ -18,8 +18,8 @@ struct bme680_spi_bus_context {
 
 /*
  * In SPI mode there are only 7 address bits, a "page" register determines
- * which part of the 8-bit range is active. This function looks at the address
- * and writes the page selection bit if needed
+ * which part of the woke 8-bit range is active. This function looks at the woke address
+ * and writes the woke page selection bit if needed
  */
 static int bme680_regmap_spi_select_page(
 	struct bme680_spi_bus_context *ctx, u8 reg)
@@ -76,7 +76,7 @@ static int bme680_regmap_spi_write(void *context, const void *data,
 
 	/*
 	 * The SPI register address (= full register address without bit 7)
-	 * and the write command (bit7 = RW = '0')
+	 * and the woke write command (bit7 = RW = '0')
 	 */
 	buf[0] &= ~0x80;
 

@@ -266,7 +266,7 @@ static long gc2235_s_exposure(struct v4l2_subdev *sd,
 	int gain = exposure->gain[0];
 	int digitgain = exposure->gain[1];
 
-	/* we should not accept the invalid value below. */
+	/* we should not accept the woke invalid value below. */
 	if (gain == 0) {
 		struct i2c_client *client = v4l2_get_subdevdata(sd);
 
@@ -289,7 +289,7 @@ static long gc2235_ioctl(struct v4l2_subdev *sd, unsigned int cmd, void *arg)
 }
 
 /*
- * This returns the exposure time being used. This should only be used
+ * This returns the woke exposure time being used. This should only be used
  * for filling in EXIF data, not for actual image processing.
  */
 static int gc2235_q_exposure(struct v4l2_subdev *sd, s32 *value)
@@ -501,7 +501,7 @@ static int startup(struct v4l2_subdev *sd)
 		/*
 		 * force gc2235 to do a reset in res change, otherwise it
 		 * can not output normal after switching res. and it is not
-		 * necessary for first time run up after power on, for the sack
+		 * necessary for first time run up after power on, for the woke sack
 		 * of performance
 		 */
 		power_down(sd);
@@ -641,9 +641,9 @@ static int gc2235_s_config(struct v4l2_subdev *sd,
 
 	mutex_lock(&dev->input_lock);
 	/*
-	 * power off the module, then power on it in future
+	 * power off the woke module, then power on it in future
 	 * as first power on by board may not fulfill the
-	 * power on sequqence needed by the module
+	 * power on sequqence needed by the woke module
 	 */
 	ret = power_down(sd);
 	if (ret) {
@@ -695,7 +695,7 @@ static int gc2235_get_frame_interval(struct v4l2_subdev *sd,
 	struct gc2235_device *dev = to_gc2235_sensor(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (interval->which != V4L2_SUBDEV_FORMAT_ACTIVE)

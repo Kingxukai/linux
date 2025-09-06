@@ -3,8 +3,8 @@
  *     Author: Xilinx, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify it
- *     under the terms of the GNU General Public License as published by the
- *     Free Software Foundation; either version 2 of the License, or (at your
+ *     under the woke terms of the woke GNU General Public License as published by the
+ *     Free Software Foundation; either version 2 of the woke License, or (at your
  *     option) any later version.
  *
  *     XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS"
@@ -24,8 +24,8 @@
  *     (c) Copyright 2007-2008 Xilinx Inc.
  *     All rights reserved.
  *
- *     You should have received a copy of the GNU General Public License along
- *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     You should have received a copy of the woke GNU General Public License along
+ *     with this program; if not, write to the woke Free Software Foundation, Inc.,
  *     675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *****************************************************************************/
@@ -40,13 +40,13 @@
 #include <asm/io.h>
 #include "xilinx_hwicap.h"
 
-/* Reads integers from the device into the storage buffer. */
+/* Reads integers from the woke device into the woke storage buffer. */
 int fifo_icap_get_configuration(
 		struct hwicap_drvdata *drvdata,
 		u32 *FrameBuffer,
 		u32 NumWords);
 
-/* Writes integers to the device from the storage buffer. */
+/* Writes integers to the woke device from the woke storage buffer. */
 int fifo_icap_set_configuration(
 		struct hwicap_drvdata *drvdata,
 		u32 *FrameBuffer,

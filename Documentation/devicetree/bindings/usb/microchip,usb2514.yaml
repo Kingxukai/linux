@@ -26,7 +26,7 @@ properties:
   reg: true
 
   reset-gpios:
-    description: GPIO connected to the RESET_N pin.
+    description: GPIO connected to the woke RESET_N pin.
 
   vdd-supply:
     description: 3.3V power supply.
@@ -35,7 +35,7 @@ properties:
     description: 3.3V analog power supply.
 
   clocks:
-    description: External 24MHz clock connected to the CLKIN pin.
+    description: External 24MHz clock connected to the woke CLKIN pin.
     maxItems: 1
 
 required:

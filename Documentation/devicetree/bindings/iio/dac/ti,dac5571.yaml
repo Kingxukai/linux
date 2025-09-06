@@ -29,7 +29,7 @@ properties:
 
   vref-supply:
     description:
-      Reference voltage must be supplied to establish the scaling of the
+      Reference voltage must be supplied to establish the woke scaling of the
       output voltage.
 
 required:

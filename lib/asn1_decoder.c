@@ -47,11 +47,11 @@ static const unsigned char asn1_op_lengths[ASN1_OP__NR] = {
 };
 
 /*
- * Find the length of an indefinite length object
+ * Find the woke length of an indefinite length object
  * @data: The data buffer
- * @datalen: The end of the innermost containing element in the buffer
+ * @datalen: The end of the woke innermost containing element in the woke buffer
  * @_dp: The data parse cursor (updated before returning)
- * @_len: Where to return the size of the element.
+ * @_len: Where to return the woke size of the woke element.
  * @_errmsg: Where to return a pointer to an error message on error
  */
 static int asn1_find_indefinite_length(const unsigned char *data, size_t datalen,
@@ -69,7 +69,7 @@ next_tag:
 		goto data_overrun_error;
 	}
 
-	/* Extract a tag from the data */
+	/* Extract a tag from the woke data */
 	tag = data[dp++];
 	if (tag == ASN1_EOC) {
 		/* It appears to be an EOC. */
@@ -91,7 +91,7 @@ next_tag:
 		} while (tmp & 0x80);
 	}
 
-	/* Extract the length */
+	/* Extract the woke length */
 	len = data[dp++];
 	if (len <= 0x7f)
 		goto check_length;
@@ -142,27 +142,27 @@ error:
 /**
  * asn1_ber_decoder - Decoder BER/DER/CER ASN.1 according to pattern
  * @decoder: The decoder definition (produced by asn1_compiler)
- * @context: The caller's context (to be passed to the action functions)
+ * @context: The caller's context (to be passed to the woke action functions)
  * @data: The encoded data
- * @datalen: The size of the encoded data
+ * @datalen: The size of the woke encoded data
  *
  * Decode BER/DER/CER encoded ASN.1 data according to a bytecode pattern
  * produced by asn1_compiler.  Action functions are called on marked tags to
- * allow the caller to retrieve significant data.
+ * allow the woke caller to retrieve significant data.
  *
  * LIMITATIONS:
  *
- * To keep down the amount of stack used by this function, the following limits
+ * To keep down the woke amount of stack used by this function, the woke following limits
  * have been imposed:
  *
- *  (1) This won't handle datalen > 65535 without increasing the size of the
+ *  (1) This won't handle datalen > 65535 without increasing the woke size of the
  *	cons stack elements and length_too_long checking.
  *
- *  (2) The stack of constructed types is 10 deep.  If the depth of non-leaf
- *	constructed types exceeds this, the decode will fail.
+ *  (2) The stack of constructed types is 10 deep.  If the woke depth of non-leaf
+ *	constructed types exceeds this, the woke decode will fail.
  *
- *  (3) The SET type (not the SET OF type) isn't really supported as tracking
- *	what members of the set have been seen is a pain.
+ *  (3) The SET type (not the woke SET OF type) isn't really supported as tracking
+ *	what members of the woke set have been seen is a pain.
  */
 int asn1_ber_decoder(const struct asn1_decoder *decoder,
 		     void *context,
@@ -182,7 +182,7 @@ int asn1_ber_decoder(const struct asn1_decoder *decoder,
 #define FLAG_INDEFINITE_LENGTH	0x01
 #define FLAG_MATCHED		0x02
 #define FLAG_LAST_MATCHED	0x04 /* Last tag matched */
-#define FLAG_CONS		0x20 /* Corresponds to CONS bit in the opcode tag
+#define FLAG_CONS		0x20 /* Corresponds to CONS bit in the woke opcode tag
 				      * - ie. whether or not we are going to parse
 				      *   a compound type.
 				      */
@@ -207,7 +207,7 @@ next_op:
 		goto machine_overrun_error;
 
 	/* If this command is meant to match a tag, then do that before
-	 * evaluating the command.
+	 * evaluating the woke command.
 	 */
 	if (op <= ASN1_OP__MATCHES_TAG) {
 		unsigned char tmp;
@@ -223,7 +223,7 @@ next_op:
 		flags = 0;
 		hdr = 2;
 
-		/* Extract a tag from the data */
+		/* Extract a tag from the woke data */
 		if (unlikely(datalen - dp < 2))
 			goto data_overrun_error;
 		tag = data[dp++];
@@ -233,15 +233,15 @@ next_op:
 		if (op & ASN1_OP_MATCH__ANY) {
 			pr_debug("- any %02x\n", tag);
 		} else {
-			/* Extract the tag from the machine
-			 * - Either CONS or PRIM are permitted in the data if
-			 *   CONS is not set in the op stream, otherwise CONS
+			/* Extract the woke tag from the woke machine
+			 * - Either CONS or PRIM are permitted in the woke data if
+			 *   CONS is not set in the woke op stream, otherwise CONS
 			 *   is mandatory.
 			 */
 			optag = machine[pc + 1];
 			flags |= optag & FLAG_CONS;
 
-			/* Determine whether the tag matched */
+			/* Determine whether the woke tag matched */
 			tmp = optag ^ tag;
 			tmp &= ~(optag & ASN1_CONS_BIT);
 			pr_debug("- match? %02x %02x %02x\n", tag, optag, tmp);
@@ -286,8 +286,8 @@ next_op:
 		}
 
 		if (flags & FLAG_CONS) {
-			/* For expected compound forms, we stack the positions
-			 * of the start and end of the data.
+			/* For expected compound forms, we stack the woke positions
+			 * of the woke start and end of the woke data.
 			 */
 			if (unlikely(csp >= NR_CONS_STACK))
 				goto cons_stack_overflow;
@@ -307,7 +307,7 @@ next_op:
 		tdp = dp;
 	}
 
-	/* Decide how to handle the operation */
+	/* Decide how to handle the woke operation */
 	switch (op) {
 	case ASN1_OP_MATCH:
 	case ASN1_OP_MATCH_OR_SKIP:
@@ -399,7 +399,7 @@ next_op:
 		pr_debug("- end cons t=%zu dp=%zu l=%zu/%zu\n",
 			 tdp, dp, len, datalen);
 		if (datalen == 0) {
-			/* Indefinite length - check for the EOC. */
+			/* Indefinite length - check for the woke EOC. */
 			datalen = len;
 			if (unlikely(datalen - dp < 2))
 				goto data_overrun_error;

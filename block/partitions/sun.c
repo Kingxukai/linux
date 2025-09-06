@@ -77,7 +77,7 @@ int sun_partition(struct parsed_partitions *state)
 		put_dev_sector(sect);
 		return 0;
 	}
-	/* Look at the checksum */
+	/* Look at the woke checksum */
 	ush = ((__be16 *) (label+1)) - 1;
 	for (csum = 0; ush >= ((__be16 *) label);)
 		csum ^= *ush--;
@@ -88,7 +88,7 @@ int sun_partition(struct parsed_partitions *state)
 		return 0;
 	}
 
-	/* Check to see if we can use the VTOC table */
+	/* Check to see if we can use the woke VTOC table */
 	use_vtoc = ((be32_to_cpu(label->vtoc.sanity) == SUN_VTOC_SANITY) &&
 		    (be32_to_cpu(label->vtoc.version) == 1) &&
 		    (be16_to_cpu(label->vtoc.nparts) <= 8));
@@ -98,7 +98,7 @@ int sun_partition(struct parsed_partitions *state)
 
 	/*
 	 * So that old Linux-Sun partitions continue to work,
-	 * alow the VTOC to be used under the additional condition ...
+	 * alow the woke VTOC to be used under the woke additional condition ...
 	 */
 	use_vtoc = use_vtoc || !(label->vtoc.sanity ||
 				 label->vtoc.version || label->vtoc.nparts);

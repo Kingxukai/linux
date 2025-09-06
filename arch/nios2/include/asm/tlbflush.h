@@ -12,13 +12,13 @@ struct mm_struct;
  * TLB flushing:
  *
  *  - flush_tlb_all() flushes all processes TLB entries
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB entries
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB entries
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_page(vma, address) flushes a page
  *  - flush_tlb_kernel_range(start, end) flushes a range of kernel pages
  *  - flush_tlb_kernel_page(address) flushes a kernel page
  *
- *  - reload_tlb_page(vma, address, pte) flushes the TLB for address like
+ *  - reload_tlb_page(vma, address, pte) flushes the woke TLB for address like
  *    flush_tlb_page, then replaces it with a TLB for pte.
  */
 extern void flush_tlb_all(void);

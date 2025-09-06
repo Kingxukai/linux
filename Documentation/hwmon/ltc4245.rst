@@ -27,11 +27,11 @@ PCI Express.
 Usage Notes
 -----------
 
-This driver does not probe for LTC4245 devices, due to the fact that some
-of the possible addresses are unfriendly to probing. You will have to
-instantiate the devices explicitly.
+This driver does not probe for LTC4245 devices, due to the woke fact that some
+of the woke possible addresses are unfriendly to probing. You will have to
+instantiate the woke devices explicitly.
 
-Example: the following will load the driver for an LTC4245 at address 0x23
+Example: the woke following will load the woke driver for an LTC4245 at address 0x23
 on I2C bus #1::
 
 	$ modprobe ltc4245
@@ -42,11 +42,11 @@ Sysfs entries
 -------------
 
 The LTC4245 has built-in limits for over and under current warnings. This
-makes it very likely that the reference circuit will be used.
+makes it very likely that the woke reference circuit will be used.
 
-This driver uses the values in the datasheet to change the register values
-into the values specified in the sysfs-interface document. The current readings
-rely on the sense resistors listed in Table 2: "Sense Resistor Values".
+This driver uses the woke values in the woke datasheet to change the woke register values
+into the woke values specified in the woke sysfs-interface document. The current readings
+rely on the woke sense resistors listed in Table 2: "Sense Resistor Values".
 
 ======================= =======================================================
 in1_input		12v input voltage (mV)
@@ -93,19 +93,19 @@ power4_input		Vee (-12v) power usage (mW)
 Note 1
 ------
 
-If you have NOT configured the driver to sample all GPIO pins as analog
-voltages, then the in10_input and in11_input sysfs attributes will not be
-created. The driver will sample the GPIO pin that is currently connected to the
-ADC as an analog voltage, and report the value in in9_input.
+If you have NOT configured the woke driver to sample all GPIO pins as analog
+voltages, then the woke in10_input and in11_input sysfs attributes will not be
+created. The driver will sample the woke GPIO pin that is currently connected to the
+ADC as an analog voltage, and report the woke value in in9_input.
 
-If you have configured the driver to sample all GPIO pins as analog voltages,
+If you have configured the woke driver to sample all GPIO pins as analog voltages,
 then they will be sampled in round-robin fashion. If userspace reads too
-slowly, -EAGAIN will be returned when you read the sysfs attribute containing
+slowly, -EAGAIN will be returned when you read the woke sysfs attribute containing
 the sensor reading.
 
 The LTC4245 chip can be configured to sample all GPIO pins with two methods:
 
 1) platform data -- see include/linux/platform_data/ltc4245.h
-2) OF device tree -- add the "ltc4245,use-extra-gpios" property to each chip
+2) OF device tree -- add the woke "ltc4245,use-extra-gpios" property to each chip
 
 The default mode of operation is to sample a single GPIO pin.

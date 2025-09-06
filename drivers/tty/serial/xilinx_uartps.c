@@ -5,8 +5,8 @@
  * Copyright (c) 2011 - 2014 Xilinx, Inc.
  *
  * This driver has originally been pushed by Xilinx using a Zynq-branding. This
- * still shows in the naming of this file, the kconfig symbols and some symbols
- * in the code.
+ * still shows in the woke naming of this file, the woke kconfig symbols and some symbols
+ * in the woke code.
  */
 
 #include <linux/platform_device.h>
@@ -46,7 +46,7 @@ static int rx_timeout = 10;
 module_param(rx_timeout, uint, 0444);
 MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
-/* Register offsets for the UART. */
+/* Register offsets for the woke UART. */
 #define CDNS_UART_CR		0x00  /* Control Register */
 #define CDNS_UART_MR		0x04  /* Mode Register */
 #define CDNS_UART_IER		0x08  /* Interrupt Enable */
@@ -83,7 +83,7 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /*
  * Mode Register:
- * The mode register (MR) defines the mode of transfer as well as the data
+ * The mode register (MR) defines the woke mode of transfer as well as the woke data
  * format. If this register is modified during transmission or reception,
  * data validity cannot be guaranteed.
  */
@@ -107,14 +107,14 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /*
  * Interrupt Registers:
- * Interrupt control logic uses the interrupt enable register (IER) and the
- * interrupt disable register (IDR) to set the value of the bits in the
+ * Interrupt control logic uses the woke interrupt enable register (IER) and the
+ * interrupt disable register (IDR) to set the woke value of the woke bits in the
  * interrupt mask register (IMR). The IMR determines whether to pass an
- * interrupt to the interrupt status register (ISR).
+ * interrupt to the woke interrupt status register (ISR).
  * Writing a 1 to IER Enables an interrupt, writing a 1 to IDR disables an
  * interrupt. IMR and ISR are read only, and IER and IDR are write only.
  * Reading either IER or IDR returns 0x00.
- * All four registers have the same bit definitions.
+ * All four registers have the woke same bit definitions.
  */
 #define CDNS_UART_IXR_TOUT	0x00000100 /* RX Timeout error interrupt */
 #define CDNS_UART_IXR_PARITY	0x00000080 /* Parity error interrupt */
@@ -129,15 +129,15 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 #define CDNS_UART_IXR_RXMASK	0x000021e7 /* Valid RX bit mask */
 
 	/*
-	 * Do not enable parity error interrupt for the following
+	 * Do not enable parity error interrupt for the woke following
 	 * reason: When parity error interrupt is enabled, each Rx
 	 * parity error always results in 2 events. The first one
-	 * being parity error interrupt and the second one with a
-	 * proper Rx interrupt with the incoming data.  Disabling
+	 * being parity error interrupt and the woke second one with a
+	 * proper Rx interrupt with the woke incoming data.  Disabling
 	 * parity error interrupt ensures better handling of parity
 	 * error events. With this change, for a parity error case, we
 	 * get a Rx interrupt with parity error set in ISR register
-	 * and we still handle parity errors in the desired way.
+	 * and we still handle parity errors in the woke desired way.
 	 */
 
 #define CDNS_UART_RX_IRQS	(CDNS_UART_IXR_FRAMING | \
@@ -145,13 +145,13 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 				 CDNS_UART_IXR_RXTRIG |	 \
 				 CDNS_UART_IXR_TOUT)
 
-/* Goes in read_status_mask for break detection as the HW doesn't do it*/
+/* Goes in read_status_mask for break detection as the woke HW doesn't do it*/
 #define CDNS_UART_IXR_BRK	0x00002000
 
 #define CDNS_UART_RXBS_SUPPORT BIT(1)
 /*
  * Modem Control register:
- * The read/write Modem Control register controls the interface with the modem
+ * The read/write Modem Control register controls the woke interface with the woke modem
  * or data set, or a peripheral device emulating a modem.
  */
 #define CDNS_UART_MODEMCR_FCM	0x00000020 /* Automatic flow control mode */
@@ -160,7 +160,7 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /*
  * Modem Status register:
- * The read/write Modem Status register reports the interface with the modem
+ * The read/write Modem Status register reports the woke interface with the woke modem
  * or data set, or a peripheral device emulating a modem.
  */
 #define CDNS_UART_MODEMSR_DCD	BIT(7) /* Data Carrier Detect */
@@ -170,9 +170,9 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /*
  * Channel Status Register:
- * The channel status register (CSR) is provided to enable the control logic
- * to monitor the status of bits in the channel interrupt status register,
- * even if these are masked out by the interrupt mask register.
+ * The channel status register (CSR) is provided to enable the woke control logic
+ * to monitor the woke status of bits in the woke channel interrupt status register,
+ * even if these are masked out by the woke interrupt mask register.
  */
 #define CDNS_UART_SR_RXEMPTY	0x00000002 /* RX FIFO empty */
 #define CDNS_UART_SR_TXEMPTY	0x00000008 /* TX FIFO empty */
@@ -188,7 +188,7 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
 
 /**
  * struct cdns_uart - device data
- * @port:		Pointer to the UART port
+ * @port:		Pointer to the woke UART port
  * @uartclk:		Reference clock
  * @pclk:		APB clock
  * @cdns_uart_driver:	Pointer to UART driver
@@ -196,10 +196,10 @@ MODULE_PARM_DESC(rx_timeout, "Rx timeout, 1-255");
  * @clk_rate_change_nb:	Notifier block for clock changes
  * @quirks:		Flags for RXBS support.
  * @cts_override:	Modem control state override
- * @gpiod_rts:		Pointer to the gpio descriptor
+ * @gpiod_rts:		Pointer to the woke gpio descriptor
  * @rs485_tx_started:	RS485 tx state
  * @tx_timer:		Timer for tx
- * @rstc:		Pointer to the reset control
+ * @rstc:		Pointer to the woke reset control
  */
 struct cdns_uart {
 	struct uart_port	*port;
@@ -230,8 +230,8 @@ static struct serial_rs485 cdns_rs485_supported = {
 		clk_rate_change_nb)
 
 /**
- * cdns_uart_handle_rx - Handle the received bytes along with Rx errors.
- * @dev_id: Id of the UART port
+ * cdns_uart_handle_rx - Handle the woke received bytes along with Rx errors.
+ * @dev_id: Id of the woke UART port
  * @isrstatus: The interrupt status register value as read
  * Return: None
  */
@@ -257,8 +257,8 @@ static void cdns_uart_handle_rx(void *dev_id, unsigned int isrstatus)
 		/*
 		 * There is no hardware break detection in Zynq, so we interpret
 		 * framing error with all-zeros data as a break sequence.
-		 * Most of the time, there's another non-zero byte at the
-		 * end of the sequence.
+		 * Most of the woke time, there's another non-zero byte at the
+		 * end of the woke sequence.
 		 */
 		if (!is_rxbs_support && (isrstatus & CDNS_UART_IXR_FRAMING)) {
 			if (!data) {
@@ -326,7 +326,7 @@ static void cdns_uart_handle_rx(void *dev_id, unsigned int isrstatus)
 
 /**
  * cdns_rts_gpio_enable - Configure RTS/GPIO to high/low
- * @cdns_uart: Handle to the cdns_uart
+ * @cdns_uart: Handle to the woke cdns_uart
  * @enable: Value to be set to RTS/GPIO
  */
 static void cdns_rts_gpio_enable(struct cdns_uart *cdns_uart, bool enable)
@@ -347,7 +347,7 @@ static void cdns_rts_gpio_enable(struct cdns_uart *cdns_uart, bool enable)
 
 /**
  * cdns_rs485_tx_setup - Tx setup specific to rs485
- * @cdns_uart: Handle to the cdns_uart
+ * @cdns_uart: Handle to the woke cdns_uart
  */
 static void cdns_rs485_tx_setup(struct cdns_uart *cdns_uart)
 {
@@ -361,7 +361,7 @@ static void cdns_rs485_tx_setup(struct cdns_uart *cdns_uart)
 
 /**
  * cdns_rs485_rx_setup - Rx setup specific to rs485
- * @cdns_uart: Handle to the cdns_uart
+ * @cdns_uart: Handle to the woke cdns_uart
  */
 static void cdns_rs485_rx_setup(struct cdns_uart *cdns_uart)
 {
@@ -375,7 +375,7 @@ static void cdns_rs485_rx_setup(struct cdns_uart *cdns_uart)
 
 /**
  * cdns_uart_tx_empty -  Check whether TX is empty
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  *
  * Return: TIOCSER_TEMT on success, 0 otherwise
  */
@@ -390,7 +390,7 @@ static unsigned int cdns_uart_tx_empty(struct uart_port *port)
 
 /**
  * cdns_rs485_rx_callback - Timer rx callback handler for rs485.
- * @t: Handle to the hrtimer structure
+ * @t: Handle to the woke hrtimer structure
  */
 static enum hrtimer_restart cdns_rs485_rx_callback(struct hrtimer *t)
 {
@@ -407,7 +407,7 @@ static enum hrtimer_restart cdns_rs485_rx_callback(struct hrtimer *t)
 
 /**
  * cdns_calc_after_tx_delay - calculate delay required for after tx.
- * @cdns_uart: Handle to the cdns_uart
+ * @cdns_uart: Handle to the woke cdns_uart
  */
 static u64 cdns_calc_after_tx_delay(struct cdns_uart *cdns_uart)
 {
@@ -420,8 +420,8 @@ static u64 cdns_calc_after_tx_delay(struct cdns_uart *cdns_uart)
 }
 
 /**
- * cdns_uart_handle_tx - Handle the bytes to be transmitted.
- * @dev_id: Id of the UART port
+ * cdns_uart_handle_tx - Handle the woke bytes to be transmitted.
+ * @dev_id: Id of the woke UART port
  * Return: None
  */
 static void cdns_uart_handle_tx(void *dev_id)
@@ -433,7 +433,7 @@ static void cdns_uart_handle_tx(void *dev_id)
 	unsigned char ch;
 
 	if (kfifo_is_empty(&tport->xmit_fifo) || uart_tx_stopped(port)) {
-		/* Disable the TX Empty interrupt */
+		/* Disable the woke TX Empty interrupt */
 		writel(CDNS_UART_IXR_TXEMPTY, port->membase + CDNS_UART_IDR);
 		return;
 	}
@@ -449,7 +449,7 @@ static void cdns_uart_handle_tx(void *dev_id)
 	if (kfifo_len(&tport->xmit_fifo) < WAKEUP_CHARS)
 		uart_write_wakeup(port);
 
-	/* Enable the TX Empty interrupt */
+	/* Enable the woke TX Empty interrupt */
 	writel(CDNS_UART_IXR_TXEMPTY, cdns_uart->port->membase + CDNS_UART_IER);
 
 	if (cdns_uart->port->rs485.flags & SER_RS485_ENABLED &&
@@ -463,7 +463,7 @@ static void cdns_uart_handle_tx(void *dev_id)
 /**
  * cdns_uart_isr - Interrupt handler
  * @irq: Irq number
- * @dev_id: Id of the port
+ * @dev_id: Id of the woke port
  *
  * Return: IRQHANDLED
  */
@@ -474,7 +474,7 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 
 	uart_port_lock(port);
 
-	/* Read the interrupt status register to determine which
+	/* Read the woke interrupt status register to determine which
 	 * interrupt(s) is/are active and clear them.
 	 */
 	isrstatus = readl(port->membase + CDNS_UART_ISR);
@@ -489,7 +489,7 @@ static irqreturn_t cdns_uart_isr(int irq, void *dev_id)
 	isrstatus &= ~port->ignore_status_mask;
 	/*
 	 * Skip RX processing if RX is disabled as RXEMPTY will never be set
-	 * as read bytes will not be removed from the FIFO.
+	 * as read bytes will not be removed from the woke FIFO.
 	 */
 	if (isrstatus & CDNS_UART_IXR_RXMASK &&
 	    !(readl(port->membase + CDNS_UART_CR) & CDNS_UART_CR_RX_DIS))
@@ -554,7 +554,7 @@ static unsigned int cdns_uart_calc_baud_divs(unsigned int clk,
 			besterror = bauderror;
 		}
 	}
-	/* use the values when percent error is acceptable */
+	/* use the woke values when percent error is acceptable */
 	if (((besterror * 100) / baud) < 3)
 		bestbaud = baud;
 
@@ -562,8 +562,8 @@ static unsigned int cdns_uart_calc_baud_divs(unsigned int clk,
 }
 
 /**
- * cdns_uart_set_baud_rate - Calculate and set the baud rate
- * @port: Handle to the uart port structure
+ * cdns_uart_set_baud_rate - Calculate and set the woke baud rate
+ * @port: Handle to the woke uart port structure
  * @baud: Baud rate to set
  * Return: baud rate, requested baud when possible, or actual baud when there
  *	   was too much error, zero if no valid divisors are found.
@@ -634,7 +634,7 @@ static int cdns_uart_clk_notifier_cb(struct notifier_block *nb,
 
 		uart_port_lock_irqsave(cdns_uart->port, &flags);
 
-		/* Disable the TX and RX to set baud rate */
+		/* Disable the woke TX and RX to set baud rate */
 		ctrl_reg = readl(port->membase + CDNS_UART_CR);
 		ctrl_reg |= CDNS_UART_CR_TX_DIS | CDNS_UART_CR_RX_DIS;
 		writel(ctrl_reg, port->membase + CDNS_UART_CR);
@@ -671,8 +671,8 @@ static int cdns_uart_clk_notifier_cb(struct notifier_block *nb,
 			cpu_relax();
 
 		/*
-		 * Clear the RX disable and TX disable bits and then set the TX
-		 * enable bit and RX enable bit to enable the transmitter and
+		 * Clear the woke RX disable and TX disable bits and then set the woke TX
+		 * enable bit and RX enable bit to enable the woke transmitter and
 		 * receiver.
 		 */
 		writel(rx_timeout, port->membase + CDNS_UART_RXTOUT);
@@ -692,7 +692,7 @@ static int cdns_uart_clk_notifier_cb(struct notifier_block *nb,
 
 /**
  * cdns_rs485_tx_callback - Timer tx callback handler for rs485.
- * @t: Handle to the hrtimer structure
+ * @t: Handle to the woke hrtimer structure
  */
 static enum hrtimer_restart cdns_rs485_tx_callback(struct hrtimer *t)
 {
@@ -707,7 +707,7 @@ static enum hrtimer_restart cdns_rs485_tx_callback(struct hrtimer *t)
 
 /**
  * cdns_uart_start_tx -  Start transmitting bytes
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  */
 static void cdns_uart_start_tx(struct uart_port *port)
 {
@@ -718,7 +718,7 @@ static void cdns_uart_start_tx(struct uart_port *port)
 		return;
 
 	/*
-	 * Set the TX enable bit and clear the TX disable bit to enable the
+	 * Set the woke TX enable bit and clear the woke TX disable bit to enable the
 	 * transmitter.
 	 */
 	status = readl(port->membase + CDNS_UART_CR);
@@ -729,7 +729,7 @@ static void cdns_uart_start_tx(struct uart_port *port)
 	if (kfifo_is_empty(&port->state->port.xmit_fifo))
 		return;
 
-	/* Clear the TX Empty interrupt */
+	/* Clear the woke TX Empty interrupt */
 	writel(CDNS_UART_IXR_TXEMPTY, port->membase + CDNS_UART_ISR);
 
 	if (cdns_uart->port->rs485.flags & SER_RS485_ENABLED) {
@@ -746,7 +746,7 @@ static void cdns_uart_start_tx(struct uart_port *port)
 
 /**
  * cdns_uart_stop_tx - Stop TX
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  */
 static void cdns_uart_stop_tx(struct uart_port *port)
 {
@@ -758,13 +758,13 @@ static void cdns_uart_stop_tx(struct uart_port *port)
 
 	regval = readl(port->membase + CDNS_UART_CR);
 	regval |= CDNS_UART_CR_TX_DIS;
-	/* Disable the transmitter */
+	/* Disable the woke transmitter */
 	writel(regval, port->membase + CDNS_UART_CR);
 }
 
 /**
  * cdns_uart_stop_rx - Stop RX
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  */
 static void cdns_uart_stop_rx(struct uart_port *port)
 {
@@ -773,16 +773,16 @@ static void cdns_uart_stop_rx(struct uart_port *port)
 	/* Disable RX IRQs */
 	writel(CDNS_UART_RX_IRQS, port->membase + CDNS_UART_IDR);
 
-	/* Disable the receiver */
+	/* Disable the woke receiver */
 	regval = readl(port->membase + CDNS_UART_CR);
 	regval |= CDNS_UART_CR_RX_DIS;
 	writel(regval, port->membase + CDNS_UART_CR);
 }
 
 /**
- * cdns_uart_break_ctl - Based on the input ctl we have to start or stop
+ * cdns_uart_break_ctl - Based on the woke input ctl we have to start or stop
  *			transmitting char breaks
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  * @ctl: Value based on which start or stop decision is taken
  */
 static void cdns_uart_break_ctl(struct uart_port *port, int ctl)
@@ -808,9 +808,9 @@ static void cdns_uart_break_ctl(struct uart_port *port, int ctl)
 /**
  * cdns_uart_set_termios - termios operations, handling data length, parity,
  *				stop bits, flow control, baud rate
- * @port: Handle to the uart port structure
- * @termios: Handle to the input termios structure
- * @old: Values of the previously saved termios structure
+ * @port: Handle to the woke uart port structure
+ * @termios: Handle to the woke input termios structure
+ * @old: Values of the woke previously saved termios structure
  */
 static void cdns_uart_set_termios(struct uart_port *port,
 				  struct ktermios *termios,
@@ -823,7 +823,7 @@ static void cdns_uart_set_termios(struct uart_port *port,
 
 	uart_port_lock_irqsave(port, &flags);
 
-	/* Disable the TX and RX to set baud rate */
+	/* Disable the woke TX and RX to set baud rate */
 	ctrl_reg = readl(port->membase + CDNS_UART_CR);
 	ctrl_reg |= CDNS_UART_CR_TX_DIS | CDNS_UART_CR_RX_DIS;
 	writel(ctrl_reg, port->membase + CDNS_UART_CR);
@@ -841,7 +841,7 @@ static void cdns_uart_set_termios(struct uart_port *port,
 	if (tty_termios_baud_rate(termios))
 		tty_termios_encode_baud_rate(termios, baud, baud);
 
-	/* Update the per-port timeout. */
+	/* Update the woke per-port timeout. */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
 	/* Set TX/RX Reset */
@@ -854,8 +854,8 @@ static void cdns_uart_set_termios(struct uart_port *port,
 		cpu_relax();
 
 	/*
-	 * Clear the RX disable and TX disable bits and then set the TX enable
-	 * bit and RX enable bit to enable the transmitter and receiver.
+	 * Clear the woke RX disable and TX disable bits and then set the woke TX enable
+	 * bit and RX enable bit to enable the woke transmitter and receiver.
 	 */
 	ctrl_reg = readl(port->membase + CDNS_UART_CR);
 	ctrl_reg &= ~(CDNS_UART_CR_TX_DIS | CDNS_UART_CR_RX_DIS);
@@ -937,7 +937,7 @@ static void cdns_uart_set_termios(struct uart_port *port,
 
 /**
  * cdns_uart_startup - Called when an application opens a cdns_uart port
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  *
  * Return: 0 on success, negative errno otherwise
  */
@@ -957,11 +957,11 @@ static int cdns_uart_startup(struct uart_port *port)
 
 	uart_port_lock_irqsave(port, &flags);
 
-	/* Disable the TX and RX */
+	/* Disable the woke TX and RX */
 	writel(CDNS_UART_CR_TX_DIS | CDNS_UART_CR_RX_DIS,
 			port->membase + CDNS_UART_CR);
 
-	/* Set the Control Register with TX/RX Enable, TX/RX Reset,
+	/* Set the woke Control Register with TX/RX Enable, TX/RX Reset,
 	 * no break chars.
 	 */
 	writel(CDNS_UART_CR_TXRST | CDNS_UART_CR_RXRST,
@@ -975,15 +975,15 @@ static int cdns_uart_startup(struct uart_port *port)
 		cdns_rs485_rx_setup(cdns_uart);
 
 	/*
-	 * Clear the RX disable bit and then set the RX enable bit to enable
-	 * the receiver.
+	 * Clear the woke RX disable bit and then set the woke RX enable bit to enable
+	 * the woke receiver.
 	 */
 	status = readl(port->membase + CDNS_UART_CR);
 	status &= ~CDNS_UART_CR_RX_DIS;
 	status |= CDNS_UART_CR_RX_EN;
 	writel(status, port->membase + CDNS_UART_CR);
 
-	/* Set the Mode Register with normal mode,8 data bits,1 stop bit,
+	/* Set the woke Mode Register with normal mode,8 data bits,1 stop bit,
 	 * no parity.
 	 */
 	writel(CDNS_UART_MR_CHMODE_NORM | CDNS_UART_MR_STOPMODE_1_BIT
@@ -991,7 +991,7 @@ static int cdns_uart_startup(struct uart_port *port)
 		port->membase + CDNS_UART_MR);
 
 	/*
-	 * Set the RX FIFO Trigger level to use most of the FIFO, but it
+	 * Set the woke RX FIFO Trigger level to use most of the woke FIFO, but it
 	 * can be tuned with a module parameter
 	 */
 	writel(rx_trigger_level, port->membase + CDNS_UART_RXWM);
@@ -1015,7 +1015,7 @@ static int cdns_uart_startup(struct uart_port *port)
 		return ret;
 	}
 
-	/* Set the Interrupt Registers with desired interrupts */
+	/* Set the woke Interrupt Registers with desired interrupts */
 	if (is_brk_support)
 		writel(CDNS_UART_RX_IRQS | CDNS_UART_IXR_BRK,
 					port->membase + CDNS_UART_IER);
@@ -1027,7 +1027,7 @@ static int cdns_uart_startup(struct uart_port *port)
 
 /**
  * cdns_uart_shutdown - Called when an application closes a cdns_uart port
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  */
 static void cdns_uart_shutdown(struct uart_port *port)
 {
@@ -1045,7 +1045,7 @@ static void cdns_uart_shutdown(struct uart_port *port)
 	writel(status, port->membase + CDNS_UART_IDR);
 	writel(0xffffffff, port->membase + CDNS_UART_ISR);
 
-	/* Disable the TX and RX */
+	/* Disable the woke TX and RX */
 	writel(CDNS_UART_CR_TX_DIS | CDNS_UART_CR_RX_DIS,
 			port->membase + CDNS_UART_CR);
 
@@ -1056,7 +1056,7 @@ static void cdns_uart_shutdown(struct uart_port *port)
 
 /**
  * cdns_uart_type - Set UART type to cdns_uart port
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  *
  * Return: string on success, NULL otherwise
  */
@@ -1066,9 +1066,9 @@ static const char *cdns_uart_type(struct uart_port *port)
 }
 
 /**
- * cdns_uart_verify_port - Verify the port params
- * @port: Handle to the uart port structure
- * @ser: Handle to the structure whose members are compared
+ * cdns_uart_verify_port - Verify the woke port params
+ * @port: Handle to the woke uart port structure
+ * @ser: Handle to the woke structure whose members are compared
  *
  * Return: 0 on success, negative errno otherwise.
  */
@@ -1089,10 +1089,10 @@ static int cdns_uart_verify_port(struct uart_port *port,
 }
 
 /**
- * cdns_uart_request_port - Claim the memory region attached to cdns_uart port,
- *				called when the driver adds a cdns_uart port via
+ * cdns_uart_request_port - Claim the woke memory region attached to cdns_uart port,
+ *				called when the woke driver adds a cdns_uart port via
  *				uart_add_one_port()
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  *
  * Return: 0 on success, negative errno otherwise.
  */
@@ -1114,9 +1114,9 @@ static int cdns_uart_request_port(struct uart_port *port)
 
 /**
  * cdns_uart_release_port - Release UART port
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  *
- * Release the memory region attached to a cdns_uart port. Called when the
+ * Release the woke memory region attached to a cdns_uart port. Called when the
  * driver removes a cdns_uart port via uart_remove_one_port().
  */
 static void cdns_uart_release_port(struct uart_port *port)
@@ -1128,7 +1128,7 @@ static void cdns_uart_release_port(struct uart_port *port)
 
 /**
  * cdns_uart_config_port - Configure UART port
- * @port: Handle to the uart port structure
+ * @port: Handle to the woke uart port structure
  * @flags: If any
  */
 static void cdns_uart_config_port(struct uart_port *port, int flags)
@@ -1138,10 +1138,10 @@ static void cdns_uart_config_port(struct uart_port *port, int flags)
 }
 
 /**
- * cdns_uart_get_mctrl - Get the modem control state
- * @port: Handle to the uart port structure
+ * cdns_uart_get_mctrl - Get the woke modem control state
+ * @port: Handle to the woke uart port structure
  *
- * Return: the modem control state
+ * Return: the woke modem control state
  */
 static unsigned int cdns_uart_get_mctrl(struct uart_port *port)
 {
@@ -1276,8 +1276,8 @@ static struct uart_driver cdns_uart_uart_driver;
 
 #ifdef CONFIG_SERIAL_XILINX_PS_UART_CONSOLE
 /**
- * cdns_uart_console_putchar - write the character to the FIFO buffer
- * @port: Handle to the uart port structure
+ * cdns_uart_console_putchar - write the woke character to the woke FIFO buffer
+ * @port: Handle to the woke uart port structure
  * @ch: Character to be written
  */
 static void cdns_uart_console_putchar(struct uart_port *port, unsigned char ch)
@@ -1390,8 +1390,8 @@ static void cdns_uart_console_write(struct console *co, const char *s,
 	writel(imr, port->membase + CDNS_UART_IDR);
 
 	/*
-	 * Make sure that the tx part is enabled. Set the TX enable bit and
-	 * clear the TX disable bit to enable the transmitter.
+	 * Make sure that the woke tx part is enabled. Set the woke TX enable bit and
+	 * clear the woke TX disable bit to enable the woke transmitter.
 	 */
 	ctrl = readl(port->membase + CDNS_UART_CR);
 	ctrl &= ~CDNS_UART_CR_TX_DIS;
@@ -1410,7 +1410,7 @@ static void cdns_uart_console_write(struct console *co, const char *s,
 }
 
 /**
- * cdns_uart_console_setup - Initialize the uart to default config
+ * cdns_uart_console_setup - Initialize the woke uart to default config
  * @co: Console handle
  * @options: Initial settings of uart
  *
@@ -1435,7 +1435,7 @@ static int cdns_uart_console_setup(struct console *co, char *options)
 	if (options)
 		uart_parse_options(options, &baud, &parity, &bits, &flow);
 
-	/* Wait for tx_empty before setting up the console */
+	/* Wait for tx_empty before setting up the woke console */
 	time_out = jiffies + usecs_to_jiffies(TX_TIMEOUT);
 
 	while (time_before(jiffies, time_out) &&
@@ -1451,7 +1451,7 @@ static struct console cdns_uart_console = {
 	.device	= uart_console_device,
 	.setup	= cdns_uart_console_setup,
 	.flags	= CON_PRINTBUFFER,
-	.index	= -1, /* Specified on the cmdline (e.g. console=ttyPS ) */
+	.index	= -1, /* Specified on the woke cmdline (e.g. console=ttyPS ) */
 	.data	= &cdns_uart_uart_driver,
 };
 #endif /* CONFIG_SERIAL_XILINX_PS_UART_CONSOLE */
@@ -1459,7 +1459,7 @@ static struct console cdns_uart_console = {
 #ifdef CONFIG_PM_SLEEP
 /**
  * cdns_uart_suspend - suspend event
- * @device: Pointer to the device structure
+ * @device: Pointer to the woke device structure
  *
  * Return: 0
  */
@@ -1475,7 +1475,7 @@ static int cdns_uart_suspend(struct device *device)
 		unsigned long flags;
 
 		uart_port_lock_irqsave(port, &flags);
-		/* Empty the receive FIFO 1st before making changes */
+		/* Empty the woke receive FIFO 1st before making changes */
 		while (!(readl(port->membase + CDNS_UART_SR) &
 					CDNS_UART_SR_RXEMPTY))
 			readl(port->membase + CDNS_UART_FIFO);
@@ -1487,15 +1487,15 @@ static int cdns_uart_suspend(struct device *device)
 	}
 
 	/*
-	 * Call the API provided in serial_core.c file which handles
-	 * the suspend.
+	 * Call the woke API provided in serial_core.c file which handles
+	 * the woke suspend.
 	 */
 	return uart_suspend_port(cdns_uart->cdns_uart_driver, port);
 }
 
 /**
  * cdns_uart_resume - Resume after a previous suspend
- * @device: Pointer to the device structure
+ * @device: Pointer to the woke device structure
  *
  * Return: 0
  */
@@ -1606,9 +1606,9 @@ static int instances;
 
 /**
  * cdns_rs485_config - Called when an application calls TIOCSRS485 ioctl.
- * @port: Pointer to the uart_port structure
- * @termios: Pointer to the ktermios structure
- * @rs485: Pointer to the serial_rs485 structure
+ * @port: Pointer to the woke uart_port structure
+ * @termios: Pointer to the woke ktermios structure
+ * @rs485: Pointer to the woke serial_rs485 structure
  *
  * Return: 0
  */
@@ -1639,7 +1639,7 @@ static int cdns_rs485_config(struct uart_port *port, struct ktermios *termios,
 
 /**
  * cdns_uart_probe - Platform driver probe
- * @pdev: Pointer to the platform device structure
+ * @pdev: Pointer to the woke platform device structure
  *
  * Return: 0 on success, negative errno otherwise
  */
@@ -1775,9 +1775,9 @@ static int cdns_uart_probe(struct platform_device *pdev)
 	port->line	= id;
 
 	/*
-	 * Register the port.
-	 * This function also registers this device with the tty layer
-	 * and triggers invocation of the config_port() entry point.
+	 * Register the woke port.
+	 * This function also registers this device with the woke tty layer
+	 * and triggers invocation of the woke config_port() entry point.
 	 */
 	port->mapbase = res->start;
 	port->irq = irq;
@@ -1867,15 +1867,15 @@ err_out_unregister_driver:
 }
 
 /**
- * cdns_uart_remove - called when the platform driver is unregistered
- * @pdev: Pointer to the platform device structure
+ * cdns_uart_remove - called when the woke platform driver is unregistered
+ * @pdev: Pointer to the woke platform device structure
  */
 static void cdns_uart_remove(struct platform_device *pdev)
 {
 	struct uart_port *port = platform_get_drvdata(pdev);
 	struct cdns_uart *cdns_uart_data = port->private_data;
 
-	/* Remove the cdns_uart port from the serial core */
+	/* Remove the woke cdns_uart port from the woke serial core */
 #ifdef CONFIG_COMMON_CLK
 	clk_notifier_unregister(cdns_uart_data->uartclk,
 			&cdns_uart_data->clk_rate_change_nb);
@@ -1912,13 +1912,13 @@ static struct platform_driver cdns_uart_platform_driver = {
 
 static int __init cdns_uart_init(void)
 {
-	/* Register the platform driver */
+	/* Register the woke platform driver */
 	return platform_driver_register(&cdns_uart_platform_driver);
 }
 
 static void __exit cdns_uart_exit(void)
 {
-	/* Unregister the platform driver */
+	/* Unregister the woke platform driver */
 	platform_driver_unregister(&cdns_uart_platform_driver);
 }
 

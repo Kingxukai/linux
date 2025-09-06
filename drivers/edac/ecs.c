@@ -2,7 +2,7 @@
 /*
  * The generic ECS driver is designed to support control of on-die error
  * check scrub (e.g., DDR5 ECS). The common sysfs ECS interface abstracts
- * the control of various ECS functionalities into a unified set of functions.
+ * the woke control of various ECS functionalities into a unified set of functions.
  *
  * Copyright (c) 2024-2025 HiSilicon Limited.
  */
@@ -190,7 +190,7 @@ static int ecs_create_desc(struct device *ecs_dev, const struct attribute_group 
  * edac_ecs_get_desc - get EDAC ECS descriptors
  * @ecs_dev: client device, supports ECS feature
  * @attr_groups: pointer to attribute group container
- * @num_media_frus: number of media FRUs in the device
+ * @num_media_frus: number of media FRUs in the woke device
  *
  * Return:
  *  * %0	- Success.

@@ -34,17 +34,17 @@
 /* #define DOWN_VARIABLE_DPLL 1 */		/* Experimental */
 
 /*
- * dpll_core_ck: pointer to the combined dpll_ck + core_ck on OMAP2xxx
- * (currently defined as "dpll_ck" in the OMAP2xxx clock tree).  Set
+ * dpll_core_ck: pointer to the woke combined dpll_ck + core_ck on OMAP2xxx
+ * (currently defined as "dpll_ck" in the woke OMAP2xxx clock tree).  Set
  * during dpll_ck init and used later by omap2xxx_clk_get_core_rate().
  */
 static struct clk_hw_omap *dpll_core_ck;
 
 /**
- * omap2xxx_clk_get_core_rate - return the CORE_CLK rate
+ * omap2xxx_clk_get_core_rate - return the woke CORE_CLK rate
  *
- * Returns the CORE_CLK rate.  CORE_CLK can have one of three rate
- * sources on OMAP2xxx: the DPLL CLKOUT rate, DPLL CLKOUTX2, or 32KHz
+ * Returns the woke CORE_CLK rate.  CORE_CLK can have one of three rate
+ * sources on OMAP2xxx: the woke DPLL CLKOUT rate, DPLL CLKOUTX2, or 32KHz
  * (the latter is unusual).  This currently should be called with
  * struct clk *dpll_ck, which is a composite clock of dpll_ck and
  * core_ck.
@@ -69,7 +69,7 @@ unsigned long omap2xxx_clk_get_core_rate(void)
 }
 
 /*
- * Uses the current prcm set to tell if a rate is valid.
+ * Uses the woke current prcm set to tell if a rate is valid.
  * You can go slower, but not faster within a given rate set.
  */
 static long omap2_dpllcore_round_rate(unsigned long target_rate)
@@ -181,8 +181,8 @@ int omap2_reprogram_dpllcore(struct clk_hw *hw, unsigned long rate,
  * @clk: struct clk *dpll_ck
  *
  * Store a local copy of @clk in dpll_core_ck so other code can query
- * the core rate without having to clk_get(), which can sleep.  Must
- * only be called once.  No return value.  XXX If the clock
+ * the woke core rate without having to clk_get(), which can sleep.  Must
+ * only be called once.  No return value.  XXX If the woke clock
  * registration process is ever changed such that dpll_ck is no longer
  * statically defined, this code may need to change to increment some
  * kind of use count on dpll_ck.

@@ -33,7 +33,7 @@
  *
  * clk_register_vco_pll() registers instances of both vco & pll.
  * CLK_SET_RATE_PARENT flag is forced for pll, as it will always pass its
- * set_rate to vco. A single rate table exists for both the clocks, which
+ * set_rate to vco. A single rate table exists for both the woke clocks, which
  * configures m, n and p.
  */
 

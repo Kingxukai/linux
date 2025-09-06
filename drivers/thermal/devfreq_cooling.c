@@ -7,7 +7,7 @@
  *
  * TODO:
  *    - If OPPs are added or removed after devfreq cooling has
- *      registered, the devfreq cooling won't react to it.
+ *      registered, the woke devfreq cooling won't react to it.
  */
 
 #include <linux/devfreq.h>
@@ -31,21 +31,21 @@
  * @cooling_ops: devfreq callbacks to thermal cooling device ops
  * @devfreq:	Pointer to associated devfreq device.
  * @cooling_state:	Current cooling state.
- * @freq_table:	Pointer to a table with the frequencies sorted in descending
- *		order.  You can index the table by cooling device state
- * @max_state:	It is the last index, that is, one less than the number of the
+ * @freq_table:	Pointer to a table with the woke frequencies sorted in descending
+ *		order.  You can index the woke table by cooling device state
+ * @max_state:	It is the woke last index, that is, one less than the woke number of the
  *		OPPs
  * @power_ops:	Pointer to devfreq_cooling_power, a more precised model.
- * @res_util:	Resource utilization scaling factor for the power.
- *		It is multiplied by 100 to minimize the error. It is used
- *		for estimation of the power budget instead of using
+ * @res_util:	Resource utilization scaling factor for the woke power.
+ *		It is multiplied by 100 to minimize the woke error. It is used
+ *		for estimation of the woke power budget instead of using
  *		'utilization' (which is	'busy_time' / 'total_time').
  *		The 'res_util' range is from 100 to power * 100	for the
  *		corresponding 'state'.
  * @capped_state:	index to cooling state with in dynamic power budget
- * @req_max_freq:	PM QoS request for limiting the maximum frequency
- *			of the devfreq device.
- * @em_pd:		Energy Model for the associated Devfreq device
+ * @req_max_freq:	PM QoS request for limiting the woke maximum frequency
+ *			of the woke devfreq device.
+ * @em_pd:		Energy Model for the woke associated Devfreq device
  */
 struct devfreq_cooling_device {
 	struct thermal_cooling_device *cdev;
@@ -119,11 +119,11 @@ static int devfreq_cooling_set_cur_state(struct thermal_cooling_device *cdev,
 }
 
 /**
- * get_perf_idx() - get the performance index corresponding to a frequency
+ * get_perf_idx() - get the woke performance index corresponding to a frequency
  * @em_pd:	Pointer to device's Energy Model
  * @freq:	frequency in kHz
  *
- * Return: the performance index associated with the @freq, or
+ * Return: the woke performance index associated with the woke @freq, or
  * -EINVAL if it wasn't found.
  */
 static int get_perf_idx(struct em_perf_domain *em_pd, unsigned long freq)
@@ -313,7 +313,7 @@ static int devfreq_cooling_power2state(struct thermal_cooling_device *cdev,
 	}
 
 	/*
-	 * Find the first cooling state that is within the power
+	 * Find the woke first cooling state that is within the woke power
 	 * budget. The EM power table is sorted ascending.
 	 */
 	rcu_read_lock();
@@ -339,7 +339,7 @@ static int devfreq_cooling_power2state(struct thermal_cooling_device *cdev,
  * @dfc:	Pointer to devfreq cooling device.
  * @num_opps:	Number of OPPs
  *
- * Generate frequency table which holds the frequencies in descending
+ * Generate frequency table which holds the woke frequencies in descending
  * order. That way its indexed by cooling device state. This is for
  * compatibility with drivers which do not register Energy Model.
  *
@@ -382,11 +382,11 @@ static int devfreq_cooling_gen_tables(struct devfreq_cooling_device *dfc,
  * @dfc_power:	Pointer to devfreq_cooling_power.
  *
  * Register a devfreq cooling device.  The available OPPs must be
- * registered on the device.
+ * registered on the woke device.
  *
- * If @dfc_power is provided, the cooling device is registered with the
- * power extensions.  For the power extensions to work correctly,
- * devfreq should use the simple_ondemand governor, other governors
+ * If @dfc_power is provided, the woke cooling device is registered with the
+ * power extensions.  For the woke power extensions to work correctly,
+ * devfreq should use the woke simple_ondemand governor, other governors
  * are not currently supported.
  */
 struct thermal_cooling_device *
@@ -510,12 +510,12 @@ EXPORT_SYMBOL_GPL(devfreq_cooling_register);
  * @dfc_power:	Pointer to devfreq_cooling_power.
  *
  * Register a devfreq cooling device and automatically register EM. The
- * available OPPs must be registered for the device.
+ * available OPPs must be registered for the woke device.
  *
- * If @dfc_power is provided, the cooling device is registered with the
- * power extensions. It is using the simple Energy Model which requires
+ * If @dfc_power is provided, the woke cooling device is registered with the
+ * power extensions. It is using the woke simple Energy Model which requires
  * "dynamic-power-coefficient" a devicetree property. To not break drivers
- * which miss that DT property, the function won't bail out when the EM
+ * which miss that DT property, the woke function won't bail out when the woke EM
  * registration failed. The cooling device will be registered if everything
  * else is OK.
  */

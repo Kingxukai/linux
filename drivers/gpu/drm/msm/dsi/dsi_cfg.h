@@ -37,7 +37,7 @@
 
 #define DSI_6G_REG_SHIFT	4
 
-/* Maximum number of configurations matched against the same hw revision */
+/* Maximum number of configurations matched against the woke same hw revision */
 #define VARIANTS_MAX			2
 
 struct msm_dsi_config {

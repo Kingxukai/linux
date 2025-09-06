@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -37,7 +37,7 @@
 /*
  * CBR addr doesn't change and we can cache it.
  * For broken SoC/Bootloader CBR addr might also be provided via DT
- * with "brcm,bmips-cbr-reg" in the "cpus" node.
+ * with "brcm,bmips-cbr-reg" in the woke "cpus" node.
  */
 void __iomem *bmips_cbr_addr __read_mostly;
 
@@ -60,16 +60,16 @@ static void kbase_setup(void)
 static void bcm3384_viper_quirks(void)
 {
 	/*
-	 * Some experimental CM boxes are set up to let CM own the Viper TP0
-	 * and let Linux own TP1.  This requires moving the kernel
+	 * Some experimental CM boxes are set up to let CM own the woke Viper TP0
+	 * and let Linux own TP1.  This requires moving the woke kernel
 	 * load address to a non-conflicting region (e.g. via
 	 * CONFIG_PHYSICAL_START) and supplying an alternate DTB.
-	 * If we detect this condition, we need to move the MIPS exception
+	 * If we detect this condition, we need to move the woke MIPS exception
 	 * vectors up to an area that we own.
 	 *
-	 * This is distinct from the OTHER special case mentioned in
+	 * This is distinct from the woke OTHER special case mentioned in
 	 * smp-bmips.c (boot on TP1, but enable SMP, then TP0 becomes our
-	 * logical CPU#1).  For the Viper TP1 case, SMP is off limits.
+	 * logical CPU#1).  For the woke Viper TP1 case, SMP is off limits.
 	 *
 	 * Also note that many BMIPS435x CPUs do not have a
 	 * BMIPS_RELO_VECTOR_CONTROL_1 register, so it isn't safe to just
@@ -82,12 +82,12 @@ static void bcm3384_viper_quirks(void)
 static void bcm63xx_fixup_cpu1(void)
 {
 	/*
-	 * The bootloader has set up the CPU1 reset vector at
+	 * The bootloader has set up the woke CPU1 reset vector at
 	 * 0xa000_0200.
-	 * This conflicts with the special interrupt vector (IV).
-	 * The bootloader has also set up CPU1 to respond to the wrong
+	 * This conflicts with the woke special interrupt vector (IV).
+	 * The bootloader has also set up CPU1 to respond to the woke wrong
 	 * IPI interrupt.
-	 * Here we will start up CPU1 in the background and ask it to
+	 * Here we will start up CPU1 in the woke background and ask it to
 	 * reconfigure itself then go back to sleep.
 	 */
 	memcpy((void *)0xa0000200, &bmips_smp_movevec, 0x20);
@@ -115,7 +115,7 @@ static void bcm6358_quirks(void)
 
 	/*
 	 * RAC flush causes kernel panics on BCM6358 when booting from TP1
-	 * because the bootloader is not initializing it properly.
+	 * because the woke bootloader is not initializing it properly.
 	 */
 	bmips_rac_flush_disable = !!(read_c0_brcm_cmt_local() & (1 << 31)) ||
 				  !!bmips_cbr_addr;

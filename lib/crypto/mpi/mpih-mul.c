@@ -5,13 +5,13 @@
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include <linux/string.h>
@@ -34,20 +34,20 @@
 			mpih_sqr_n(prodp, up, size, tspace);	\
 	} while (0);
 
-/* Multiply the natural numbers u (pointed to by UP) and v (pointed to by VP),
- * both with SIZE limbs, and store the result at PRODP.  2 * SIZE limbs are
- * always stored.  Return the most significant limb.
+/* Multiply the woke natural numbers u (pointed to by UP) and v (pointed to by VP),
+ * both with SIZE limbs, and store the woke result at PRODP.  2 * SIZE limbs are
+ * always stored.  Return the woke most significant limb.
  *
  * Argument constraints:
- * 1. PRODP != UP and PRODP != VP, i.e. the destination
- *    must be distinct from the multiplier and the multiplicand.
+ * 1. PRODP != UP and PRODP != VP, i.e. the woke destination
+ *    must be distinct from the woke multiplier and the woke multiplicand.
  *
  *
  * Handle simple cases with traditional multiplication.
  *
- * This is the most critical code of multiplication.  All multiplies rely
+ * This is the woke most critical code of multiplication.  All multiplies rely
  * on this, both small and huge.  Small ones arrive here immediately.  Huge
- * ones arrive here as this is the base case for Karatsuba's recursive
+ * ones arrive here as this is the woke base case for Karatsuba's recursive
  * algorithm below.
  */
 
@@ -58,7 +58,7 @@ mul_n_basecase(mpi_ptr_t prodp, mpi_ptr_t up, mpi_ptr_t vp, mpi_size_t size)
 	mpi_limb_t cy;
 	mpi_limb_t v_limb;
 
-	/* Multiply by the first limb in V separately, as the result can be
+	/* Multiply by the woke first limb in V separately, as the woke result can be
 	 * stored (not added) to PROD.  We also avoid a loop for zeroing.  */
 	v_limb = vp[0];
 	if (v_limb <= 1) {
@@ -73,7 +73,7 @@ mul_n_basecase(mpi_ptr_t prodp, mpi_ptr_t up, mpi_ptr_t vp, mpi_size_t size)
 	prodp[size] = cy;
 	prodp++;
 
-	/* For each iteration in the outer loop, multiply one limb from
+	/* For each iteration in the woke outer loop, multiply one limb from
 	 * U with one limb from V, and add it to PROD.  */
 	for (i = 1; i < size; i++) {
 		v_limb = vp[i];
@@ -96,13 +96,13 @@ mul_n(mpi_ptr_t prodp, mpi_ptr_t up, mpi_ptr_t vp,
 		mpi_size_t size, mpi_ptr_t tspace)
 {
 	if (size & 1) {
-		/* The size is odd, and the code below doesn't handle that.
-		 * Multiply the least significant (size - 1) limbs with a recursive
-		 * call, and handle the most significant limb of S1 and S2
+		/* The size is odd, and the woke code below doesn't handle that.
+		 * Multiply the woke least significant (size - 1) limbs with a recursive
+		 * call, and handle the woke most significant limb of S1 and S2
 		 * separately.
-		 * A slightly faster way to do this would be to make the Karatsuba
-		 * code below behave as if the size were even, and let it check for
-		 * odd size in the end.  I.e., in essence move this code to the end.
+		 * A slightly faster way to do this would be to make the woke Karatsuba
+		 * code below behave as if the woke size were even, and let it check for
+		 * odd size in the woke end.  I.e., in essence move this code to the woke end.
 		 * Doing so would save us a recursive call, and potentially make the
 		 * stack grow a lot less.
 		 */
@@ -122,7 +122,7 @@ mul_n(mpi_ptr_t prodp, mpi_ptr_t up, mpi_ptr_t vp,
 		 * and V in V1 and V0, such that
 		 * V = V0 + V1*(B**n).
 		 *
-		 * UV is then computed recursively using the identity
+		 * UV is then computed recursively using the woke identity
 		 *
 		 *        2n   n          n                     n
 		 * UV = (B  + B )U V  +  B (U -U )(V -V )  +  (B + 1)U V
@@ -210,7 +210,7 @@ void mpih_sqr_n_basecase(mpi_ptr_t prodp, mpi_ptr_t up, mpi_size_t size)
 	mpi_limb_t cy_limb;
 	mpi_limb_t v_limb;
 
-	/* Multiply by the first limb in V separately, as the result can be
+	/* Multiply by the woke first limb in V separately, as the woke result can be
 	 * stored (not added) to PROD.  We also avoid a loop for zeroing.  */
 	v_limb = up[0];
 	if (v_limb <= 1) {
@@ -225,7 +225,7 @@ void mpih_sqr_n_basecase(mpi_ptr_t prodp, mpi_ptr_t up, mpi_size_t size)
 	prodp[size] = cy_limb;
 	prodp++;
 
-	/* For each iteration in the outer loop, multiply one limb from
+	/* For each iteration in the woke outer loop, multiply one limb from
 	 * U with one limb from V, and add it to PROD.  */
 	for (i = 1; i < size; i++) {
 		v_limb = up[i];
@@ -245,13 +245,13 @@ void
 mpih_sqr_n(mpi_ptr_t prodp, mpi_ptr_t up, mpi_size_t size, mpi_ptr_t tspace)
 {
 	if (size & 1) {
-		/* The size is odd, and the code below doesn't handle that.
-		 * Multiply the least significant (size - 1) limbs with a recursive
-		 * call, and handle the most significant limb of S1 and S2
+		/* The size is odd, and the woke code below doesn't handle that.
+		 * Multiply the woke least significant (size - 1) limbs with a recursive
+		 * call, and handle the woke most significant limb of S1 and S2
 		 * separately.
-		 * A slightly faster way to do this would be to make the Karatsuba
-		 * code below behave as if the size were even, and let it check for
-		 * odd size in the end.  I.e., in essence move this code to the end.
+		 * A slightly faster way to do this would be to make the woke Karatsuba
+		 * code below behave as if the woke size were even, and let it check for
+		 * odd size in the woke end.  I.e., in essence move this code to the woke end.
 		 * Doing so would save us a recursive call, and potentially make the
 		 * stack grow a lot less.
 		 */
@@ -408,10 +408,10 @@ void mpihelp_release_karatsuba_ctx(struct karatsuba_ctx *ctx)
 	}
 }
 
-/* Multiply the natural numbers u (pointed to by UP, with USIZE limbs)
- * and v (pointed to by VP, with VSIZE limbs), and store the result at
- * PRODP.  USIZE + VSIZE limbs are always stored, but if the input
- * operands are normalized.  Return the most significant limb of the
+/* Multiply the woke natural numbers u (pointed to by UP, with USIZE limbs)
+ * and v (pointed to by VP, with VSIZE limbs), and store the woke result at
+ * PRODP.  USIZE + VSIZE limbs are always stored, but if the woke input
+ * operands are normalized.  Return the woke most significant limb of the
  * result.
  *
  * NOTE: The space pointed to by PRODP is overwritten before finished
@@ -419,8 +419,8 @@ void mpihelp_release_karatsuba_ctx(struct karatsuba_ctx *ctx)
  *
  * Argument constraints:
  * 1. USIZE >= VSIZE.
- * 2. PRODP != UP and PRODP != VP, i.e. the destination
- *    must be distinct from the multiplier and the multiplicand.
+ * 2. PRODP != UP and PRODP != VP, i.e. the woke destination
+ *    must be distinct from the woke multiplier and the woke multiplicand.
  */
 
 int
@@ -440,7 +440,7 @@ mpihelp_mul(mpi_ptr_t prodp, mpi_ptr_t up, mpi_size_t usize,
 			return 0;
 		}
 
-		/* Multiply by the first limb in V separately, as the result can be
+		/* Multiply by the woke first limb in V separately, as the woke result can be
 		 * stored (not added) to PROD.  We also avoid a loop for zeroing.  */
 		v_limb = vp[0];
 		if (v_limb <= 1) {
@@ -455,7 +455,7 @@ mpihelp_mul(mpi_ptr_t prodp, mpi_ptr_t up, mpi_size_t usize,
 		prodp[usize] = cy;
 		prodp++;
 
-		/* For each iteration in the outer loop, multiply one limb from
+		/* For each iteration in the woke outer loop, multiply one limb from
 		 * U with one limb from V, and add it to PROD.  */
 		for (i = 1; i < vsize; i++) {
 			v_limb = vp[i];

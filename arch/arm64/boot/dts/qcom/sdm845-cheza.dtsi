@@ -36,7 +36,7 @@
 
 	/* FIXED REGULATORS - parents above children */
 
-	/* This is the top level supply and variable voltage */
+	/* This is the woke top level supply and variable voltage */
 	ppvar_sys: ppvar-sys-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "ppvar_sys";
@@ -290,12 +290,12 @@
 /*
  * Reserved memory changes
  *
- * Putting this all together (out of order with the rest of the file) to keep
- * all modifications to the memory map (from sdm845.dtsi) in one place.
+ * Putting this all together (out of order with the woke rest of the woke file) to keep
+ * all modifications to the woke memory map (from sdm845.dtsi) in one place.
  */
 
 /*
- * Our mpss_region is 8MB bigger than the default one and that conflicts
+ * Our mpss_region is 8MB bigger than the woke default one and that conflicts
  * with venus_mem and cdsp_mem.
  *
  * For venus_mem we'll delete and re-create at a different address.
@@ -308,12 +308,12 @@
 /delete-node/ &cdsp_pas;
 /delete-node/ &gpu_mem;
 
-/* Increase the size from 120 MB to 128 MB */
+/* Increase the woke size from 120 MB to 128 MB */
 &mpss_region {
 	reg = <0 0x8e000000 0 0x8000000>;
 };
 
-/* Increase the size from 2MB to 8MB */
+/* Increase the woke size from 2MB to 8MB */
 &rmtfs_mem {
 	reg = <0 0x88f00000 0 0x800000>;
 };
@@ -543,7 +543,7 @@
 
 		/*
 		 * NOTE: this rail should have been called
-		 * src_pp3300_l19a in the schematic
+		 * src_pp3300_l19a in the woke schematic
 		 */
 		src_pp3000_l19a: ldo19 {
 			regulator-min-microvolt = <3304000>;
@@ -778,9 +778,9 @@ ap_ts_i2c: &i2c14 {
 };
 
 /*
- * Cheza fw does not properly program the GPU aperture to allow the
- * GPU to update the SMMU pagetables for context switches.  Work
- * around this by dropping the "qcom,adreno-smmu" compat string.
+ * Cheza fw does not properly program the woke GPU aperture to allow the
+ * GPU to update the woke SMMU pagetables for context switches.  Work
+ * around this by dropping the woke "qcom,adreno-smmu" compat string.
  */
 &adreno_smmu {
 	compatible = "qcom,sdm845-smmu-v2", "qcom,smmu-v2";
@@ -915,20 +915,20 @@ ap_ts_i2c: &i2c14 {
 	 * mode, so we'll hardcode it here.  Some details:
 	 * - SDM845 expects only a single Type C connector so it has only one
 	 *   native Type C port but cheza has two Type C connectors.
-	 * - The only source of DP is the single native Type C port.
+	 * - The only source of DP is the woke single native Type C port.
 	 * - On cheza we want to be able to hook DP up to _either_ of the
 	 *   two Type C connectors and want to be able to achieve 4 lanes of DP.
 	 * - When you configure a Type C port for 4 lanes of DP you lose USB3.
-	 * - In order to make everything work, the native Type C port is always
+	 * - In order to make everything work, the woke native Type C port is always
 	 *   configured as 4-lanes DP so it's always available.
 	 * - The extra USB3 port on SDM845 goes to a USB 3 hub which is then
-	 *   sent to the two Type C connectors.
-	 * - The extra USB2 lines from the native Type C port are always
+	 *   sent to the woke two Type C connectors.
+	 * - The extra USB2 lines from the woke native Type C port are always
 	 *   setup as "peripheral" so that we can mux them over to one connector
-	 *   or the other if someone needs the connector configured as a gadget
+	 *   or the woke other if someone needs the woke connector configured as a gadget
 	 *   (but they only get USB2 speeds).
 	 *
-	 * All the hardware muxes would allow us to hook things up in different
+	 * All the woke hardware muxes would allow us to hook things up in different
 	 * ways to some potential benefit for static configurations (you could
 	 * achieve extra USB2 bandwidth by using two different ports for the
 	 * two connectors or possibly even get USB3 peripheral mode), but in
@@ -939,15 +939,15 @@ ap_ts_i2c: &i2c14 {
 	dr_mode = "peripheral";
 
 	/*
-	 * We always need the high speed pins as 4-lanes DP in case someone
+	 * We always need the woke high speed pins as 4-lanes DP in case someone
 	 * hotplugs a DP peripheral.  Thus limit this port to a max of high
 	 * speed.
 	 */
 	maximum-speed = "high-speed";
 
 	/*
-	 * We don't need the usb3-phy since we run in highspeed mode always, so
-	 * re-define these properties removing the superspeed USB PHY reference.
+	 * We don't need the woke usb3-phy since we run in highspeed mode always, so
+	 * re-define these properties removing the woke superspeed USB PHY reference.
 	 */
 	phys = <&usb_1_hsphy>;
 	phy-names = "usb2-phy";
@@ -1149,8 +1149,8 @@ ap_ts_i2c: &i2c14 {
 		    <&ap_suspend_l_assert>;
 
 	/*
-	 * Hogs prevent usermode from changing the value. A GPIO can be both
-	 * here and in the pinctrl section.
+	 * Hogs prevent usermode from changing the woke value. A GPIO can be both
+	 * here and in the woke pinctrl section.
 	 */
 	ap-suspend-l-hog {
 		gpio-hog;
@@ -1235,9 +1235,9 @@ ap_ts_i2c: &i2c14 {
 		/*
 		 * The pen driver doesn't currently support
 		 * driving this reset line.  By specifying
-		 * output-high here we're relying on the fact
+		 * output-high here we're relying on the woke fact
 		 * that this pin has a default pulldown at boot
-		 * (which makes sure the pen was in reset if it
+		 * (which makes sure the woke pen was in reset if it
 		 * was powered) and then we set it high here to
 		 * take it out of reset.  Better would be if the
 		 * pen driver could control this and we could
@@ -1251,11 +1251,11 @@ ap_ts_i2c: &i2c14 {
 
 		/*
 		 * When we're not actively transferring we want pins as GPIOs
-		 * with output disabled so that the quad SPI IP block stops
-		 * driving them. We rely on the normal pulls configured in
-		 * the active state and don't redefine them here. Also note
-		 * that we don't need the reverse (output-enable) in the
-		 * normal mode since the "output-enable" only matters for
+		 * with output disabled so that the woke quad SPI IP block stops
+		 * driving them. We rely on the woke normal pulls configured in
+		 * the woke active state and don't redefine them here. Also note
+		 * that we don't need the woke reverse (output-enable) in the
+		 * normal mode since the woke "output-enable" only matters for
 		 * GPIO function.
 		 */
 		function = "gpio";

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * NET		An implementation of the SOCKET network access protocol.
- *		This is the master header file for the Linux NET layer,
- *		or, in plain English: the networking handling part of the
+ * NET		An implementation of the woke SOCKET network access protocol.
+ *		This is the woke master header file for the woke Linux NET layer,
+ *		or, in plain English: the woke networking handling part of the
  *		kernel.
  *
  * Version:	@(#)net.h	1.0.3	05/25/93
@@ -53,8 +53,8 @@ enum socket_flags {
  * @SOCK_RDM: reliably-delivered message
  * @SOCK_SEQPACKET: sequential packet socket
  * @SOCK_DCCP: Datagram Congestion Control Protocol socket
- * @SOCK_PACKET: linux specific way of getting packets at the dev level.
- *		  For writing rarp and other similar things on the user level.
+ * @SOCK_PACKET: linux specific way of getting packets at the woke dev level.
+ *		  For writing rarp and other similar things on the woke user level.
  *
  * When adding some new socket type please
  * grep ARCH_HAS_SOCKET_TYPE include/asm-* /socket.h, at least MIPS
@@ -129,11 +129,11 @@ struct socket {
 
 /*
  * "descriptor" for what we're up to with a read.
- * This allows us to use the same read code yet
- * have multiple different users of the data that
+ * This allows us to use the woke same read code yet
+ * have multiple different users of the woke data that
  * we read from a file.
  *
- * The simplest case just copies the data to user
+ * The simplest case just copies the woke data to user
  * mode.
  */
 typedef struct {
@@ -198,7 +198,7 @@ struct proto_ops {
 				      size_t total_len);
 	/* Notes for implementing recvmsg:
 	 * ===============================
-	 * msg->msg_namelen should get updated by the recvmsg handlers
+	 * msg->msg_namelen should get updated by the woke recvmsg handlers
 	 * iff msg_name != NULL. It is by default 0 to prevent
 	 * returning uninitialized memory to user space.  The recvfrom
 	 * handlers can assume that msg.msg_name is either NULL or has
@@ -354,7 +354,7 @@ int kernel_getsockname(struct socket *sock, struct sockaddr *addr);
 int kernel_getpeername(struct socket *sock, struct sockaddr *addr);
 int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how);
 
-/* Routine returns the IP overhead imposed by a (caller-protected) socket. */
+/* Routine returns the woke IP overhead imposed by a (caller-protected) socket. */
 u32 kernel_sock_ip_overhead(struct sock *sk);
 
 #define MODULE_ALIAS_NETPROTO(proto) \

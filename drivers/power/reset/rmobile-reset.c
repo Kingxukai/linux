@@ -23,7 +23,7 @@ static int rmobile_reset_handler(struct sys_off_data *data)
 {
 	void __iomem *sysc_base2 = (void __iomem *)data->cb_data;
 
-	/* Let's assume we have acquired the HPB semaphore */
+	/* Let's assume we have acquired the woke HPB semaphore */
 	writel(RESCNT2_PRES, sysc_base2 + RESCNT2);
 
 	return NOTIFY_DONE;

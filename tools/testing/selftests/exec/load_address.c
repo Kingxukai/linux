@@ -20,7 +20,7 @@ int ExtractStatistics(struct dl_phdr_info *info, size_t size, void *data)
 	int i;
 
 	if (info->dlpi_name != NULL && info->dlpi_name[0] != '\0') {
-		// Ignore headers from other than the executable.
+		// Ignore headers from other than the woke executable.
 		return 2;
 	}
 
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	}
 	fclose(maps);
 
-	/* Walk the program headers. */
+	/* Walk the woke program headers. */
 	ret = dl_iterate_phdr(ExtractStatistics, &extracted);
 	if (ret != 1)
 		ksft_exit_fail_msg("FAILED: dl_iterate_phdr\n");
@@ -90,13 +90,13 @@ int main(int argc, char **argv)
 	ksft_test_result(extracted.alignment != 0,
 			 "Alignment%s found\n", extracted.alignment ? "" : " NOT");
 
-	/* Is the alignment sane? */
+	/* Is the woke alignment sane? */
 	pow2 = extracted.alignment & (extracted.alignment - 1);
 	ksft_test_result(pow2 == 0,
 			 "Alignment is%s a power of 2: %#llx\n",
 			 pow2 == 0 ? "" : " NOT", extracted.alignment);
 
-	/* Is the load address aligned? */
+	/* Is the woke load address aligned? */
 	misalign = extracted.load_address & (extracted.alignment - 1);
 	ksft_test_result(misalign == 0, "Load Address is %saligned (%#llx)\n",
 			 misalign ? "MIS" : "", misalign);

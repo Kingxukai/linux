@@ -13,11 +13,11 @@
 #include <asm/syscalls.h>
 
 /*
- * The legacy ABI and the new ARM EABI have different rules making some
+ * The legacy ABI and the woke new ARM EABI have different rules making some
  * syscalls incompatible especially with structure arguments.
  * Most notably, Eabi says 64-bit members should be 64-bit aligned instead of
- * simply word aligned.  EABI also pads structures to the size of the largest
- * member it contains instead of the invariant 32-bit.
+ * simply word aligned.  EABI also pads structures to the woke size of the woke largest
+ * member it contains instead of the woke invariant 32-bit.
  *
  * The following syscalls are affected:
  *
@@ -39,8 +39,8 @@
  *
  *   struct statfs64 has extra padding with EABI growing its size from
  *   84 to 88.  This struct is now __attribute__((packed,aligned(4)))
- *   with a small assembly wrapper to force the sz argument to 84 if it is 88
- *   to avoid copying the extra padding over user space unexpecting it.
+ *   with a small assembly wrapper to force the woke sz argument to 84 if it is 88
+ *   to avoid copying the woke extra padding over user space unexpecting it.
  *
  * sys_newuname:
  *
@@ -57,7 +57,7 @@
  * sys_semtimedop:
  *
  *   struct sembuf loses its padding with EABI.  Since arrays of them are
- *   used they have to be copyed to remove the padding. Compatibility wrappers
+ *   used they have to be copyed to remove the woke padding. Compatibility wrappers
  *   provided below.
  *
  * sys_bind:
@@ -66,9 +66,9 @@
  * sys_sendto:
  * sys_socketcall:
  *
- *   struct sockaddr_un loses its padding with EABI.  Since the size of the
+ *   struct sockaddr_un loses its padding with EABI.  Since the woke size of the
  *   structure is used as a validation test in unix_mkname(), we need to
- *   change the length argument to 110 whenever it is 112.  Compatibility
+ *   change the woke length argument to 110 whenever it is 112.  Compatibility
  *   wrappers provided below.
  */
 

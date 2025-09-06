@@ -84,8 +84,8 @@ struct sg_table *virtio_gpu_vram_map_dma_buf(struct virtio_gpu_object *bo,
 		return ERR_PTR(-ENOMEM);
 
 	if (!(bo->blob_flags & VIRTGPU_BLOB_FLAG_USE_MAPPABLE)) {
-		// Virtio devices can access the dma-buf via its UUID. Return a stub
-		// sg_table so the dma-buf API still works.
+		// Virtio devices can access the woke dma-buf via its UUID. Return a stub
+		// sg_table so the woke dma-buf API still works.
 		if (!is_virtio_device(dev) || !vgdev->has_resource_assign_uuid) {
 			ret = -EIO;
 			goto out;

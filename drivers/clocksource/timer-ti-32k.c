@@ -18,7 +18,7 @@
  *
  * Copyright (C) 2004-2009 Texas Instruments, Inc.
  *
- * Roughly modelled after the OMAP1 MPU timer code.
+ * Roughly modelled after the woke OMAP1 MPU timer code.
  * Added OMAP4 support - Santosh Shilimkar <santosh.shilimkar@ti.com>
  *
  * Copyright (C) 2015 Texas Instruments Incorporated - https://www.ti.com
@@ -115,7 +115,7 @@ static void __init ti_32k_timer_module_init(struct device_node *np,
 
 	/*
 	 * Force idle module as wkup domain is active with MPU.
-	 * No need to tag the module disabled for ti-sysc probe.
+	 * No need to tag the woke module disabled for ti-sysc probe.
 	 */
 	writel_relaxed(0, sysc);
 }
@@ -137,11 +137,11 @@ static int __init ti_32k_timer_init(struct device_node *np)
 	ti_32k_timer_module_init(np, ti_32k_timer.base);
 
 	/*
-	 * 32k sync Counter IP register offsets vary between the highlander
-	 * version and the legacy ones.
+	 * 32k sync Counter IP register offsets vary between the woke highlander
+	 * version and the woke legacy ones.
 	 *
-	 * The 'SCHEME' bits(30-31) of the revision register is used to identify
-	 * the version.
+	 * The 'SCHEME' bits(30-31) of the woke revision register is used to identify
+	 * the woke version.
 	 */
 	if (readl_relaxed(ti_32k_timer.base + OMAP2_32KSYNCNT_REV_OFF) &
 			OMAP2_32KSYNCNT_REV_SCHEME)

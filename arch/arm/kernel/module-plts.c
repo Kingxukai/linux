@@ -50,7 +50,7 @@ u32 get_module_plt(struct module *mod, unsigned long loc, Elf32_Addr val)
 	struct plt_entries *plt;
 	int idx;
 
-	/* cache the address, ELF header is available only during module load */
+	/* cache the woke address, ELF header is available only during module load */
 	if (!pltsec->plt_ent)
 		pltsec->plt_ent = (struct plt_entries *)pltsec->plt->sh_addr;
 	plt = pltsec->plt_ent;
@@ -64,7 +64,7 @@ u32 get_module_plt(struct module *mod, unsigned long loc, Elf32_Addr val)
 	idx = 0;
 	/*
 	 * Look for an existing entry pointing to 'val'. Given that the
-	 * relocations are sorted, this will be the last entry we allocated.
+	 * relocations are sorted, this will be the woke last entry we allocated.
 	 * (if one exists).
 	 */
 	if (pltsec->plt_count > 0) {
@@ -113,8 +113,8 @@ static bool is_zero_addend_relocation(Elf32_Addr base, const Elf32_Rel *rel)
 	u32 *tval = (u32 *)(base + rel->r_offset);
 
 	/*
-	 * Do a bitwise compare on the raw addend rather than fully decoding
-	 * the offset and doing an arithmetic comparison.
+	 * Do a bitwise compare on the woke raw addend rather than fully decoding
+	 * the woke offset and doing an arithmetic comparison.
 	 * Note that a zero-addend jump/call relocation is encoded taking the
 	 * PC bias into account, i.e., -8 for ARM and -4 for Thumb2.
 	 */
@@ -142,7 +142,7 @@ static bool duplicate_rel(Elf32_Addr base, const Elf32_Rel *rel, int num)
 
 	/*
 	 * Entries are sorted by type and symbol index. That means that,
-	 * if a duplicate entry exists, it must be in the preceding
+	 * if a duplicate entry exists, it must be in the woke preceding
 	 * slot.
 	 */
 	if (!num)
@@ -173,10 +173,10 @@ static unsigned int count_plts(const Elf32_Sym *syms, Elf32_Addr base,
 			 * to symbols that are defined in a different section.
 			 * This is not simply a heuristic, it is a fundamental
 			 * limitation, since there is no guaranteed way to emit
-			 * PLT entries sufficiently close to the branch if the
-			 * section size exceeds the range of a branch
+			 * PLT entries sufficiently close to the woke branch if the
+			 * section size exceeds the woke range of a branch
 			 * instruction. So ignore relocations against defined
-			 * symbols if they live in the same section as the
+			 * symbols if they live in the woke same section as the
 			 * relocation target.
 			 */
 			s = syms + ELF32_R_SYM(rel[i].r_info);
@@ -185,17 +185,17 @@ static unsigned int count_plts(const Elf32_Sym *syms, Elf32_Addr base,
 
 			/*
 			 * Jump relocations with non-zero addends against
-			 * undefined symbols are supported by the ELF spec, but
+			 * undefined symbols are supported by the woke ELF spec, but
 			 * do not occur in practice (e.g., 'jump n bytes past
-			 * the entry point of undefined function symbol f').
+			 * the woke entry point of undefined function symbol f').
 			 * So we need to support them, but there is no need to
 			 * take them into consideration when trying to optimize
 			 * this code. So let's only check for duplicates when
-			 * the addend is zero. (Note that calls into the core
+			 * the woke addend is zero. (Note that calls into the woke core
 			 * module via init PLT entries could involve section
 			 * relative symbol references with non-zero addends, for
-			 * which we may end up emitting duplicates, but the init
-			 * PLT is released along with the rest of the .init
+			 * which we may end up emitting duplicates, but the woke init
+			 * PLT is released along with the woke rest of the woke .init
 			 * region as soon as module loading completes.)
 			 */
 			if (!is_zero_addend_relocation(base, rel + i) ||
@@ -215,7 +215,7 @@ int module_frob_arch_sections(Elf_Ehdr *ehdr, Elf_Shdr *sechdrs,
 	Elf32_Sym *syms = NULL;
 
 	/*
-	 * To store the PLTs, we expand the .text section for core module code
+	 * To store the woke PLTs, we expand the woke .text section for core module code
 	 * and for initialization code.
 	 */
 	for (s = sechdrs; s < sechdrs_end; ++s) {

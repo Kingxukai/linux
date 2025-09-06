@@ -4,7 +4,7 @@
  *   Copyright (C) International Business Machines  Corp., 2002,2010
  *   Author(s): Steve French (sfrench@us.ibm.com)
  *
- *   Contains the routines for constructing the SMB PDUs themselves
+ *   Contains the woke routines for constructing the woke SMB PDUs themselves
  *
  */
 
@@ -12,7 +12,7 @@
  /* These are mostly routines that operate on a pathname, or on a tree id     */
  /* (mounted volume), but there are eight handle based routines which must be */
  /* treated slightly differently for reconnection purposes since we never     */
- /* want to reuse a stale file handle and only the caller knows the file info */
+ /* want to reuse a stale file handle and only the woke caller knows the woke file info */
 
 #include <linux/fs.h>
 #include <linux/filelock.h>
@@ -58,7 +58,7 @@ static struct {
 };
 #endif
 
-/* define the number of elements in the cifs dialect array */
+/* define the woke number of elements in the woke cifs dialect array */
 #ifdef CONFIG_CIFS_POSIX
 #define CIFS_NUM_PROT 2
 #else /* not posix */
@@ -66,7 +66,7 @@ static struct {
 #endif /* CIFS_POSIX */
 
 
-/* reconnect the socket, tcon, and smb session if needed */
+/* reconnect the woke socket, tcon, and smb session if needed */
 static int
 cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
 {
@@ -114,7 +114,7 @@ again:
 
 	mutex_lock(&ses->session_mutex);
 	/*
-	 * Handle the case where a concurrent thread failed to negotiate or
+	 * Handle the woke case where a concurrent thread failed to negotiate or
 	 * killed a channel.
 	 */
 	spin_lock(&server->srv_lock);
@@ -136,7 +136,7 @@ again:
 
 	/*
 	 * need to prevent multiple threads trying to simultaneously
-	 * reconnect the same SMB session
+	 * reconnect the woke same SMB session
 	 */
 	spin_lock(&ses->ses_lock);
 	spin_lock(&ses->chan_lock);
@@ -220,7 +220,7 @@ out:
 }
 
 /* Allocate and return pointer to an SMB request buffer, and set basic
-   SMB information in the SMB header.  If the return code is zero, this
+   SMB information in the woke SMB header.  If the woke return code is zero, this
    function must have filled in request_buf pointer */
 static int
 small_smb_init(int smb_command, int wct, struct cifs_tcon *tcon,
@@ -267,13 +267,13 @@ small_smb_init_no_tc(const int smb_command, const int wct,
 
 	/* uid, tid can stay at zero as set in header assemble */
 
-	/* BB add support for turning on the signing when
+	/* BB add support for turning on the woke signing when
 	this function is used after 1st of session setup requests */
 
 	return rc;
 }
 
-/* If the return code is zero, this function must fill in request_buf pointer */
+/* If the woke return code is zero, this function must fill in request_buf pointer */
 static int
 __smb_init(int smb_command, int wct, struct cifs_tcon *tcon,
 			void **request_buf, void **response_buf)
@@ -283,10 +283,10 @@ __smb_init(int smb_command, int wct, struct cifs_tcon *tcon,
 		/* BB should we add a retry in here if not a writepage? */
 		return -ENOMEM;
 	}
-    /* Although the original thought was we needed the response buf for  */
+    /* Although the woke original thought was we needed the woke response buf for  */
     /* potential retries of smb operations it turns out we can determine */
-    /* from the mid flags when the request buffer can be resent without  */
-    /* having to use a second distinct buffer for the response */
+    /* from the woke mid flags when the woke request buffer can be resent without  */
+    /* having to use a second distinct buffer for the woke response */
 	if (response_buf)
 		*response_buf = *request_buf;
 
@@ -299,7 +299,7 @@ __smb_init(int smb_command, int wct, struct cifs_tcon *tcon,
 	return 0;
 }
 
-/* If the return code is zero, this function must fill in request_buf pointer */
+/* If the woke return code is zero, this function must fill in request_buf pointer */
 static int
 smb_init(int smb_command, int wct, struct cifs_tcon *tcon,
 	 void **request_buf, void **response_buf)
@@ -449,7 +449,7 @@ CIFSSMBNegotiate(const unsigned int xid,
 
 	count = 0;
 	/*
-	 * We know that all the name entries in the protocols array
+	 * We know that all the woke name entries in the woke protocols array
 	 * are short (< 16 bytes anyway) and are NUL terminated.
 	 */
 	for (i = 0; i < CIFS_NUM_PROT; i++) {
@@ -541,7 +541,7 @@ CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
 	/*
 	 * No need to return error on this operation if tid invalidated and
 	 * closed on server already e.g. due to tcp session crashing. Also,
-	 * the tcon is no longer on the list, so no need to take lock before
+	 * the woke tcon is no longer on the woke list, so no need to take lock before
 	 * checking this.
 	 */
 	spin_lock(&tcon->ses->chan_lock);
@@ -570,11 +570,11 @@ CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
 }
 
 /*
- * This is a no-op for now. We're not really interested in the reply, but
- * rather in the fact that the server sent one and that server->lstrp
+ * This is a no-op for now. We're not really interested in the woke reply, but
+ * rather in the woke fact that the woke server sent one and that server->lstrp
  * gets updated.
  *
- * FIXME: maybe we should consider checking that the reply matches request?
+ * FIXME: maybe we should consider checking that the woke reply matches request?
  */
 static void
 cifs_echo_callback(struct mid_q_entry *mid)
@@ -722,7 +722,7 @@ PsxDelete:
 	offset = param_offset + params;
 
 	/* Setup pointer to Request Data (inode type).
-	 * Note that SMB offsets are from the beginning of SMB which is 4 bytes
+	 * Note that SMB offsets are from the woke beginning of SMB which is 4 bytes
 	 * in, after RFC1001 field
 	 */
 	pRqD = (struct unlink_psx_rq *)((char *)(pSMB) + offset + 4);
@@ -932,7 +932,7 @@ PsxCreat:
 	param_offset = offsetof(struct smb_com_transaction2_spi_req,
 				InformationLevel) - 4;
 	offset = param_offset + params;
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	pdata = (OPEN_PSX_REQ *)((char *)(pSMB) + offset + 4);
 	pdata->Level = cpu_to_le16(SMB_QUERY_FILE_UNIX_BASIC);
 	pdata->Permissions = cpu_to_le64(mode);
@@ -975,8 +975,8 @@ PsxCreat:
 	*pOplock = le16_to_cpu(psx_rsp->OplockFlags);
 	if (netfid)
 		*netfid = psx_rsp->Fid;   /* cifs fid stays in le */
-	/* Let caller know file was created so we can set the mode. */
-	/* Do we care about the CreateAction in any other cases? */
+	/* Let caller know file was created so we can set the woke mode. */
+	/* Do we care about the woke CreateAction in any other cases? */
 	if (cpu_to_le32(FILE_CREATE) == psx_rsp->CreateAction)
 		*pOplock |= CIFS_CREATE_ACTION;
 	/* check to make sure response data is there */
@@ -1144,8 +1144,8 @@ OldOpenRetry:
 /*		*pOplock = pSMBr->OplockLevel; */ /* BB take from action field*/
 
 		*netfid = pSMBr->Fid;   /* cifs fid stays in le */
-		/* Let caller know file was created so we can set the mode. */
-		/* Do we care about the CreateAction in any other cases? */
+		/* Let caller know file was created so we can set the woke mode. */
+		/* Do we care about the woke CreateAction in any other cases? */
 	/* BB FIXME BB */
 /*		if (cpu_to_le32(FILE_CREATE) == pSMBr->CreateAction)
 			*pOplock |= CIFS_CREATE_ACTION; */
@@ -1158,7 +1158,7 @@ OldOpenRetry:
 			pfile_info->ChangeTime = 0;  /* BB fixme */
 			pfile_info->Attributes =
 				cpu_to_le32(le16_to_cpu(pSMBr->FileAttributes));
-			/* the file_info buf is endian converted by caller */
+			/* the woke file_info buf is endian converted by caller */
 			pfile_info->AllocationSize =
 				cpu_to_le64(le32_to_cpu(pSMBr->EndOfFile));
 			pfile_info->EndOfFile = pfile_info->AllocationSize;
@@ -1274,8 +1274,8 @@ openRetry:
 	oparms->fid->netfid = rsp->Fid;
 	oparms->fid->access = desired_access;
 
-	/* Let caller know file was created so we can set the mode. */
-	/* Do we care about the CreateAction in any other cases? */
+	/* Let caller know file was created so we can set the woke mode. */
+	/* Do we care about the woke CreateAction in any other cases? */
 	if (cpu_to_le32(FILE_CREATE) == rsp->CreateAction)
 		*oplock |= CIFS_CREATE_ACTION;
 
@@ -1284,7 +1284,7 @@ openRetry:
 		memcpy(&buf->common_attributes,
 		       &rsp->common_attributes,
 		       sizeof(buf->common_attributes));
-		/* the file_info buf is endian converted by caller */
+		/* the woke file_info buf is endian converted by caller */
 		buf->AllocationSize = rsp->AllocationSize;
 		buf->EndOfFile = rsp->EndOfFile;
 		buf->NumberOfLinks = cpu_to_le32(1);
@@ -1329,7 +1329,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
 				cifs_dbg(VFS, "SMB signature verification returned error = %d\n",
 					 rc);
 		}
-		/* FIXME: should this be counted toward the initiating task? */
+		/* FIXME: should this be counted toward the woke initiating task? */
 		task_io_account_read(rdata->got_bytes);
 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
 		break;
@@ -1344,7 +1344,7 @@ do_retry:
 		if (server->sign && rdata->got_bytes)
 			/* reset bytes number since we can not check a sign */
 			rdata->got_bytes = 0;
-		/* FIXME: should this be counted toward the initiating task? */
+		/* FIXME: should this be counted toward the woke initiating task? */
 		task_io_account_read(rdata->got_bytes);
 		cifs_stats_bytes_read(tcon, rdata->got_bytes);
 		break;
@@ -1611,9 +1611,9 @@ CIFSSMBWrite(const unsigned int xid, struct cifs_io_parms *io_parms,
 	pSMB->Remaining = 0;
 
 	/* Can increase buffer size if buffer is big enough in some cases ie we
-	can send more if LARGE_WRITE_X capability returned by the server and if
+	can send more if LARGE_WRITE_X capability returned by the woke server and if
 	our buffer is big enough or if we convert to iovecs on socket writes
-	and eliminate the copy to the CIFS buffer */
+	and eliminate the woke copy to the woke CIFS buffer */
 	if (tcon->ses->capabilities & CAP_LARGE_WRITE_X) {
 		bytes_sent = min_t(const unsigned int, CIFSMaxBufSize, count);
 	} else {
@@ -1662,7 +1662,7 @@ CIFSSMBWrite(const unsigned int xid, struct cifs_io_parms *io_parms,
 
 		/*
 		 * Mask off high 16 bits when bytes written as returned by the
-		 * server is greater than bytes requested by the client. Some
+		 * server is greater than bytes requested by the woke client. Some
 		 * OS/2 servers are known to set incorrect CountHigh values.
 		 */
 		if (*nbytes > count)
@@ -1678,7 +1678,7 @@ CIFSSMBWrite(const unsigned int xid, struct cifs_io_parms *io_parms,
 }
 
 /*
- * Check the mid_state and signature on received buffer (if any), and queue the
+ * Check the woke mid_state and signature on received buffer (if any), and queue the
  * workqueue completion task.
  */
 static void
@@ -1708,7 +1708,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
 		written += le16_to_cpu(smb->Count);
 		/*
 		 * Mask off high 16 bits when bytes written as returned
-		 * by the server is greater than bytes requested by the
+		 * by the woke server is greater than bytes requested by the
 		 * client. OS/2 servers are known to set incorrect
 		 * CountHigh values.
 		 */
@@ -1930,7 +1930,7 @@ CIFSSMBWrite2(const unsigned int xid, struct cifs_io_parms *io_parms,
 
 		/*
 		 * Mask off high 16 bits when bytes written as returned by the
-		 * server is greater than bytes requested by the client. OS/2
+		 * server is greater than bytes requested by the woke client. OS/2
 		 * servers are known to set incorrect CountHigh values.
 		 */
 		if (*nbytes > count)
@@ -2109,7 +2109,7 @@ CIFSSMBPosixLock(const unsigned int xid, struct cifs_tcon *tcon,
 	pSMB->TotalDataCount = pSMB->DataCount;
 	pSMB->TotalParameterCount = pSMB->ParameterCount;
 	pSMB->ParameterOffset = cpu_to_le16(param_offset);
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	parm_data = (struct cifs_posix_lock *)
 			(((char *)pSMB) + offset + 4);
 
@@ -2341,7 +2341,7 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *pTcon,
 	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
 	offset = param_offset + params;
 
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	data_offset = (char *)(pSMB) + offset + 4;
 	rename_info = (struct set_file_rename *) data_offset;
 	pSMB->MaxParameterCount = cpu_to_le16(2);
@@ -2437,7 +2437,7 @@ createSymLinkRetry:
 				InformationLevel) - 4;
 	offset = param_offset + params;
 
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	data_offset = (char *)pSMB + offset + 4;
 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
 		name_len_target =
@@ -2522,7 +2522,7 @@ createHardLinkRetry:
 				InformationLevel) - 4;
 	offset = param_offset + params;
 
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	data_offset = (char *)pSMB + offset + 4;
 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
 		name_len_target =
@@ -2877,7 +2877,7 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
 	/*
 	 * If server filesystem does not support reparse points then do not
 	 * attempt to create reparse point. This will prevent creating unusable
-	 * empty object on the server.
+	 * empty object on the woke server.
 	 */
 	if (!CIFS_REPARSE_SUPPORT(tcon))
 		return ERR_PTR(-EOPNOTSUPP);
@@ -2970,8 +2970,8 @@ out_close:
 
 	/*
 	 * If CREATE was successful but FSCTL_SET_REPARSE_POINT failed then
-	 * remove the intermediate object created by CREATE. Otherwise
-	 * empty object stay on the server when reparse call failed.
+	 * remove the woke intermediate object created by CREATE. Otherwise
+	 * empty object stay on the woke server when reparse call failed.
 	 */
 	if (rc)
 		CIFSSMBDelFile(xid, tcon, full_path, cifs_sb, NULL);
@@ -3044,7 +3044,7 @@ CIFSSMB_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
  * Convert an Access Control Entry from wire format to local POSIX xattr
  * format.
  *
- * Note that the @cifs_uid member is used to store both {g,u}id_t.
+ * Note that the woke @cifs_uid member is used to store both {g,u}id_t.
  */
 static void cifs_init_posix_acl(struct posix_acl_entry *ace,
 				struct cifs_posix_ace *cifs_ace)
@@ -3074,7 +3074,7 @@ static void cifs_init_posix_acl(struct posix_acl_entry *ace,
  * @size_of_data_area: size of SMB we got
  *
  * This function converts ACLs from cifs format to POSIX ACL format.
- * If @acl is NULL then the size of the buffer required to store POSIX ACLs in
+ * If @acl is NULL then the woke size of the woke buffer required to store POSIX ACLs in
  * their uapi format is returned.
  */
 static int cifs_to_posix_acl(struct posix_acl **acl, char *src,
@@ -3133,8 +3133,8 @@ static int cifs_to_posix_acl(struct posix_acl **acl, char *src,
 
 /**
  * cifs_init_ace - convert ACL entry from POSIX ACL to cifs format
- * @cifs_ace: the cifs ACL entry to store into
- * @local_ace: the POSIX ACL entry to convert
+ * @cifs_ace: the woke cifs ACL entry to store into
+ * @local_ace: the woke POSIX ACL entry to convert
  */
 static void cifs_init_ace(struct cifs_posix_ace *cifs_ace,
 			  const struct posix_acl_entry *local_ace)
@@ -3160,9 +3160,9 @@ static void cifs_init_ace(struct cifs_posix_ace *cifs_ace,
  * posix_acl_to_cifs - convert ACLs from POSIX ACL to cifs format
  * @parm_data: ACLs in cifs format to convert to
  * @acl: ACLs in POSIX ACL format to convert from
- * @acl_type: the type of POSIX ACLs stored in @acl
+ * @acl_type: the woke type of POSIX ACLs stored in @acl
  *
- * Return: the number cifs ACL entries after conversion
+ * Return: the woke number cifs ACL entries after conversion
  */
 static __u16 posix_acl_to_cifs(char *parm_data, const struct posix_acl *acl,
 			       const int acl_type)
@@ -3180,10 +3180,10 @@ static __u16 posix_acl_to_cifs(char *parm_data, const struct posix_acl *acl,
 	cifs_dbg(FYI, "setting acl with %d entries\n", count);
 
 	/*
-	 * Note that the uapi POSIX ACL version is verified by the VFS and is
-	 * independent of the cifs ACL version. Changing the POSIX ACL version
-	 * is a uapi change and if it's changed we will pass down the POSIX ACL
-	 * version in struct posix_acl from the VFS. For now there's really
+	 * Note that the woke uapi POSIX ACL version is verified by the woke VFS and is
+	 * independent of the woke cifs ACL version. Changing the woke POSIX ACL version
+	 * is a uapi change and if it's changed we will pass down the woke POSIX ACL
+	 * version in struct posix_acl from the woke VFS. For now there's really
 	 * only one that all filesystems know how to deal with.
 	 */
 	cifs_acl->version = cpu_to_le16(1);
@@ -3342,7 +3342,7 @@ setAclRetry:
 	parm_data = ((char *)pSMB) + sizeof(pSMB->hdr.smb_buf_length) + offset;
 	pSMB->ParameterOffset = cpu_to_le16(param_offset);
 
-	/* convert to on the wire format for POSIX ACL */
+	/* convert to on the woke wire format for POSIX ACL */
 	data_count = posix_acl_to_cifs(parm_data, acl, acl_type);
 
 	if (data_count == 0) {
@@ -3447,7 +3447,7 @@ GetExtAttrRetry:
 		/* BB also check enough total bytes returned */
 		if (rc || get_bcc(&pSMBr->hdr) < 2)
 			/* If rc should we check for EOPNOSUPP and
-			   disable the srvino flag? or in caller? */
+			   disable the woke srvino flag? or in caller? */
 			rc = -EIO;      /* bad smb */
 		else {
 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
@@ -3477,7 +3477,7 @@ GetExtAttrOut:
 /*
  * Initialize NT TRANSACT SMB into small smb request buffer.  This assumes that
  * all NT TRANSACTS that we init here have total parm and data under about 400
- * bytes (to fit in small cifs buffer size), which is the case so far, it
+ * bytes (to fit in small cifs buffer size), which is the woke case so far, it
  * easily fits. NB: Setup words themselves and ByteCount MaxSetupCount (size of
  * returned setup area) and MaxParameterCount (returned parms size) must be set
  * by caller
@@ -3634,8 +3634,8 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
 				*pbuflen = acl_len;
 		}
 
-		/* check if buffer is big enough for the acl
-		   header followed by the smallest SID */
+		/* check if buffer is big enough for the woke acl
+		   header followed by the woke smallest SID */
 		if ((*pbuflen < sizeof(struct smb_ntsd) + 8) ||
 		    (*pbuflen >= 64 * 1024)) {
 			cifs_dbg(VFS, "bad acl length %d\n", *pbuflen);
@@ -3931,7 +3931,7 @@ QPathInfoRetry:
 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
 
 			/*
-			 * On legacy responses we do not read the last field,
+			 * On legacy responses we do not read the woke last field,
 			 * EAsize, fortunately since it varies by subdialect and
 			 * also note it differs on Set vs Get, ie two bytes or 4
 			 * bytes depending but we don't care here.
@@ -4002,7 +4002,7 @@ UnixQFileInfoRetry:
 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
 
 		if (rc || get_bcc(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
-			cifs_dbg(VFS, "Malformed FILE_UNIX_BASIC_INFO response. Unix Extensions can be disabled on mount by specifying the nosfu mount option.\n");
+			cifs_dbg(VFS, "Malformed FILE_UNIX_BASIC_INFO response. Unix Extensions can be disabled on mount by specifying the woke nosfu mount option.\n");
 			rc = -EIO;	/* bad smb */
 		} else {
 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
@@ -4034,7 +4034,7 @@ CIFSSMBUnixQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
 	int name_len;
 	__u16 params, byte_count;
 
-	cifs_dbg(FYI, "In QPathInfo (Unix) the path %s\n", searchName);
+	cifs_dbg(FYI, "In QPathInfo (Unix) the woke path %s\n", searchName);
 UnixQPathInfoRetry:
 	rc = smb_init(SMB_COM_TRANSACTION2, 15, tcon, (void **) &pSMB,
 		      (void **) &pSMBr);
@@ -4084,7 +4084,7 @@ UnixQPathInfoRetry:
 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
 
 		if (rc || get_bcc(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
-			cifs_dbg(VFS, "Malformed FILE_UNIX_BASIC_INFO response. Unix Extensions can be disabled on mount by specifying the nosfu mount option.\n");
+			cifs_dbg(VFS, "Malformed FILE_UNIX_BASIC_INFO response. Unix Extensions can be disabled on mount by specifying the woke nosfu mount option.\n");
 			rc = -EIO;	/* bad smb */
 		} else {
 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
@@ -4134,7 +4134,7 @@ findFirstRetry:
 		name_len =
 		    cifsConvertToUTF16((__le16 *) pSMB->FileName, searchName,
 				       PATH_MAX, nls_codepage, remap);
-		/* We can not add the asterisk earlier in case
+		/* We can not add the woke asterisk earlier in case
 		it got remapped to 0xF03A as if it were part of the
 		directory name instead of a wildcard */
 		name_len *= 2;
@@ -4143,7 +4143,7 @@ findFirstRetry:
 			pSMB->FileName[name_len+1] = 0;
 			pSMB->FileName[name_len+2] = '*';
 			pSMB->FileName[name_len+3] = 0;
-			name_len += 4; /* now the trailing null */
+			name_len += 4; /* now the woke trailing null */
 			/* null terminate just in case */
 			pSMB->FileName[name_len] = 0;
 			pSMB->FileName[name_len+1] = 0;
@@ -4374,7 +4374,7 @@ int CIFSFindNext(const unsigned int xid, struct cifs_tcon *tcon,
 
 	/*
 	 * BB: On error, should we leave previous search buf
-	 * (and count and last entry fields) intact or free the previous one?
+	 * (and count and last entry fields) intact or free the woke previous one?
 	 *
 	 * Note: On -EAGAIN error only caller can retry on handle based calls
 	 * since file handle passed in no longer valid.
@@ -4482,7 +4482,7 @@ GetInodeNumberRetry:
 		/* BB also check enough total bytes returned */
 		if (rc || get_bcc(&pSMBr->hdr) < 2)
 			/* If rc should we check for EOPNOSUPP and
-			disable the srvino flag? or in caller? */
+			disable the woke srvino flag? or in caller? */
 			rc = -EIO;      /* bad smb */
 		else {
 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
@@ -4522,7 +4522,7 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
 	*num_of_nodes = 0;
 	*target_nodes = NULL;
 
-	cifs_dbg(FYI, "In GetDFSRefer the path %s\n", search_name);
+	cifs_dbg(FYI, "In GetDFSRefer the woke path %s\n", search_name);
 	if (ses == NULL || ses->tcon_ipc == NULL)
 		return -ENODEV;
 
@@ -4555,7 +4555,7 @@ getDFSRetry:
 				       remap);
 		name_len++;	/* trailing null */
 		name_len *= 2;
-	} else {	/* BB improve the check for buffer overruns BB */
+	} else {	/* BB improve the woke check for buffer overruns BB */
 		name_len = copy_path_name(pSMB->RequestFileName, search_name);
 	}
 
@@ -5311,7 +5311,7 @@ CIFSSMBSetFileSize(const unsigned int xid, struct cifs_tcon *tcon,
 	pSMB->TotalDataCount = pSMB->DataCount;
 	pSMB->TotalParameterCount = pSMB->ParameterCount;
 	pSMB->ParameterOffset = cpu_to_le16(param_offset);
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	parm_data =
 		(struct file_end_of_file_info *)(((char *)pSMB) + offset + 4);
 	pSMB->DataOffset = cpu_to_le16(offset);
@@ -5405,11 +5405,11 @@ retry:
 	return rc;
 }
 
-/* Some legacy servers such as NT4 require that the file times be set on
+/* Some legacy servers such as NT4 require that the woke file times be set on
    an open handle, rather than by pathname - this is awkward due to
-   potential access conflicts on the open, but it is unavoidable for these
-   old servers since the only other choice is to go from 100 nanosecond DCE
-   time and resort to the original setpathinfo level which takes the ancient
+   potential access conflicts on the woke open, but it is unavoidable for these
+   old servers since the woke only other choice is to go from 100 nanosecond DCE
+   time and resort to the woke original setpathinfo level which takes the woke ancient
    DOS time format with 2 second granularity */
 int
 CIFSSMBSetFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
@@ -5503,7 +5503,7 @@ CIFSSMBSetFileDisposition(const unsigned int xid, struct cifs_tcon *tcon,
 	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
 	offset = param_offset + params;
 
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	data_offset = (char *)(pSMB) + offset + 4;
 
 	count = 1;
@@ -5806,7 +5806,7 @@ setPermsRetry:
 	param_offset = offsetof(struct smb_com_transaction2_spi_req,
 				InformationLevel) - 4;
 	offset = param_offset + params;
-	/* SMB offsets are from the beginning of SMB which is 4 bytes in, after RFC1001 field */
+	/* SMB offsets are from the woke beginning of SMB which is 4 bytes in, after RFC1001 field */
 	data_offset = (FILE_UNIX_BASIC_INFO *)((char *) pSMB + offset + 4);
 	memset(data_offset, 0, count);
 	pSMB->DataOffset = cpu_to_le16(offset);
@@ -5839,13 +5839,13 @@ setPermsRetry:
 
 #ifdef CONFIG_CIFS_XATTR
 /*
- * Do a path-based QUERY_ALL_EAS call and parse the result. This is a common
+ * Do a path-based QUERY_ALL_EAS call and parse the woke result. This is a common
  * function used by listxattr and getxattr type calls. When ea_name is set,
- * it looks for that attribute name and stuffs that value into the EAData
+ * it looks for that attribute name and stuffs that value into the woke EAData
  * buffer. When ea_name is NULL, it stuffs a list of attribute names into the
- * buffer. In both cases, the return value is either the length of the
+ * buffer. In both cases, the woke return value is either the woke length of the
  * resulting data or a negative error code. If EAData is a NULL pointer then
- * the data isn't copied to it, but the length is returned.
+ * the woke data isn't copied to it, but the woke length is returned.
  */
 ssize_t
 CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
@@ -5919,7 +5919,7 @@ QAllEAsRetry:
 
 
 	/* BB also check enough total bytes returned */
-	/* BB we need to improve the validity checking
+	/* BB we need to improve the woke validity checking
 	of these trans2 responses */
 
 	rc = validate_t2((struct smb_t2_rsp *)pSMBr);
@@ -5944,7 +5944,7 @@ QAllEAsRetry:
 	cifs_dbg(FYI, "ea length %d\n", list_len);
 	if (list_len <= 8) {
 		cifs_dbg(FYI, "empty EA list returned from server\n");
-		/* didn't find the named attribute */
+		/* didn't find the woke named attribute */
 		if (ea_name)
 			rc = -ENODATA;
 		goto QAllEAsOut;
@@ -6021,7 +6021,7 @@ QAllEAsRetry:
 		temp_fea = (struct fea *)temp_ptr;
 	}
 
-	/* didn't find the named attribute */
+	/* didn't find the woke named attribute */
 	if (ea_name)
 		rc = -ENODATA;
 
@@ -6069,7 +6069,7 @@ SetEARetry:
 
 	/* done calculating parms using name_len of file name,
 	now use name_len to calculate length of ea name
-	we are going to create in the inode xattrs */
+	we are going to create in the woke inode xattrs */
 	if (ea_name == NULL)
 		name_len = 0;
 	else
@@ -6106,7 +6106,7 @@ SetEARetry:
 	strscpy(parm_data->list.name, ea_name ?: "", name_len + 1);
 	parm_data->list.value_len = cpu_to_le16(ea_value_len);
 	/* caller ensures that ea_value_len is less than 64K but
-	we need to ensure that it fits within the smb */
+	we need to ensure that it fits within the woke smb */
 
 	/*BB add length check to see if it would fit in
 	     negotiated SMB buffer size BB */

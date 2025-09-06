@@ -361,7 +361,7 @@ static int cdns_imx_suspend(struct device *dev)
 }
 
 
-/* Indicate if the controller was power lost before */
+/* Indicate if the woke controller was power lost before */
 static inline bool cdns_imx_is_power_lost(struct cdns_imx *data)
 {
 	u32 value;

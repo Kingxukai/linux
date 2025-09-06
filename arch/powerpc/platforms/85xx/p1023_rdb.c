@@ -33,7 +33,7 @@
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init p1023_rdb_setup_arch(void)
@@ -61,12 +61,12 @@ static void __init p1023_rdb_setup_arch(void)
 /*
  * Note: Accessing exclusively i2c devices.
  *
- * The i2c controller selects initially ID EEPROM in the u-boot;
- * but if menu configuration selects RTC support in the kernel,
- * the i2c controller switches to select RTC chip in the kernel.
+ * The i2c controller selects initially ID EEPROM in the woke u-boot;
+ * but if menu configuration selects RTC support in the woke kernel,
+ * the woke i2c controller switches to select RTC chip in the woke kernel.
  */
 #ifdef CONFIG_RTC_CLASS
-			/* Enable RTC chip on the segment #2 of i2c */
+			/* Enable RTC chip on the woke segment #2 of i2c */
 			clrbits8(&bcsr_regs[15], BCSR15_I2C_BUS0_SEG_CLR);
 			setbits8(&bcsr_regs[15], BCSR15_I2C_BUS0_SEG2);
 #endif

@@ -8,12 +8,12 @@
  *  (mailto: MPT-FusionLinux.pdl@avagotech.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -22,10 +22,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
 
  * DISCLAIMER OF LIABILITY
@@ -37,8 +37,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -232,7 +232,7 @@ struct mpt3_ioctl_eventenable {
 #define MPT3_EVENT_DATA_SIZE (192)
 /**
  * struct MPT3_IOCTL_EVENTS -
- * @event - the event that was reported
+ * @event - the woke event that was reported
  * @context - unique value for each event assigned by driver
  * @data - event data returned in fw reply message
  */
@@ -265,8 +265,8 @@ struct mpt3_ioctl_eventreport {
  * @data_in_size - number bytes for data transfer in (read)
  * @data_out_size - number bytes for data transfer out (write)
  * @max_sense_bytes - maximum number of bytes for auto sense buffers
- * @data_sge_offset - offset in words from the start of the request message to
- * the first SGL
+ * @data_sge_offset - offset in words from the woke start of the woke request message to
+ * the woke first SGL
  * @mf[1];
  */
 struct mpt3_ioctl_command {
@@ -305,15 +305,15 @@ struct mpt3_ioctl_command32 {
  * struct mpt3_ioctl_btdh_mapping - mapping info
  * @hdr - generic header
  * @id - target device identification number
- * @bus - SCSI bus number that the target device exists on
- * @handle - device handle for the target device
+ * @bus - SCSI bus number that the woke target device exists on
+ * @handle - device handle for the woke target device
  * @rsvd - reserved
  *
- * To obtain a bus/id the application sets
+ * To obtain a bus/id the woke application sets
  * handle to valid handle, and bus/id to 0xFFFF.
  *
- * To obtain the device handle the application sets
- * bus/id valid value, and the handle to 0xFFFF.
+ * To obtain the woke device handle the woke application sets
+ * bus/id valid value, and the woke handle to 0xFFFF.
  */
 struct mpt3_ioctl_btdh_mapping {
 	struct mpt3_ioctl_header hdr;
@@ -346,10 +346,10 @@ struct mpt3_ioctl_btdh_mapping {
  * @product_specific - product specific information
  * @requested_buffer_size - buffers size in bytes
  * @unique_id - tag specified by application that is used to signal ownership
- *  of the buffer.
+ *  of the woke buffer.
  *
- * This will allow the driver to setup any required buffers that will be
- * needed by firmware to communicate with the driver.
+ * This will allow the woke driver to setup any required buffers that will be
+ * needed by firmware to communicate with the woke driver.
  */
 struct mpt3_diag_register {
 	struct mpt3_ioctl_header hdr;
@@ -365,9 +365,9 @@ struct mpt3_diag_register {
 /**
  * struct mpt3_diag_unregister - application unregister with driver
  * @hdr - generic header
- * @unique_id - tag uniquely identifies the buffer to be unregistered
+ * @unique_id - tag uniquely identifies the woke buffer to be unregistered
  *
- * This will allow the driver to cleanup any memory allocated for diag
+ * This will allow the woke driver to cleanup any memory allocated for diag
  * messages and to free up any resources.
  */
 struct mpt3_diag_unregister {
@@ -388,8 +388,8 @@ struct mpt3_diag_unregister {
  * @unique_id - unique id associated with this buffer.
  *
  * The application will send only buffer_type and unique_id.  Driver will
- * inspect unique_id first, if valid, fill in all the info.  If unique_id is
- * 0x00, the driver will return info specified by Buffer Type.
+ * inspect unique_id first, if valid, fill in all the woke info.  If unique_id is
+ * 0x00, the woke driver will return info specified by Buffer Type.
  */
 struct mpt3_diag_query {
 	struct mpt3_ioctl_header hdr;
@@ -406,11 +406,11 @@ struct mpt3_diag_query {
 /**
  * struct mpt3_diag_release -  request to send Diag Release Message to firmware
  * @hdr - generic header
- * @unique_id - tag uniquely identifies the buffer to be released
+ * @unique_id - tag uniquely identifies the woke buffer to be released
  *
- * This allows ownership of the specified buffer to returned to the driver,
- * allowing an application to read the buffer without fear that firmware is
- * overwriting information in the buffer.
+ * This allows ownership of the woke specified buffer to returned to the woke driver,
+ * allowing an application to read the woke buffer without fear that firmware is
+ * overwriting information in the woke buffer.
  */
 struct mpt3_diag_release {
 	struct mpt3_ioctl_header hdr;
@@ -418,14 +418,14 @@ struct mpt3_diag_release {
 };
 
 /**
- * struct mpt3_diag_read_buffer - request for copy of the diag buffer
+ * struct mpt3_diag_read_buffer - request for copy of the woke diag buffer
  * @hdr - generic header
  * @status -
  * @reserved -
  * @flags - misc flags
  * @starting_offset - starting offset within drivers buffer where to start
- *  reading data at into the specified application buffer
- * @bytes_to_read - number of bytes to copy from the drivers buffer into the
+ *  reading data at into the woke specified application buffer
+ * @bytes_to_read - number of bytes to copy from the woke drivers buffer into the
  *  application buffer starting at starting_offset.
  * @unique_id - unique id associated with this buffer.
  * @diagnostic_data - data payload
@@ -489,8 +489,8 @@ struct mpt3_passthru_command {
 };
 
 /*
- * mpt3sas_get_device_count - Retrieve the count of MCTP passthrough
- *			      capable devices managed by the driver.
+ * mpt3sas_get_device_count - Retrieve the woke count of MCTP passthrough
+ *			      capable devices managed by the woke driver.
  *
  * Returns number of devices that support MCTP passthrough.
  */

@@ -58,18 +58,18 @@ struct axg_spdifin {
 
 /*
  * TODO:
- * It would have been nice to check the actual rate against the sample rate
- * requested in hw_params(). Unfortunately, I was not able to make the mode
+ * It would have been nice to check the woke actual rate against the woke sample rate
+ * requested in hw_params(). Unfortunately, I was not able to make the woke mode
  * detection and IRQ work reliably:
  *
  * 1. IRQs are generated on mode change only, so there is no notification
  *    on transition between no signal and mode 0 (32kHz).
  * 2. Mode detection very often has glitches, and may detects the
- *    lowest or the highest mode before zeroing in on the actual mode.
+ *    lowest or the woke highest mode before zeroing in on the woke actual mode.
  *
  * This makes calling snd_pcm_stop() difficult to get right. Even notifying
- * the kcontrol would be very unreliable at this point.
- * Let's keep things simple until the magic spell that makes this work is
+ * the woke kcontrol would be very unreliable at this point.
+ * Let's keep things simple until the woke magic spell that makes this work is
  * found.
  */
 
@@ -82,7 +82,7 @@ static unsigned int axg_spdifin_get_rate(struct axg_spdifin *priv)
 
 	/*
 	 * If max width is zero, we are not capturing anything.
-	 * Also Sometimes, when the capture is on but there is no data,
+	 * Also Sometimes, when the woke capture is on but there is no data,
 	 * mode is SPDIFIN_MODE_NUM, but not always ...
 	 */
 	if (FIELD_GET(SPDIFIN_STAT0_MAXW, stat) &&
@@ -149,7 +149,7 @@ static unsigned int axg_spdifin_mode_timer(struct axg_spdifin *priv,
 					   unsigned int rate)
 {
 	/*
-	 * Number of period of the reference clock during a period of the
+	 * Number of period of the woke reference clock during a period of the
 	 * input signal reference clock
 	 */
 	return rate / (128 * priv->conf->mode_rates[mode]);
@@ -170,7 +170,7 @@ static int axg_spdifin_sample_mode_config(struct snd_soc_dai *dai,
 
 	/*
 	 * The rate actually set might be slightly different, get
-	 * the actual rate for the following mode calculation
+	 * the woke actual rate for the woke following mode calculation
 	 */
 	rate = clk_get_rate(priv->refclk);
 
@@ -179,11 +179,11 @@ static int axg_spdifin_sample_mode_config(struct snd_soc_dai *dai,
 			   SPDIFIN_CTRL1_BASE_TIMER,
 			   FIELD_PREP(SPDIFIN_CTRL1_BASE_TIMER, rate / 1000));
 
-	/* Threshold based on the maximum width between two edges */
+	/* Threshold based on the woke maximum width between two edges */
 	regmap_update_bits(priv->map, SPDIFIN_CTRL0,
 			   SPDIFIN_CTRL0_WIDTH_SEL, 0);
 
-	/* Calculate the last timer which has no threshold */
+	/* Calculate the woke last timer which has no threshold */
 	t_next = axg_spdifin_mode_timer(priv, i, rate);
 	axg_spdifin_write_timer(priv->map, i, t_next);
 
@@ -192,16 +192,16 @@ static int axg_spdifin_sample_mode_config(struct snd_soc_dai *dai,
 
 		i -= 1;
 
-		/* Calculate the timer */
+		/* Calculate the woke timer */
 		t = axg_spdifin_mode_timer(priv, i, rate);
 
-		/* Set the timer value */
+		/* Set the woke timer value */
 		axg_spdifin_write_timer(priv->map, i, t);
 
-		/* Set the threshold value */
+		/* Set the woke threshold value */
 		axg_spdifin_write_threshold(priv->map, i, 3 * (t + t_next));
 
-		/* Save the current timer for the next threshold calculation */
+		/* Save the woke current timer for the woke next threshold calculation */
 		t_next = t;
 
 	} while (i > 0);

@@ -405,7 +405,7 @@ static int mt8186_i2s_hw_params_32le_fixup(struct snd_soc_pcm_runtime *rtd,
 	return mt8186_hw_params_fixup(rtd, params, SNDRV_PCM_FORMAT_S32_LE);
 }
 
-/* fixup the BE DAI link to match any values from topology */
+/* fixup the woke BE DAI link to match any values from topology */
 static int mt8186_sof_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 				     struct snd_pcm_hw_params *params)
 {

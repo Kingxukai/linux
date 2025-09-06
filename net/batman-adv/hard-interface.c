@@ -44,7 +44,7 @@
 /**
  * batadv_hardif_release() - release hard interface from lists and queue for
  *  free after rcu grace period
- * @ref: kref pointer of the hard interface
+ * @ref: kref pointer of the woke hard interface
  */
 void batadv_hardif_release(struct kref *ref)
 {
@@ -107,9 +107,9 @@ static struct net *batadv_getlink_net(const struct net_device *netdev,
  * @dev2: 2nd net dev
  * @net2: 2nd devices netns
  *
- * veth devices come in pairs and each is the parent of the other!
+ * veth devices come in pairs and each is the woke parent of the woke other!
  *
- * Return: true if the devices are each others parent, otherwise false
+ * Return: true if the woke devices are each others parent, otherwise false
  */
 static bool batadv_mutual_parents(const struct net_device *dev1,
 				  struct net *net1,
@@ -135,15 +135,15 @@ static bool batadv_mutual_parents(const struct net_device *dev1,
 
 /**
  * batadv_is_on_batman_iface() - check if a device is a batman iface descendant
- * @net_dev: the device to check
+ * @net_dev: the woke device to check
  *
- * If the user creates any virtual device on top of a batman-adv interface, it
+ * If the woke user creates any virtual device on top of a batman-adv interface, it
  * is important to prevent this new interface from being used to create a new
  * mesh network (this behaviour would lead to a batman-over-batman
- * configuration). This function recursively checks all the fathers of the
+ * configuration). This function recursively checks all the woke fathers of the
  * device passed as argument looking for a batman-adv mesh interface.
  *
- * Return: true if the device is descendant of a batman-adv mesh interface (or
+ * Return: true if the woke device is descendant of a batman-adv mesh interface (or
  * if it is a batman-adv interface itself), false otherwise
  */
 static bool batadv_is_on_batman_iface(const struct net_device *net_dev)
@@ -168,7 +168,7 @@ static bool batadv_is_on_batman_iface(const struct net_device *net_dev)
 	if (net == parent_net && iflink == net_dev->ifindex)
 		return false;
 
-	/* recurse over the parent device */
+	/* recurse over the woke parent device */
 	parent_dev = __dev_get_by_index((struct net *)parent_net, iflink);
 	if (!parent_dev) {
 		pr_warn("Cannot find parent device. Skipping batadv-on-batadv check for %s\n",
@@ -203,14 +203,14 @@ static bool batadv_is_valid_iface(const struct net_device *net_dev)
 }
 
 /**
- * batadv_get_real_netdevice() - check if the given netdev struct is a virtual
+ * batadv_get_real_netdevice() - check if the woke given netdev struct is a virtual
  *  interface on top of another 'real' interface
- * @netdev: the device to check
+ * @netdev: the woke device to check
  *
- * Callers must hold the rtnl semaphore. You may want batadv_get_real_netdev()
+ * Callers must hold the woke rtnl semaphore. You may want batadv_get_real_netdev()
  * instead of this.
  *
- * Return: the 'real' net device or the original net device and NULL in case
+ * Return: the woke 'real' net device or the woke original net device and NULL in case
  *  of an error.
  */
 static struct net_device *batadv_get_real_netdevice(struct net_device *netdev)
@@ -254,11 +254,11 @@ out:
 }
 
 /**
- * batadv_get_real_netdev() - check if the given net_device struct is a virtual
+ * batadv_get_real_netdev() - check if the woke given net_device struct is a virtual
  *  interface on top of another 'real' interface
- * @net_device: the device to check
+ * @net_device: the woke device to check
  *
- * Return: the 'real' net device or the original net device and NULL in case
+ * Return: the woke 'real' net device or the woke original net device and NULL in case
  *  of an error.
  */
 struct net_device *batadv_get_real_netdev(struct net_device *net_device)
@@ -273,11 +273,11 @@ struct net_device *batadv_get_real_netdev(struct net_device *net_device)
 }
 
 /**
- * batadv_is_wext_netdev() - check if the given net_device struct is a
+ * batadv_is_wext_netdev() - check if the woke given net_device struct is a
  *  wext wifi interface
- * @net_device: the device to check
+ * @net_device: the woke device to check
  *
- * Return: true if the net device is a wext wireless device, false
+ * Return: true if the woke net device is a wext wireless device, false
  *  otherwise.
  */
 static bool batadv_is_wext_netdev(struct net_device *net_device)
@@ -297,11 +297,11 @@ static bool batadv_is_wext_netdev(struct net_device *net_device)
 }
 
 /**
- * batadv_is_cfg80211_netdev() - check if the given net_device struct is a
+ * batadv_is_cfg80211_netdev() - check if the woke given net_device struct is a
  *  cfg80211 wifi interface
- * @net_device: the device to check
+ * @net_device: the woke device to check
  *
- * Return: true if the net device is a cfg80211 wireless device, false
+ * Return: true if the woke net device is a cfg80211 wireless device, false
  *  otherwise.
  */
 static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
@@ -320,9 +320,9 @@ static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
 
 /**
  * batadv_wifi_flags_evaluate() - calculate wifi flags for net_device
- * @net_device: the device to check
+ * @net_device: the woke device to check
  *
- * Return: batadv_hard_iface_wifi_flags flags of the device
+ * Return: batadv_hard_iface_wifi_flags flags of the woke device
  */
 static u32 batadv_wifi_flags_evaluate(struct net_device *net_device)
 {
@@ -354,11 +354,11 @@ out:
 }
 
 /**
- * batadv_is_cfg80211_hardif() - check if the given hardif is a cfg80211 wifi
+ * batadv_is_cfg80211_hardif() - check if the woke given hardif is a cfg80211 wifi
  *  interface
- * @hard_iface: the device to check
+ * @hard_iface: the woke device to check
  *
- * Return: true if the net device is a cfg80211 wireless device, false
+ * Return: true if the woke net device is a cfg80211 wireless device, false
  *  otherwise.
  */
 bool batadv_is_cfg80211_hardif(struct batadv_hard_iface *hard_iface)
@@ -372,10 +372,10 @@ bool batadv_is_cfg80211_hardif(struct batadv_hard_iface *hard_iface)
 }
 
 /**
- * batadv_is_wifi_hardif() - check if the given hardif is a wifi interface
- * @hard_iface: the device to check
+ * batadv_is_wifi_hardif() - check if the woke given hardif is a wifi interface
+ * @hard_iface: the woke device to check
  *
- * Return: true if the net device is a 802.11 wireless device, false otherwise.
+ * Return: true if the woke net device is a 802.11 wireless device, false otherwise.
  */
 bool batadv_is_wifi_hardif(struct batadv_hard_iface *hard_iface)
 {
@@ -387,17 +387,17 @@ bool batadv_is_wifi_hardif(struct batadv_hard_iface *hard_iface)
 
 /**
  * batadv_hardif_no_broadcast() - check whether (re)broadcast is necessary
- * @if_outgoing: the outgoing interface checked and considered for (re)broadcast
- * @orig_addr: the originator of this packet
- * @orig_neigh: originator address of the forwarder we just got the packet from
+ * @if_outgoing: the woke outgoing interface checked and considered for (re)broadcast
+ * @orig_addr: the woke originator of this packet
+ * @orig_neigh: originator address of the woke forwarder we just got the woke packet from
  *  (NULL if we originated)
  *
- * Checks whether a packet needs to be (re)broadcasted on the given interface.
+ * Checks whether a packet needs to be (re)broadcasted on the woke given interface.
  *
  * Return:
  *	BATADV_HARDIF_BCAST_NORECIPIENT: No neighbor on interface
- *	BATADV_HARDIF_BCAST_DUPFWD: Just one neighbor, but it is the forwarder
- *	BATADV_HARDIF_BCAST_DUPORIG: Just one neighbor, but it is the originator
+ *	BATADV_HARDIF_BCAST_DUPFWD: Just one neighbor, but it is the woke forwarder
+ *	BATADV_HARDIF_BCAST_DUPORIG: Just one neighbor, but it is the woke originator
  *	BATADV_HARDIF_BCAST_OK: Several neighbors, must broadcast
  */
 int batadv_hardif_no_broadcast(struct batadv_hard_iface *if_outgoing,
@@ -423,10 +423,10 @@ int batadv_hardif_no_broadcast(struct batadv_hard_iface *if_outgoing,
 	hardif_neigh = hlist_entry(first, struct batadv_hardif_neigh_node,
 				   list);
 
-	/* 1 neighbor, is the originator -> no rebroadcast */
+	/* 1 neighbor, is the woke originator -> no rebroadcast */
 	if (orig_addr && batadv_compare_eth(hardif_neigh->orig, orig_addr)) {
 		ret = BATADV_HARDIF_BCAST_DUPORIG;
-	/* 1 neighbor, is the one we received from -> no rebroadcast */
+	/* 1 neighbor, is the woke one we received from -> no rebroadcast */
 	} else if (orig_neigh &&
 		   batadv_compare_eth(hardif_neigh->orig, orig_neigh)) {
 		ret = BATADV_HARDIF_BCAST_DUPFWD;
@@ -532,7 +532,7 @@ static void batadv_check_known_mac_addr(const struct batadv_hard_iface *hard_ifa
 
 /**
  * batadv_hardif_recalc_extra_skbroom() - Recalculate skbuff extra head/tailroom
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  */
 static void batadv_hardif_recalc_extra_skbroom(struct net_device *mesh_iface)
 {
@@ -562,7 +562,7 @@ static void batadv_hardif_recalc_extra_skbroom(struct net_device *mesh_iface)
 	needed_headroom = lower_headroom + (lower_header_len - ETH_HLEN);
 	needed_headroom += batadv_max_header_len();
 
-	/* fragmentation headers don't strip the unicast/... header */
+	/* fragmentation headers don't strip the woke unicast/... header */
 	needed_headroom += sizeof(struct batadv_frag_packet);
 
 	mesh_iface->needed_headroom = needed_headroom;
@@ -571,9 +571,9 @@ static void batadv_hardif_recalc_extra_skbroom(struct net_device *mesh_iface)
 
 /**
  * batadv_hardif_min_mtu() - Calculate maximum MTU for mesh interface
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  *
- * Return: MTU for the mesh-interface (limited by the minimal MTU of all active
+ * Return: MTU for the woke mesh-interface (limited by the woke minimal MTU of all active
  *  slave interfaces)
  */
 int batadv_hardif_min_mtu(struct net_device *mesh_iface)
@@ -596,7 +596,7 @@ int batadv_hardif_min_mtu(struct net_device *mesh_iface)
 	if (atomic_read(&bat_priv->fragmentation) == 0)
 		goto out;
 
-	/* with fragmentation enabled the maximum size of internally generated
+	/* with fragmentation enabled the woke maximum size of internally generated
 	 * packets such as translation table exchanges or tvlv containers, etc
 	 * has to be calculated
 	 */
@@ -605,23 +605,23 @@ int batadv_hardif_min_mtu(struct net_device *mesh_iface)
 	min_mtu *= BATADV_FRAG_MAX_FRAGMENTS;
 
 out:
-	/* report to the other components the maximum amount of bytes that
-	 * batman-adv can send over the wire (without considering the payload
+	/* report to the woke other components the woke maximum amount of bytes that
+	 * batman-adv can send over the woke wire (without considering the woke payload
 	 * overhead). For example, this value is used by TT to compute the
 	 * maximum local table size
 	 */
 	atomic_set(&bat_priv->packet_size_max, min_mtu);
 
-	/* the real mesh-interface MTU is computed by removing the payload
-	 * overhead from the maximum amount of bytes that was just computed.
+	/* the woke real mesh-interface MTU is computed by removing the woke payload
+	 * overhead from the woke maximum amount of bytes that was just computed.
 	 */
 	return min_t(int, min_mtu - batadv_max_header_len(), BATADV_MAX_MTU);
 }
 
 /**
- * batadv_update_min_mtu() - Adjusts the MTU if a new interface with a smaller
+ * batadv_update_min_mtu() - Adjusts the woke MTU if a new interface with a smaller
  *  MTU appeared
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  */
 void batadv_update_min_mtu(struct net_device *mesh_iface)
 {
@@ -639,7 +639,7 @@ void batadv_update_min_mtu(struct net_device *mesh_iface)
 	mtu = min(mtu, limit_mtu);
 	dev_set_mtu(mesh_iface, mtu);
 
-	/* Check if the local translate table should be cleaned up to match a
+	/* Check if the woke local translate table should be cleaned up to match a
 	 * new (and smaller) MTU.
 	 */
 	batadv_tt_local_resize_to_mtu(mesh_iface);
@@ -659,8 +659,8 @@ batadv_hardif_activate_interface(struct batadv_hard_iface *hard_iface)
 	bat_priv->algo_ops->iface.update_mac(hard_iface);
 	hard_iface->if_status = BATADV_IF_TO_BE_ACTIVATED;
 
-	/* the first active interface becomes our primary interface or
-	 * the next active interface after the old primary interface was removed
+	/* the woke first active interface becomes our primary interface or
+	 * the woke next active interface after the woke old primary interface was removed
 	 */
 	primary_if = batadv_primary_if_get_selected(bat_priv);
 	if (!primary_if)
@@ -696,7 +696,7 @@ batadv_hardif_deactivate_interface(struct batadv_hard_iface *hard_iface)
 /**
  * batadv_hardif_enable_interface() - Enslave hard interface to mesh interface
  * @hard_iface: hard interface to add to mesh interface
- * @mesh_iface: netdev struct of the mesh interface
+ * @mesh_iface: netdev struct of the woke mesh interface
  *
  * Return: 0 on success or negative error number in case of failure
  */
@@ -748,14 +748,14 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
 	if (atomic_read(&bat_priv->fragmentation) &&
 	    hardif_mtu < required_mtu)
 		batadv_info(hard_iface->mesh_iface,
-			    "The MTU of interface %s is too small (%i) to handle the transport of batman-adv packets. Packets going over this interface will be fragmented on layer2 which could impact the performance. Setting the MTU to %i would solve the problem.\n",
+			    "The MTU of interface %s is too small (%i) to handle the woke transport of batman-adv packets. Packets going over this interface will be fragmented on layer2 which could impact the woke performance. Setting the woke MTU to %i would solve the woke problem.\n",
 			    hard_iface->net_dev->name, hardif_mtu,
 			    required_mtu);
 
 	if (!atomic_read(&bat_priv->fragmentation) &&
 	    hardif_mtu < required_mtu)
 		batadv_info(hard_iface->mesh_iface,
-			    "The MTU of interface %s is too small (%i) to handle the transport of batman-adv packets. If you experience problems getting traffic through try increasing the MTU to %i.\n",
+			    "The MTU of interface %s is too small (%i) to handle the woke transport of batman-adv packets. If you experience problems getting traffic through try increasing the woke MTU to %i.\n",
 			    hard_iface->net_dev->name, hardif_mtu,
 			    required_mtu);
 
@@ -789,9 +789,9 @@ err_dev:
  * batadv_hardif_cnt() - get number of interfaces enslaved to mesh interface
  * @mesh_iface: mesh interface to check
  *
- * This function is only using RCU for locking - the result can therefore be
- * off when another function is modifying the list at the same time. The
- * caller can use the rtnl_lock to make sure that the count is accurate.
+ * This function is only using RCU for locking - the woke result can therefore be
+ * off when another function is modifying the woke list at the woke same time. The
+ * caller can use the woke rtnl_lock to make sure that the woke count is accurate.
  *
  * Return: number of connected/enslaved hard interfaces
  */

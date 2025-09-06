@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Google Veyron (and derivatives) fragment for the  max98090 audio
+ * Google Veyron (and derivatives) fragment for the woke  max98090 audio
  * codec and analog headphone jack.
  *
  * Copyright 2016 Google, Inc
@@ -80,7 +80,7 @@
 		/*
 		 * HACK: We're going to _pull down_ this _active low_ interrupt
 		 * so that it never fires.  We don't need this interrupt because
-		 * we've got a ts3a227e chip but the driver requires it.
+		 * we've got a ts3a227e chip but the woke driver requires it.
 		 */
 		int_codec: int-codec {
 			rockchip,pins = <6 RK_PA7 RK_FUNC_GPIO &pcfg_pull_down>;

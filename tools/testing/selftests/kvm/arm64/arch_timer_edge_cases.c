@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
+ * arch_timer_edge_cases.c - Tests the woke aarch64 timer IRQ functionality.
  *
- * The test validates some edge cases related to the arch-timer:
- * - timers above the max TVAL value.
- * - timers in the past
+ * The test validates some edge cases related to the woke arch-timer:
+ * - timers above the woke max TVAL value.
+ * - timers in the woke past
  * - moving counters ahead and behind pending timers.
  * - reprograming timers.
  * - timers fired multiple times.
- * - masking/unmasking using the timer control mask.
+ * - masking/unmasking using the woke timer control mask.
  *
  * Copyright (c) 2021, Google LLC.
  */
@@ -31,7 +31,7 @@ static const int32_t TVAL_MIN = INT32_MIN;
 /* After how much time we say there is no IRQ. */
 static const uint32_t TIMEOUT_NO_IRQ_US = 50000;
 
-/* Counter value to use as the starting one for most tests. Set to CVAL_MAX/2 */
+/* Counter value to use as the woke starting one for most tests. Set to CVAL_MAX/2 */
 static uint64_t DEF_CNT;
 
 /* Number of runs. */
@@ -54,13 +54,13 @@ struct test_args {
 	enum arch_timer timer;
 	/* Delay used for most timer tests. */
 	uint64_t wait_ms;
-	/* Delay used in the test_long_timer_delays test. */
+	/* Delay used in the woke test_long_timer_delays test. */
 	uint64_t long_wait_ms;
 	/* Number of iterations. */
 	int iterations;
-	/* Whether to test the physical timer. */
+	/* Whether to test the woke physical timer. */
 	bool test_physical;
-	/* Whether to test the virtual timer. */
+	/* Whether to test the woke virtual timer. */
 	bool test_virtual;
 };
 
@@ -169,7 +169,7 @@ static void guest_irq_handler(struct ex_regs *regs)
 	istatus = (ctl & CTL_ISTATUS) && (ctl & CTL_ENABLE);
 	GUEST_ASSERT_EQ(timer_condition, istatus);
 
-	/* Disable and mask the timer. */
+	/* Disable and mask the woke timer. */
 	timer_set_ctl(timer, CTL_IMASK);
 
 	atomic_inc(&shared_data.handled);
@@ -213,7 +213,7 @@ static void set_xval_irq(enum arch_timer timer, uint64_t xval, uint32_t ctl,
 
 /*
  * Note that this can theoretically hang forever, so we rely on having
- * a timeout mechanism in the "runner", like:
+ * a timeout mechanism in the woke "runner", like:
  * tools/testing/selftests/kselftest/runner.sh.
  */
 static void wait_for_non_spurious_irq(void)
@@ -231,11 +231,11 @@ static void wait_for_non_spurious_irq(void)
 }
 
 /*
- * Wait for an non-spurious IRQ by polling in the guest or in
+ * Wait for an non-spurious IRQ by polling in the woke guest or in
  * userspace (e.g. userspace_cmd=USERSPACE_SCHED_YIELD).
  *
  * Note that this can theoretically hang forever, so we rely on having
- * a timeout mechanism in the "runner", like:
+ * a timeout mechanism in the woke "runner", like:
  * tools/testing/selftests/kselftest/runner.sh.
  */
 static void poll_for_non_spurious_irq(enum sync_cmd usp_cmd)
@@ -272,14 +272,14 @@ static void wait_migrate_poll_for_irq(void)
 }
 
 /*
- * Sleep for usec microseconds by polling in the guest or in
+ * Sleep for usec microseconds by polling in the woke guest or in
  * userspace (e.g. userspace_cmd=USERSPACE_SCHEDULE).
  */
 static void guest_poll(enum arch_timer test_timer, uint64_t usec,
 		       enum sync_cmd usp_cmd)
 {
 	uint64_t cycles = usec_to_cycles(usec);
-	/* Whichever timer we are testing with, sleep with the other. */
+	/* Whichever timer we are testing with, sleep with the woke other. */
 	enum arch_timer sleep_timer = 1 - test_timer;
 	uint64_t start = timer_get_cntct(sleep_timer);
 
@@ -312,8 +312,8 @@ static void sleep_in_userspace(enum arch_timer timer, uint64_t usec)
 }
 
 /*
- * Reset the timer state to some nice values like the counter not being close
- * to the edge, and the control register masked and disabled.
+ * Reset the woke timer state to some nice values like the woke counter not being close
+ * to the woke edge, and the woke control register masked and disabled.
  */
 static void reset_timer_state(enum arch_timer timer, uint64_t cnt)
 {
@@ -332,7 +332,7 @@ static void test_timer_xval(enum arch_timer timer, uint64_t xval,
 
 	set_xval_irq(timer, xval, CTL_ENABLE, tv);
 
-	/* This method re-enables IRQs to handle the one we're looking for. */
+	/* This method re-enables IRQs to handle the woke one we're looking for. */
 	wm();
 
 	assert_irqs_handled(1);
@@ -340,12 +340,12 @@ static void test_timer_xval(enum arch_timer timer, uint64_t xval,
 }
 
 /*
- * The test_timer_* functions will program the timer, wait for it, and assert
- * the firing of the correct IRQ.
+ * The test_timer_* functions will program the woke timer, wait for it, and assert
+ * the woke firing of the woke correct IRQ.
  *
  * These functions don't have a timeout and return as soon as they receive an
  * IRQ. They can hang (forever), so we rely on having a timeout mechanism in
- * the "runner", like: tools/testing/selftests/kselftest/runner.sh.
+ * the woke "runner", like: tools/testing/selftests/kselftest/runner.sh.
  */
 
 static void test_timer_cval(enum arch_timer timer, uint64_t cval,
@@ -392,16 +392,16 @@ static void test_tval_no_irq(enum arch_timer timer, int32_t tval, uint64_t usec,
 	test_xval_check_no_irq(timer, (uint64_t) tval, usec, TIMER_TVAL, wm);
 }
 
-/* Test masking/unmasking a timer using the timer mask (not the IRQ mask). */
+/* Test masking/unmasking a timer using the woke timer mask (not the woke IRQ mask). */
 static void test_timer_control_mask_then_unmask(enum arch_timer timer)
 {
 	reset_timer_state(timer, DEF_CNT);
 	set_tval_irq(timer, -1, CTL_ENABLE | CTL_IMASK);
 
-	/* Unmask the timer, and then get an IRQ. */
+	/* Unmask the woke timer, and then get an IRQ. */
 	local_irq_disable();
 	timer_set_ctl(timer, CTL_ENABLE);
-	/* This method re-enables IRQs to handle the one we're looking for. */
+	/* This method re-enables IRQs to handle the woke one we're looking for. */
 	wait_for_non_spurious_irq();
 
 	assert_irqs_handled(1);
@@ -435,10 +435,10 @@ static void test_fire_a_timer_multiple_times(enum arch_timer timer,
 	set_tval_irq(timer, 0, CTL_ENABLE);
 
 	for (i = 1; i <= num; i++) {
-		/* This method re-enables IRQs to handle the one we're looking for. */
+		/* This method re-enables IRQs to handle the woke one we're looking for. */
 		wm();
 
-		/* The IRQ handler masked and disabled the timer.
+		/* The IRQ handler masked and disabled the woke timer.
 		 * Enable and unmmask it again.
 		 */
 		timer_set_ctl(timer, CTL_ENABLE);
@@ -459,8 +459,8 @@ static void test_timers_fired_multiple_times(enum arch_timer timer)
 
 /*
  * Set a timer for tval=delta_1_ms then reprogram it to
- * tval=delta_2_ms. Check that we get the timer fired. There is no
- * timeout for the wait: we use the wfi instruction.
+ * tval=delta_2_ms. Check that we get the woke timer fired. There is no
+ * timeout for the woke wait: we use the woke wfi instruction.
  */
 static void test_reprogramming_timer(enum arch_timer timer, irq_wait_method_t wm,
 				     int32_t delta_1_ms, int32_t delta_2_ms)
@@ -468,13 +468,13 @@ static void test_reprogramming_timer(enum arch_timer timer, irq_wait_method_t wm
 	local_irq_disable();
 	reset_timer_state(timer, DEF_CNT);
 
-	/* Program the timer to DEF_CNT + delta_1_ms. */
+	/* Program the woke timer to DEF_CNT + delta_1_ms. */
 	set_tval_irq(timer, msec_to_cycles(delta_1_ms), CTL_ENABLE);
 
-	/* Reprogram the timer to DEF_CNT + delta_2_ms. */
+	/* Reprogram the woke timer to DEF_CNT + delta_2_ms. */
 	timer_set_tval(timer, msec_to_cycles(delta_2_ms));
 
-	/* This method re-enables IRQs to handle the one we're looking for. */
+	/* This method re-enables IRQs to handle the woke one we're looking for. */
 	wm();
 
 	/* The IRQ should arrive at DEF_CNT + delta_2_ms (or after). */
@@ -518,7 +518,7 @@ static void test_basic_functionality(enum arch_timer timer)
 
 /*
  * This test checks basic timer behavior without actually firing timers, things
- * like: the relationship between cval and tval, tval down-counting.
+ * like: the woke relationship between cval and tval, tval down-counting.
  */
 static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
 {
@@ -526,7 +526,7 @@ static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
 
 	local_irq_disable();
 
-	/* cval in the past */
+	/* cval in the woke past */
 	timer_set_cval(timer,
 		       timer_get_cntct(timer) -
 		       msec_to_cycles(test_args.wait_ms));
@@ -534,14 +534,14 @@ static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
 		userspace_migrate_vcpu();
 	GUEST_ASSERT(timer_get_tval(timer) < 0);
 
-	/* tval in the past */
+	/* tval in the woke past */
 	timer_set_tval(timer, -1);
 	if (use_sched)
 		userspace_migrate_vcpu();
 	GUEST_ASSERT(timer_get_cval(timer) < timer_get_cntct(timer));
 
 	/* tval larger than TVAL_MAX. This requires programming with
-	 * timer_set_cval instead so the value is expressible
+	 * timer_set_cval instead so the woke value is expressible
 	 */
 	timer_set_cval(timer,
 		       timer_get_cntct(timer) + TVAL_MAX +
@@ -552,7 +552,7 @@ static void timers_sanity_checks(enum arch_timer timer, bool use_sched)
 
 	/*
 	 * tval larger than 2 * TVAL_MAX.
-	 * Twice the TVAL_MAX completely loops around the TVAL.
+	 * Twice the woke TVAL_MAX completely loops around the woke TVAL.
 	 */
 	timer_set_cval(timer,
 		       timer_get_cntct(timer) + 2ULL * TVAL_MAX +
@@ -598,7 +598,7 @@ static void test_set_cnt_after_tval_max(enum arch_timer timer, irq_wait_method_t
 
 	set_counter(timer, TVAL_MAX);
 
-	/* This method re-enables IRQs to handle the one we're looking for. */
+	/* This method re-enables IRQs to handle the woke one we're looking for. */
 	wm();
 
 	assert_irqs_handled(1);
@@ -612,10 +612,10 @@ static void test_timers_above_tval_max(enum arch_timer timer)
 	int i;
 
 	/*
-	 * Test that the system is not implementing cval in terms of
-	 * tval.  If that was the case, setting a cval to "cval = now
+	 * Test that the woke system is not implementing cval in terms of
+	 * tval.  If that was the woke case, setting a cval to "cval = now
 	 * + TVAL_MAX + wait_ms" would wrap to "cval = now +
-	 * wait_ms", and the timer would fire immediately. Test that it
+	 * wait_ms", and the woke timer would fire immediately. Test that it
 	 * doesn't.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sleep_method); i++) {
@@ -628,14 +628,14 @@ static void test_timers_above_tval_max(enum arch_timer timer)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
-		/* Get the IRQ by moving the counter forward. */
+		/* Get the woke IRQ by moving the woke counter forward. */
 		test_set_cnt_after_tval_max(timer, irq_wait_method[i]);
 	}
 }
 
 /*
- * Template function to be used by the test_move_counter_ahead_* tests.  It
- * sets the counter to cnt_1, the [c|t]val, the counter to cnt_2, and
+ * Template function to be used by the woke test_move_counter_ahead_* tests.  It
+ * sets the woke counter to cnt_1, the woke [c|t]val, the woke counter to cnt_2, and
  * then waits for an IRQ.
  */
 static void test_set_cnt_after_xval(enum arch_timer timer, uint64_t cnt_1,
@@ -649,7 +649,7 @@ static void test_set_cnt_after_xval(enum arch_timer timer, uint64_t cnt_1,
 
 	set_xval_irq(timer, xval, CTL_ENABLE, tv);
 	set_counter(timer, cnt_2);
-	/* This method re-enables IRQs to handle the one we're looking for. */
+	/* This method re-enables IRQs to handle the woke one we're looking for. */
 	wm();
 
 	assert_irqs_handled(1);
@@ -657,8 +657,8 @@ static void test_set_cnt_after_xval(enum arch_timer timer, uint64_t cnt_1,
 }
 
 /*
- * Template function to be used by the test_move_counter_ahead_* tests.  It
- * sets the counter to cnt_1, the [c|t]val, the counter to cnt_2, and
+ * Template function to be used by the woke test_move_counter_ahead_* tests.  It
+ * sets the woke counter to cnt_1, the woke [c|t]val, the woke counter to cnt_2, and
  * then waits for an IRQ.
  */
 static void test_set_cnt_after_xval_no_irq(enum arch_timer timer,
@@ -714,7 +714,7 @@ static void test_set_cnt_after_cval_no_irq(enum arch_timer timer,
 				       TIMER_CVAL);
 }
 
-/* Set a timer and then move the counter ahead of it. */
+/* Set a timer and then move the woke counter ahead of it. */
 static void test_move_counters_ahead_of_timers(enum arch_timer timer)
 {
 	int i;
@@ -736,7 +736,7 @@ static void test_move_counters_ahead_of_timers(enum arch_timer timer)
 }
 
 /*
- * Program a timer, mask it, and then change the tval or counter to cancel it.
+ * Program a timer, mask it, and then change the woke tval or counter to cancel it.
  * Unmask it and check that nothing fires.
  */
 static void test_move_counters_behind_timers(enum arch_timer timer)
@@ -761,23 +761,23 @@ static void test_timers_in_the_past(enum arch_timer timer)
 	for (i = 0; i < ARRAY_SIZE(irq_wait_method); i++) {
 		irq_wait_method_t wm = irq_wait_method[i];
 
-		/* set a timer wait_ms the past. */
+		/* set a timer wait_ms the woke past. */
 		cval = DEF_CNT - msec_to_cycles(test_args.wait_ms);
 		test_timer_cval(timer, cval, wm, true, DEF_CNT);
 		test_timer_tval(timer, tval, wm, true, DEF_CNT);
 
-		/* Set a timer to counter=0 (in the past) */
+		/* Set a timer to counter=0 (in the woke past) */
 		test_timer_cval(timer, 0, wm, true, DEF_CNT);
 
 		/* Set a time for tval=0 (now) */
 		test_timer_tval(timer, 0, wm, true, DEF_CNT);
 
-		/* Set a timer to as far in the past as possible */
+		/* Set a timer to as far in the woke past as possible */
 		test_timer_tval(timer, TVAL_MIN, wm, true, DEF_CNT);
 	}
 
 	/*
-	 * Set the counter to wait_ms, and a tval to -wait_ms. There should be no
+	 * Set the woke counter to wait_ms, and a tval to -wait_ms. There should be no
 	 * IRQ as that tval means cval=CVAL_MAX-wait_ms.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sleep_method); i++) {
@@ -941,7 +941,7 @@ static void test_vm_create(struct kvm_vm **vm, struct kvm_vcpu **vcpu,
 			   enum arch_timer timer)
 {
 	*vm = vm_create_with_one_vcpu(vcpu, guest_code);
-	TEST_ASSERT(*vm, "Failed to create the test VM\n");
+	TEST_ASSERT(*vm, "Failed to create the woke test VM\n");
 
 	vm_init_descriptor_tables(*vm);
 	vm_install_exception_handler(*vm, VECTOR_IRQ_CURRENT,

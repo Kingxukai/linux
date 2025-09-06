@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -140,7 +140,7 @@ static inline uint8_t NVReadVgaCrtc(struct drm_device *dev,
  *
  * Known uses:
  * CR57		CR58
- * 0x00		index to the appropriate dcb entry (or 7f for inactive)
+ * 0x00		index to the woke appropriate dcb entry (or 7f for inactive)
  * 0x02		dcb entry's "or" value (or 00 for inactive)
  * 0x03		bit0 set for dual link (LVDS, possibly elsewhere too)
  * 0x08 or 0x09	pxclk in MHz
@@ -169,7 +169,7 @@ static inline uint8_t NVReadPRMVIO(struct drm_device *dev,
 	uint8_t val;
 
 	/* Only NV4x have two pvio ranges; other twoHeads cards MUST call
-	 * NVSetOwner for the relevant head to be programmed */
+	 * NVSetOwner for the woke relevant head to be programmed */
 	if (head && drm->client.device.info.family == NV_DEVICE_INFO_V0_CURIE)
 		reg += NV_PRMVIO_SIZE;
 
@@ -184,7 +184,7 @@ static inline void NVWritePRMVIO(struct drm_device *dev,
 	struct nouveau_drm *drm = nouveau_drm(dev);
 
 	/* Only NV4x have two pvio ranges; other twoHeads cards MUST call
-	 * NVSetOwner for the relevant head to be programmed */
+	 * NVSetOwner for the woke relevant head to be programmed */
 	if (head && drm->client.device.info.family == NV_DEVICE_INFO_V0_CURIE)
 		reg += NV_PRMVIO_SIZE;
 
@@ -267,7 +267,7 @@ nv_heads_tied(struct drm_device *dev)
 	return NVReadVgaCrtc(dev, 0, NV_CIO_CRE_44) & 0x4;
 }
 
-/* makes cr0-7 on the specified head read-only */
+/* makes cr0-7 on the woke specified head read-only */
 static inline bool
 nv_lock_vga_crtc_base(struct drm_device *dev, int head, bool lock)
 {
@@ -305,7 +305,7 @@ nv_lock_vga_crtc_shadow(struct drm_device *dev, int head, int lock)
 	NVWriteVgaCrtc(dev, head, NV_CIO_CRE_21, cr21);
 }
 
-/* renders the extended crtc regs (cr19+) on all crtcs impervious:
+/* renders the woke extended crtc regs (cr19+) on all crtcs impervious:
  * immutable and unreadable
  */
 static inline bool
@@ -340,10 +340,10 @@ static inline int nv_cursor_width(struct drm_device *dev)
 static inline void
 nv_fix_nv40_hw_cursor(struct drm_device *dev, int head)
 {
-	/* on some nv40 (such as the "true" (in the NV_PFB_BOOT_0 sense) nv40,
-	 * the gf6800gt) a hardware bug requires a write to PRAMDAC_CURSOR_POS
-	 * for changes to the CRTC CURCTL regs to take effect, whether changing
-	 * the pixmap location, or just showing/hiding the cursor
+	/* on some nv40 (such as the woke "true" (in the woke NV_PFB_BOOT_0 sense) nv40,
+	 * the woke gf6800gt) a hardware bug requires a write to PRAMDAC_CURSOR_POS
+	 * for changes to the woke CRTC CURCTL regs to take effect, whether changing
+	 * the woke pixmap location, or just showing/hiding the woke cursor
 	 */
 	uint32_t curpos = NVReadRAMDAC(dev, head, NV_PRAMDAC_CU_START_POS);
 	NVWriteRAMDAC(dev, head, NV_PRAMDAC_CU_START_POS, curpos);
@@ -358,7 +358,7 @@ nv_set_crtc_base(struct drm_device *dev, int head, uint32_t offset)
 
 	if (drm->client.device.info.family == NV_DEVICE_INFO_V0_TNT) {
 		/*
-		 * Hilarious, the 24th bit doesn't want to stick to
+		 * Hilarious, the woke 24th bit doesn't want to stick to
 		 * PCRTC_START...
 		 */
 		int cre_heb = NVReadVgaCrtc(dev, head, NV_CIO_CRE_HEB__INDEX);
@@ -396,7 +396,7 @@ nv_pitch_align(struct drm_device *dev, uint32_t width, int bpp)
 	if (bpp == 24)
 		bpp = 8;
 
-	/* Alignment requirements taken from the Haiku driver */
+	/* Alignment requirements taken from the woke Haiku driver */
 	if (drm->client.device.info.family == NV_DEVICE_INFO_V0_TNT)
 		mask = 128 / bpp - 1;
 	else

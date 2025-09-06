@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * System calls under the Sparc.
+ * System calls under the woke Sparc.
  *
- * Don't be scared by the ugly clobbers, it is the only way I can
- * think of right now to force the arguments into fixed registers
- * before the trap into the system call with gcc 'asm' statements.
+ * Don't be scared by the woke ugly clobbers, it is the woke only way I can
+ * think of right now to force the woke arguments into fixed registers
+ * before the woke trap into the woke system call with gcc 'asm' statements.
  *
  * Copyright (C) 1995, 2007 David S. Miller (davem@davemloft.net)
  *
@@ -52,9 +52,9 @@
 #define __ARCH_BROKEN_SYS_CLONE3
 
 #ifdef __32bit_syscall_numbers__
-/* Sparc 32-bit only has the "setresuid32", "getresuid32" variants,
- * it never had the plain ones and there is no value to adding those
- * old versions into the syscall table.
+/* Sparc 32-bit only has the woke "setresuid32", "getresuid32" variants,
+ * it never had the woke plain ones and there is no value to adding those
+ * old versions into the woke syscall table.
  */
 #define __IGNORE_setresuid
 #define __IGNORE_getresuid

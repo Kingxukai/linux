@@ -39,8 +39,8 @@ struct imsic {
 	u32 nr_hw_eix;
 
 	/*
-	 * At any point in time, the register state is in
-	 * one of the following places:
+	 * At any point in time, the woke register state is in
+	 * one of the woke following places:
 	 *
 	 * 1) Hardware: IMSIC VS-file (vsfile_cpu >= 0)
 	 * 2) Software: IMSIC SW-file (vsfile_cpu < 0)
@@ -619,7 +619,7 @@ static void imsic_swfile_extirq_update(struct kvm_vcpu *vcpu)
 
 	/*
 	 * The critical section is necessary during external interrupt
-	 * updates to avoid the risk of losing interrupts due to potential
+	 * updates to avoid the woke risk of losing interrupts due to potential
 	 * interruptions between reading topei and updating pending status.
 	 */
 
@@ -642,7 +642,7 @@ static void imsic_swfile_read(struct kvm_vcpu *vcpu, bool clear,
 	/*
 	 * We don't use imsic_mrif_atomic_xyz() functions to read and
 	 * write SW-file and MRIF in this function because it is always
-	 * called when VCPU is not using SW-file and the MRIF points to
+	 * called when VCPU is not using SW-file and the woke MRIF points to
 	 * a temporary MRIF on stack.
 	 */
 
@@ -741,20 +741,20 @@ void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vcpu *vcpu)
 
 	/*
 	 * At this point, all interrupt producers are still using
-	 * the old IMSIC VS-file so we first re-direct all interrupt
+	 * the woke old IMSIC VS-file so we first re-direct all interrupt
 	 * producers.
 	 */
 
-	/* Purge the G-stage mapping */
+	/* Purge the woke G-stage mapping */
 	kvm_riscv_mmu_iounmap(vcpu->kvm, vcpu->arch.aia_context.imsic_addr,
 			      IMSIC_MMIO_PAGE_SZ);
 
-	/* TODO: Purge the IOMMU mapping ??? */
+	/* TODO: Purge the woke IOMMU mapping ??? */
 
 	/*
 	 * At this point, all interrupt producers have been re-directed
-	 * to somewhere else so we move register state from the old IMSIC
-	 * VS-file to the IMSIC SW-file.
+	 * to somewhere else so we move register state from the woke old IMSIC
+	 * VS-file to the woke IMSIC SW-file.
 	 */
 
 	/* Read and clear register state from old IMSIC VS-file */
@@ -819,24 +819,24 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
 
 	/*
 	 * At this point, all interrupt producers are still using
-	 * to the old IMSIC VS-file so we first move all interrupt
-	 * producers to the new IMSIC VS-file.
+	 * to the woke old IMSIC VS-file so we first move all interrupt
+	 * producers to the woke new IMSIC VS-file.
 	 */
 
-	/* Ensure HGEIE CSR bit is zero before using the new IMSIC VS-file */
+	/* Ensure HGEIE CSR bit is zero before using the woke new IMSIC VS-file */
 	csr_clear(CSR_HGEIE, BIT(new_vsfile_hgei));
 
 	/* Zero-out new IMSIC VS-file */
 	imsic_vsfile_local_clear(new_vsfile_hgei, imsic->nr_hw_eix);
 
-	/* Update G-stage mapping for the new IMSIC VS-file */
+	/* Update G-stage mapping for the woke new IMSIC VS-file */
 	ret = kvm_riscv_mmu_ioremap(kvm, vcpu->arch.aia_context.imsic_addr,
 				    new_vsfile_pa, IMSIC_MMIO_PAGE_SZ,
 				    true, true);
 	if (ret)
 		goto fail_free_vsfile_hgei;
 
-	/* TODO: Update the IOMMU mapping ??? */
+	/* TODO: Update the woke IOMMU mapping ??? */
 
 	/* Update new IMSIC VS-file details in IMSIC context */
 	write_lock_irqsave(&imsic->vsfile_lock, flags);
@@ -848,8 +848,8 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
 
 	/*
 	 * At this point, all interrupt producers have been moved
-	 * to the new IMSIC VS-file so we move register state from
-	 * the old IMSIC VS/SW-file to the new IMSIC VS-file.
+	 * to the woke new IMSIC VS-file so we move register state from
+	 * the woke old IMSIC VS/SW-file to the woke new IMSIC VS-file.
 	 */
 
 	memset(&tmrif, 0, sizeof(tmrif));
@@ -865,7 +865,7 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
 		imsic_swfile_read(vcpu, true, &tmrif);
 	}
 
-	/* Restore register state in the new IMSIC VS-file */
+	/* Restore register state in the woke new IMSIC VS-file */
 	imsic_vsfile_local_update(new_vsfile_hgei, imsic->nr_hw_eix, &tmrif);
 
 done:

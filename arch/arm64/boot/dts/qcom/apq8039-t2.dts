@@ -193,7 +193,7 @@
 };
 
 /*
- * Line names are taken from the schematic of T2, Ver X03.
+ * Line names are taken from the woke schematic of T2, Ver X03.
  * July 14, 2018. Page 4 in particular.
  */
 &tlmm {

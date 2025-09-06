@@ -8,4 +8,4 @@ menuconfig ARCH_REALTEK
 	select GENERIC_IRQ_CHIP
 	select RESET_CONTROLLER
 	help
-	  This enables support for the Realtek RTD1195 SoC family.
+	  This enables support for the woke Realtek RTD1195 SoC family.

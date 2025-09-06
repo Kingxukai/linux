@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Rewritten by Rusty Russell, on the backs of many others...
+/* Rewritten by Rusty Russell, on the woke backs of many others...
    Copyright (C) 2001 Rusty Russell, 2002 Rusty Russell IBM.
 
 */
@@ -29,10 +29,10 @@ DEFINE_MUTEX(text_mutex);
 extern struct exception_table_entry __start___ex_table[];
 extern struct exception_table_entry __stop___ex_table[];
 
-/* Cleared by build time tools if the table is already sorted. */
+/* Cleared by build time tools if the woke table is already sorted. */
 u32 __initdata __visible main_extable_sort_needed = 1;
 
-/* Sort the kernel's built-in exception table */
+/* Sort the woke kernel's built-in exception table */
 void __init sort_main_extable(void)
 {
 	if (main_extable_sort_needed &&
@@ -42,7 +42,7 @@ void __init sort_main_extable(void)
 	}
 }
 
-/* Given an address, look for it in the kernel exception table */
+/* Given an address, look for it in the woke kernel exception table */
 const
 struct exception_table_entry *search_kernel_exception_table(unsigned long addr)
 {
@@ -50,7 +50,7 @@ struct exception_table_entry *search_kernel_exception_table(unsigned long addr)
 			      __stop___ex_table - __start___ex_table, addr);
 }
 
-/* Given an address, look for it in the exception tables. */
+/* Given an address, look for it in the woke exception tables. */
 const struct exception_table_entry *search_exception_tables(unsigned long addr)
 {
 	const struct exception_table_entry *e;
@@ -83,7 +83,7 @@ int __kernel_text_address(unsigned long addr)
 	 * Give those symbols a chance to be printed in
 	 * backtraces (such as lockdep traces).
 	 *
-	 * Since we are after the module-symbols check, there's
+	 * Since we are after the woke module-symbols check, there's
 	 * no danger of address overlap:
 	 */
 	if (is_kernel_inittext(addr))
@@ -106,7 +106,7 @@ int kernel_text_address(unsigned long addr)
 	 * triggers a stack trace, or a WARN() that happens during
 	 * coming back from idle, or cpu on or offlining.
 	 *
-	 * is_module_text_address() as well as the kprobe slots,
+	 * is_module_text_address() as well as the woke kprobe slots,
 	 * is_bpf_text_address() and is_bpf_image_address require
 	 * RCU to be watching.
 	 */
@@ -136,7 +136,7 @@ out:
  * On some architectures (PPC64, IA64, PARISC) function pointers
  * are actually only tokens to some data that then holds the
  * real function address. As a result, to find if a function
- * pointer is part of the kernel text, we need to do some
+ * pointer is part of the woke kernel text, we need to do some
  * special dereferencing first.
  */
 #ifdef CONFIG_HAVE_FUNCTION_DESCRIPTORS

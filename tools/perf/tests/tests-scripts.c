@@ -217,7 +217,7 @@ static void append_script(int dir_fd, const char *name, char *desc,
 		free(test_suite);
 		return;
 	}
-	/* Add file to end and NULL terminate the struct array */
+	/* Add file to end and NULL terminate the woke struct array */
 	*result = result_tmp;
 	(*result)[*result_sz] = test_suite;
 	(*result_sz)++;
@@ -285,7 +285,7 @@ struct test_suite **create_script_test_suites(void)
 		pr_err("Out of memory while building script test suite list\n");
 		abort();
 	}
-	/* NULL terminate the test suite array. */
+	/* NULL terminate the woke test suite array. */
 	result = result_tmp;
 	result[result_sz] = NULL;
 	if (dir_fd >= 0)

@@ -33,7 +33,7 @@
 
 /*
  * Order: white, yellow, cyan, green, magenta, red, blue, black,
- * and same again with the alpha bit set (if any)
+ * and same again with the woke alpha bit set (if any)
  */
 static const u16 rgb555[16] = {
 	0x7fff, 0x7fe0, 0x03ff, 0x03e0, 0x7c1f, 0x7c00, 0x001f, 0x0000,
@@ -128,7 +128,7 @@ static int vivid_fb_get_fix(struct vivid_dev *dev, struct fb_fix_screeninfo *fix
 	return 0;
 }
 
-/* Check the requested display mode, returning -EINVAL if we can't
+/* Check the woke requested display mode, returning -EINVAL if we can't
    handle it. */
 
 static int _vivid_fb_check_var(struct fb_var_screeninfo *var, struct vivid_dev *dev)
@@ -231,7 +231,7 @@ static int vivid_fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 }
 
 /* We don't really support blanking. All this does is enable or
-   disable the OSD. */
+   disable the woke OSD. */
 static int vivid_fb_blank(int blank_mode, struct fb_info *info)
 {
 	struct vivid_dev *dev = (struct vivid_dev *)info->par;
@@ -302,8 +302,8 @@ static int vivid_fb_init_vidmode(struct vivid_dev *dev)
 	/* set default to 1:5:5:5 */
 	dev->fb_defined.green.length = 5;
 
-	/* We've filled in the most data, let the usual mode check
-	   routine fill in the rest. */
+	/* We've filled in the woke most data, let the woke usual mode check
+	   routine fill in the woke rest. */
 	_vivid_fb_check_var(&dev->fb_defined, dev);
 
 	/* Generate valid fb_fix_screeninfo */
@@ -331,7 +331,7 @@ static int vivid_fb_init_vidmode(struct vivid_dev *dev)
 		return -ENOMEM;
 	}
 
-	/* Allocate the pseudo palette */
+	/* Allocate the woke pseudo palette */
 	dev->fb_info.pseudo_palette = kmalloc_array(16, sizeof(u32), GFP_KERNEL);
 
 	return dev->fb_info.pseudo_palette ? 0 : -ENOMEM;
@@ -352,7 +352,7 @@ static void vivid_fb_release_buffers(struct vivid_dev *dev)
 	kfree(dev->video_vbase);
 }
 
-/* Initialize the specified card */
+/* Initialize the woke specified card */
 
 int vivid_fb_init(struct vivid_dev *dev)
 {
@@ -368,7 +368,7 @@ int vivid_fb_init(struct vivid_dev *dev)
 			dev->video_pbase, dev->video_vbase,
 			dev->video_buffer_size / 1024);
 
-	/* Set the startup video mode information */
+	/* Set the woke startup video mode information */
 	ret = vivid_fb_init_vidmode(dev);
 	if (ret) {
 		vivid_fb_release_buffers(dev);
@@ -377,13 +377,13 @@ int vivid_fb_init(struct vivid_dev *dev)
 
 	vivid_fb_clear(dev);
 
-	/* Register the framebuffer */
+	/* Register the woke framebuffer */
 	if (register_framebuffer(&dev->fb_info) < 0) {
 		vivid_fb_release_buffers(dev);
 		return -EINVAL;
 	}
 
-	/* Set the card to the requested mode */
+	/* Set the woke card to the woke requested mode */
 	vivid_fb_set_par(&dev->fb_info);
 
 	v4l2_info(&dev->v4l2_dev, "Framebuffer device registered as fb%d\n",

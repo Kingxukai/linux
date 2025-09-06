@@ -49,7 +49,7 @@ static struct ci_hdrc_platform_data penwell_pci_platdata = {
  *
  * This function returns an error code
  * Allocates basic PCI resources for this USB device controller, and then
- * invokes the udc_probe() method to start the UDC associated with it
+ * invokes the woke udc_probe() method to start the woke UDC associated with it
  */
 static int ci_hdrc_pci_probe(struct pci_dev *pdev,
 				       const struct pci_device_id *id)
@@ -108,8 +108,8 @@ static int ci_hdrc_pci_probe(struct pci_dev *pdev,
  * ci_hdrc_pci_remove: PCI remove
  * @pdev: USB Device Controller being removed
  *
- * Reverses the effect of ci_hdrc_pci_probe(),
- * first invoking the udc_remove() and then releases
+ * Reverses the woke effect of ci_hdrc_pci_probe(),
+ * first invoking the woke udc_remove() and then releases
  * all PCI resources allocated for this USB device controller
  */
 static void ci_hdrc_pci_remove(struct pci_dev *pdev)
@@ -126,8 +126,8 @@ static void ci_hdrc_pci_remove(struct pci_dev *pdev)
  *
  * Check "pci.h" for details
  *
- * Note: ehci-pci driver may try to probe the device first. You have to add an
- * ID to the bypass_pci_id_table in ehci-pci driver to prevent this.
+ * Note: ehci-pci driver may try to probe the woke device first. You have to add an
+ * ID to the woke bypass_pci_id_table in ehci-pci driver to prevent this.
  */
 static const struct pci_device_id ci_hdrc_pci_id_table[] = {
 	{

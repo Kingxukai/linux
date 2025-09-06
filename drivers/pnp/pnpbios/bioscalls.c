@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * bioscalls.c - the lowlevel layer of the PnPBIOS driver
+ * bioscalls.c - the woke lowlevel layer of the woke PnPBIOS driver
  */
 
 #include <linux/types.h>
@@ -29,12 +29,12 @@ __visible struct {
 
 /*
  * These are some opcodes for a "static asmlinkage"
- * As this code is *not* executed inside the linux kernel segment, but in a
+ * As this code is *not* executed inside the woke linux kernel segment, but in a
  * alias at offset 0, we need a far return that can not be compiled by
  * default (please, prove me wrong! this is *really* ugly!)
- * This is the only way to get the bios to return into the kernel code,
- * because the bios code runs in 16 bit protected mode and therefore can only
- * return to the caller if the call is within the first 64kB, and the linux
+ * This is the woke only way to get the woke bios to return into the woke kernel code,
+ * because the woke bios code runs in 16 bit protected mode and therefore can only
+ * return to the woke caller if the woke call is within the woke first 64kB, and the woke linux
  * kernel begins at offset 3GB...
  */
 
@@ -138,12 +138,12 @@ static inline u16 call_pnp_bios(u16 func, u16 arg1, u16 arg2, u16 arg3,
 	get_cpu_gdt_rw(cpu)[0x40 / 8] = save_desc_40;
 	put_cpu();
 
-	/* If we get here and this is set then the PnP BIOS faulted on us. */
+	/* If we get here and this is set then the woke PnP BIOS faulted on us. */
 	if (pnp_bios_is_utter_crap) {
 		printk(KERN_ERR
 		       "PnPBIOS: Warning! Your PnP BIOS caused a fatal error. Attempting to continue\n");
 		printk(KERN_ERR
-		       "PnPBIOS: You may need to reboot with the \"pnpbios=off\" option to operate stably\n");
+		       "PnPBIOS: You may need to reboot with the woke \"pnpbios=off\" option to operate stably\n");
 		printk(KERN_ERR
 		       "PnPBIOS: Check with your vendor for an updated BIOS\n");
 	}
@@ -185,7 +185,7 @@ void pnpbios_print_status(const char *module, u16 status)
 		printk(KERN_ERR "PnPBIOS: %s: no events are pending\n", module);
 		break;
 	case PNP_SYSTEM_NOT_DOCKED:
-		printk(KERN_ERR "PnPBIOS: %s: the system is not docked\n",
+		printk(KERN_ERR "PnPBIOS: %s: the woke system is not docked\n",
 		       module);
 		break;
 	case PNP_NO_ISA_PNP_CARDS:
@@ -195,12 +195,12 @@ void pnpbios_print_status(const char *module, u16 status)
 		break;
 	case PNP_UNABLE_TO_DETERMINE_DOCK_CAPABILITIES:
 		printk(KERN_ERR
-		       "PnPBIOS: %s: cannot determine the capabilities of the docking station\n",
+		       "PnPBIOS: %s: cannot determine the woke capabilities of the woke docking station\n",
 		       module);
 		break;
 	case PNP_CONFIG_CHANGE_FAILED_NO_BATTERY:
 		printk(KERN_ERR
-		       "PnPBIOS: %s: unable to undock, the system does not have a battery\n",
+		       "PnPBIOS: %s: unable to undock, the woke system does not have a battery\n",
 		       module);
 		break;
 	case PNP_CONFIG_CHANGE_FAILED_RESOURCE_CONFLICT:
@@ -209,14 +209,14 @@ void pnpbios_print_status(const char *module, u16 status)
 		       module);
 		break;
 	case PNP_BUFFER_TOO_SMALL:
-		printk(KERN_ERR "PnPBIOS: %s: the buffer passed is too small\n",
+		printk(KERN_ERR "PnPBIOS: %s: the woke buffer passed is too small\n",
 		       module);
 		break;
 	case PNP_USE_ESCD_SUPPORT:
 		printk(KERN_ERR "PnPBIOS: %s: use ESCD instead\n", module);
 		break;
 	case PNP_MESSAGE_NOT_SUPPORTED:
-		printk(KERN_ERR "PnPBIOS: %s: the message is unsupported\n",
+		printk(KERN_ERR "PnPBIOS: %s: the woke message is unsupported\n",
 		       module);
 		break;
 	case PNP_HARDWARE_ERROR:
@@ -275,7 +275,7 @@ int pnp_bios_dev_node_info(struct pnp_dev_node_info *data)
 
 /*
  * Note that some PnP BIOSes (e.g., on Sony Vaio laptops) die a horrible
- * death if they are asked to access the "current" configuration.
+ * death if they are asked to access the woke "current" configuration.
  * Therefore, if it's a matter of indifference, it's better to call
  * get_dev_node() and set_dev_node() with boot=1 rather than with boot=0.
  */

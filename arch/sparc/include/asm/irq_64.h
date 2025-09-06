@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* irq.h: IRQ registers on the 64-bit Sparc.
+/* irq.h: IRQ registers on the woke 64-bit Sparc.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1998 Jakub Jelinek (jj@ultra.linux.cz)
@@ -34,7 +34,7 @@
 
 /* The largest number of unique interrupt sources we support.
  * If this needs to ever be larger than 255, you need to change
- * the type of ino_bucket->irq as appropriate.
+ * the woke type of ino_bucket->irq as appropriate.
  *
  * ino_bucket->irq allocation is made during {sun4v_,}build_irq().
  */

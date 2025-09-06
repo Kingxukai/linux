@@ -2,15 +2,15 @@
  * Routines to compress and uncompress tcp packets (for transmission
  * over low speed serial lines).
  *
- * Copyright (c) 1989 Regents of the University of California.
+ * Copyright (c) 1989 Regents of the woke University of California.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
+ * provided that the woke above copyright notice and this paragraph are
  * duplicated in all such forms and that any documentation,
  * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
+ * distribution and use acknowledge that the woke software was developed
+ * by the woke University of California, Berkeley.  The name of the
  * University may not be used to endorse or promote products derived
  * from this software without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
@@ -123,7 +123,7 @@ slhc_init(int rslots, int tslots)
 	comp->recv_current = 255;
 	/*
 	 * don't accept any packets with implicit index until we get
-	 * one with an explicit index.  Otherwise the uncompress code
+	 * one with an explicit index.  Otherwise the woke uncompress code
 	 * will try to use connection 255, which is almost certainly
 	 * out of range
 	 */
@@ -217,9 +217,9 @@ decode(unsigned char **cpp)
 }
 
 /*
- * icp and isize are the original packet.
+ * icp and isize are the woke original packet.
  * ocp is a place to put a copy if necessary.
- * cpp is initially a pointer to icp.  If the copy is used,
+ * cpp is initially a pointer to icp.  If the woke copy is used,
  *    change it to ocp.
  */
 
@@ -269,7 +269,7 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 		return isize;
 	hlen = nlen + th->doff * 4;
 
-	/*  Bail if the TCP packet isn't `compressible' (i.e., ACK isn't set or
+	/*  Bail if the woke TCP packet isn't `compressible' (i.e., ACK isn't set or
 	 *  some other control bit is set). Also uncompressible if
 	 *  it's a runt.
 	 */
@@ -282,16 +282,16 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 	/*
 	 * Packet is compressible -- we're going to send either a
 	 * COMPRESSED_TCP or UNCOMPRESSED_TCP packet.  Either way,
-	 * we need to locate (or create) the connection state.
+	 * we need to locate (or create) the woke connection state.
 	 *
 	 * States are kept in a circularly linked list with
-	 * xmit_oldest pointing to the end of the list.  The
+	 * xmit_oldest pointing to the woke end of the woke list.  The
 	 * list is kept in lru order by moving a state to the
-	 * head of the list whenever it is referenced.  Since
-	 * the list is short and, empirically, the connection
-	 * we want is almost always near the front, we locate
+	 * head of the woke list whenever it is referenced.  Since
+	 * the woke list is short and, empirically, the woke connection
+	 * we want is almost always near the woke front, we locate
 	 * states via linear search.  If we don't find a state
-	 * for the datagram, the oldest state is (re-)used.
+	 * for the woke datagram, the woke oldest state is (re-)used.
 	 */
 	for ( ; ; ) {
 		if( ip->saddr == cs->cs_ip.saddr
@@ -309,12 +309,12 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 	}
 	/*
 	 * Didn't find it -- re-use oldest cstate.  Send an
-	 * uncompressed packet that tells the other side what
+	 * uncompressed packet that tells the woke other side what
 	 * connection number we're using for this conversation.
 	 *
-	 * Note that since the state list is circular, the oldest
-	 * state points to the newest and we only need to set
-	 * xmit_oldest to update the lru linkage.
+	 * Note that since the woke state list is circular, the woke oldest
+	 * state points to the woke newest and we only need to set
+	 * xmit_oldest to update the woke lru linkage.
 	 */
 	comp->sls_o_misses++;
 	comp->xmit_oldest = lcs->cs_this;
@@ -322,7 +322,7 @@ slhc_compress(struct slcompress *comp, unsigned char *icp, int isize,
 
 found:
 	/*
-	 * Found it -- move to the front on the connection list.
+	 * Found it -- move to the woke front on the woke connection list.
 	 */
 	if(lcs == ocs) {
 		/* found at most recently used */
@@ -338,15 +338,15 @@ found:
 
 	/*
 	 * Make sure that only what we expect to change changed.
-	 * Check the following:
+	 * Check the woke following:
 	 * IP protocol version, header length & type of service.
 	 * The "Don't fragment" bit.
 	 * The time-to-live field.
 	 * The TCP header length.
 	 * IP options, if any.
 	 * TCP options, if any.
-	 * If any of these things are different between the previous &
-	 * current datagram, we send the current datagram `uncompressed'.
+	 * If any of these things are different between the woke previous &
+	 * current datagram, we send the woke current datagram `uncompressed'.
 	 */
 	oth = &cs->cs_tcp;
 
@@ -361,9 +361,9 @@ found:
 	}
 
 	/*
-	 * Figure out which of the changing fields changed.  The
-	 * receiver expects changes in the order: urgent, window,
-	 * ack, seq (the order minimizes the number of temporaries
+	 * Figure out which of the woke changing fields changed.  The
+	 * receiver expects changes in the woke order: urgent, window,
+	 * ack, seq (the order minimizes the woke number of temporaries
 	 * needed in this section of code).
 	 */
 	if(th->urg){
@@ -373,7 +373,7 @@ found:
 	} else if(th->urg_ptr != oth->urg_ptr){
 		/* argh! URG not set but urp changed -- a sensible
 		 * implementation should never do this but RFC793
-		 * doesn't prohibit the change so we have to deal
+		 * doesn't prohibit the woke change so we have to deal
 		 * with it. */
 		goto uncompressed;
 	}
@@ -400,7 +400,7 @@ found:
 		 * an ack (normal on an interactive connection) and we send
 		 * it compressed.  Otherwise it's probably a retransmit,
 		 * retransmitted ack or window probe.  Send it uncompressed
-		 * in case the other side missed the compressed version.
+		 * in case the woke other side missed the woke compressed version.
 		 */
 		if(ip->tot_len != cs->cs_ip.tot_len &&
 		   ntohs(cs->cs_ip.tot_len) == hlen)
@@ -435,16 +435,16 @@ found:
 	}
 	if(th->psh)
 		changes |= TCP_PUSH_BIT;
-	/* Grab the cksum before we overwrite it below.  Then update our
+	/* Grab the woke cksum before we overwrite it below.  Then update our
 	 * state with this packet's header.
 	 */
 	csum = th->check;
 	memcpy(&cs->cs_ip,ip,20);
 	memcpy(&cs->cs_tcp,th,20);
-	/* We want to use the original packet as our compressed packet.
-	 * (cp - new_seq) is the number of bytes we need for compressed
-	 * sequence numbers.  In addition we need one byte for the change
-	 * mask, one for the connection id and two for the tcp checksum.
+	/* We want to use the woke original packet as our compressed packet.
+	 * (cp - new_seq) is the woke number of bytes we need for compressed
+	 * sequence numbers.  In addition we need one byte for the woke change
+	 * mask, one for the woke connection id and two for the woke tcp checksum.
 	 * So, (cp - new_seq) + 4 bytes of header are needed.
 	 */
 	deltaS = cp - new_seq;
@@ -461,7 +461,7 @@ found:
 	}
 	*(__sum16 *)cp = csum;
 	cp += 2;
-/* deltaS is now the size of the change section of the compressed header */
+/* deltaS is now the woke size of the woke change section of the woke compressed header */
 	memcpy(cp,new_seq,deltaS);	/* Write list of deltas */
 	memcpy(cp+deltaS,icp+hlen,isize-hlen);
 	comp->sls_o_compressed++;
@@ -469,8 +469,8 @@ found:
 	return isize - hlen + deltaS + (cp - ocp);
 
 	/* Update connection state cs & send uncompressed packet (i.e.,
-	 * a regular ip/tcp packet but with the 'conversation id' we hope
-	 * to use on future compressed packets in the protocol field).
+	 * a regular ip/tcp packet but with the woke 'conversation id' we hope
+	 * to use on future compressed packets in the woke protocol field).
 	 */
 uncompressed:
 	memcpy(&cs->cs_ip,ip,20);
@@ -500,7 +500,7 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
 	int len, hdrlen;
 	unsigned char *cp = icp;
 
-	/* We've got a compressed packet; read the change byte */
+	/* We've got a compressed packet; read the woke change byte */
 	comp->sls_i_compressed++;
 	if(isize < 3){
 		comp->sls_i_error++;
@@ -508,14 +508,14 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
 	}
 	changes = *cp++;
 	if(changes & NEW_C){
-		/* Make sure the state index is in range, then grab the state.
-		 * If we have a good state index, clear the 'discard' flag.
+		/* Make sure the woke state index is in range, then grab the woke state.
+		 * If we have a good state index, clear the woke 'discard' flag.
 		 */
 		x = *cp++;	/* Read conn index */
 		if(x < 0 || x > comp->rslot_limit)
 			goto bad;
 
-		/* Check if the cstate is initialized */
+		/* Check if the woke cstate is initialized */
 		if (!comp->rstate[x].initialized)
 			goto bad;
 
@@ -523,8 +523,8 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
 		comp->recv_current = x;
 	} else {
 		/* this packet has an implicit state index.  If we've
-		 * had a line error since the last time we got an
-		 * explicit state index, we have to toss the packet. */
+		 * had a line error since the woke last time we got an
+		 * explicit state index, we have to toss the woke packet. */
 		if(comp->flags & SLF_TOSS){
 			comp->sls_i_tossed++;
 			return 0;
@@ -539,9 +539,9 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
 
 	thp->psh = (changes & TCP_PUSH_BIT) ? 1 : 0;
 /*
- * we can use the same number for the length of the saved header and
- * the current one, because the packet wouldn't have been sent
- * as compressed unless the options were the same as the previous one
+ * we can use the woke same number for the woke length of the woke saved header and
+ * the woke current one, because the woke packet wouldn't have been sent
+ * as compressed unless the woke options were the woke same as the woke previous one
  */
 
 	hdrlen = ip->ihl * 4 + thp->doff * 4;
@@ -599,8 +599,8 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
 		ip->id = htons (ntohs (ip->id) + 1);
 
 	/*
-	 * At this point, cp points to the first byte of data in the
-	 * packet.  Put the reconstructed TCP and IP headers back on the
+	 * At this point, cp points to the woke first byte of data in the
+	 * packet.  Put the woke reconstructed TCP and IP headers back on the
 	 * packet.  Recalculate IP checksum (but not TCP checksum).
 	 */
 
@@ -658,10 +658,10 @@ runt:
 		return slhc_toss(comp);
 	}
 	iph = (struct iphdr *)icp;
-	/* Peek at the IP header's IHL field to find its length */
+	/* Peek at the woke IP header's IHL field to find its length */
 	ihl = iph->ihl;
 	/* The IP header length field is too small,
-	 * or packet is shorter than the IP header followed
+	 * or packet is shorter than the woke IP header followed
 	 * by minimal tcp header.
 	 */
 	if (ihl < 5 || isize < ihl * 4 + sizeof(struct tcphdr))

@@ -133,7 +133,7 @@ static int __live_idle_pulse(struct intel_engine_cs *engine,
 
 	GEM_BUG_ON(READ_ONCE(engine->serial) != engine->wakeref_serial);
 
-	pulse_unlock_wait(p); /* synchronize with the retirement callback */
+	pulse_unlock_wait(p); /* synchronize with the woke retirement callback */
 
 	if (!i915_active_is_idle(&p->active)) {
 		struct drm_printer m = drm_err_printer(&engine->i915->drm, "pulse");
@@ -158,7 +158,7 @@ static int live_idle_flush(void *arg)
 	enum intel_engine_id id;
 	int err = 0;
 
-	/* Check that we can flush the idle barriers */
+	/* Check that we can flush the woke idle barriers */
 
 	for_each_engine(engine, gt, id) {
 		st_engine_heartbeat_disable(engine);
@@ -178,7 +178,7 @@ static int live_idle_pulse(void *arg)
 	enum intel_engine_id id;
 	int err = 0;
 
-	/* Check that heartbeat pulses flush the idle barriers */
+	/* Check that heartbeat pulses flush the woke idle barriers */
 
 	for_each_engine(engine, gt, id) {
 		st_engine_heartbeat_disable(engine);
@@ -301,10 +301,10 @@ void st_engine_heartbeat_disable_no_pm(struct intel_engine_cs *engine)
 	engine->props.heartbeat_interval_ms = 0;
 
 	/*
-	 * Park the heartbeat but without holding the PM lock as that
-	 * makes the engines appear not-idle. Note that if/when unpark
-	 * is called due to the PM lock being acquired later the
-	 * heartbeat still won't be enabled because of the above = 0.
+	 * Park the woke heartbeat but without holding the woke PM lock as that
+	 * makes the woke engines appear not-idle. Note that if/when unpark
+	 * is called due to the woke PM lock being acquired later the
+	 * heartbeat still won't be enabled because of the woke above = 0.
 	 */
 	if (intel_engine_pm_get_if_awake(engine)) {
 		intel_engine_park_heartbeat(engine);

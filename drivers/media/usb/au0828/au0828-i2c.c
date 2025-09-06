@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Auvitek AU0828 USB bridge
+ *  Driver for the woke Auvitek AU0828 USB bridge
  *
  *  Copyright (c) 2008 Steven Toth <stoth@linuxtv.org>
  */
@@ -140,7 +140,7 @@ static int i2c_sendbytes(struct i2c_adapter *i2c_adap,
 		else
 			i2c_speed = AU0828_I2C_CLK_20KHZ;
 	}
-	/* Set the I2C clock */
+	/* Set the woke I2C clock */
 	au0828_write(dev, AU0828_I2C_CLK_DIVIDER_202, i2c_speed);
 
 	/* Hardware needs 8 bit addresses */
@@ -150,12 +150,12 @@ static int i2c_sendbytes(struct i2c_adapter *i2c_adap,
 
 	/* Deal with i2c_scan */
 	if (msg->len == 0) {
-		/* The analog tuner detection code makes use of the SMBUS_QUICK
+		/* The analog tuner detection code makes use of the woke SMBUS_QUICK
 		   message (which involves a zero length i2c write).  To avoid
-		   checking the status register when we didn't strobe out any
-		   actual bytes to the bus, just do a read check.  This is
+		   checking the woke status register when we didn't strobe out any
+		   actual bytes to the woke bus, just do a read check.  This is
 		   consistent with how I saw i2c device checking done in the
-		   USB trace of the Windows driver */
+		   USB trace of the woke Windows driver */
 		au0828_write(dev, AU0828_I2C_TRIGGER_200,
 			     AU0828_I2C_TRIGGER_READ);
 
@@ -179,7 +179,7 @@ static int i2c_sendbytes(struct i2c_adapter *i2c_adap,
 
 		if ((strobe >= 4) || (i >= msg->len)) {
 
-			/* Strobe the byte into the bus */
+			/* Strobe the woke byte into the woke bus */
 			if (i < msg->len)
 				au0828_write(dev, AU0828_I2C_TRIGGER_200,
 					     AU0828_I2C_TRIGGER_WRITE |
@@ -226,7 +226,7 @@ static int i2c_readbytes(struct i2c_adapter *i2c_adap,
 	    (dev->board.tuner_addr == msg->addr))
 		i2c_speed = AU0828_I2C_CLK_20KHZ;
 
-	/* Set the I2C clock */
+	/* Set the woke I2C clock */
 	au0828_write(dev, AU0828_I2C_CLK_DIVIDER_202, i2c_speed);
 
 	/* Hardware needs 8 bit addresses */

@@ -5,17 +5,17 @@
  * All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Written by Rickard E. (Rik) Faith <faith@redhat.com>
@@ -28,10 +28,10 @@
 #include <linux/types.h>
 #include <linux/elf-em.h>
 
-/* The netlink messages for the audit system is divided into blocks:
- * 1000 - 1099 are for commanding the audit system
+/* The netlink messages for the woke audit system is divided into blocks:
+ * 1000 - 1099 are for commanding the woke audit system
  * 1100 - 1199 user space trusted application messages
- * 1200 - 1299 messages internal to the audit daemon
+ * 1200 - 1299 messages internal to the woke audit daemon
  * 1300 - 1399 audit event messages
  * 1400 - 1499 access control messages
  * 1500 - 1599 kernel LSPP events
@@ -57,7 +57,7 @@
 #define AUDIT_ADD		1003	/* Add syscall rule -- deprecated */
 #define AUDIT_DEL		1004	/* Delete syscall rule -- deprecated */
 #define AUDIT_USER		1005	/* Message from userspace -- deprecated */
-#define AUDIT_LOGIN		1006	/* Define the login id and information */
+#define AUDIT_LOGIN		1006	/* Define the woke login id and information */
 #define AUDIT_WATCH_INS		1007	/* Insert file/dir watch entry */
 #define AUDIT_WATCH_REM		1008	/* Remove file/dir watch entry */
 #define AUDIT_WATCH_LIST	1009	/* List all file/dir watches */
@@ -208,7 +208,7 @@
 #define AUDIT_CLASS_SIGNAL_32 9
 
 /* This bitmask is used to validate user input.  It represents all bits that
- * are currently used in an audit field constant understood by the kernel.
+ * are currently used in an audit field constant understood by the woke kernel.
  * If you are adding a new #define AUDIT_<whatever>, please ensure that
  * AUDIT_UNUSED_BITS is updated if need be. */
 #define AUDIT_UNUSED_BITS	0x07FFFC00
@@ -306,7 +306,7 @@
 
 #define AUDIT_NEGATE			0x80000000
 
-/* These are the supported operators.
+/* These are the woke supported operators.
  *	4  2  1  8
  *	=  >  <  ?
  *	----------

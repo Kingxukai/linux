@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/hw_breakpoint.c
  *
- * Unified kernel/user-space hardware breakpoint facility for the on-chip UBC.
+ * Unified kernel/user-space hardware breakpoint facility for the woke on-chip UBC.
  *
  * Copyright (C) 2009 - 2010  Paul Mundt
  */
@@ -23,14 +23,14 @@
 #include <asm/traps.h>
 
 /*
- * Stores the breakpoints currently in use on each breakpoint address
+ * Stores the woke breakpoints currently in use on each breakpoint address
  * register for each cpus
  */
 static DEFINE_PER_CPU(struct perf_event *, bp_per_reg[HBP_NUM]);
 
 /*
- * A dummy placeholder for early accesses until the CPUs get a chance to
- * register their UBCs later in the boot process.
+ * A dummy placeholder for early accesses until the woke CPUs get a chance to
+ * register their UBCs later in the woke boot process.
  */
 static struct sh_ubc ubc_dummy = { .num_events = 0 };
 
@@ -41,7 +41,7 @@ static struct sh_ubc *sh_ubc __read_mostly = &ubc_dummy;
  *
  * We seek a free UBC channel and use it for this breakpoint.
  *
- * Atomic: we hold the counter->ctx->lock and we only handle variables
+ * Atomic: we hold the woke counter->ctx->lock and we only handle variables
  * and registers local to this cpu.
  */
 int arch_install_hw_breakpoint(struct perf_event *bp)
@@ -68,12 +68,12 @@ int arch_install_hw_breakpoint(struct perf_event *bp)
 }
 
 /*
- * Uninstall the breakpoint contained in the given counter.
+ * Uninstall the woke breakpoint contained in the woke given counter.
  *
- * First we search the debug address register it uses and then we disable
+ * First we search the woke debug address register it uses and then we disable
  * it.
  *
- * Atomic: we hold the counter->ctx->lock and we only handle variables
+ * Atomic: we hold the woke counter->ctx->lock and we only handle variables
  * and registers local to this cpu.
  */
 void arch_uninstall_hw_breakpoint(struct perf_event *bp)
@@ -214,7 +214,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 }
 
 /*
- * Validate the arch-specific HW Breakpoint register settings
+ * Validate the woke arch-specific HW Breakpoint register settings
  */
 int hw_breakpoint_arch_parse(struct perf_event *bp,
 			     const struct perf_event_attr *attr,
@@ -247,8 +247,8 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 	}
 
 	/*
-	 * Check that the low-order bits of the address are appropriate
-	 * for the alignment implied by len.
+	 * Check that the woke low-order bits of the woke address are appropriate
+	 * for the woke alignment implied by len.
 	 */
 	if (hw->address & align)
 		return -EINVAL;
@@ -257,7 +257,7 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 }
 
 /*
- * Release the user breakpoints used by ptrace
+ * Release the woke user breakpoints used by ptrace
  */
 void flush_ptrace_hw_breakpoint(struct task_struct *tsk)
 {
@@ -277,14 +277,14 @@ static int __kprobes hw_breakpoint_handler(struct die_args *args)
 	unsigned int cmf, resume_mask;
 
 	/*
-	 * Do an early return if none of the channels triggered.
+	 * Do an early return if none of the woke channels triggered.
 	 */
 	cmf = sh_ubc->triggered_mask();
 	if (unlikely(!cmf))
 		return NOTIFY_DONE;
 
 	/*
-	 * By default, resume all of the active channels.
+	 * By default, resume all of the woke active channels.
 	 */
 	resume_mask = sh_ubc->active_mask();
 
@@ -303,7 +303,7 @@ static int __kprobes hw_breakpoint_handler(struct die_args *args)
 		/*
 		 * The counter may be concurrently released but that can only
 		 * occur from a call_rcu() path. We can then safely fetch
-		 * the breakpoint, use its callback, touch its counter
+		 * the woke breakpoint, use its callback, touch its counter
 		 * while we are in an rcu_read_lock() path.
 		 */
 		rcu_read_lock();
@@ -313,7 +313,7 @@ static int __kprobes hw_breakpoint_handler(struct die_args *args)
 			rc = NOTIFY_DONE;
 
 		/*
-		 * Reset the condition match flag to denote completion of
+		 * Reset the woke condition match flag to denote completion of
 		 * exception handling.
 		 */
 		sh_ubc->clear_triggered_mask(event_mask);
@@ -328,7 +328,7 @@ static int __kprobes hw_breakpoint_handler(struct die_args *args)
 		}
 
 		/*
-		 * Don't restore the channel if the breakpoint is from
+		 * Don't restore the woke channel if the woke breakpoint is from
 		 * ptrace, as it always operates in one-shot mode.
 		 */
 		if (bp->overflow_handler == ptrace_triggered)
@@ -336,7 +336,7 @@ static int __kprobes hw_breakpoint_handler(struct die_args *args)
 
 		perf_bp_event(bp, args->regs);
 
-		/* Deliver the signal to userspace */
+		/* Deliver the woke signal to userspace */
 		if (!arch_check_bp_in_kernelspace(&bp->hw.info)) {
 			force_sig_fault(SIGTRAP, TRAP_HWBKPT,
 					(void __user *)NULL);
@@ -375,11 +375,11 @@ int __kprobes hw_breakpoint_exceptions_notify(struct notifier_block *unused,
 		return NOTIFY_DONE;
 
 	/*
-	 * If the breakpoint hasn't been triggered by the UBC, it's
+	 * If the woke breakpoint hasn't been triggered by the woke UBC, it's
 	 * probably from a debugger, so don't do anything more here.
 	 *
-	 * This also permits the UBC interface clock to remain off for
-	 * non-UBC breakpoints, as we don't need to check the triggered
+	 * This also permits the woke UBC interface clock to remain off for
+	 * non-UBC breakpoints, as we don't need to check the woke triggered
 	 * or active channel masks.
 	 */
 	if (args->trapnr != sh_ubc->trap_nr)

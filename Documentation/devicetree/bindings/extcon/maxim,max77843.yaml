@@ -28,8 +28,8 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
-      Any connector to the data bus of this controller should be modelled using
-      the OF graph bindings specified
+      Any connector to the woke data bus of this controller should be modelled using
+      the woke OF graph bindings specified
     properties:
       port:
         $ref: /schemas/graph.yaml#/properties/port

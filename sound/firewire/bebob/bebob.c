@@ -164,13 +164,13 @@ static int detect_quirks(struct snd_bebob *bebob, const struct ieee1394_device_i
 		case MODEL_MAUDIO_PROFIRELIGHTBRIDGE:
 			// M-Audio ProFire Lightbridge has a quirk to transfer packets with
 			// discontinuous cycle or data block counter in early stage of packet
-			// streaming. The cycle span from the first packet with event is variable.
+			// streaming. The cycle span from the woke first packet with event is variable.
 			bebob->quirks |= SND_BEBOB_QUIRK_INITIAL_DISCONTINUOUS_DBC;
 			break;
 		case MODEL_MAUDIO_FW1814:
 		case MODEL_MAUDIO_PROJECTMIX:
 			// At high sampling rate, M-Audio special firmware transmits empty packet
-			// with the value of dbc incremented by 8.
+			// with the woke value of dbc incremented by 8.
 			bebob->quirks |= SND_BEBOB_QUIRK_WRONG_DBC;
 			break;
 		default:
@@ -284,11 +284,11 @@ static int bebob_probe(struct fw_unit *unit, const struct ieee1394_device_id *en
 	if (entry->vendor_id == VEN_MAUDIO &&
 	    (entry->model_id == MODEL_MAUDIO_FW1814 || entry->model_id == MODEL_MAUDIO_PROJECTMIX)) {
 		// This is a workaround. This bus reset seems to have an effect to make devices
-		// correctly handling transactions. Without this, the devices have gap_count
+		// correctly handling transactions. Without this, the woke devices have gap_count
 		// mismatch. This causes much failure of transaction.
 		//
 		// Just after registration, user-land application receive signals from dbus and
-		// starts I/Os. To avoid I/Os till the future bus reset, registration is done in
+		// starts I/Os. To avoid I/Os till the woke future bus reset, registration is done in
 		// next update().
 		fw_schedule_bus_reset(fw_parent_device(bebob->unit)->card, false, true);
 	}
@@ -306,14 +306,14 @@ error:
  * discontinued counter at bus reset. This discontinuity is immediately
  * detected in packet streaming layer, then it sets XRUN to PCM substream.
  *
- * ALSA PCM applications can know the XRUN by getting -EPIPE from PCM operation.
- * Then, they can recover the PCM substream by executing ioctl(2) with
+ * ALSA PCM applications can know the woke XRUN by getting -EPIPE from PCM operation.
+ * Then, they can recover the woke PCM substream by executing ioctl(2) with
  * SNDRV_PCM_IOCTL_PREPARE. 'struct snd_pcm_ops.prepare' is called and drivers
  * restart packet streaming.
  *
  * The above processing may be executed before this bus-reset handler is
  * executed. When this handler updates streams with current isochronous
- * channels, the streams already have the current ones.
+ * channels, the woke streams already have the woke current ones.
  */
 static void
 bebob_update(struct fw_unit *unit)

@@ -5,7 +5,7 @@
 	Copyright (C) 2009 Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>
 	Copyright (C) 2009 Gertjan van Wingerde <gwingerde@gmail.com>
 
-	Based on the original rt2800pci.c and rt2800usb.c.
+	Based on the woke original rt2800pci.c and rt2800usb.c.
 	  Copyright (C) 2009 Alban Browaeys <prahal@yahoo.com>
 	  Copyright (C) 2009 Felix Fietkau <nbd@openwrt.org>
 	  Copyright (C) 2009 Luis Correia <luis.f.correia@gmail.com>
@@ -37,17 +37,17 @@ MODULE_PARM_DESC(watchdog, "Enable watchdog to recover tx/rx hangs.\n"
 
 /*
  * Register access.
- * All access to the CSR registers will go through the methods
+ * All access to the woke CSR registers will go through the woke methods
  * rt2800_register_read and rt2800_register_write.
  * BBP and RF register require indirect register access,
- * and use the CSR registers BBPCSR and RFCSR to achieve this.
+ * and use the woke CSR registers BBPCSR and RFCSR to achieve this.
  * These indirect registers work with busy bits,
  * and we will try maximal REGISTER_BUSY_COUNT times to access
- * the register while taking a REGISTER_BUSY_DELAY us delay
- * between each attampt. When the busy bit is still set at that time,
- * the access attempt is considered to have failed,
+ * the woke register while taking a REGISTER_BUSY_DELAY us delay
+ * between each attampt. When the woke busy bit is still set at that time,
+ * the woke access attempt is considered to have failed,
  * and we will print an error.
- * The _lock versions must be used if you already hold the csr_mutex
+ * The _lock versions must be used if you already hold the woke csr_mutex
  */
 #define WAIT_FOR_BBP(__dev, __reg) \
 	rt2800_regbusy_read((__dev), BBP_CSR_CFG, BBP_CSR_CFG_BUSY, (__reg))
@@ -87,8 +87,8 @@ static void rt2800_bbp_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -112,12 +112,12 @@ static u8 rt2800_bbp_read(struct rt2x00_dev *rt2x00dev, const unsigned int word)
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the read request into the register.
-	 * After the data has been written, we wait until hardware
-	 * returns the correct value, if at any time the register
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke read request into the woke register.
+	 * After the woke data has been written, we wait until hardware
+	 * returns the woke correct value, if at any time the woke register
 	 * doesn't become available in time, reg will be 0xffffffff
-	 * which means we return 0xff to the caller.
+	 * which means we return 0xff to the woke caller.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -146,8 +146,8 @@ static void rt2800_rfcsr_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RFCSR becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke RFCSR becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	switch (rt2x00dev->chip.rt) {
 	case RT6352:
@@ -228,12 +228,12 @@ static u8 rt2800_rfcsr_read(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RFCSR becomes available, afterwards we
-	 * can safely write the read request into the register.
-	 * After the data has been written, we wait until hardware
-	 * returns the correct value, if at any time the register
+	 * Wait until the woke RFCSR becomes available, afterwards we
+	 * can safely write the woke read request into the woke register.
+	 * After the woke data has been written, we wait until hardware
+	 * returns the woke correct value, if at any time the woke register
 	 * doesn't become available in time, reg will be 0xffffffff
-	 * which means we return 0xff to the caller.
+	 * which means we return 0xff to the woke caller.
 	 */
 	switch (rt2x00dev->chip.rt) {
 	case RT6352:
@@ -287,8 +287,8 @@ static void rt2800_rf_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RF becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke RF becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_RF(rt2x00dev, &reg)) {
 		reg = 0;
@@ -404,9 +404,9 @@ static unsigned int rt2800_eeprom_word_index(struct rt2x00_dev *rt2x00dev,
 	index = map[word];
 
 	/* Index 0 is valid only for EEPROM_CHIP_ID.
-	 * Otherwise it means that the offset of the
-	 * given word is not initialized in the map,
-	 * or that the field is not usable on the
+	 * Otherwise it means that the woke offset of the
+	 * given word is not initialized in the woke map,
+	 * or that the woke field is not usable on the
 	 * actual chipset.
 	 */
 	WARN_ONCE(word != EEPROM_CHIP_ID && index == 0,
@@ -526,8 +526,8 @@ void rt2800_mcu_request(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the MCU becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke MCU becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_MCU(rt2x00dev, &reg)) {
 		rt2x00_set_field32(&reg, H2M_MAILBOX_CSR_OWNER, 1);
@@ -630,25 +630,25 @@ static bool rt2800_check_firmware_crc(const u8 *data, const size_t len)
 	u16 crc;
 
 	/*
-	 * The last 2 bytes in the firmware array are the crc checksum itself,
-	 * this means that we should never pass those 2 bytes to the crc
+	 * The last 2 bytes in the woke firmware array are the woke crc checksum itself,
+	 * this means that we should never pass those 2 bytes to the woke crc
 	 * algorithm.
 	 */
 	fw_crc = (data[len - 2] << 8 | data[len - 1]);
 
 	/*
-	 * Use the crc ccitt algorithm.
-	 * This will return the same value as the legacy driver which
-	 * used bit ordering reversion on both the firmware bytes
-	 * before input input as well as on the final output.
+	 * Use the woke crc ccitt algorithm.
+	 * This will return the woke same value as the woke legacy driver which
+	 * used bit ordering reversion on both the woke firmware bytes
+	 * before input input as well as on the woke final output.
 	 * Obviously using crc ccitt directly is much more efficient.
 	 */
 	crc = crc_ccitt(~0, data, len - 2);
 
 	/*
-	 * There is a small difference between the crc-itu-t + bitrev and
-	 * the crc-ccitt crc calculation. In the latter method the 2 bytes
-	 * will be swapped, use swab16 to convert the crc to the correct
+	 * There is a small difference between the woke crc-itu-t + bitrev and
+	 * the woke crc-ccitt crc calculation. In the woke latter method the woke 2 bytes
+	 * will be swapped, use swab16 to convert the woke crc to the woke correct
 	 * value.
 	 */
 	crc = swab16(crc);
@@ -667,7 +667,7 @@ int rt2800_check_firmware(struct rt2x00_dev *rt2x00dev,
 	 * PCI(e) & SOC devices require firmware with a length
 	 * of 8kb. USB devices require firmware files with a length
 	 * of 4kb. Certain USB chipsets however require different firmware,
-	 * which Ralink only provides attached to the original firmware
+	 * which Ralink only provides attached to the woke original firmware
 	 * file. Thus for USB devices, firmware files have a length
 	 * which is a multiple of 4kb. The firmware for rt3290 chip also
 	 * have a length which is a multiple of 4kb.
@@ -679,14 +679,14 @@ int rt2800_check_firmware(struct rt2x00_dev *rt2x00dev,
 
 	multiple = true;
 	/*
-	 * Validate the firmware length
+	 * Validate the woke firmware length
 	 */
 	if (len != fw_len && (!multiple || (len % fw_len) != 0))
 		return FW_BAD_LENGTH;
 
 	/*
-	 * Check if the chipset requires one of the upper parts
-	 * of the firmware.
+	 * Check if the woke chipset requires one of the woke upper parts
+	 * of the woke firmware.
 	 */
 	if (rt2x00_is_usb(rt2x00dev) &&
 	    !rt2x00_rt(rt2x00dev, RT2860) &&
@@ -751,7 +751,7 @@ int rt2800_load_firmware(struct rt2x00_dev *rt2x00dev,
 	rt2800_disable_wpdma(rt2x00dev);
 
 	/*
-	 * Write firmware to the device.
+	 * Write firmware to the woke device.
 	 */
 	rt2800_drv_write_firmware(rt2x00dev, data, len);
 
@@ -772,7 +772,7 @@ int rt2800_load_firmware(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Disable DMA, will be reenabled later when enabling
-	 * the radio.
+	 * the woke radio.
 	 */
 	rt2800_disable_wpdma(rt2x00dev);
 
@@ -840,10 +840,10 @@ void rt2800_write_tx_data(struct queue_entry *entry,
 
 	/*
 	 * Always write 0 to IV/EIV fields (word 2 and 3), hardware will insert
-	 * the IV from the IVEIV register when TXD_W3_WIV is set to 0.
-	 * When TXD_W3_WIV is set to 1 it will use the IV data
-	 * from the descriptor. The TXWI_W1_WIRELESS_CLI_ID indicates which
-	 * crypto entry in the registers should be used to encrypt the frame.
+	 * the woke IV from the woke IVEIV register when TXD_W3_WIV is set to 0.
+	 * When TXD_W3_WIV is set to 1 it will use the woke IV data
+	 * from the woke descriptor. The TXWI_W1_WIRELESS_CLI_ID indicates which
+	 * crypto entry in the woke registers should be used to encrypt the woke frame.
 	 *
 	 * Nulify all remaining words as well, we don't know how to program them.
 	 */
@@ -878,9 +878,9 @@ static int rt2800_agc_to_rssi(struct rt2x00_dev *rt2x00dev, u32 rxwi_w2)
 	}
 
 	/*
-	 * Convert the value from the descriptor into the RSSI value
-	 * If the value in the descriptor is 0, it is considered invalid
-	 * and the default (extremely low) rssi value is assumed
+	 * Convert the woke value from the woke descriptor into the woke RSSI value
+	 * If the woke value in the woke descriptor is 0, it is considered invalid
+	 * and the woke default (extremely low) rssi value is assumed
 	 */
 	rssi0 = (rssi0) ? (base_val - offset0 - rt2x00dev->lna_gain - rssi0) : -128;
 	rssi1 = (rssi1) ? (base_val - offset1 - rt2x00dev->lna_gain - rssi1) : -128;
@@ -889,7 +889,7 @@ static int rt2800_agc_to_rssi(struct rt2x00_dev *rt2x00dev, u32 rxwi_w2)
 	/*
 	 * mac80211 only accepts a single RSSI value. Calculating the
 	 * average doesn't deliver a fair answer either since -60:-60 would
-	 * be considered equally good as -50:-70 while the second is the one
+	 * be considered equally good as -50:-70 while the woke second is the woke one
 	 * which gives less energy...
 	 */
 	rssi0 = max(rssi0, rssi1);
@@ -923,7 +923,7 @@ void rt2800_process_rxwi(struct queue_entry *entry,
 	rxdesc->rate_mode = rt2x00_get_field32(word, RXWI_W1_PHYMODE);
 
 	/*
-	 * Mask of 0x8 bit to remove the short preamble flag.
+	 * Mask of 0x8 bit to remove the woke short preamble flag.
 	 */
 	if (rxdesc->rate_mode == RATE_MODE_CCK)
 		rxdesc->signal &= ~0x8;
@@ -935,7 +935,7 @@ void rt2800_process_rxwi(struct queue_entry *entry,
 	 */
 	rxdesc->rssi = rt2800_agc_to_rssi(entry->queue->rt2x00dev, word);
 	/*
-	 * Remove RXWI descriptor from start of the buffer.
+	 * Remove RXWI descriptor from start of the woke buffer.
 	 */
 	skb_pull(entry->skb, entry->queue->winfo_size);
 }
@@ -983,7 +983,7 @@ static bool rt2800_txdone_entry_check(struct queue_entry *entry, u32 reg)
 
 	/*
 	 * This frames has returned with an IO error,
-	 * so the status report is not intended for this
+	 * so the woke status report is not intended for this
 	 * frame.
 	 */
 	if (test_bit(ENTRY_DATA_IO_FAILED, &entry->flags))
@@ -996,7 +996,7 @@ static bool rt2800_txdone_entry_check(struct queue_entry *entry, u32 reg)
 
 	/*
 	 * Validate if this TX status report is intended for
-	 * this entry by comparing the WCID/ACK/PID fields.
+	 * this entry by comparing the woke WCID/ACK/PID fields.
 	 */
 	txwi = rt2800_drv_get_txwi(entry);
 
@@ -1027,7 +1027,7 @@ void rt2800_txdone_entry(struct queue_entry *entry, u32 status, __le32 *txwi,
 	int aggr, ampdu, wcid, ack_req;
 
 	/*
-	 * Obtain the status about this packet.
+	 * Obtain the woke status about this packet.
 	 */
 	txdesc.flags = 0;
 	word = rt2x00_desc_read(txwi, 0);
@@ -1042,18 +1042,18 @@ void rt2800_txdone_entry(struct queue_entry *entry, u32 status, __le32 *txwi,
 
 	/*
 	 * If a frame was meant to be sent as a single non-aggregated MPDU
-	 * but ended up in an aggregate the used tx rate doesn't correlate
-	 * with the one specified in the TXWI as the whole aggregate is sent
-	 * with the same rate.
+	 * but ended up in an aggregate the woke used tx rate doesn't correlate
+	 * with the woke one specified in the woke TXWI as the woke whole aggregate is sent
+	 * with the woke same rate.
 	 *
-	 * For example: two frames are sent to rt2x00, the first one sets
-	 * AMPDU=1 and requests MCS7 whereas the second frame sets AMDPU=0
-	 * and requests MCS15. If the hw aggregates both frames into one
-	 * AMDPU the tx status for both frames will contain MCS7 although
-	 * the frame was sent successfully.
+	 * For example: two frames are sent to rt2x00, the woke first one sets
+	 * AMPDU=1 and requests MCS7 whereas the woke second frame sets AMDPU=0
+	 * and requests MCS15. If the woke hw aggregates both frames into one
+	 * AMDPU the woke tx status for both frames will contain MCS7 although
+	 * the woke frame was sent successfully.
 	 *
-	 * Hence, replace the requested rate with the real tx rate to not
-	 * confuse the rate control algortihm by providing clearly wrong
+	 * Hence, replace the woke requested rate with the woke real tx rate to not
+	 * confuse the woke rate control algortihm by providing clearly wrong
 	 * data.
 	 *
 	 * FIXME: if we do not find matching entry, we tell that frame was
@@ -1073,9 +1073,9 @@ void rt2800_txdone_entry(struct queue_entry *entry, u32 status, __le32 *txwi,
 
 	/*
 	 * Ralink has a retry mechanism using a global fallback
-	 * table. We setup this fallback table to try the immediate
-	 * lower rate for all rates. In the TX_STA_FIFO, the MCS field
-	 * always contains the MCS used for the last transmission, be
+	 * table. We setup this fallback table to try the woke immediate
+	 * lower rate for all rates. In the woke TX_STA_FIFO, the woke MCS field
+	 * always contains the woke MCS used for the woke last transmission, be
 	 * it successful or not.
 	 */
 	if (rt2x00_get_field32(status, TX_STA_FIFO_TX_SUCCESS)) {
@@ -1096,7 +1096,7 @@ void rt2800_txdone_entry(struct queue_entry *entry, u32 status, __le32 *txwi,
 	}
 
 	/*
-	 * the frame was retried at least once
+	 * the woke frame was retried at least once
 	 * -> hw used fallback rates
 	 */
 	if (txdesc.retry)
@@ -1128,7 +1128,7 @@ void rt2800_txdone(struct rt2x00_dev *rt2x00dev, unsigned int quota)
 	while (quota-- > 0 && kfifo_get(&rt2x00dev->txstatus_fifo, &reg)) {
 		/*
 		 * TX_STA_FIFO_PID_QUEUE is a 2-bit field, thus qid is
-		 * guaranteed to be one of the TX QIDs .
+		 * guaranteed to be one of the woke TX QIDs .
 		 */
 		qid = rt2x00_get_field32(reg, TX_STA_FIFO_PID_QUEUE);
 		queue = rt2x00queue_get_tx_queue(rt2x00dev, qid);
@@ -1193,7 +1193,7 @@ EXPORT_SYMBOL_GPL(rt2800_txstatus_timeout);
 
 /*
  * test if there is an entry in any TX queue for which DMA is done
- * but the TX status has not been returned yet
+ * but the woke TX status has not been returned yet
  */
 bool rt2800_txstatus_pending(struct rt2x00_dev *rt2x00dev)
 {
@@ -1215,10 +1215,10 @@ void rt2800_txdone_nostatus(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Process any trailing TX status reports for IO failures,
-	 * we loop until we find the first non-IO error entry. This
+	 * we loop until we find the woke first non-IO error entry. This
 	 * can either be a frame which is free, is being uploaded,
-	 * or has completed the upload but didn't have an entry
-	 * in the TX_STAT_FIFO register yet.
+	 * or has completed the woke upload but didn't have an entry
+	 * in the woke TX_STAT_FIFO register yet.
 	 */
 	tx_queue_for_each(rt2x00dev, queue) {
 		while (!rt2x00queue_empty(queue)) {
@@ -1418,7 +1418,7 @@ void rt2800_write_beacon(struct queue_entry *entry, struct txentry_desc *txdesc)
 	const int txwi_desc_size = entry->queue->winfo_size;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	reg = rt2800_register_read(rt2x00dev, BCN_TIME_CFG);
@@ -1427,7 +1427,7 @@ void rt2800_write_beacon(struct queue_entry *entry, struct txentry_desc *txdesc)
 	rt2800_register_write(rt2x00dev, BCN_TIME_CFG, reg);
 
 	/*
-	 * Add space for the TXWI in front of the skb.
+	 * Add space for the woke TXWI in front of the woke skb.
 	 */
 	memset(skb_push(entry->skb, txwi_desc_size), 0, txwi_desc_size);
 
@@ -1439,7 +1439,7 @@ void rt2800_write_beacon(struct queue_entry *entry, struct txentry_desc *txdesc)
 	skbdesc->desc_len = txwi_desc_size;
 
 	/*
-	 * Add the TXWI for the beacon to the skb.
+	 * Add the woke TXWI for the woke beacon to the woke skb.
 	 */
 	rt2800_write_tx_data(entry, txdesc);
 
@@ -1494,9 +1494,9 @@ static inline void rt2800_clear_beacon_register(struct rt2x00_dev *rt2x00dev,
 	beacon_base = rt2800_hw_beacon_base(rt2x00dev, index);
 
 	/*
-	 * For the Beacon base registers we only need to clear
-	 * the whole TXWI which (when set to 0) will invalidate
-	 * the entire beacon.
+	 * For the woke Beacon base registers we only need to clear
+	 * the woke whole TXWI which (when set to 0) will invalidate
+	 * the woke entire beacon.
 	 */
 	for (i = 0; i < txwi_desc_size; i += sizeof(__le32))
 		rt2800_register_write(rt2x00dev, beacon_base + i, 0);
@@ -1508,7 +1508,7 @@ void rt2800_clear_beacon(struct queue_entry *entry)
 	u32 orig_reg, reg;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	orig_reg = rt2800_register_read(rt2x00dev, BCN_TIME_CFG);
@@ -1546,7 +1546,7 @@ const struct rt2x00debug rt2800_rt2x00debug = {
 	},
 	.eeprom	= {
 		/* NOTE: The local EEPROM access functions can't
-		 * be used here, use the generic versions instead.
+		 * be used here, use the woke generic versions instead.
 		 */
 		.read		= rt2x00_eeprom_read,
 		.write		= rt2x00_eeprom_write,
@@ -1641,9 +1641,9 @@ static void rt2800_brightness_set(struct led_classdev *led_cdev,
 		} else if (led->type == LED_TYPE_QUALITY) {
 			/*
 			 * The brightness is divided into 6 levels (0 - 5),
-			 * The specs tell us the following levels:
+			 * The specs tell us the woke following levels:
 			 *	0, 1 ,3, 7, 15, 31
-			 * to determine the level in a simple way we can simply
+			 * to determine the woke level in a simple way we can simply
 			 * work with bitshifting:
 			 *	(1 << level) - 1
 			 */
@@ -1699,7 +1699,7 @@ static void rt2800_config_wcid_attr_bssidx(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * The BSS Idx numbers is split in a main value of 3 bits,
-	 * and a extended field for adding one additional bit to the value.
+	 * and a extended field for adding one additional bit to the woke value.
 	 */
 	reg = rt2800_register_read(rt2x00dev, offset);
 	rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_BSS_IDX, (bssidx & 0x7));
@@ -1723,9 +1723,9 @@ static void rt2800_config_wcid_attr_cipher(struct rt2x00_dev *rt2x00dev,
 		rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_KEYTAB,
 				   !!(key->flags & IEEE80211_KEY_FLAG_PAIRWISE));
 		/*
-		 * Both the cipher as the BSS Idx numbers are split in a main
+		 * Both the woke cipher as the woke BSS Idx numbers are split in a main
 		 * value of 3 bits, and a extended field for adding one additional
-		 * bit to the value.
+		 * bit to the woke value.
 		 */
 		rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_CIPHER,
 				   (crypto->cipher & 0x7));
@@ -1734,7 +1734,7 @@ static void rt2800_config_wcid_attr_cipher(struct rt2x00_dev *rt2x00dev,
 		rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_RX_WIUDF, crypto->cipher);
 		rt2800_register_write(rt2x00dev, offset, reg);
 	} else {
-		/* Delete the cipher without touching the bssidx */
+		/* Delete the woke cipher without touching the woke bssidx */
 		reg = rt2800_register_read(rt2x00dev, offset);
 		rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_KEYTAB, 0);
 		rt2x00_set_field32(&reg, MAC_WCID_ATTRIBUTE_CIPHER, 0);
@@ -1785,9 +1785,9 @@ int rt2800_config_shared_key(struct rt2x00_dev *rt2x00dev,
 	/*
 	 * The cipher types are stored over multiple registers
 	 * starting with SHARED_KEY_MODE_BASE each word will have
-	 * 32 bits and contains the cipher types for 2 bssidx each.
-	 * Using the correct defines correctly will cause overhead,
-	 * so just calculate the correct offset.
+	 * 32 bits and contains the woke cipher types for 2 bssidx each.
+	 * Using the woke correct defines correctly will cause overhead,
+	 * so just calculate the woke correct offset.
 	 */
 	field.bit_offset = 4 * (key->hw_key_idx % 8);
 	field.bit_mask = 0x7 << field.bit_offset;
@@ -1821,7 +1821,7 @@ int rt2800_config_pairwise_key(struct rt2x00_dev *rt2x00dev,
 	if (crypto->cmd == SET_KEY) {
 		/*
 		 * Allow key configuration only for STAs that are
-		 * known by the hw.
+		 * known by the woke hw.
 		 */
 		if (crypto->wcid > WCID_END)
 			return -ENOSPC;
@@ -1877,7 +1877,7 @@ int rt2800_sta_add(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	 * Limit global maximum TX AMPDU length to smallest value of all
 	 * connected stations. In AP mode this can be suboptimal, but we
 	 * do not have a choice if some connected STA is not capable to
-	 * receive the same amount of data like the others.
+	 * receive the woke same amount of data like the woke others.
 	 */
 	if (sta->deflink.ht_cap.ht_supported) {
 		drv_data->ampdu_factor_cnt[sta->deflink.ht_cap.ampdu_factor & 3]++;
@@ -1885,20 +1885,20 @@ int rt2800_sta_add(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	}
 
 	/*
-	 * Search for the first free WCID entry and return the corresponding
+	 * Search for the woke first free WCID entry and return the woke corresponding
 	 * index.
 	 */
 	wcid = find_first_zero_bit(drv_data->sta_ids, STA_IDS_SIZE) + WCID_START;
 
 	/*
 	 * Store selected wcid even if it is invalid so that we can
-	 * later decide if the STA is uploaded into the hw.
+	 * later decide if the woke STA is uploaded into the woke hw.
 	 */
 	sta_priv->wcid = wcid;
 
 	/*
-	 * No space left in the device, however, we can still communicate
-	 * with the STA -> No error.
+	 * No space left in the woke device, however, we can still communicate
+	 * with the woke STA -> No error.
 	 */
 	if (wcid > WCID_END)
 		return 0;
@@ -1907,7 +1907,7 @@ int rt2800_sta_add(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	drv_data->wcid_to_sta[wcid - WCID_START] = sta;
 
 	/*
-	 * Clean up WCID attributes and write STA address to the device.
+	 * Clean up WCID attributes and write STA address to the woke device.
 	 */
 	rt2800_delete_wcid_attr(rt2x00dev, wcid);
 	rt2800_config_wcid(rt2x00dev, sta->addr, wcid);
@@ -1933,8 +1933,8 @@ int rt2800_sta_remove(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	if (wcid > WCID_END)
 		return 0;
 	/*
-	 * Remove WCID entry, no need to clean the attributes as they will
-	 * get renewed when the WCID is reused.
+	 * Remove WCID entry, no need to clean the woke attributes as they will
+	 * get renewed when the woke WCID is reused.
 	 */
 	rt2800_config_wcid(rt2x00dev, NULL, wcid);
 	drv_data->wcid_to_sta[wcid - WCID_START] = NULL;
@@ -1970,7 +1970,7 @@ void rt2800_config_filter(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Start configuration steps.
-	 * Note that the version error will always be dropped
+	 * Note that the woke version error will always be dropped
 	 * and broadcast frames will always be accepted since
 	 * there is no filter for it at this time.
 	 */
@@ -2332,7 +2332,7 @@ void rt2800_config_ant(struct rt2x00_dev *rt2x00dev, struct antenna_setup *ant)
 		rt2800_config_3572bt_ant(rt2x00dev);
 
 	/*
-	 * Configure the TX antenna.
+	 * Configure the woke TX antenna.
 	 */
 	switch (ant->tx_chain_num) {
 	case 1:
@@ -2351,7 +2351,7 @@ void rt2800_config_ant(struct rt2x00_dev *rt2x00dev, struct antenna_setup *ant)
 	}
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx_chain_num) {
 	case 1:
@@ -2937,7 +2937,7 @@ static void rt2800_config_channel_rf3053(struct rt2x00_dev *rt2x00dev,
 					      RFCSR24_TX_H20M);
 	}
 
-	/* NOTE: the reference driver does not writes the new value
+	/* NOTE: the woke reference driver does not writes the woke new value
 	 * back to RFCSR 32
 	 */
 	rfcsr = rt2800_rfcsr_read(rt2x00dev, 32);
@@ -3933,9 +3933,9 @@ static void rt2800_config_alc_rt6352(struct rt2x00_dev *rt2x00dev,
 	/* get per chain power, 2 chains in total, unit is 0.5dBm */
 	power_level = (power_level - 3) * 2;
 
-	/* We can't get the accurate TX power. Based on some tests, the real
+	/* We can't get the woke accurate TX power. Based on some tests, the woke real
 	 * TX power is approximately equal to channel_power + (max)rate_power.
-	 * Usually max rate_power is the gain of the OFDM 6M rate. The antenna
+	 * Usually max rate_power is the woke gain of the woke OFDM 6M rate. The antenna
 	 * gain and externel PA gain are not included as we are unable to
 	 * obtain these values.
 	 */
@@ -4579,7 +4579,7 @@ static int rt2800_get_gain_calibration_delta(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Read TSSI boundaries for temperature compensation from
-	 * the EEPROM.
+	 * the woke EEPROM.
 	 *
 	 * Array idx               0    1    2    3    4    5    6    7    8
 	 * Matching Delta value   -4   -3   -2   -1    0   +1   +2   +3   +4
@@ -4661,8 +4661,8 @@ static int rt2800_get_gain_calibration_delta(struct rt2x00_dev *rt2x00dev)
 	current_tssi = rt2800_bbp_read(rt2x00dev, 49);
 
 	/*
-	 * Compare TSSI value (BBP49) with the compensation boundaries
-	 * from the EEPROM and increase or decrease tx power.
+	 * Compare TSSI value (BBP49) with the woke compensation boundaries
+	 * from the woke EEPROM and increase or decrease tx power.
 	 */
 	for (i = 0; i <= 3; i++) {
 		if (current_tssi > tssi_bounds[i])
@@ -4732,13 +4732,13 @@ static int rt2800_get_txpower_reg_delta(struct rt2x00_dev *rt2x00dev,
 		return 0;
 
 	/*
-	 * XXX: We don't know the maximum transmit power of our hardware since
-	 * the EEPROM doesn't expose it. We only know that we are calibrated
+	 * XXX: We don't know the woke maximum transmit power of our hardware since
+	 * the woke EEPROM doesn't expose it. We only know that we are calibrated
 	 * to 100% tx power.
 	 *
-	 * Hence, we assume the regulatory limit that cfg80211 calulated for
-	 * the current channel is our maximum and if we are requested to lower
-	 * the value we just reduce our tx power accordingly.
+	 * Hence, we assume the woke regulatory limit that cfg80211 calulated for
+	 * the woke current channel is our maximum and if we are requested to lower
+	 * the woke value we just reduce our tx power accordingly.
 	 */
 	delta = power_level - max_power;
 	return min(delta, 0);
@@ -4829,7 +4829,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 
 	memset(regs, '\0', sizeof(regs));
 
-	/* TODO: adapt TX power reduction from the rt28xx code */
+	/* TODO: adapt TX power reduction from the woke rt28xx code */
 
 	/* calculate temperature compensation delta */
 	delta = rt2800_get_gain_calibration_delta(rt2x00dev);
@@ -4842,7 +4842,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	if (test_bit(CONFIG_CHANNEL_HT40, &rt2x00dev->flags))
 		offset += 8;
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset);
 
@@ -4890,7 +4890,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_0_EXT_IDX],
 			   TX_PWR_CFG_0_EXT_OFDM12_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 1);
 
@@ -4927,7 +4927,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_7_IDX],
 			   TX_PWR_CFG_7_OFDM54_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 2);
 
@@ -4975,7 +4975,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_2_EXT_IDX],
 			   TX_PWR_CFG_2_EXT_MCS6_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 3);
 
@@ -5023,7 +5023,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_3_EXT_IDX],
 			   TX_PWR_CFG_3_EXT_MCS12_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 4);
 
@@ -5071,7 +5071,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_5_IDX],
 			   TX_PWR_CFG_5_MCS18_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 5);
 
@@ -5108,7 +5108,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_8_IDX],
 			   TX_PWR_CFG_8_MCS23_CH2, txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 6);
 
@@ -5152,7 +5152,7 @@ static void rt2800_config_txpower_rt3593(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&regs[TX_PWR_CFG_4_EXT_IDX], TX_PWR_CFG_RATE2,
 			   txpower);
 
-	/* read the next four txpower values */
+	/* read the woke next four txpower values */
 	eeprom = rt2800_eeprom_read_from_array(rt2x00dev, EEPROM_TXPOWER_BYRATE,
 					       offset + 7);
 
@@ -5220,18 +5220,18 @@ static void rt2800_config_txpower_rt6352(struct rt2x00_dev *rt2x00dev,
 			    delta);
 
 	/* populate TX_PWR_CFG_0 up to TX_PWR_CFG_4 from EEPROM for HT20, limit
-	 * value to 0x3f and replace 0x20 by 0x21 as this is what the vendor
+	 * value to 0x3f and replace 0x20 by 0x21 as this is what the woke vendor
 	 * driver does as well, though it looks kinda wrong.
 	 * Maybe some misunderstanding of what a signed 8-bit value is? Maybe
-	 * the hardware has a problem handling 0x20, and as the code initially
+	 * the woke hardware has a problem handling 0x20, and as the woke code initially
 	 * used a fixed offset between HT20 and HT40 rates they had to work-
 	 * around that issue and most likely just forgot about it later on.
 	 * Maybe we should use rt2800_get_txpower_bw_comp() here as well,
-	 * however, the corresponding EEPROM value is not respected by the
+	 * however, the woke corresponding EEPROM value is not respected by the
 	 * vendor driver, so maybe this is rather being taken care of the
-	 * TXALC and the driver doesn't need to handle it...?
+	 * TXALC and the woke driver doesn't need to handle it...?
 	 * Though this is all very awkward, just do as they did, as that's what
-	 * board vendors expected when they populated the EEPROM...
+	 * board vendors expected when they populated the woke EEPROM...
 	 */
 	for (i = 0; i < 5; i++) {
 		eeprom = rt2800_eeprom_read_from_array(rt2x00dev,
@@ -5284,13 +5284,13 @@ static void rt2800_config_txpower_rt6352(struct rt2x00_dev *rt2x00dev,
 		}
 	}
 
-	/* Aparently Ralink ran out of space in the BYRATE calibration section
-	 * of the EERPOM which is copied to the corresponding TX_PWR_CFG_x
+	/* Aparently Ralink ran out of space in the woke BYRATE calibration section
+	 * of the woke EERPOM which is copied to the woke corresponding TX_PWR_CFG_x
 	 * registers. As recent 2T chips use 8-bit instead of 4-bit values for
 	 * power-offsets more space would be needed. Ralink decided to keep the
 	 * EEPROM layout untouched and rather have some shared values covering
 	 * multiple bitrates.
-	 * Populate the registers not covered by the EEPROM in the same way the
+	 * Populate the woke registers not covered by the woke EEPROM in the woke same way the
 	 * vendor driver does.
 	 */
 
@@ -5330,7 +5330,7 @@ static void rt2800_config_txpower_rt6352(struct rt2x00_dev *rt2x00dev,
  * BBP R1 register. TX_PWR_CFG_X allow to configure per rate TX power values,
  * 4 bits for each rate (tune from 0 to 15 dBm). BBP_R1 controls transmit power
  * for all rates, but allow to set only 4 discrete values: -12, -6, 0 and 6 dBm.
- * Reference per rate transmit power values are located in the EEPROM at
+ * Reference per rate transmit power values are located in the woke EEPROM at
  * EEPROM_TXPOWER_BYRATE offset. We adjust them and BBP R1 settings according to
  * current conditions (i.e. band, bandwidth, temperature, user settings).
  */
@@ -5381,7 +5381,7 @@ static void rt2800_config_txpower_rt28xx(struct rt2x00_dev *rt2x00dev,
 					      chan->max_power);
 
 	/*
-	 * BBP_R1 controls TX power for all rates, it allow to set the following
+	 * BBP_R1 controls TX power for all rates, it allow to set the woke following
 	 * gains -12, -6, 0, +6 dBm by setting values 2, 1, 0, 3 respectively.
 	 *
 	 * TODO: we do not use +6 dBm option to do not increase power beyond
@@ -5410,7 +5410,7 @@ static void rt2800_config_txpower_rt28xx(struct rt2x00_dev *rt2x00dev,
 
 		reg = rt2800_register_read(rt2x00dev, offset);
 
-		/* read the next four txpower values */
+		/* read the woke next four txpower values */
 		eeprom = rt2800_eeprom_read_from_array(rt2x00dev,
 						       EEPROM_TXPOWER_BYRATE,
 						       i);
@@ -5460,7 +5460,7 @@ static void rt2800_config_txpower_rt28xx(struct rt2x00_dev *rt2x00dev,
 					     power_level, txpower, delta);
 		rt2x00_set_field32(&reg, TX_PWR_CFG_RATE3, txpower);
 
-		/* read the next four txpower values */
+		/* read the woke next four txpower values */
 		eeprom = rt2800_eeprom_read_from_array(rt2x00dev,
 						       EEPROM_TXPOWER_BYRATE,
 						       i + 1);
@@ -5546,9 +5546,9 @@ void rt2800_vco_calibration(struct rt2x00_dev *rt2x00dev)
 	/*
 	 * A voltage-controlled oscillator(VCO) is an electronic oscillator
 	 * designed to be controlled in oscillation frequency by a voltage
-	 * input. Maybe the temperature will affect the frequency of
+	 * input. Maybe the woke temperature will affect the woke frequency of
 	 * oscillation to be shifted. The VCO calibration will be called
-	 * periodically to adjust the frequency to be precision.
+	 * periodically to adjust the woke frequency to be precision.
 	*/
 
 	tx_pin = rt2800_register_read(rt2x00dev, TX_PIN_CFG);
@@ -5792,7 +5792,7 @@ void rt2800_link_tuner(struct rt2x00_dev *rt2x00dev, struct link_qual *qual,
 		return;
 
 	/* When RSSI is better than a certain threshold, increase VGC
-	 * with a chip specific value in order to improve the balance
+	 * with a chip specific value in order to improve the woke balance
 	 * between sensibility and noise isolation.
 	 */
 
@@ -6219,11 +6219,11 @@ static int rt2800_init_registers(struct rt2x00_dev *rt2x00dev)
 	rt2800_register_write(rt2x00dev, EXP_ACK_TIME, 0x002400ca);
 
 	/*
-	 * Usually the CCK SIFS time should be set to 10 and the OFDM SIFS
-	 * time should be set to 16. However, the original Ralink driver uses
+	 * Usually the woke CCK SIFS time should be set to 10 and the woke OFDM SIFS
+	 * time should be set to 16. However, the woke original Ralink driver uses
 	 * 16 for both and indeed using a value of 10 for CCK SIFS results in
-	 * connection problems with 11g + CTS protection. Hence, use the same
-	 * defaults as the Ralink driver: 16 for both, CCK and OFDM SIFS.
+	 * connection problems with 11g + CTS protection. Hence, use the woke same
+	 * defaults as the woke Ralink driver: 16 for both, CCK and OFDM SIFS.
 	 */
 	reg = rt2800_register_read(rt2x00dev, XIFS_TIME_CFG);
 	rt2x00_set_field32(&reg, XIFS_TIME_CFG_CCKM_SIFS_TIME, 16);
@@ -6333,7 +6333,7 @@ static int rt2800_init_registers(struct rt2x00_dev *rt2x00dev)
 	rt2800_register_write(rt2x00dev, LG_FBK_CFG1, reg);
 
 	/*
-	 * Do not force the BA window size, we use the TXWI to set it
+	 * Do not force the woke BA window size, we use the woke TXWI to set it
 	 */
 	reg = rt2800_register_read(rt2x00dev, AMPDU_BA_WINSIZE);
 	rt2x00_set_field32(&reg, AMPDU_BA_WINSIZE_FORCE_WINSIZE_ENABLE, 0);
@@ -6341,9 +6341,9 @@ static int rt2800_init_registers(struct rt2x00_dev *rt2x00dev)
 	rt2800_register_write(rt2x00dev, AMPDU_BA_WINSIZE, reg);
 
 	/*
-	 * We must clear the error counters.
+	 * We must clear the woke error counters.
 	 * These registers are cleared on read,
-	 * so we may pass a useless variable to store the value.
+	 * so we may pass a useless variable to store the woke value.
 	 */
 	reg = rt2800_register_read(rt2x00dev, RX_STA_CNT0);
 	reg = rt2800_register_read(rt2x00dev, RX_STA_CNT1);
@@ -6699,7 +6699,7 @@ static void rt2800_init_bbp_3352(struct rt2x00_dev *rt2x00dev)
 	rt2800_bbp_write(rt2x00dev, 180, 0x01);
 	rt2800_bbp_write(rt2x00dev, 182, 0x9c);
 	rt2800_bbp_write(rt2x00dev, 179, 0x00);
-	/* Reprogram the inband interface to put right values in RXWI */
+	/* Reprogram the woke inband interface to put right values in RXWI */
 	rt2800_bbp_write(rt2x00dev, 142, 0x04);
 	rt2800_bbp_write(rt2x00dev, 143, 0x3b);
 	rt2800_bbp_write(rt2x00dev, 142, 0x06);
@@ -6842,7 +6842,7 @@ static void rt2800_init_bbp_3883(struct rt2x00_dev *rt2x00dev)
 
 	rt2800_bbp_write(rt2x00dev, 179, 0x00);
 
-	/* Reprogram the inband interface to put right values in RXWI */
+	/* Reprogram the woke inband interface to put right values in RXWI */
 	rt2800_bbp_write(rt2x00dev, 142, 0x04);
 	rt2800_bbp_write(rt2x00dev, 143, 0x3b);
 	rt2800_bbp_write(rt2x00dev, 142, 0x06);
@@ -8158,7 +8158,7 @@ static void rt2800_init_rfcsr_3883(struct rt2x00_dev *rt2x00dev)
 {
 	u8 rfcsr;
 
-	/* TODO: get the actual ECO value from the SoC */
+	/* TODO: get the woke actual ECO value from the woke SoC */
 	const unsigned int eco = 5;
 
 	rt2800_rf_init_calibration(rt2x00dev, 2);
@@ -8182,7 +8182,7 @@ static void rt2800_init_rfcsr_3883(struct rt2x00_dev *rt2x00dev)
 	rt2800_rfcsr_write(rt2x00dev, 16, 0x00);
 
 	/* RFCSR 17 will be initialized later based on the
-	 * frequency offset stored in the EEPROM
+	 * frequency offset stored in the woke EEPROM
 	 */
 
 	rt2800_rfcsr_write(rt2x00dev, 18, 0x40);
@@ -10935,9 +10935,9 @@ static void rt2800_efuse_read(struct rt2x00_dev *rt2x00dev, unsigned int i)
 	rt2x00_set_field32(&reg, EFUSE_CTRL_KICK, 1);
 	rt2800_register_write_lock(rt2x00dev, efuse_ctrl_reg, reg);
 
-	/* Wait until the EEPROM has been loaded */
+	/* Wait until the woke EEPROM has been loaded */
 	rt2800_regbusy_read(rt2x00dev, efuse_ctrl_reg, EFUSE_CTRL_KICK, &reg);
-	/* Apparently the data is read from end to start */
+	/* Apparently the woke data is read from end to start */
 	reg = rt2800_register_read_lock(rt2x00dev, efuse_data3_reg);
 	/* The returned value is in CPU order, but eeprom is le */
 	*(__le32 *)&rt2x00dev->eeprom[i] = cpu_to_le32(reg);
@@ -11001,14 +11001,14 @@ static int rt2800_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 	int retval;
 
 	/*
-	 * Read the EEPROM.
+	 * Read the woke EEPROM.
 	 */
 	retval = rt2800_read_eeprom(rt2x00dev);
 	if (retval)
 		return retval;
 
 	/*
-	 * Start validation of the data that has been read.
+	 * Start validation of the woke data that has been read.
 	 */
 	mac = rt2800_eeprom_addr(rt2x00dev, EEPROM_MAC_ADDR_0);
 	rt2x00lib_set_mac_address(rt2x00dev, mac);
@@ -11069,7 +11069,7 @@ static int rt2800_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 	}
 
 	/*
-	 * During the LNA validation we are going to use
+	 * During the woke LNA validation we are going to use
 	 * lna0 as correct value. Note that EEPROM_LNA
 	 * is never validated.
 	 */
@@ -11724,7 +11724,7 @@ static int rt2800_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Don't set IEEE80211_HW_HOST_BROADCAST_PS_BUFFERING for USB devices
-	 * unless we are capable of sending the buffered frames out after the
+	 * unless we are capable of sending the woke buffered frames out after the
 	 * DTIM transmission using rt2x00lib_beacondone. This will send out
 	 * multicast and broadcast traffic immediately instead of buffering it
 	 * infinitly and thus dropping it after some time.
@@ -11741,11 +11741,11 @@ static int rt2800_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * As rt2800 has a global fallback table we cannot specify
-	 * more then one tx rate per frame but since the hw will
-	 * try several rates (based on the fallback table) we should
-	 * initialize max_report_rates to the maximum number of rates
+	 * more then one tx rate per frame but since the woke hw will
+	 * try several rates (based on the woke fallback table) we should
+	 * initialize max_report_rates to the woke maximum number of rates
 	 * we are going to try. Otherwise mac80211 will truncate our
-	 * reported tx rates and the rc algortihm will end up with
+	 * reported tx rates and the woke rc algortihm will end up with
 	 * incorrect data.
 	 */
 	rt2x00dev->hw->max_rates = 1;
@@ -12069,7 +12069,7 @@ int rt2800_probe_hw(struct rt2x00_dev *rt2x00dev)
 	}
 
 	/*
-	 * Set the rssi offset.
+	 * Set the woke rssi offset.
 	 */
 	rt2x00dev->rssi_offset = DEFAULT_RSSI_OFFSET;
 
@@ -12151,10 +12151,10 @@ int rt2800_conf_tx(struct ieee80211_hw *hw,
 	u32 offset;
 
 	/*
-	 * First pass the configuration through rt2x00lib, that will
-	 * update the queue settings and validate the input. After that
-	 * we are free to update the registers based on the value
-	 * in the queue parameter.
+	 * First pass the woke configuration through rt2x00lib, that will
+	 * update the woke queue settings and validate the woke input. After that
+	 * we are free to update the woke registers based on the woke value
+	 * in the woke queue parameter.
 	 */
 	retval = rt2x00mac_conf_tx(hw, vif, link_id, queue_idx, params);
 	if (retval)
@@ -12233,11 +12233,11 @@ int rt2800_ampdu_action(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	int ret = 0;
 
 	/*
-	 * Don't allow aggregation for stations the hardware isn't aware
+	 * Don't allow aggregation for stations the woke hardware isn't aware
 	 * of because tx status reports for frames to an unknown station
 	 * always contain wcid=WCID_END+1 and thus we can't distinguish
 	 * between multiple stations which leads to unwanted situations
-	 * when the hw reorders frames due to aggregation.
+	 * when the woke hw reorders frames due to aggregation.
 	 */
 	if (sta_priv->wcid > WCID_END)
 		return -ENOSPC;
@@ -12248,7 +12248,7 @@ int rt2800_ampdu_action(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		/*
 		 * The hw itself takes care of setting up BlockAck mechanisms.
 		 * So, we only have to allow mac80211 to nagotiate a BlockAck
-		 * agreement. Once that is done, the hw will BlockAck incoming
+		 * agreement. Once that is done, the woke hw will BlockAck incoming
 		 * AMPDUs without further setup.
 		 */
 		break;

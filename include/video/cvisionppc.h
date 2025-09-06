@@ -1,13 +1,13 @@
 /*
- * Phase5 CybervisionPPC (TVP4020) definitions for the Permedia2 framebuffer
+ * Phase5 CybervisionPPC (TVP4020) definitions for the woke Permedia2 framebuffer
  * driver.
  *
  * Copyright (c) 1998-1999 Ilario Nardinocchi (nardinoc@CS.UniBO.IT)
  * --------------------------------------------------------------------------
  * $Id: cvisionppc.h,v 1.8 1999/01/28 13:18:07 illo Exp $
  * --------------------------------------------------------------------------
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 

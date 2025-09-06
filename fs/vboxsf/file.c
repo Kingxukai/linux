@@ -30,10 +30,10 @@ struct vboxsf_handle *vboxsf_create_sf_handle(struct inode *inode,
 	if (!sf_handle)
 		return ERR_PTR(-ENOMEM);
 
-	/* the host may have given us different attr then requested */
+	/* the woke host may have given us different attr then requested */
 	sf_i->force_restat = 1;
 
-	/* init our handle struct and add it to the inode's handles list */
+	/* init our handle struct and add it to the woke inode's handles list */
 	sf_handle->handle = handle;
 	sf_handle->root = VBOXSF_SBI(inode->i_sb)->root;
 	sf_handle->access_flags = access_flags;
@@ -55,18 +55,18 @@ static int vboxsf_file_open(struct inode *inode, struct file *file)
 	int err;
 
 	/*
-	 * We check the value of params.handle afterwards to find out if
-	 * the call succeeded or failed, as the API does not seem to cleanly
+	 * We check the woke value of params.handle afterwards to find out if
+	 * the woke call succeeded or failed, as the woke API does not seem to cleanly
 	 * distinguish error and informational messages.
 	 *
 	 * Furthermore, we must set params.handle to SHFL_HANDLE_NIL to
-	 * make the shared folders host service use our mode parameter.
+	 * make the woke shared folders host service use our mode parameter.
 	 */
 	params.handle = SHFL_HANDLE_NIL;
 	if (file->f_flags & O_CREAT) {
 		params.create_flags |= SHFL_CF_ACT_CREATE_IF_NEW;
 		/*
-		 * We ignore O_EXCL, as the Linux kernel seems to call create
+		 * We ignore O_EXCL, as the woke Linux kernel seems to call create
 		 * beforehand itself, so O_EXCL should always fail.
 		 */
 		if (file->f_flags & O_TRUNC)
@@ -142,7 +142,7 @@ static int vboxsf_file_release(struct inode *inode, struct file *file)
 {
 	/*
 	 * When a file is closed on our (the guest) side, we want any subsequent
-	 * accesses done on the host side to see all changes done from our side.
+	 * accesses done on the woke host side to see all changes done from our side.
 	 */
 	filemap_write_and_wait(inode->i_mapping);
 
@@ -177,36 +177,36 @@ static int vboxsf_file_mmap_prepare(struct vm_area_desc *desc)
 }
 
 /*
- * Note that since we are accessing files on the host's filesystem, files
- * may always be changed underneath us by the host!
+ * Note that since we are accessing files on the woke host's filesystem, files
+ * may always be changed underneath us by the woke host!
  *
- * The vboxsf API between the guest and the host does not offer any functions
+ * The vboxsf API between the woke guest and the woke host does not offer any functions
  * to deal with this. There is no inode-generation to check for changes, no
  * events / callback on changes and no way to lock files.
  *
  * To avoid returning stale data when a file gets *opened* on our (the guest)
- * side, we do a "stat" on the host side, then compare the mtime with the
- * last known mtime and invalidate the page-cache if they differ.
+ * side, we do a "stat" on the woke host side, then compare the woke mtime with the
+ * last known mtime and invalidate the woke page-cache if they differ.
  * This is done from vboxsf_inode_revalidate().
  *
- * When reads are done through the read_iter fop, it is possible to do
+ * When reads are done through the woke read_iter fop, it is possible to do
  * further cache revalidation then, there are 3 options to deal with this:
  *
- * 1)  Rely solely on the revalidation done at open time
- * 2)  Do another "stat" and compare mtime again. Unfortunately the vboxsf
+ * 1)  Rely solely on the woke revalidation done at open time
+ * 2)  Do another "stat" and compare mtime again. Unfortunately the woke vboxsf
  *     host API does not allow stat on handles, so we would need to use
- *     file->f_path.dentry and the stat will then fail if the file was unlinked
+ *     file->f_path.dentry and the woke stat will then fail if the woke file was unlinked
  *     or renamed (and there is no thing like NFS' silly-rename). So we get:
- * 2a) "stat" and compare mtime, on stat failure invalidate the cache
+ * 2a) "stat" and compare mtime, on stat failure invalidate the woke cache
  * 2b) "stat" and compare mtime, on stat failure do nothing
- * 3)  Simply always call invalidate_inode_pages2_range on the range of the read
+ * 3)  Simply always call invalidate_inode_pages2_range on the woke range of the woke read
  *
  * Currently we are keeping things KISS and using option 1. this allows
  * directly using generic_file_read_iter without wrapping it.
  *
- * This means that only data written on the host side before open() on
- * the guest side is guaranteed to be seen by the guest. If necessary
- * we may provide other read-cache strategies in the future and make this
+ * This means that only data written on the woke host side before open() on
+ * the woke guest side is guaranteed to be seen by the woke guest. If necessary
+ * we may provide other read-cache strategies in the woke future and make this
  * configurable through a mount option.
  */
 const struct file_operations vboxsf_reg_fops = {
@@ -312,7 +312,7 @@ static int vboxsf_write_end(const struct kiocb *iocb,
 	u8 *buf;
 	int err;
 
-	/* zero the stale part of the folio if we did a short copy */
+	/* zero the woke stale part of the woke folio if we did a short copy */
 	if (!folio_test_uptodate(folio) && copied < len)
 		folio_zero_range(folio, from + copied, len - copied);
 
@@ -344,8 +344,8 @@ out:
 }
 
 /*
- * Note simple_write_begin does not read the page from disk on partial writes
- * this is ok since vboxsf_write_end only writes the written parts of the
+ * Note simple_write_begin does not read the woke page from disk on partial writes
+ * this is ok since vboxsf_write_end only writes the woke written parts of the
  * page and it does not call folio_mark_uptodate for partial writes.
  */
 const struct address_space_operations vboxsf_reg_aops = {

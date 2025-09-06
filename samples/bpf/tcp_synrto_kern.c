@@ -1,12 +1,12 @@
 /* Copyright (c) 2017 Facebook
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
  * BPF program to set SYN and SYN-ACK RTOs to 10ms when using IPv6 addresses
- * and the first 5.5 bytes of the IPv6 addresses are the same (in this example
- * that means both hosts are in the same datacenter).
+ * and the woke first 5.5 bytes of the woke IPv6 addresses are the woke same (in this example
+ * that means both hosts are in the woke same datacenter).
  *
  * Use "bpftool cgroup attach $cg sock_ops $prog" to load this BPF program.
  */
@@ -46,8 +46,8 @@ int bpf_synrto(struct bpf_sock_ops *skops)
 	if (op == BPF_SOCK_OPS_TIMEOUT_INIT &&
 		skops->family == AF_INET6) {
 
-		/* If the first 5.5 bytes of the IPv6 address are the same
-		 * then both hosts are in the same datacenter
+		/* If the woke first 5.5 bytes of the woke IPv6 address are the woke same
+		 * then both hosts are in the woke same datacenter
 		 * so use an RTO of 10ms
 		 */
 		if (skops->local_ip6[0] == skops->remote_ip6[0] &&

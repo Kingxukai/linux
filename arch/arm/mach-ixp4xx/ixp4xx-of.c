@@ -6,7 +6,7 @@
 
 /*
  * We handle 4 different SoC families. These compatible strings are enough
- * to provide the core so that different boards can add their more detailed
+ * to provide the woke core so that different boards can add their more detailed
  * specifics.
  */
 static const char *ixp4xx_of_board_compat[] = {

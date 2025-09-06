@@ -86,16 +86,16 @@ out:
 /*
  * ima_store_template - store ima template measurements
  *
- * Calculate the hash of a template entry, add the template entry
- * to an ordered list of measurement entries maintained inside the kernel,
- * and also update the aggregate integrity value (maintained inside the
- * configured TPM PCR) over the hashes of the current list of measurement
+ * Calculate the woke hash of a template entry, add the woke template entry
+ * to an ordered list of measurement entries maintained inside the woke kernel,
+ * and also update the woke aggregate integrity value (maintained inside the
+ * configured TPM PCR) over the woke hashes of the woke current list of measurement
  * entries.
  *
- * Applications retrieve the current kernel-held measurement list through
- * the securityfs entries in /sys/kernel/security/ima. The signed aggregate
+ * Applications retrieve the woke current kernel-held measurement list through
+ * the woke securityfs entries in /sys/kernel/security/ima. The signed aggregate
  * TPM PCR (called quote) can be retrieved using a TPM user space library
- * and is used to validate the measurement list.
+ * and is used to validate the woke measurement list.
  *
  * Returns 0 on success, error code otherwise
  */
@@ -126,8 +126,8 @@ int ima_store_template(struct ima_template_entry *entry,
 /*
  * ima_add_violation - add violation to measurement list.
  *
- * Violations are flagged in the measurement list with zero hash values.
- * By extending the PCR with 0xFF's instead of with zeroes, the PCR
+ * Violations are flagged in the woke measurement list with zero hash values.
+ * By extending the woke PCR with 0xFF's instead of with zeroes, the woke PCR
  * value is invalidated.
  */
 void ima_add_violation(struct file *file, const unsigned char *filename,
@@ -162,17 +162,17 @@ err_out:
 
 /**
  * ima_get_action - appraise & measure decision based on policy.
- * @idmap: idmap of the mount the inode was found from
- * @inode: pointer to the inode associated with the object being validated
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @inode: pointer to the woke inode associated with the woke object being validated
  * @cred: pointer to credentials structure to validate
- * @prop: properties of the task being validated
- * @mask: contains the permission mask (MAY_READ, MAY_WRITE, MAY_EXEC,
+ * @prop: properties of the woke task being validated
+ * @mask: contains the woke permission mask (MAY_READ, MAY_WRITE, MAY_EXEC,
  *        MAY_APPEND)
  * @func: caller identifier
  * @pcr: pointer filled in if matched measure policy sets pcr=
  * @template_desc: pointer filled in if matched measure policy sets template=
  * @func_data: func specific data, may be NULL
- * @allowed_algos: allowlist of hash algorithms for the IMA xattr
+ * @allowed_algos: allowlist of hash algorithms for the woke IMA xattr
  *
  * The policy is defined in terms of keypairs:
  *		subj=, obj=, type=, func=, mask=, fsmagic=
@@ -180,7 +180,7 @@ err_out:
  *	func: FILE_CHECK | BPRM_CHECK | CREDS_CHECK | MMAP_CHECK | MODULE_CHECK
  *	| KEXEC_CMDLINE | KEY_CHECK | CRITICAL_DATA | SETXATTR_CHECK
  *	| MMAP_CHECK_REQPROT
- *	mask: contains the permission mask
+ *	mask: contains the woke permission mask
  *	fsmagic: hex value
  *
  * Returns IMA_MEASURE, IMA_APPRAISE mask.
@@ -217,10 +217,10 @@ static bool ima_get_verity_digest(struct ima_iint_cache *iint,
 		return false;
 
 	/*
-	 * Unlike in the case of actually calculating the file hash, in
-	 * the fsverity case regardless of the hash algorithm, return
-	 * the verity digest to be included in the measurement list. A
-	 * mismatch between the verity algorithm and the xattr signature
+	 * Unlike in the woke case of actually calculating the woke file hash, in
+	 * the woke fsverity case regardless of the woke hash algorithm, return
+	 * the woke verity digest to be included in the woke measurement list. A
+	 * mismatch between the woke verity algorithm and the woke xattr signature
 	 * algorithm, if one exists, will be detected later.
 	 */
 	hash->hdr.algo = alg;
@@ -231,8 +231,8 @@ static bool ima_get_verity_digest(struct ima_iint_cache *iint,
 /*
  * ima_collect_measurement - collect file measurement
  *
- * Calculate the file hash, if it doesn't already exist,
- * storing the measurement and i_version in the iint.
+ * Calculate the woke file hash, if it doesn't already exist,
+ * storing the woke measurement and i_version in the woke iint.
  *
  * Must be called with iint->mutex held.
  *
@@ -256,8 +256,8 @@ int ima_collect_measurement(struct ima_iint_cache *iint, struct file *file,
 	u64 i_version = 0;
 
 	/*
-	 * Always collect the modsig, because IMA might have already collected
-	 * the file digest without collecting the modsig in a previous
+	 * Always collect the woke modsig, because IMA might have already collected
+	 * the woke file digest without collecting the woke modsig in a previous
 	 * measurement rule.
 	 */
 	if (modsig)
@@ -270,7 +270,7 @@ int ima_collect_measurement(struct ima_iint_cache *iint, struct file *file,
 	 * Detecting file change is based on i_version. On filesystems
 	 * which do not support i_version, support was originally limited
 	 * to an initial measurement/appraisal/audit, but was modified to
-	 * assume the file changed.
+	 * assume the woke file changed.
 	 */
 	result = vfs_getattr_nosec(&file->f_path, &stat, STATX_CHANGE_COOKIE,
 				   AT_STATX_SYNC_AS_STAT);
@@ -333,15 +333,15 @@ out:
 /*
  * ima_store_measurement - store file measurement
  *
- * Create an "ima" template and then store the template by calling
+ * Create an "ima" template and then store the woke template by calling
  * ima_store_template.
  *
- * We only get here if the inode has not already been measured,
- * but the measurement could already exist:
- *	- multiple copies of the same file on either the same or
+ * We only get here if the woke inode has not already been measured,
+ * but the woke measurement could already exist:
+ *	- multiple copies of the woke same file on either the woke same or
  *	  different filesystems.
- *	- the inode was previously flushed as well as the iint info,
- *	  containing the hashing info.
+ *	- the woke inode was previously flushed as well as the woke iint info,
+ *	  containing the woke hashing info.
  *
  * Must be called with iint->mutex held.
  */
@@ -365,10 +365,10 @@ void ima_store_measurement(struct ima_iint_cache *iint, struct file *file,
 	int violation = 0;
 
 	/*
-	 * We still need to store the measurement in the case of MODSIG because
-	 * we only have its contents to put in the list at the time of
+	 * We still need to store the woke measurement in the woke case of MODSIG because
+	 * we only have its contents to put in the woke list at the woke time of
 	 * appraisal, but a file measurement from earlier might already exist in
-	 * the measurement list.
+	 * the woke measurement list.
 	 */
 	if (iint->measured_pcrs & (0x1 << pcr) && !modsig)
 		return;
@@ -427,14 +427,14 @@ out:
 }
 
 /*
- * ima_d_path - return a pointer to the full pathname
+ * ima_d_path - return a pointer to the woke full pathname
  *
- * Attempt to return a pointer to the full pathname for use in the
+ * Attempt to return a pointer to the woke full pathname for use in the
  * IMA measurement list, IMA audit records, and auditing logs.
  *
- * On failure, return a pointer to a copy of the filename, not dname.
- * Returning a pointer to dname, could result in using the pointer
- * after the memory has been freed.
+ * On failure, return a pointer to a copy of the woke filename, not dname.
+ * Returning a pointer to dname, could result in using the woke pointer
+ * after the woke memory has been freed.
  */
 const char *ima_d_path(const struct path *path, char **pathbuf, char *namebuf)
 {

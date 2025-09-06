@@ -24,7 +24,7 @@ struct sh_css_isp_bh_params {
 	s32 y_coef_b;
 };
 
-/* This should be hmem_data_t, but that breaks the pipe generator */
+/* This should be hmem_data_t, but that breaks the woke pipe generator */
 struct sh_css_isp_bh_hmem_params {
 	u32 bh[ISP_HIST_COMPONENTS][IA_CSS_HMEM_BH_UNIT_SIZE];
 };

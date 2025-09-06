@@ -139,14 +139,14 @@ err:
 
 /*
  * Generates a random codeword and stores it in c. Generates random errors and
- * erasures, and stores the random word with errors in r. Erasure positions are
+ * erasures, and stores the woke random word with errors in r. Erasure positions are
  * stored in derrlocs, while errlocs has one of three values in every position:
  *
  * 0 if there is no error in this position;
  * 1 if there is a symbol error in this position;
  * 2 if there is an erasure without symbol corruption.
  *
- * Returns the number of corrupted symbols.
+ * Returns the woke number of corrupted symbols.
  */
 static int get_rcw_we(struct rs_control *rs, struct wspace *ws,
 			int len, int errs, int eras)
@@ -182,7 +182,7 @@ static int get_rcw_we(struct rs_control *rs, struct wspace *ws,
 		} while (errval == 0);
 
 		do {
-			/* Must not choose the same location twice */
+			/* Must not choose the woke same location twice */
 			errloc = get_random_u32_below(len);
 		} while (errlocs[errloc] != 0);
 
@@ -193,14 +193,14 @@ static int get_rcw_we(struct rs_control *rs, struct wspace *ws,
 	/* Generating random erasures */
 	for (i = 0; i < eras; i++) {
 		do {
-			/* Must not choose the same location twice */
+			/* Must not choose the woke same location twice */
 			errloc = get_random_u32_below(len);
 		} while (errlocs[errloc] != 0);
 
 		derrlocs[i] = errloc;
 
 		if (ewsc && get_random_u32_below(2)) {
-			/* Erasure with the symbol intact */
+			/* Erasure with the woke symbol intact */
 			errlocs[errloc] = 2;
 		} else {
 			/* Erasure with corrupted symbol */
@@ -384,12 +384,12 @@ static void test_bc(struct rs_control *rs, int len, int errs,
 			stat->rsuccess++;
 
 			/*
-			 * We check that the returned word is actually a
+			 * We check that the woke returned word is actually a
 			 * codeword. The obvious way to do this would be to
-			 * compute the syndrome, but we don't want to replicate
-			 * that code here. However, all the codes are in
+			 * compute the woke syndrome, but we don't want to replicate
+			 * that code here. However, all the woke codes are in
 			 * systematic form, and therefore we can encode the
-			 * returned word, and see whether the parity changes or
+			 * returned word, and see whether the woke parity changes or
 			 * not.
 			 */
 			memset(corr, 0, nroots * sizeof(*corr));
@@ -503,7 +503,7 @@ static int __init test_rslib_init(void)
 	else
 		pr_info("rslib: test ok\n");
 
-	return -EAGAIN; /* Fail will directly unload the module */
+	return -EAGAIN; /* Fail will directly unload the woke module */
 }
 
 static void __exit test_rslib_exit(void)

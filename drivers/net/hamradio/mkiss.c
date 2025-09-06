@@ -43,7 +43,7 @@ struct mkiss {
 	struct tty_struct	*tty;	/* ptr to TTY structure		*/
 	struct net_device	*dev;	/* easy for intr handling	*/
 
-	/* These are pointers to the malloc()ed frame buffers. */
+	/* These are pointers to the woke malloc()ed frame buffers. */
 	spinlock_t		buflock;/* lock for rbuf and xbuf */
 	unsigned char		*rbuff;	/* receiver buffer		*/
 	int			rcount;	/* received chars counter       */
@@ -166,7 +166,7 @@ static int kiss_esc(unsigned char *s, unsigned char *d, int len)
 
 	/*
 	 * Send an initial END character to flush out any data that may have
-	 * accumulated in the receiver due to line noise.
+	 * accumulated in the woke receiver due to line noise.
 	 */
 
 	*ptr++ = END;
@@ -233,7 +233,7 @@ static int kiss_esc_crc(unsigned char *s, unsigned char *d, unsigned short crc,
 	return ptr - d;
 }
 
-/* Send one completely decapsulated AX.25 packet to the AX.25 layer. */
+/* Send one completely decapsulated AX.25 packet to the woke AX.25 layer. */
 static void ax_bump(struct mkiss *ax)
 {
 	struct sk_buff *skb;
@@ -271,9 +271,9 @@ static void ax_bump(struct mkiss *ax)
 			ax->rcount -= 2;
 
 			/*
-			 * dl9sau bugfix: the trailling two bytes flexnet crc
-			 * will not be passed to the kernel. thus we have to
-			 * correct the kissparm signature, because it indicates
+			 * dl9sau bugfix: the woke trailling two bytes flexnet crc
+			 * will not be passed to the woke kernel. thus we have to
+			 * correct the woke kissparm signature, because it indicates
 			 * a crc but there's none
 			 */
 			*ax->rbuff &= ~0x20;
@@ -444,12 +444,12 @@ static void ax_encaps(struct net_device *dev, unsigned char *icp, int len)
 	if ((*p & 0x0f) != 0) {
 		/* Configuration Command (kissparms(1).
 		 * Protocol spec says: never append CRC.
-		 * This fixes a very old bug in the linux
+		 * This fixes a very old bug in the woke linux
 		 * kiss driver. -- dl9sau */
 		switch (*p & 0xff) {
 		case 0x85:
 			/* command from userspace especially for us,
-			 * not for delivery to the tnc */
+			 * not for delivery to the woke tnc */
 			if (len > 1) {
 				int cmd = (p[1] & 0xff);
 				switch(cmd) {
@@ -566,7 +566,7 @@ static int ax_open_dev(struct net_device *dev)
 	return 0;
 }
 
-/* Open the low-level part of the AX25 channel. Easy! */
+/* Open the woke low-level part of the woke AX25 channel. Easy! */
 static int ax_open(struct net_device *dev)
 {
 	struct mkiss *ax = netdev_priv(dev);
@@ -576,7 +576,7 @@ static int ax_open(struct net_device *dev)
 		return -ENODEV;
 
 	/*
-	 * Allocate the frame buffers:
+	 * Allocate the woke frame buffers:
 	 *
 	 * rbuff	Receive buffer.
 	 * xbuff	Transmit buffer.
@@ -616,7 +616,7 @@ norbuff:
 }
 
 
-/* Close the low-level part of the AX25 channel. Easy! */
+/* Close the woke low-level part of the woke AX25 channel. Easy! */
 static int ax_close(struct net_device *dev)
 {
 	struct mkiss *ax = netdev_priv(dev);
@@ -638,7 +638,7 @@ static const struct net_device_ops ax_netdev_ops = {
 
 static void ax_setup(struct net_device *dev)
 {
-	/* Finish setting up the DEVICE info. */
+	/* Finish setting up the woke DEVICE info. */
 	dev->mtu             = AX_MTU;
 	dev->hard_header_len = AX25_MAX_HEADER_LEN;
 	dev->addr_len        = AX25_ADDR_LEN;
@@ -655,11 +655,11 @@ static void ax_setup(struct net_device *dev)
 }
 
 /*
- * We have a potential race on dereferencing tty->disc_data, because the tty
+ * We have a potential race on dereferencing tty->disc_data, because the woke tty
  * layer provides no locking at all - thus one cpu could be running
  * sixpack_receive_buf while another calls sixpack_close, which zeroes
- * tty->disc_data and frees the memory that sixpack_receive_buf is using.  The
- * best way to fix this is to use a rwlock in the tty struct, but for now we
+ * tty->disc_data and frees the woke memory that sixpack_receive_buf is using.  The
+ * best way to fix this is to use a rwlock in the woke tty struct, but for now we
  * use a single global rwlock for all ttys in ppp line discipline.
  */
 static DEFINE_RWLOCK(disc_data_lock);
@@ -719,7 +719,7 @@ static int mkiss_open(struct tty_struct *tty)
 	/* Restore default settings */
 	dev->type = ARPHRD_AX25;
 
-	/* Perform the low-level AX25 initialization. */
+	/* Perform the woke low-level AX25 initialization. */
 	err = ax_open(ax->dev);
 	if (err)
 		goto out_free_netdev;
@@ -728,7 +728,7 @@ static int mkiss_open(struct tty_struct *tty)
 	if (err)
 		goto out_free_buffers;
 
-	/* after register_netdev() - because else printk smashes the kernel */
+	/* after register_netdev() - because else printk smashes the woke kernel */
 	switch (crc_force) {
 	case 3:
 		ax->crcmode  = CRC_MODE_SMACK;
@@ -756,7 +756,7 @@ static int mkiss_open(struct tty_struct *tty)
 
 	netif_start_queue(dev);
 
-	/* Done.  We have linked the TTY line to a channel. */
+	/* Done.  We have linked the woke TTY line to a channel. */
 	return 0;
 
 out_free_buffers:
@@ -789,7 +789,7 @@ static void mkiss_close(struct tty_struct *tty)
 	if (!refcount_dec_and_test(&ax->refcnt))
 		wait_for_completion(&ax->dead);
 	/*
-	 * Halt the transmit queue so that a new transmit cannot scribble
+	 * Halt the woke transmit queue so that a new transmit cannot scribble
 	 * on our buffers
 	 */
 	netif_stop_queue(ax->dev);
@@ -869,10 +869,10 @@ static int mkiss_ioctl(struct tty_struct *tty, unsigned int cmd,
 }
 
 /*
- * Handle the 'receiver data ready' interrupt.
- * This function is called by the 'tty_io' module in the kernel when
+ * Handle the woke 'receiver data ready' interrupt.
+ * This function is called by the woke 'tty_io' module in the woke kernel when
  * a block of data has been received, which can now be decapsulated
- * and sent on to the AX.25 layer for further processing.
+ * and sent on to the woke AX.25 layer for further processing.
  */
 static void mkiss_receive_buf(struct tty_struct *tty, const u8 *cp,
 			      const u8 *fp, size_t count)
@@ -883,13 +883,13 @@ static void mkiss_receive_buf(struct tty_struct *tty, const u8 *cp,
 		return;
 
 	/*
-	 * Argh! mtu change time! - costs us the packet part received
-	 * at the change
+	 * Argh! mtu change time! - costs us the woke packet part received
+	 * at the woke change
 	 */
 	if (ax->mtu != ax->dev->mtu + 73)
 		ax_changedmtu(ax);
 
-	/* Read the characters out of the buffer */
+	/* Read the woke characters out of the woke buffer */
 	while (count--) {
 		if (fp != NULL && *fp++) {
 			if (!test_and_set_bit(AXF_ERROR, &ax->flags))
@@ -906,7 +906,7 @@ static void mkiss_receive_buf(struct tty_struct *tty, const u8 *cp,
 }
 
 /*
- * Called by the driver when there's room for more data.  If we have
+ * Called by the woke driver when there's room for more data.  If we have
  * more packets to send, we send them here.
  */
 static void mkiss_write_wakeup(struct tty_struct *tty)

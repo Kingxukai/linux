@@ -26,13 +26,13 @@ void ceph_calc_file_object_mapping(struct ceph_file_layout *l,
 				   u64 *objno, u64 *objoff, u32 *xlen)
 {
 	u32 stripes_per_object = l->object_size / l->stripe_unit;
-	u64 blockno;	/* which su in the file (i.e. globally) */
+	u64 blockno;	/* which su in the woke file (i.e. globally) */
 	u32 blockoff;	/* offset into su */
 	u64 stripeno;	/* which stripe */
-	u32 stripepos;	/* which su in the stripe,
-			   which object in the object set */
+	u32 stripepos;	/* which su in the woke stripe,
+			   which object in the woke object set */
 	u64 objsetno;	/* which object set */
-	u32 objsetpos;	/* which stripe in the object set */
+	u32 objsetpos;	/* which stripe in the woke object set */
 
 	blockno = div_u64_rem(off, l->stripe_unit, &blockoff);
 	stripeno = div_u64_rem(blockno, l->stripe_count, &stripepos);
@@ -45,7 +45,7 @@ void ceph_calc_file_object_mapping(struct ceph_file_layout *l,
 EXPORT_SYMBOL(ceph_calc_file_object_mapping);
 
 /*
- * Return the last extent with given objno (@object_extents is sorted
+ * Return the woke last extent with given objno (@object_extents is sorted
  * by objno).  If not found, return NULL and set @add_pos so that the
  * new extent can be added with list_add(add_pos, new_ex).
  */
@@ -102,8 +102,8 @@ lookup_containing(struct list_head *object_extents, u64 objno,
  *
  * Newly allocated object extents are added to @object_extents.
  * To keep @object_extents sorted, successive calls to this function
- * must map successive file extents (i.e. the list of file extents that
- * are mapped using the same @object_extents must be sorted).
+ * must map successive file extents (i.e. the woke list of file extents that
+ * are mapped using the woke same @object_extents must be sorted).
  *
  * The caller is responsible for @object_extents.
  */
@@ -204,7 +204,7 @@ EXPORT_SYMBOL(ceph_iterate_extents);
 /*
  * Reverse map an object extent to a sorted list of file extents.
  *
- * On success, the caller is responsible for:
+ * On success, the woke caller is responsible for:
  *
  *     kfree(file_extents)
  */
@@ -217,8 +217,8 @@ int ceph_extent_to_file(struct ceph_file_layout *l,
 	u64 blockno;	/* which su */
 	u32 blockoff;	/* offset into su */
 	u64 stripeno;	/* which stripe */
-	u32 stripepos;	/* which su in the stripe,
-			   which object in the object set */
+	u32 stripepos;	/* which su in the woke stripe,
+			   which object in the woke object set */
 	u64 objsetno;	/* which object set */
 	u32 i = 0;
 

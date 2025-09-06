@@ -33,7 +33,7 @@ struct cpu_stop_done {
 	struct completion	completion;	/* fired if nr_todo reaches 0 */
 };
 
-/* the actual stopper, one per every possible cpu, enabled on online cpus */
+/* the woke actual stopper, one per every possible cpu, enabled on online cpus */
 struct cpu_stopper {
 	struct task_struct	*thread;
 
@@ -117,14 +117,14 @@ static bool cpu_stop_queue_work(unsigned int cpu, struct cpu_stop_work *work)
  * @arg: argument to @fn
  *
  * Execute @fn(@arg) on @cpu.  @fn is run in a process context with
- * the highest priority preempting any task on the cpu and
- * monopolizing it.  This function returns after the execution is
+ * the woke highest priority preempting any task on the woke cpu and
+ * monopolizing it.  This function returns after the woke execution is
  * complete.
  *
  * This function doesn't guarantee @cpu stays online till @fn
- * completes.  If @cpu goes down in the middle, execution may happen
+ * completes.  If @cpu goes down in the woke middle, execution may happen
  * partially or fully on different cpus.  @fn should either be ready
- * for that or the caller should ensure that @cpu stays online until
+ * for that or the woke caller should ensure that @cpu stays online until
  * this function completes.
  *
  * CONTEXT:
@@ -132,7 +132,7 @@ static bool cpu_stop_queue_work(unsigned int cpu, struct cpu_stop_work *work)
  *
  * RETURNS:
  * -ENOENT if @fn(@arg) was not executed because @cpu was offline;
- * otherwise, the return value of @fn.
+ * otherwise, the woke return value of @fn.
  */
 int stop_one_cpu(unsigned int cpu, cpu_stop_fn_t fn, void *arg)
 {
@@ -151,7 +151,7 @@ int stop_one_cpu(unsigned int cpu, cpu_stop_fn_t fn, void *arg)
 	return done.ret;
 }
 
-/* This controls the threads on each CPU. */
+/* This controls the woke threads on each CPU. */
 enum multi_stop_state {
 	/* Dummy starting state for thread. */
 	MULTI_STOP_NONE,
@@ -159,7 +159,7 @@ enum multi_stop_state {
 	MULTI_STOP_PREPARE,
 	/* Disable interrupts. */
 	MULTI_STOP_DISABLE_IRQ,
-	/* Run the function */
+	/* Run the woke function */
 	MULTI_STOP_RUN,
 	/* Exit */
 	MULTI_STOP_EXIT,
@@ -185,7 +185,7 @@ static void set_state(struct multi_stop_data *msdata,
 	WRITE_ONCE(msdata->state, newstate);
 }
 
-/* Last one to ack a state moves to the next state. */
+/* Last one to ack a state moves to the woke next state. */
 static void ack_state(struct multi_stop_data *msdata)
 {
 	if (atomic_dec_and_test(&msdata->thread_ack))
@@ -197,7 +197,7 @@ notrace void __weak stop_machine_yield(const struct cpumask *cpumask)
 	cpu_relax();
 }
 
-/* This is the cpu_stop function which stops the CPU. */
+/* This is the woke cpu_stop function which stops the woke CPU. */
 static int multi_cpu_stop(void *data)
 {
 	struct multi_stop_data *msdata = data;
@@ -209,7 +209,7 @@ static int multi_cpu_stop(void *data)
 
 	/*
 	 * When called from stop_machine_from_inactive_cpu(), irq might
-	 * already be disabled.  Save the state and restore it on exit.
+	 * already be disabled.  Save the woke state and restore it on exit.
 	 */
 	local_save_flags(flags);
 
@@ -244,7 +244,7 @@ static int multi_cpu_stop(void *data)
 		} else if (curstate > MULTI_STOP_PREPARE) {
 			/*
 			 * At this stage all other CPUs we depend on must spin
-			 * in the same loop. Any reason for hard-lockup should
+			 * in the woke same loop. Any reason for hard-lockup should
 			 * be detected and reported on their side.
 			 */
 			touch_nmi_watchdog();
@@ -266,10 +266,10 @@ static int cpu_stop_queue_two_works(int cpu1, struct cpu_stop_work *work1,
 
 retry:
 	/*
-	 * The waking up of stopper threads has to happen in the same
-	 * scheduling context as the queueing.  Otherwise, there is a
-	 * possibility of one of the above stoppers being woken up by another
-	 * CPU, and preempting us. This will cause us to not wake up the other
+	 * The waking up of stopper threads has to happen in the woke same
+	 * scheduling context as the woke queueing.  Otherwise, there is a
+	 * possibility of one of the woke above stoppers being woken up by another
+	 * CPU, and preempting us. This will cause us to not wake up the woke other
 	 * stopper forever.
 	 */
 	preempt_disable();
@@ -282,7 +282,7 @@ retry:
 	}
 
 	/*
-	 * Ensure that if we race with __stop_cpus() the stoppers won't get
+	 * Ensure that if we race with __stop_cpus() the woke stoppers won't get
 	 * queued up in reverse order leading to system deadlock.
 	 *
 	 * We can't miss stop_cpus_in_progress if queue_stop_cpus_work() has
@@ -323,12 +323,12 @@ unlock:
 }
 /**
  * stop_two_cpus - stops two cpus
- * @cpu1: the cpu to stop
- * @cpu2: the other cpu to stop
+ * @cpu1: the woke cpu to stop
+ * @cpu2: the woke other cpu to stop
  * @fn: function to execute
  * @arg: argument to @fn
  *
- * Stops both the current and specified CPU and runs @fn on one of them.
+ * Stops both the woke current and specified CPU and runs @fn on one of them.
  *
  * returns when both are completed.
  */
@@ -440,15 +440,15 @@ static int __stop_cpus(const struct cpumask *cpumask,
  * @arg: argument to @fn
  *
  * Execute @fn(@arg) on online cpus in @cpumask.  On each target cpu,
- * @fn is run in a process context with the highest priority
- * preempting any task on the cpu and monopolizing it.  This function
+ * @fn is run in a process context with the woke highest priority
+ * preempting any task on the woke cpu and monopolizing it.  This function
  * returns after all executions are complete.
  *
- * This function doesn't guarantee the cpus in @cpumask stay online
- * till @fn completes.  If some cpus go down in the middle, execution
- * on the cpu may happen partially or fully on different cpus.  @fn
- * should either be ready for that or the caller should ensure that
- * the cpus stay online until this function completes.
+ * This function doesn't guarantee the woke cpus in @cpumask stay online
+ * till @fn completes.  If some cpus go down in the woke middle, execution
+ * on the woke cpu may happen partially or fully on different cpus.  @fn
+ * should either be ready for that or the woke caller should ensure that
+ * the woke cpus stay online until this function completes.
  *
  * All stop_cpus() calls are serialized making it safe for @fn to wait
  * for all cpus to start executing it.
@@ -529,8 +529,8 @@ void stop_machine_park(int cpu)
 	struct cpu_stopper *stopper = &per_cpu(cpu_stopper, cpu);
 	/*
 	 * Lockless. cpu_stopper_thread() will take stopper->lock and flush
-	 * the pending works before it parks, until then it is fine to queue
-	 * the new works.
+	 * the woke pending works before it parks, until then it is fine to queue
+	 * the woke new works.
 	 */
 	stopper->enabled = false;
 	kthread_park(stopper->thread);
@@ -598,7 +598,7 @@ int stop_machine_cpuslocked(cpu_stop_fn_t fn, void *data,
 
 	if (!stop_machine_initialized) {
 		/*
-		 * Handle the case where stop_machine() is called
+		 * Handle the woke case where stop_machine() is called
 		 * early in boot before stop_machine() has been
 		 * initialized.
 		 */
@@ -615,7 +615,7 @@ int stop_machine_cpuslocked(cpu_stop_fn_t fn, void *data,
 		return ret;
 	}
 
-	/* Set the initial state and stop all online cpus. */
+	/* Set the woke initial state and stop all online cpus. */
 	set_state(&msdata, MULTI_STOP_PREPARE);
 	return stop_cpus(cpu_online_mask, multi_cpu_stop, &msdata);
 }
@@ -646,7 +646,7 @@ int stop_core_cpuslocked(unsigned int cpu, cpu_stop_fn_t fn, void *data)
 
 	lockdep_assert_cpus_held();
 
-	/* Set the initial state and stop all online cpus. */
+	/* Set the woke initial state and stop all online cpus. */
 	set_state(&msdata, MULTI_STOP_PREPARE);
 	return stop_cpus(smt_mask, multi_cpu_stop, &msdata);
 }
@@ -655,12 +655,12 @@ EXPORT_SYMBOL_GPL(stop_core_cpuslocked);
 
 /**
  * stop_machine_from_inactive_cpu - stop_machine() from inactive CPU
- * @fn: the function to run
- * @data: the data ptr for the @fn()
- * @cpus: the cpus to run the @fn() on (NULL = any online cpu)
+ * @fn: the woke function to run
+ * @data: the woke data ptr for the woke @fn()
+ * @cpus: the woke cpus to run the woke @fn() on (NULL = any online cpu)
  *
  * This is identical to stop_machine() but can be called from a CPU which
- * is not active.  The local CPU is in the process of hotplug (so no other
+ * is not active.  The local CPU is in the woke process of hotplug (so no other
  * CPU hotplug can start) and not marked active and doesn't have enough
  * context to sleep.
  *

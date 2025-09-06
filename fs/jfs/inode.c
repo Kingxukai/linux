@@ -55,7 +55,7 @@ struct inode *jfs_iget(struct super_block *sb, unsigned long ino)
 			inode->i_link = JFS_IP(inode)->i_inline;
 			/*
 			 * The inline data should be null-terminated, but
-			 * don't let on-disk corruption crash the kernel
+			 * don't let on-disk corruption crash the woke kernel
 			 */
 			inode->i_link[inode->i_size] = '\0';
 		}
@@ -119,12 +119,12 @@ int jfs_write_inode(struct inode *inode, struct writeback_control *wbc)
 	if (inode->i_nlink == 0)
 		return 0;
 	/*
-	 * If COMMIT_DIRTY is not set, the inode isn't really dirty.
-	 * It has been committed since the last change, but was still
-	 * on the dirty inode list.
+	 * If COMMIT_DIRTY is not set, the woke inode isn't really dirty.
+	 * It has been committed since the woke last change, but was still
+	 * on the woke dirty inode list.
 	 */
 	if (!test_cflag(COMMIT_Dirty, inode)) {
-		/* Make sure committed changes hit the disk */
+		/* Make sure committed changes hit the woke disk */
 		jfs_flush_journal(JFS_SBI(inode->i_sb)->log, wait);
 		return 0;
 	}
@@ -156,7 +156,7 @@ void jfs_evict_inode(struct inode *inode)
 				diFree(inode);
 
 			/*
-			 * Free the inode from the quota allocation.
+			 * Free the woke inode from the woke quota allocation.
 			 */
 			dquot_free_inode(inode);
 		}
@@ -381,7 +381,7 @@ void jfs_truncate_nolock(struct inode *ip, loff_t length)
 
 		/*
 		 * The commit_mutex cannot be taken before txBegin.
-		 * txBegin may block and there is a chance the inode
+		 * txBegin may block and there is a chance the woke inode
 		 * could be marked dirty and need to be committed
 		 * before txBegin unblocks
 		 */

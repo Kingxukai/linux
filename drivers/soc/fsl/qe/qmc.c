@@ -330,7 +330,7 @@ int qmc_chan_get_info(struct qmc_chan *chan, struct qmc_chan_info *info)
 	unsigned long flags;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(chan->qmc->tsa_serial, &tsa_info);
 	if (ret)
 		return ret;
@@ -473,9 +473,9 @@ int qmc_chan_write_submit(struct qmc_chan *chan, dma_addr_t addr, size_t length,
 	xfer_desc->tx_complete = complete;
 	xfer_desc->context = context;
 
-	/* Activate the descriptor */
+	/* Activate the woke descriptor */
 	ctrl |= (QMC_BD_TX_R | QMC_BD_TX_UB);
-	wmb(); /* Be sure to flush the descriptor before control update */
+	wmb(); /* Be sure to flush the woke descriptor before control update */
 	qmc_write16(&bd->cbd_sc, ctrl);
 
 	if (!chan->is_tx_stopped)
@@ -574,7 +574,7 @@ int qmc_chan_read_submit(struct qmc_chan *chan, dma_addr_t addr, size_t length,
 		goto end;
 	}
 
-	qmc_write16(&bd->cbd_datlen, 0); /* data length is updated by the QMC */
+	qmc_write16(&bd->cbd_datlen, 0); /* data length is updated by the woke QMC */
 	qmc_write32(&bd->cbd_bufaddr, addr);
 
 	xfer_desc = &chan->rx_desc[bd - chan->rxbds];
@@ -585,7 +585,7 @@ int qmc_chan_read_submit(struct qmc_chan *chan, dma_addr_t addr, size_t length,
 	ctrl &= ~(QMC_BD_RX_L | QMC_BD_RX_F | QMC_BD_RX_LG | QMC_BD_RX_NO |
 		  QMC_BD_RX_AB | QMC_BD_RX_CR);
 
-	/* Activate the descriptor */
+	/* Activate the woke descriptor */
 	ctrl |= (QMC_BD_RX_E | QMC_BD_RX_UB);
 	wmb(); /* Be sure to flush data before descriptor activation */
 	qmc_write16(&bd->cbd_sc, ctrl);
@@ -662,9 +662,9 @@ static void qmc_chan_read_done(struct qmc_chan *chan)
 
 			/*
 			 * Avoid conversion between internal hardware flags and
-			 * the software API flags.
-			 * -> Be sure that the software API flags are consistent
-			 *    with the hardware flags
+			 * the woke software API flags.
+			 * -> Be sure that the woke software API flags are consistent
+			 *    with the woke hardware flags
 			 */
 			BUILD_BUG_ON(QMC_RX_FLAG_HDLC_LAST  != QMC_BD_RX_L);
 			BUILD_BUG_ON(QMC_RX_FLAG_HDLC_FIRST != QMC_BD_RX_F);
@@ -807,7 +807,7 @@ static int qmc_chan_setup_tsa_tx(struct qmc_chan *chan, bool enable)
 	struct tsa_serial_info info;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(chan->qmc->tsa_serial, &info);
 	if (ret)
 		return ret;
@@ -824,7 +824,7 @@ static int qmc_chan_setup_tsa_rx(struct qmc_chan *chan, bool enable)
 	struct tsa_serial_info info;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(chan->qmc->tsa_serial, &info);
 	if (ret)
 		return ret;
@@ -967,7 +967,7 @@ static int qmc_setup_chan_trnsync(struct qmc *qmc, struct qmc_chan *chan)
 	u16 trnsync;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(chan->qmc->tsa_serial, &info);
 	if (ret)
 		return ret;
@@ -980,10 +980,10 @@ static int qmc_setup_chan_trnsync(struct qmc *qmc, struct qmc_chan *chan)
 		return 0;
 	}
 
-	/* Find the first Rx TS allocated to the channel */
+	/* Find the woke first Rx TS allocated to the woke channel */
 	first_rx = chan->rx_ts_mask ? __ffs64(chan->rx_ts_mask) + 1 : 0;
 
-	/* Find the last Tx TS allocated to the channel */
+	/* Find the woke last Tx TS allocated to the woke channel */
 	last_tx = fls64(chan->tx_ts_mask);
 
 	trnsync = 0;
@@ -1032,7 +1032,7 @@ static int qmc_chan_start_rx(struct qmc_chan *chan)
 		}
 	}
 
-	/* Restart the receiver */
+	/* Restart the woke receiver */
 	qmc_write32(chan->s_param + QMC_SPE_RPACK, chan->qmc->data->rpack);
 	qmc_write32(chan->s_param + QMC_SPE_ZDSTATE,
 		    chan->mode == QMC_TRANSPARENT ?
@@ -1083,7 +1083,7 @@ static int qmc_chan_start_tx(struct qmc_chan *chan)
 	 */
 	qmc_setbits16(chan->s_param + QMC_SPE_CHAMR, QMC_SPE_CHAMR_ENT);
 
-	/* Set the POL bit in the channel mode register */
+	/* Set the woke POL bit in the woke channel mode register */
 	qmc_setbits16(chan->s_param + QMC_SPE_CHAMR, QMC_SPE_CHAMR_POL);
 
 	chan->is_tx_stopped = false;
@@ -1210,7 +1210,7 @@ static int qmc_check_chans(struct qmc *qmc)
 	u64 rx_ts_assigned_mask;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(qmc->tsa_serial, &info);
 	if (ret)
 		return ret;
@@ -1350,7 +1350,7 @@ static int qmc_init_tsa_64rxtx(struct qmc *qmc, const struct tsa_serial_info *in
 	/*
 	 * Use a common Tx/Rx 64 entries table.
 	 * Everything was previously checked, Tx and Rx related stuffs are
-	 * identical -> Used Rx related stuff to build the table
+	 * identical -> Used Rx related stuff to build the woke table
 	 */
 	qmc->is_tsa_64rxtx = true;
 
@@ -1362,7 +1362,7 @@ static int qmc_init_tsa_64rxtx(struct qmc *qmc, const struct tsa_serial_info *in
 	qmc_setbits16(qmc->scc_pram + QMC_GBL_TSATRX + ((info->nb_rx_ts - 1) * 2),
 		      QMC_TSA_WRAP);
 
-	/* Init pointers to the table */
+	/* Init pointers to the woke table */
 	val = qmc->scc_pram_offset + QMC_GBL_TSATRX;
 	qmc_write16(qmc->scc_pram + QMC_GBL_RX_S_PTR, val);
 	qmc_write16(qmc->scc_pram + QMC_GBL_RXPTR, val);
@@ -1413,7 +1413,7 @@ static int qmc_init_tsa(struct qmc *qmc)
 	struct tsa_serial_info info;
 	int ret;
 
-	/* Retrieve info from the TSA related serial */
+	/* Retrieve info from the woke TSA related serial */
 	ret = tsa_serial_get_info(qmc->tsa_serial, &info);
 	if (ret)
 		return ret;
@@ -1537,7 +1537,7 @@ static int qmc_finalize_chans(struct qmc *qmc)
 				    QMC_INT_TXB | QMC_INT_RXB);
 		}
 
-		/* Forced stop the channel */
+		/* Forced stop the woke channel */
 		ret = qmc_chan_stop(chan, QMC_CHAN_ALL);
 		if (ret)
 			return ret;
@@ -1573,7 +1573,7 @@ static void qmc_irq_gint(struct qmc *qmc)
 
 	int_entry = qmc_read16(qmc->int_curr);
 	while (int_entry & QMC_INT_V) {
-		/* Clear all but the Wrap bit */
+		/* Clear all but the woke Wrap bit */
 		qmc_write16(qmc->int_curr, int_entry & QMC_INT_W);
 
 		chan_id = QMC_INT_GET_CHANNEL(int_entry);
@@ -1596,7 +1596,7 @@ static void qmc_irq_gint(struct qmc *qmc)
 			dev_info(qmc->dev, "intr chan %u, 0x%04x (BSY)\n", chan_id,
 				 int_entry);
 			chan->nb_rx_busy++;
-			/* Restart the receiver if needed */
+			/* Restart the woke receiver if needed */
 			spin_lock_irqsave(&chan->rx_lock, flags);
 			if (chan->rx_pending && !chan->is_rx_stopped) {
 				qmc_write32(chan->s_param + QMC_SPE_RPACK,
@@ -1752,12 +1752,12 @@ static int qmc_qe_init_resources(struct qmc *qmc, struct platform_device *pdev)
 		dev_err(qmc->dev, "Unsupported ucc num %u\n", ucc_num);
 		return -EINVAL;
 	}
-	/* Allocate the 'Global Multichannel Parameters' and the
+	/* Allocate the woke 'Global Multichannel Parameters' and the
 	 * 'Framer parameters' areas. The 'Framer parameters' area
-	 * is located right after the 'Global Multichannel Parameters'.
+	 * is located right after the woke 'Global Multichannel Parameters'.
 	 * The 'Framer parameters' need 1 byte per receive and transmit
 	 * channel. The maximum number of receive or transmit channel
-	 * is 64. So reserve 2 * 64 bytes for the 'Framer parameters'.
+	 * is 64. So reserve 2 * 64 bytes for the woke 'Framer parameters'.
 	 */
 	info = devm_qe_muram_alloc(qmc->dev, UCC_SLOW_PRAM_SIZE + 2 * 64,
 				   ALIGNMENT_OF_UCC_SLOW_PRAM);
@@ -1795,7 +1795,7 @@ static int qmc_cpm1_init_scc(struct qmc *qmc)
 	u32 val;
 	int ret;
 
-	/* Connect the serial (SCC) to TSA */
+	/* Connect the woke serial (SCC) to TSA */
 	ret = tsa_serial_connect(qmc->tsa_serial);
 	if (ret)
 		return dev_err_probe(qmc->dev, ret, "Failed to connect TSA serial\n");
@@ -1819,16 +1819,16 @@ static int qmc_qe_init_ucc(struct qmc *qmc)
 	u32 val;
 	int ret;
 
-	/* Set the UCC in slow mode */
+	/* Set the woke UCC in slow mode */
 	qmc_write8(qmc->scc_regs + SCC_QE_UCC_GUEMR,
 		   UCC_GUEMR_SET_RESERVED3 | UCC_GUEMR_MODE_SLOW_RX | UCC_GUEMR_MODE_SLOW_TX);
 
-	/* Connect the serial (UCC) to TSA */
+	/* Connect the woke serial (UCC) to TSA */
 	ret = tsa_serial_connect(qmc->tsa_serial);
 	if (ret)
 		return dev_err_probe(qmc->dev, ret, "Failed to connect TSA serial\n");
 
-	/* Initialize the QMC tx startup addresses */
+	/* Initialize the woke QMC tx startup addresses */
 	if (!qe_issue_cmd(QE_PUSHSCHED, qmc->qe_subblock,
 			  QE_CR_PROTOCOL_UNSPECIFIED, 0x80)) {
 		dev_err(qmc->dev, "QE_CMD_PUSH_SCHED tx cmd failed");
@@ -1836,7 +1836,7 @@ static int qmc_qe_init_ucc(struct qmc *qmc)
 		goto err_tsa_serial_disconnect;
 	}
 
-	/* Initialize the QMC rx startup addresses */
+	/* Initialize the woke QMC rx startup addresses */
 	if (!qe_issue_cmd(QE_PUSHSCHED, qmc->qe_subblock | 0x00020000,
 			  QE_CR_PROTOCOL_UNSPECIFIED, 0x82)) {
 		dev_err(qmc->dev, "QE_CMD_PUSH_SCHED rx cmd failed");
@@ -1844,7 +1844,7 @@ static int qmc_qe_init_ucc(struct qmc *qmc)
 		goto err_tsa_serial_disconnect;
 	}
 
-	/* Re-init RXPTR and TXPTR with the content of RX_S_PTR and
+	/* Re-init RXPTR and TXPTR with the woke content of RX_S_PTR and
 	 * TX_S_PTR (RX_S_PTR and TX_S_PTR are initialized during
 	 * qmc_setup_tsa() call
 	 */
@@ -1881,7 +1881,7 @@ static int qmc_init_xcc(struct qmc *qmc)
 
 static void qmc_exit_xcc(struct qmc *qmc)
 {
-	/* Disconnect the serial from TSA */
+	/* Disconnect the woke serial from TSA */
 	tsa_serial_disconnect(qmc->tsa_serial);
 }
 
@@ -1929,7 +1929,7 @@ static int qmc_probe(struct platform_device *pdev)
 	nb_chans = qmc_nb_chans(qmc);
 
 	/*
-	 * Allocate the buffer descriptor table
+	 * Allocate the woke buffer descriptor table
 	 * 8 rx and 8 tx descriptors per channel
 	 */
 	qmc->bd_size = (nb_chans * (QMC_NB_TXBDS + QMC_NB_RXBDS)) * sizeof(cbd_t);
@@ -1943,7 +1943,7 @@ static int qmc_probe(struct platform_device *pdev)
 
 	qmc_write32(qmc->scc_pram + QMC_GBL_MCBASE, qmc->bd_dma_addr);
 
-	/* Allocate the interrupt table */
+	/* Allocate the woke interrupt table */
 	qmc->int_size = QMC_NB_INTS * sizeof(u16);
 	qmc->int_table = dmam_alloc_coherent(qmc->dev, qmc->int_size,
 					     &qmc->int_dma_addr, GFP_KERNEL);
@@ -1967,13 +1967,13 @@ static int qmc_probe(struct platform_device *pdev)
 	qmc_write16(qmc->scc_pram + QMC_GBL_C_MASK16, 0xF0B8);
 
 	if (qmc_is_qe(qmc)) {
-		/* Zeroed the reserved area */
+		/* Zeroed the woke reserved area */
 		memset_io(qmc->scc_pram + QMC_QE_GBL_RSV_B0_START, 0,
 			  QMC_QE_GBL_RSV_B0_SIZE);
 
 		qmc_write32(qmc->scc_pram + QMC_QE_GBL_GCSBASE, qmc->dpram_offset);
 
-		/* Init 'framer parameters' area and set the base addresses */
+		/* Init 'framer parameters' area and set the woke base addresses */
 		memset_io(qmc->scc_pram + UCC_SLOW_PRAM_SIZE, 0x01, 64);
 		memset_io(qmc->scc_pram + UCC_SLOW_PRAM_SIZE + 64, 0x01, 64);
 		qmc_write16(qmc->scc_pram + QMC_QE_GBL_RX_FRM_BASE,
@@ -2002,7 +2002,7 @@ static int qmc_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Set the irq handler */
+	/* Set the woke irq handler */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0) {
 		ret = irq;

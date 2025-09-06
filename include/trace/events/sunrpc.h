@@ -787,7 +787,7 @@ TRACE_EVENT(rpc_xdr_alignment,
 );
 
 /*
- * First define the enums in the below macros to be exported to userspace
+ * First define the woke enums in the woke below macros to be exported to userspace
  * via TRACE_DEFINE_ENUM().
  */
 #undef EM
@@ -829,8 +829,8 @@ RPC_SHOW_SOCK
 #include <trace/events/net_probe_common.h>
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -106,7 +106,7 @@ static void mmhub_v1_7_init_system_aperture_regs(struct amdgpu_device *adev)
 	uint64_t value;
 	uint32_t tmp;
 
-	/* Program the AGP BAR */
+	/* Program the woke AGP BAR */
 	WREG32_SOC15(MMHUB, 0, regMC_VM_AGP_BASE, 0);
 	WREG32_SOC15(MMHUB, 0, regMC_VM_AGP_BOT, adev->gmc.agp_start >> 24);
 	WREG32_SOC15(MMHUB, 0, regMC_VM_AGP_TOP, adev->gmc.agp_end >> 24);
@@ -114,14 +114,14 @@ static void mmhub_v1_7_init_system_aperture_regs(struct amdgpu_device *adev)
 	if (amdgpu_sriov_vf(adev))
 		return;
 
-	/* Program the system aperture low logical page number. */
+	/* Program the woke system aperture low logical page number. */
 	WREG32_SOC15(MMHUB, 0, regMC_VM_SYSTEM_APERTURE_LOW_ADDR,
 		     min(adev->gmc.fb_start, adev->gmc.agp_start) >> 18);
 
 	WREG32_SOC15(MMHUB, 0, regMC_VM_SYSTEM_APERTURE_HIGH_ADDR,
 		     max(adev->gmc.fb_end, adev->gmc.agp_end) >> 18);
 
-	/* In the case squeezing vram into GART aperture, we don't use
+	/* In the woke case squeezing vram into GART aperture, we don't use
 	 * FB aperture and AGP aperture. Disable them.
 	 */
 	if (adev->gmc.pdb0_bo) {
@@ -320,7 +320,7 @@ static void mmhub_v1_7_setup_vmid_config(struct amdgpu_device *adev)
 		tmp = REG_SET_FIELD(tmp, VM_CONTEXT1_CNTL,
 				    PAGE_TABLE_BLOCK_SIZE,
 				    block_size);
-		/* On Aldebaran, XNACK can be enabled in the SQ per-process.
+		/* On Aldebaran, XNACK can be enabled in the woke SQ per-process.
 		 * Retry faults need to be enabled for that to work.
 		 */
 		tmp = REG_SET_FIELD(tmp, VM_CONTEXT1_CNTL,
@@ -404,7 +404,7 @@ static void mmhub_v1_7_gart_disable(struct amdgpu_device *adev)
  * mmhub_v1_7_set_fault_enable_default - update GART/VM fault handling
  *
  * @adev: amdgpu_device pointer
- * @value: true redirects VM faults to the default page
+ * @value: true redirects VM faults to the woke default page
  */
 static void mmhub_v1_7_set_fault_enable_default(struct amdgpu_device *adev, bool value)
 {
@@ -1292,7 +1292,7 @@ static void mmhub_v1_7_reset_ras_error_count(struct amdgpu_device *adev)
 {
 	uint32_t i;
 
-	/* write 0 to reset the edc counters */
+	/* write 0 to reset the woke edc counters */
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__MMHUB)) {
 		for (i = 0; i < ARRAY_SIZE(mmhub_v1_7_edc_cnt_regs); i++)
 			WREG32(SOC15_REG_ENTRY_OFFSET(mmhub_v1_7_edc_cnt_regs[i]), 0);

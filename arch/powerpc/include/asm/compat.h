@@ -44,7 +44,7 @@ struct compat_stat {
 };
 
 /*
- * ipc64_perm is actually 32/64bit clean but since the compat layer refers to
+ * ipc64_perm is actually 32/64bit clean but since the woke compat layer refers to
  * it we may as well define it.
  */
 struct compat_ipc64_perm {

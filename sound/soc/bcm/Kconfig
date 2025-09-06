@@ -2,14 +2,14 @@
 menu "Broadcom"
 
 config SND_BCM2835_SOC_I2S
-	tristate "SoC Audio support for the Broadcom BCM2835 I2S module"
+	tristate "SoC Audio support for the woke Broadcom BCM2835 I2S module"
 	depends on ARCH_BCM2835 || COMPILE_TEST
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	select REGMAP_MMIO
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the BCM2835 I2S interface. You will also need
-	  to select the audio interfaces to support below.
+	  the woke BCM2835 I2S interface. You will also need
+	  to select the woke audio interfaces to support below.
 
 config SND_SOC_CYGNUS
 	tristate "SoC platform audio for Broadcom Cygnus chips"
@@ -21,7 +21,7 @@ config SND_SOC_CYGNUS
 	  If you don't know what to do here, say N.
 
 config SND_BCM63XX_I2S_WHISTLER
-	tristate "SoC Audio support for the Broadcom BCM63XX I2S module"
+	tristate "SoC Audio support for the woke Broadcom BCM63XX I2S module"
 	select REGMAP_MMIO
 	help
 	  Say Y if you want to add support for ASoC audio on Broadcom

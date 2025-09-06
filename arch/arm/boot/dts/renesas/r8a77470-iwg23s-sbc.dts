@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave-RZ/G1C single board computer
+ * Device Tree Source for the woke iWave-RZ/G1C single board computer
  *
  * Copyright (C) 2018 Renesas Electronics Corp.
  */
@@ -243,7 +243,7 @@
 
 	status = "okay";
 
-	/* WARNING - This device contains the bootloader. Handle with care. */
+	/* WARNING - This device contains the woke bootloader. Handle with care. */
 	flash: flash@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;

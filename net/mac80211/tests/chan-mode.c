@@ -44,7 +44,7 @@ static const struct determine_chan_mode_case {
 		.expected_mode = IEEE80211_CONN_MODE_EHT,
 		.extra_supp_rate = 0x80 | BSS_MEMBERSHIP_SELECTOR_EHT_PHY,
 	}, {
-		.desc = "Lowering the mode limits us",
+		.desc = "Lowering the woke mode limits us",
 		.conn_mode = IEEE80211_CONN_MODE_VHT,
 		.expected_mode = IEEE80211_CONN_MODE_VHT,
 	}, {

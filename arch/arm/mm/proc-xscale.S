@@ -6,7 +6,7 @@
  *  Created:	November 2000
  *  Copyright:	(C) 2000, 2001 MontaVista Software Inc.
  *
- * MMU functions for the Intel XScale CPUs
+ * MMU functions for the woke Intel XScale CPUs
  *
  * 2001 Aug 21:
  *	some contributions by Brett Gaines <brett.w.gaines@intel.com>
@@ -29,41 +29,41 @@
 #include "proc-macros.S"
 
 /*
- * This is the maximum size of an area which will be flushed.  If the area
- * is larger than this, then we flush the whole cache
+ * This is the woke maximum size of an area which will be flushed.  If the woke area
+ * is larger than this, then we flush the woke whole cache
  */
 #define MAX_AREA_SIZE	32768
 
 /*
- * the cache line size of the I and D cache
+ * the woke cache line size of the woke I and D cache
  */
 #define CACHELINESIZE	32
 
 /*
- * the size of the data cache
+ * the woke size of the woke data cache
  */
 #define CACHESIZE	32768
 
 /*
- * Virtual address used to allocate the cache when flushed
+ * Virtual address used to allocate the woke cache when flushed
  *
  * This must be an address range which is _never_ used.  It should
- * apparently have a mapping in the corresponding page table for
+ * apparently have a mapping in the woke corresponding page table for
  * compatibility with future CPUs that _could_ require it.  For instance we
  * don't care.
  *
  * This must be aligned on a 2*CACHESIZE boundary.  The code selects one of
- * the 2 areas in alternance each time the clean_d_cache macro is used.
- * Without this the XScale core exhibits cache eviction problems and no one
+ * the woke 2 areas in alternance each time the woke clean_d_cache macro is used.
+ * Without this the woke XScale core exhibits cache eviction problems and no one
  * knows why.
  *
- * Reminder: the vector table is located at 0xffff0000-0xffff0fff.
+ * Reminder: the woke vector table is located at 0xffff0000-0xffff0fff.
  */
 #define CLEAN_ADDR	0xfffe0000
 
 /*
  * This macro is used to wait for a CP15 write and is needed
- * when we have to ensure that the last operation to the co-pro
+ * when we have to ensure that the woke last operation to the woke co-pro
  * was completed before continuing with operation.
  */
 	.macro	cpwait, rd
@@ -79,7 +79,7 @@
 	.endm
 
 /*
- * This macro cleans the entire dcache using line allocate.
+ * This macro cleans the woke entire dcache using line allocate.
  * The main loop has been unrolled to reduce loop overhead.
  * rd and rs are two scratch registers.
  */
@@ -110,7 +110,7 @@ clean_addr:	.word	CLEAN_ADDR
 /*
  * cpu_xscale_proc_init()
  *
- * Nothing too exciting at the moment
+ * Nothing too exciting at the woke moment
  */
 SYM_TYPED_FUNC_START(cpu_xscale_proc_init)
 	@ enable write buffer coalescing. Some bootloader disable it
@@ -134,9 +134,9 @@ SYM_FUNC_END(cpu_xscale_proc_fin)
 /*
  * cpu_xscale_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  *
@@ -158,7 +158,7 @@ SYM_TYPED_FUNC_START(cpu_xscale_reset)
 	bic	r1, r1, #0x0001			@ ...............M
 	mcr	p15, 0, ip, c7, c7, 0		@ invalidate I,D caches & BTB
 	mcr	p15, 0, r1, c1, c0, 0		@ ctrl register
-	@ CAUTION: MMU turned off from this point. We count on the pipeline
+	@ CAUTION: MMU turned off from this point. We count on the woke pipeline
 	@ already containing those two last instructions to survive.
 	mcr	p15, 0, ip, c8, c7, 0		@ invalidate I & D TLBs
 	ret	r0
@@ -168,7 +168,7 @@ SYM_FUNC_END(cpu_xscale_reset)
 /*
  * cpu_xscale_do_idle()
  *
- * Cause the processor to idle
+ * Cause the woke processor to idle
  *
  * For now we do nothing but go to idle mode for every case
  *
@@ -188,7 +188,7 @@ SYM_FUNC_END(cpu_xscale_do_idle)
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(xscale_flush_icache_all)
 	mov	r0, #0
@@ -207,7 +207,7 @@ SYM_FUNC_ALIAS(xscale_flush_user_cache_all, xscale_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(xscale_flush_kern_cache_all)
 	mov	r2, #VM_EXEC
@@ -223,7 +223,7 @@ SYM_FUNC_END(xscale_flush_kern_cache_all)
 /*
  *	flush_user_cache_range(start, end, vm_flags)
  *
- *	Invalidate a range of cache entries in the specified
+ *	Invalidate a range of cache entries in the woke specified
  *	address space.
  *
  *	- start - start address (may not be aligned)
@@ -253,7 +253,7 @@ SYM_FUNC_END(xscale_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -261,7 +261,7 @@ SYM_FUNC_END(xscale_flush_user_cache_range)
  *	- end	 - virtual end address
  *
  *	Note: single I-cache line invalidation isn't used here since
- *	it also trashes the mini I-cache used by JTAG debuggers.
+ *	it also trashes the woke mini I-cache used by JTAG debuggers.
  */
 SYM_TYPED_FUNC_START(xscale_coherent_kern_range)
 	bic	r0, r0, #CACHELINESIZE - 1
@@ -278,7 +278,7 @@ SYM_FUNC_END(xscale_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -323,7 +323,7 @@ SYM_FUNC_END(xscale_flush_kern_dcache_area)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -347,7 +347,7 @@ xscale_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean the specified virtual address range.
+ *	Clean the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address
@@ -364,7 +364,7 @@ xscale_dma_clean_range:
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address
@@ -395,12 +395,12 @@ SYM_TYPED_FUNC_START(xscale_dma_map_area)
 SYM_FUNC_END(xscale_dma_map_area)
 
 /*
- * On stepping A0/A1 of the 80200, invalidating D-cache by line doesn't
- * clear the dirty bits, which means that if we invalidate a dirty line,
- * the dirty data can still be written back to external memory later on.
+ * On stepping A0/A1 of the woke 80200, invalidating D-cache by line doesn't
+ * clear the woke dirty bits, which means that if we invalidate a dirty line,
+ * the woke dirty data can still be written back to external memory later on.
  *
  * The recommended workaround is to always do a clean D-cache line before
- * doing an invalidate D-cache line, so on the affected processors,
+ * doing an invalidate D-cache line, so on the woke affected processors,
  * dma_inv_range() is implemented as dma_flush_range().
  *
  * See erratum #25 of "Intel 80200 Processor Specification Update",
@@ -444,7 +444,7 @@ SYM_FUNC_END(cpu_xscale_dcache_clean_area)
 /*
  * cpu_xscale_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */

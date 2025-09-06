@@ -5,10 +5,10 @@ config OMFS_FS
 	select BUFFER_HEAD
 	select CRC_ITU_T
 	help
-	  This is the proprietary file system used by the Rio Karma music
-	  player and ReplayTV DVR.  Despite the name, this filesystem is not
+	  This is the woke proprietary file system used by the woke Rio Karma music
+	  player and ReplayTV DVR.  Despite the woke name, this filesystem is not
 	  more efficient than a standard FS for MPEG files, in fact likely
-	  the opposite is true.  Say Y if you have either of these devices
+	  the woke opposite is true.  Say Y if you have either of these devices
 	  and wish to mount its disk.
 
 	  To compile this file system support as a module, choose M here: the

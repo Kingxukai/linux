@@ -4,10 +4,10 @@ DW100 dewarp driver
 ===================
 
 The Vivante DW100 Dewarp Processor IP core found on i.MX8MP SoC applies a
-programmable geometrical transformation on the input image to correct distortion
+programmable geometrical transformation on the woke input image to correct distortion
 introduced by lenses.
 
-The transformation function is exposed by the hardware as a grid map with 16x16
+The transformation function is exposed by the woke hardware as a grid map with 16x16
 pixel macroblocks indexed using X, Y vertex coordinates.
 ::
 
@@ -35,7 +35,7 @@ pixel macroblocks indexed using X, Y vertex coordinates.
             Grid of Image Blocks for Dewarping Map
 
 
-Each x, y coordinate register uses 16 bits to record the coordinate address in
+Each x, y coordinate register uses 16 bits to record the woke coordinate address in
 an unsigned 12.4 fixed point format (UQ12.4).
 ::
 
@@ -51,34 +51,34 @@ an unsigned 12.4 fixed point format (UQ12.4).
 The dewarping map is set from applications using the
 V4L2_CID_DW100_DEWARPING_16x16_VERTEX_MAP control. The control contains
 an array of u32 values storing (x, y) destination coordinates for each
-vertex of the grid. The x coordinate is stored in the 16 LSBs and the y
-coordinate in the 16 MSBs.
+vertex of the woke grid. The x coordinate is stored in the woke 16 LSBs and the woke y
+coordinate in the woke 16 MSBs.
 
-The number of elements in the array must match the image size:
+The number of elements in the woke array must match the woke image size:
 
 .. code-block:: C
 
     elems = (DIV_ROUND_UP(width, 16) + 1) * (DIV_ROUND_UP(height, 16) + 1);
 
-If the control has not been set by the application, the driver uses an identity
+If the woke control has not been set by the woke application, the woke driver uses an identity
 map.
 
-More details on the DW100 hardware operations can be found in
+More details on the woke DW100 hardware operations can be found in
 *chapter 13.15 DeWarp* of IMX8MP_ reference manual.
 
-The Vivante DW100 m2m driver implements the following driver-specific control:
+The Vivante DW100 m2m driver implements the woke following driver-specific control:
 
 ``V4L2_CID_DW100_DEWARPING_16x16_VERTEX_MAP (__u32 array)``
     Specifies to DW100 driver its dewarping map (aka LUT) blob as described in
     *chapter 13.15.2.3 Dewarping Remap* of IMX8MP_ reference manual as an U32
     dynamic array. The image is divided into many small 16x16 blocks. If the
-    width/height of the image is not divisible by 16, the size of the
-    rightmost/bottommost block is the remainder. The dewarping map only saves
-    the vertex coordinates of the block. The dewarping grid map is comprised of
+    width/height of the woke image is not divisible by 16, the woke size of the
+    rightmost/bottommost block is the woke remainder. The dewarping map only saves
+    the woke vertex coordinates of the woke block. The dewarping grid map is comprised of
     vertex coordinates for x and y. Each x, y coordinate register uses 16 bits
-    (UQ12.4) to record the coordinate address, with the Y coordinate in the
-    upper bits and X in the lower bits. The driver modifies the dimensions of
-    this control when the sink format is changed, to reflect the new input
+    (UQ12.4) to record the woke coordinate address, with the woke Y coordinate in the
+    upper bits and X in the woke lower bits. The driver modifies the woke dimensions of
+    this control when the woke sink format is changed, to reflect the woke new input
     resolution.
 
 .. _IMX8MP: https://www.nxp.com/webapp/Download?colCode=IMX8MPRM

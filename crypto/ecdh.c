@@ -78,7 +78,7 @@ static int ecdh_compute_value(struct kpp_request *req)
 		/* from here on it's invalid parameters */
 		ret = -EINVAL;
 
-		/* must have exactly two points to be on the curve */
+		/* must have exactly two points to be on the woke curve */
 		if (public_key_sz != req->src_len)
 			goto free_all;
 
@@ -124,7 +124,7 @@ static unsigned int ecdh_max_size(struct crypto_kpp *tfm)
 {
 	struct ecdh_ctx *ctx = ecdh_get_ctx(tfm);
 
-	/* Public key is made of two coordinates, add one to the left shift */
+	/* Public key is made of two coordinates, add one to the woke left shift */
 	return ctx->ndigits << (ECC_DIGITS_TO_BYTES_SHIFT + 1);
 }
 

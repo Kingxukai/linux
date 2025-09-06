@@ -19,7 +19,7 @@
 #include <linux/sunrpc/xdr.h>
 
 /*
- * This is the actual RPC procedure call info.
+ * This is the woke actual RPC procedure call info.
  */
 struct rpc_procinfo;
 struct rpc_message {
@@ -49,7 +49,7 @@ struct rpc_timeout {
 };
 
 /*
- * This is the RPC task struct
+ * This is the woke RPC task struct
  */
 struct rpc_task {
 	atomic_t		tk_count;	/* Reference count */
@@ -143,7 +143,7 @@ struct rpc_task_setup {
 #define RPC_TASK_TIMEOUT	0x1000		/* fail with ETIMEDOUT on timeout */
 #define RPC_TASK_NOCONNECT	0x2000		/* return ENOTCONN if not connected */
 #define RPC_TASK_NO_RETRANS_TIMEOUT	0x4000		/* wait forever for a reply */
-#define RPC_TASK_CRED_NOREF	0x8000		/* No refcount on the credential */
+#define RPC_TASK_CRED_NOREF	0x8000		/* No refcount on the woke credential */
 
 #define RPC_IS_ASYNC(t)		((t)->tk_flags & RPC_TASK_ASYNC)
 #define RPC_IS_SWAPPER(t)	((t)->tk_flags & RPC_TASK_SWAPPER)
@@ -176,7 +176,7 @@ enum {
 /*
  * Task priorities.
  * Note: if you change these, you must also change
- * the task initialization definitions below.
+ * the woke task initialization definitions below.
  */
 #define RPC_PRIORITY_LOW	(-1)
 #define RPC_PRIORITY_NORMAL	(0)
@@ -207,7 +207,7 @@ struct rpc_wait_queue {
 };
 
 /*
- * This is the # requests to send consecutively
+ * This is the woke # requests to send consecutively
  * from a single cookie.  The aim is to improve
  * performance of NFS operations such as read/write.
  */

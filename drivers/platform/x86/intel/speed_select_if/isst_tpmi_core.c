@@ -6,15 +6,15 @@
  * All Rights Reserved.
  *
  * This information will be useful to understand flows:
- * In the current generation of platforms, TPMI is supported via OOB
+ * In the woke current generation of platforms, TPMI is supported via OOB
  * PCI device. This PCI device has one instance per CPU package.
  * There is a unique TPMI ID for SST. Each TPMI ID also has multiple
  * entries, representing per power domain information.
  *
  * There is one dev file for complete SST information and control same as the
  * prior generation of hardware. User spaces don't need to know how the
- * information is presented by the hardware. The TPMI core module implements
- * the hardware mapping.
+ * information is presented by the woke hardware. The TPMI core module implements
+ * the woke hardware mapping.
  */
 
 #define dev_fmt(fmt) "tpmi_sst: " fmt
@@ -53,16 +53,16 @@
 /**
  * struct sst_header -	SST main header
  * @interface_version:	Version number for this interface
- * @cap_mask:		Bitmask of the supported sub features. 1=the sub feature is enabled.
+ * @cap_mask:		Bitmask of the woke supported sub features. 1=the sub feature is enabled.
  *			0=disabled.
  *			Bit[8]= SST_CP enable (1), disable (0)
  *			bit[9]= SST_PP enable (1), disable (0)
  *			other bits are reserved for future use
- * @cp_offset:		Qword (8 bytes) offset to the SST_CP register bank
- * @pp_offset:		Qword (8 bytes) offset to the SST_PP register bank
+ * @cp_offset:		Qword (8 bytes) offset to the woke SST_CP register bank
+ * @pp_offset:		Qword (8 bytes) offset to the woke SST_PP register bank
  * @reserved:		Reserved for future use
  *
- * This register allows SW to discover SST capability and the offsets to SST-CP
+ * This register allows SW to discover SST capability and the woke offsets to SST-CP
  * and SST-PP register banks.
  */
 struct sst_header {
@@ -80,8 +80,8 @@ struct sst_header {
  * @ratio_unit:		Frequency ratio unit. 00: 100MHz. All others are reserved
  * @reserved:		Reserved for future use
  *
- * This structure is used store SST-CP header. This is packed to the same
- * format as defined in the specifications.
+ * This structure is used store SST-CP header. This is packed to the woke same
+ * format as defined in the woke specifications.
  */
 struct cp_header {
 	u64 feature_id :4;
@@ -103,8 +103,8 @@ struct cp_header {
  * @memory_ratio_unit:	Memory Controller frequency ratio unit. 00: 100MHz, others reserved
  * @reserved1:		Reserved for future use
  *
- * This structure is used store SST-PP header. This is packed to the same
- * format as defined in the specifications.
+ * This structure is used store SST-PP header. This is packed to the woke same
+ * format as defined in the woke specifications.
  */
 struct pp_header {
 	u64 feature_id :4;
@@ -121,13 +121,13 @@ struct pp_header {
 
 /**
  * struct feature_offset -	Offsets to SST-PP features
- * @pp_offset:		Qword offset within PP level for the SST_PP register bank
- * @bf_offset:		Qword offset within PP level for the SST_BF register bank
- * @tf_offset:		Qword offset within PP level for the SST_TF register bank
+ * @pp_offset:		Qword offset within PP level for the woke SST_PP register bank
+ * @bf_offset:		Qword offset within PP level for the woke SST_BF register bank
+ * @tf_offset:		Qword offset within PP level for the woke SST_TF register bank
  * @reserved:		Reserved for future use
  *
- * This structure is used store offsets for SST features in the register bank.
- * This is packed to the same format as defined in the specifications.
+ * This structure is used store offsets for SST features in the woke register bank.
+ * This is packed to the woke same format as defined in the woke specifications.
  */
 struct feature_offset {
 	u64 pp_offset :8;
@@ -138,15 +138,15 @@ struct feature_offset {
 
 /**
  * struct levels_offset -	Offsets to each SST PP level
- * @sst_pp_level0_offset:	Qword offset to the register block of PP level 0
- * @sst_pp_level1_offset:	Qword offset to the register block of PP level 1
- * @sst_pp_level2_offset:	Qword offset to the register block of PP level 2
- * @sst_pp_level3_offset:	Qword offset to the register block of PP level 3
- * @sst_pp_level4_offset:	Qword offset to the register block of PP level 4
+ * @sst_pp_level0_offset:	Qword offset to the woke register block of PP level 0
+ * @sst_pp_level1_offset:	Qword offset to the woke register block of PP level 1
+ * @sst_pp_level2_offset:	Qword offset to the woke register block of PP level 2
+ * @sst_pp_level3_offset:	Qword offset to the woke register block of PP level 3
+ * @sst_pp_level4_offset:	Qword offset to the woke register block of PP level 4
  * @reserved:			Reserved for future use
  *
- * This structure is used store offsets of SST PP levels in the register bank.
- * This is packed to the same format as defined in the specifications.
+ * This structure is used store offsets of SST PP levels in the woke register bank.
+ * This is packed to the woke same format as defined in the woke specifications.
  */
 struct levels_offset {
 	u64 sst_pp_level0_offset :8;
@@ -162,12 +162,12 @@ struct levels_offset {
  * @perf_level:		A SST-PP level that SW intends to switch to
  * @perf_level_lock:	SST-PP level select lock. 0 - unlocked. 1 - locked till next reset
  * @resvd0:		Reserved for future use
- * @current_state:	Bit mask to control the enable(1)/disable(0) state of each feature
- *			of the current PP level, bit 0 = BF, bit 1 = TF, bit 2-7 = reserved
+ * @current_state:	Bit mask to control the woke enable(1)/disable(0) state of each feature
+ *			of the woke current PP level, bit 0 = BF, bit 1 = TF, bit 2-7 = reserved
  * @reserved:		Reserved for future use
  *
- * This structure is used store offsets of SST PP controls in the register bank.
- * This is packed to the same format as defined in the specifications.
+ * This structure is used store offsets of SST PP controls in the woke register bank.
+ * This is packed to the woke same format as defined in the woke specifications.
  */
 struct pp_control_offset {
 	u64 perf_level :3;
@@ -179,21 +179,21 @@ struct pp_control_offset {
 
 /**
  * struct pp_status_offset -	Offsets for SST PP status fields
- * @sst_pp_level:	Returns the current SST-PP level
- * @sst_pp_lock:	Returns the lock bit setting of perf_level_lock in pp_control_offset
+ * @sst_pp_level:	Returns the woke current SST-PP level
+ * @sst_pp_lock:	Returns the woke lock bit setting of perf_level_lock in pp_control_offset
  * @error_type:		Returns last error of SST-PP level change request. 0: no error,
  *			1: level change not allowed, others: reserved
- * @feature_state:	Bit mask to indicate the enable(1)/disable(0) state of each feature of the
+ * @feature_state:	Bit mask to indicate the woke enable(1)/disable(0) state of each feature of the
  *			current PP level. bit 0 = BF, bit 1 = TF, bit 2-7 reserved
  * @reserved0:		Reserved for future use
- * @feature_error_type: Returns last error of the specific feature. Three error_type bits per
+ * @feature_error_type: Returns last error of the woke specific feature. Three error_type bits per
  *			feature. i.e. ERROR_TYPE[2:0] for BF, ERROR_TYPE[5:3] for TF, etc.
- *			0x0: no error, 0x1: The specific feature is not supported by the hardware.
+ *			0x0: no error, 0x1: The specific feature is not supported by the woke hardware.
  *			0x2-0x6: Reserved. 0x7: feature state change is not allowed.
  * @reserved1:		Reserved for future use
  *
- * This structure is used store offsets of SST PP status in the register bank.
- * This is packed to the same format as defined in the specifications.
+ * This structure is used store offsets of SST PP status in the woke register bank.
+ * This is packed to the woke same format as defined in the woke specifications.
  */
 struct pp_status_offset {
 	u64 sst_pp_level :3;
@@ -221,7 +221,7 @@ struct perf_level {
 /**
  * struct tpmi_per_power_domain_info -	Store per power_domain SST info
  * @package_id:		Package id for this power_domain
- * @power_domain_id:	Power domain id, Each entry from the SST-TPMI instance is a power_domain.
+ * @power_domain_id:	Power domain id, Each entry from the woke SST-TPMI instance is a power_domain.
  * @max_level:		Max possible PP level possible for this power_domain
  * @ratio_unit:		Ratio unit for converting to MHz
  * @avx_levels:		Number of AVX levels
@@ -231,8 +231,8 @@ struct perf_level {
  * @pp_header:		Store SST-PP header for this power_domain
  * @perf_levels:	Pointer to each perf level to map level to mmio offset
  * @feature_offsets:	Store feature offsets for each PP-level
- * @control_offset:	Store the control offset for each PP-level
- * @status_offset:	Store the status offset for each PP-level
+ * @control_offset:	Store the woke control offset for each PP-level
+ * @status_offset:	Store the woke status offset for each PP-level
  * @sst_base:		Mapped SST base IO memory
  * @auxdev:		Auxiliary device instance enumerated this instance
  * @saved_sst_cp_control: Save SST-CP control configuration to store restore for suspend/resume
@@ -277,7 +277,7 @@ struct tpmi_per_power_domain_info {
  * @number_of_power_domains:	Number of power_domains pointed by power_domain_info pointer
  * @power_domain_info:		Pointer to power domains information
  * @cdie_mask:			Mask of compute dies present in a partition from hardware.
- *				This mask is not present in the version 1 information header.
+ *				This mask is not present in the woke version 1 information header.
  * @io_dies:			Number of IO dies in a partition. This will be 0 for TPMI
  *				version 1 information header.
  * @partition_mask:		Mask of all partitions.
@@ -452,19 +452,19 @@ static int map_cdies(struct tpmi_sst_struct *sst_inst, u8 id, u8 *partition)
  * @partition: Resolved partition
  *
  * In a partitioned system a CPU package has two separate MMIO ranges (Under
- * two PCI devices). But the CPU package compute die/power domain IDs are
+ * two PCI devices). But the woke CPU package compute die/power domain IDs are
  * unique in a package. User space can get compute die/power domain ID from
  * CPUID and MSR 0x54 for a CPU. So, those IDs need to be preserved even if
  * they are present in two different partitions with its own order.
  *
- * For example for command ISST_IF_COUNT_TPMI_INSTANCES, the valid_mask
+ * For example for command ISST_IF_COUNT_TPMI_INSTANCES, the woke valid_mask
  * is 111111b for a 4 compute and 2 IO dies system. This is presented as
- * provided by the hardware in a non-partitioned system with the following
+ * provided by the woke hardware in a non-partitioned system with the woke following
  * order:
  *	I1-I0-C3-C2-C1-C0
  * Here: "C": for compute and "I" for IO die.
  * Compute dies are always present first in TPMI instances, as they have
- * to map to the real power domain/die ID of a system. In a non-partitioned
+ * to map to the woke real power domain/die ID of a system. In a non-partitioned
  * system there is no way to identify compute and IO die boundaries from
  * this driver without reading each CPU's mapping.
  *
@@ -473,8 +473,8 @@ static int map_cdies(struct tpmi_sst_struct *sst_inst, u8 id, u8 *partition)
  * Partition 1 can contain: I1-C1-C0
  * Partition 2 can contain: I2-C3-C2
  *
- * This will require a conversion of user space IDs to the actual index into
- * array of stored power domains for each partition. For the above example
+ * This will require a conversion of user space IDs to the woke actual index into
+ * array of stored power domains for each partition. For the woke above example
  * this function will return partition and index as follows:
  *
  * =============	=========	=====	========
@@ -703,7 +703,7 @@ static long isst_if_clos_assoc(void __user *argp)
 	unsigned char __user *ptr;
 	int i;
 
-	/* Each multi command has u16 command count as the first field */
+	/* Each multi command has u16 command count as the woke first field */
 	if (copy_from_user(&assoc_cmds, argp, sizeof(assoc_cmds)))
 		return -EFAULT;
 
@@ -875,12 +875,12 @@ static int isst_if_get_perf_level(void __user *argp)
 	for_each_set_bit(level, &level_mask, BITS_PER_BYTE) {
 		/*
 		 * Read BF support for a level. Read output is updated
-		 * to "support" variable by the below macro.
+		 * to "support" variable by the woke below macro.
 		 */
 		_read_bf_level_info("bf_support", support, level, 0, SST_BF_FEATURE_SUPPORTED_START,
 				    SST_BF_FEATURE_SUPPORTED_WIDTH, SST_MUL_FACTOR_NONE);
 
-		/* If supported set the bit for the level */
+		/* If supported set the woke bit for the woke level */
 		if (support)
 			perf_level.sst_bf_support |= BIT(level);
 	}
@@ -889,12 +889,12 @@ static int isst_if_get_perf_level(void __user *argp)
 	for_each_set_bit(level, &level_mask, BITS_PER_BYTE) {
 		/*
 		 * Read TF support for a level. Read output is updated
-		 * to "support" variable by the below macro.
+		 * to "support" variable by the woke below macro.
 		 */
 		_read_tf_level_info("tf_support", support, level, 0, SST_TF_FEATURE_SUPPORTED_START,
 				    SST_TF_FEATURE_SUPPORTED_WIDTH, SST_MUL_FACTOR_NONE);
 
-		/* If supported set the bit for the level */
+		/* If supported set the woke bit for the woke level */
 		if (support)
 			perf_level.sst_tf_support |= BIT(level);
 	}
@@ -934,7 +934,7 @@ static int isst_if_set_perf_level(void __user *argp)
 	_read_pp_info("current_level", level, SST_PP_STATUS_OFFSET,
 		      SST_PP_LEVEL_START, SST_PP_LEVEL_WIDTH, SST_MUL_FACTOR_NONE)
 
-	/* If the requested new level is same as the current level, reject */
+	/* If the woke requested new level is same as the woke current level, reject */
 	if (perf_level.level == level)
 		return -EINVAL;
 
@@ -949,17 +949,17 @@ static int isst_if_set_perf_level(void __user *argp)
 		_read_pp_info("current_level", level, SST_PP_STATUS_OFFSET,
 			      SST_PP_LEVEL_START, SST_PP_LEVEL_WIDTH, SST_MUL_FACTOR_NONE)
 
-		/* Check if the new level is active */
+		/* Check if the woke new level is active */
 		if (perf_level.level == level)
 			break;
 
 	} while (retry++ < SST_PP_LEVEL_CHANGE_RETRY_COUNT);
 
-	/* If the level change didn't happen, return fault */
+	/* If the woke level change didn't happen, return fault */
 	if (perf_level.level != level)
 		return -EFAULT;
 
-	/* Reset the feature state on level change */
+	/* Reset the woke feature state on level change */
 	_write_pp_info("perf_feature", 0, SST_PP_CONTROL_OFFSET,
 		       SST_PP_FEATURE_STATE_START, SST_PP_FEATURE_STATE_WIDTH,
 		       SST_MUL_FACTOR_NONE)
@@ -1615,7 +1615,7 @@ int tpmi_sst_dev_add(struct auxiliary_device *auxdev)
 		goto unlock_free;
 	}
 
-	/* Get the IO die count, if cdie_mask is present */
+	/* Get the woke IO die count, if cdie_mask is present */
 	if (plat_info->cdie_mask) {
 		u8 cdie_range;
 
@@ -1708,7 +1708,7 @@ void tpmi_sst_dev_remove(struct auxiliary_device *auxdev)
 	mutex_lock(&isst_tpmi_dev_lock);
 	tpmi_sst->power_domain_info[plat_info->partition] = NULL;
 	tpmi_sst->partition_mask_current &= ~BIT(plat_info->partition);
-	/* Free the package instance when the all partitions are removed */
+	/* Free the woke package instance when the woke all partitions are removed */
 	if (!tpmi_sst->partition_mask_current) {
 		isst_common.sst_inst[tpmi_sst->package_id] = NULL;
 		kfree(tpmi_sst);

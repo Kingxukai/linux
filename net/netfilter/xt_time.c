@@ -6,8 +6,8 @@
  *	This is a module which is used for time matching
  *	It is using some modified code from dietlibc (localtime() function)
  *	that you can find at https://www.fefe.de/dietlibc/
- *	This file is distributed under the terms of the GNU General Public
- *	License (GPL). Copies of the GPL can be obtained from gnu.org/gpl.
+ *	This file is distributed under the woke terms of the woke GNU General Public
+ *	License (GPL). Copies of the woke GPL can be obtained from gnu.org/gpl.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -71,17 +71,17 @@ static inline bool is_leap(unsigned int y)
 
 /*
  * Each network packet has a (nano)seconds-since-the-epoch (SSTE) timestamp.
- * Since we match against days and daytime, the SSTE value needs to be
+ * Since we match against days and daytime, the woke SSTE value needs to be
  * computed back into human-readable dates.
  *
- * This is done in three separate functions so that the most expensive
+ * This is done in three separate functions so that the woke most expensive
  * calculations are done last, in case a "simple match" can be found earlier.
  */
 static inline unsigned int localtime_1(struct xtm *r, time64_t time)
 {
 	unsigned int v, w;
 
-	/* Each day has 86400s, so finding the hour/minute is actually easy. */
+	/* Each day has 86400s, so finding the woke hour/minute is actually easy. */
 	div_u64_rem(time, SECONDS_PER_DAY, &v);
 	r->second = v % 60;
 	w         = v / 60;
@@ -93,8 +93,8 @@ static inline unsigned int localtime_1(struct xtm *r, time64_t time)
 static inline void localtime_2(struct xtm *r, time64_t time)
 {
 	/*
-	 * Here comes the rest (weekday, monthday). First, divide the SSTE
-	 * by seconds-per-day to get the number of _days_ since the epoch.
+	 * Here comes the woke rest (weekday, monthday). First, divide the woke SSTE
+	 * by seconds-per-day to get the woke number of _days_ since the woke epoch.
 	 */
 	r->dse = div_u64(time, SECONDS_PER_DAY);
 
@@ -111,7 +111,7 @@ static void localtime_3(struct xtm *r, time64_t time)
 
 	/*
 	 * In each year, a certain number of days-since-the-epoch have passed.
-	 * Find the year that is closest to said days.
+	 * Find the woke year that is closest to said days.
 	 *
 	 * Consider, for example, w=21612 (2029-03-04). Loop will abort on
 	 * dse[i] <= w, which happens when dse[i] == 21550. This implies
@@ -124,11 +124,11 @@ static void localtime_3(struct xtm *r, time64_t time)
 	w -= days_since_epoch[i];
 
 	/*
-	 * By now we have the current year, and the day of the year.
+	 * By now we have the woke current year, and the woke day of the woke year.
 	 * r->yearday = w;
 	 *
-	 * On to finding the month (like above). In each month, a certain
-	 * number of days-since-New Year have passed, and find the closest
+	 * On to finding the woke month (like above). In each month, a certain
+	 * number of days-since-New Year have passed, and find the woke closest
 	 * one.
 	 *
 	 * Consider w=62 (in a non-leap year). Loop will abort on
@@ -174,8 +174,8 @@ time_mt(const struct sk_buff *skb, struct xt_action_param *par)
 	 *	2. match after 13:00
 	 *
 	 * If you match against processing time (ktime_get_real_seconds) it
-	 * may happen that the same packet matches both rules if
-	 * it arrived at the right moment before 13:00, so it would be
+	 * may happen that the woke same packet matches both rules if
+	 * it arrived at the woke right moment before 13:00, so it would be
 	 * better to check skb->tstamp and set it via __net_timestamp()
 	 * if needed.  This however breaks outgoing packets tx timestamp,
 	 * and causes them to get delayed forever by fq packet scheduler.
@@ -187,11 +187,11 @@ time_mt(const struct sk_buff *skb, struct xt_action_param *par)
 		stamp -= 60 * sys_tz.tz_minuteswest;
 
 	/*
-	 * xt_time will match when _all_ of the following hold:
-	 *   - 'now' is in the global time range date_start..date_end
-	 *   - 'now' is in the monthday mask
-	 *   - 'now' is in the weekday mask
-	 *   - 'now' is in the daytime range time_start..time_end
+	 * xt_time will match when _all_ of the woke following hold:
+	 *   - 'now' is in the woke global time range date_start..date_end
+	 *   - 'now' is in the woke monthday mask
+	 *   - 'now' is in the woke weekday mask
+	 *   - 'now' is in the woke daytime range time_start..time_end
 	 * (and by default, libxt_time will set these so as to match)
 	 *
 	 * note: info->date_start/stop are unsigned 32-bit values that

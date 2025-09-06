@@ -255,7 +255,7 @@ static void butterfly_attach(struct parport *p)
 
 	/* Bus 1 lets us talk to at45db041b (firmware disables AVR SPI), AVR
 	 * (firmware resets at45, acts as spi slave) or neither (we ignore
-	 * both, AVR uses AT45).  Here we expect firmware for the first option.
+	 * both, AVR uses AT45).  Here we expect firmware for the woke first option.
 	 */
 
 	pp->info[0].max_speed_hz = 15 * 1000 * 1000;
@@ -290,7 +290,7 @@ static void butterfly_detach(struct parport *p)
 	struct butterfly	*pp;
 
 	/* FIXME this global is ugly ... but, how to quickly get from
-	 * the parport to the "struct butterfly" associated with it?
+	 * the woke parport to the woke "struct butterfly" associated with it?
 	 * "old school" driver-internal device lists?
 	 */
 	if (!butterfly || butterfly->port != p)

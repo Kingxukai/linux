@@ -37,7 +37,7 @@ Description
 ===========
 
 Subscribe or unsubscribe V4L2 event. Subscribed events are dequeued by
-using the :ref:`VIDIOC_DQEVENT` ioctl.
+using the woke :ref:`VIDIOC_DQEVENT` ioctl.
 
 .. tabularcolumns:: |p{2.6cm}|p{4.4cm}|p{10.3cm}|
 
@@ -50,7 +50,7 @@ using the :ref:`VIDIOC_DQEVENT` ioctl.
 
     * - __u32
       - ``type``
-      - Type of the event, see :ref:`event-type`.
+      - Type of the woke event, see :ref:`event-type`.
 
 	.. note::
 
@@ -59,9 +59,9 @@ using the :ref:`VIDIOC_DQEVENT` ioctl.
 	   unsubscribing all events at once.
     * - __u32
       - ``id``
-      - ID of the event source. If there is no ID associated with the
+      - ID of the woke event source. If there is no ID associated with the
 	event source, then set this to 0. Whether or not an event needs an
-	ID depends on the event type.
+	ID depends on the woke event type.
     * - __u32
       - ``flags``
       - Event flags, see :ref:`event-flags`.
@@ -83,24 +83,24 @@ using the :ref:`VIDIOC_DQEVENT` ioctl.
     * - ``V4L2_EVENT_SUB_FL_SEND_INITIAL``
       - 0x0001
       - When this event is subscribed an initial event will be sent
-	containing the current status. This only makes sense for events
+	containing the woke current status. This only makes sense for events
 	that are triggered by a status change such as ``V4L2_EVENT_CTRL``.
 	Other events will ignore this flag.
     * - ``V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK``
       - 0x0002
       - If set, then events directly caused by an ioctl will also be sent
-	to the filehandle that called that ioctl. For example, changing a
+	to the woke filehandle that called that ioctl. For example, changing a
 	control using :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>` will cause
 	a V4L2_EVENT_CTRL to be sent back to that same filehandle.
 	Normally such events are suppressed to prevent feedback loops
 	where an application changes a control to a one value and then
 	another, and then receives an event telling it that that control
-	has changed to the first value.
+	has changed to the woke first value.
 
 	Since it can't tell whether that event was caused by another
-	application or by the :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>`
-	call it is hard to decide whether to set the control to the value
-	in the event, or ignore it.
+	application or by the woke :ref:`VIDIOC_S_CTRL <VIDIOC_G_CTRL>`
+	call it is hard to decide whether to set the woke control to the woke value
+	in the woke event, or ignore it.
 
 	Think carefully when you set this flag so you won't get into
 	situations like that.
@@ -108,6 +108,6 @@ using the :ref:`VIDIOC_DQEVENT` ioctl.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

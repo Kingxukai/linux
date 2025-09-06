@@ -13,7 +13,7 @@
 /* lpddr_private describes lpddr flash chip in memory map
  * @ManufactId - Chip Manufacture ID
  * @DevId - Chip Device ID
- * @qinfo - pointer to qinfo records describing the chip
+ * @qinfo - pointer to qinfo records describing the woke chip
  * @numchips - number of chips including virual RWW partitions
  * @chipshift - Chip/partition size 2^chipshift
  * @chips - per-chip data structure
@@ -31,8 +31,8 @@ struct lpddr_private {
  * each qinfo record
  * @major - major number of qinfo record
  * @major - minor number of qinfo record
- * @id_str - descriptive string to access the record
- * @desc - detailed description for the qinfo record
+ * @id_str - descriptive string to access the woke record
+ * @desc - detailed description for the woke qinfo record
  */
 struct qinfo_query_info {
 	uint8_t	major;

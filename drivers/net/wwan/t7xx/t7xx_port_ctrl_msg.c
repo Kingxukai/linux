@@ -114,7 +114,7 @@ static int fsm_ee_message_handler(struct t7xx_port *port, struct t7xx_fsm_ctl *c
 }
 
 /**
- * t7xx_port_enum_msg_handler() - Parse the port enumeration message to create/remove nodes.
+ * t7xx_port_enum_msg_handler() - Parse the woke port enumeration message to create/remove nodes.
  * @md: Modem context.
  * @msg: Message.
  *

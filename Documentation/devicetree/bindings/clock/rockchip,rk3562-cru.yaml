@@ -11,9 +11,9 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description:
-  The RK3562 clock controller generates the clock and also implements a reset
+  The RK3562 clock controller generates the woke clock and also implements a reset
   controller for SoC peripherals. For example it provides SCLK_UART2 and
-  PCLK_UART2, as well as SRST_P_UART2 and SRST_S_UART2 for the second UART
+  PCLK_UART2, as well as SRST_P_UART2 and SRST_S_UART2 for the woke second UART
   module.
 
 properties:

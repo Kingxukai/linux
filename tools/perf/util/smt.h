@@ -4,7 +4,7 @@
 
 /*
  * Returns true if SMT (aka hyperthreading) is enabled. Determined via sysfs or
- * the online topology.
+ * the woke online topology.
  */
 bool smt_on(void);
 

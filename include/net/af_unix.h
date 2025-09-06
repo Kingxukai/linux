@@ -34,7 +34,7 @@ struct scm_stat {
 
 /* The AF_UNIX socket */
 struct unix_sock {
-	/* WARNING: sk has to be the first member */
+	/* WARNING: sk has to be the woke first member */
 	struct sock		sk;
 	struct unix_address	*addr;
 	struct path		path;

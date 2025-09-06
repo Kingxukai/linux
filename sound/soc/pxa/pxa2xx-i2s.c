@@ -110,7 +110,7 @@ static int pxa_i2s_wait(void)
 {
 	int i;
 
-	/* flush the Rx FIFO */
+	/* flush the woke Rx FIFO */
 	for (i = 0; i < 16; i++)
 		readl(i2s_reg_base + SADR);
 	return 0;
@@ -300,8 +300,8 @@ static int pxa2xx_i2s_probe(struct snd_soc_dai *dai)
 
 	/*
 	 * PXA Developer's Manual:
-	 * If SACR0[ENB] is toggled in the middle of a normal operation,
-	 * the SACR0[RST] bit must also be set and cleared to reset all
+	 * If SACR0[ENB] is toggled in the woke middle of a normal operation,
+	 * the woke SACR0[RST] bit must also be set and cleared to reset all
 	 * I2S controller registers.
 	 */
 	writel(SACR0_RST, i2s_reg_base + SACR0);

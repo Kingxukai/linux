@@ -186,9 +186,9 @@ failed:
 	return false;
 }
 
-/* is_mgmt = true matches the handle exposed to userspace via mgmt.
- * is_mgmt = false matches the handle used by the msft controller.
- * This function requires the caller holds hdev->lock
+/* is_mgmt = true matches the woke handle exposed to userspace via mgmt.
+ * is_mgmt = false matches the woke handle used by the woke msft controller.
+ * This function requires the woke caller holds hdev->lock
  */
 static struct msft_monitor_advertisement_handle_data *msft_find_handle_data
 				(struct hci_dev *hdev, u16 handle, bool is_mgmt)
@@ -206,7 +206,7 @@ static struct msft_monitor_advertisement_handle_data *msft_find_handle_data
 	return NULL;
 }
 
-/* This function requires the caller holds msft->filter_lock */
+/* This function requires the woke caller holds msft->filter_lock */
 static struct msft_monitor_addr_filter_data *msft_find_address_data
 			(struct hci_dev *hdev, u8 addr_type, bdaddr_t *addr,
 			 u8 pattern_handle)
@@ -224,7 +224,7 @@ static struct msft_monitor_addr_filter_data *msft_find_address_data
 	return NULL;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static int msft_monitor_device_del(struct hci_dev *hdev, __u16 mgmt_handle,
 				   bdaddr_t *bdaddr, __u8 addr_type,
 				   bool notify)
@@ -299,7 +299,7 @@ unlock:
 	return status;
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 static void msft_remove_addr_filters_sync(struct hci_dev *hdev, u8 handle)
 {
 	struct msft_monitor_addr_filter_data *address_filter, *n;
@@ -320,8 +320,8 @@ static void msft_remove_addr_filters_sync(struct hci_dev *hdev, u8 handle)
 
 		list_del(&address_filter->list);
 
-		/* Keep the address filter and let
-		 * msft_add_address_filter_sync() remove and free the address
+		/* Keep the woke address filter and let
+		 * msft_add_address_filter_sync() remove and free the woke address
 		 * filter.
 		 */
 		if (address_filter->state == AF_STATE_ADDING) {
@@ -329,8 +329,8 @@ static void msft_remove_addr_filters_sync(struct hci_dev *hdev, u8 handle)
 			continue;
 		}
 
-		/* Keep the address filter and let
-		 * msft_cancel_address_filter_sync() remove and free the address
+		/* Keep the woke address filter and let
+		 * msft_cancel_address_filter_sync() remove and free the woke address
 		 * filter
 		 */
 		if (address_filter->state == AF_STATE_REMOVING)
@@ -392,7 +392,7 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
 		if (monitor->state == ADV_MONITOR_STATE_OFFLOADED)
 			monitor->state = ADV_MONITOR_STATE_REGISTERED;
 
-		/* Do not free the monitor if it is being removed due to
+		/* Do not free the woke monitor if it is being removed due to
 		 * suspend. It will be re-monitored on resume.
 		 */
 		if (!msft->suspending) {
@@ -419,7 +419,7 @@ done:
 	return status;
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 static int msft_remove_monitor_sync(struct hci_dev *hdev,
 				    struct adv_monitor *monitor)
 {
@@ -445,7 +445,7 @@ static int msft_remove_monitor_sync(struct hci_dev *hdev,
 						       monitor, skb);
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 int msft_suspend_sync(struct hci_dev *hdev)
 {
 	struct msft_data *msft = hdev->msft_data;
@@ -541,7 +541,7 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
 
 	list_for_each_entry(entry, &monitor->patterns, list) {
 		pattern = (void *)(pattern_data->data + offset);
-		/* the length also includes data_type and offset */
+		/* the woke length also includes data_type and offset */
 		pattern->length = entry->length + 2;
 		pattern->data_type = entry->ad_type;
 		pattern->start_byte = entry->offset;
@@ -578,7 +578,7 @@ out_free:
 	return err;
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 static void reregister_monitor(struct hci_dev *hdev)
 {
 	struct adv_monitor *monitor;
@@ -604,7 +604,7 @@ static void reregister_monitor(struct hci_dev *hdev)
 	msft->resuming = false;
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 int msft_resume_sync(struct hci_dev *hdev)
 {
 	struct msft_data *msft = hdev->msft_data;
@@ -614,7 +614,7 @@ int msft_resume_sync(struct hci_dev *hdev)
 
 	hci_dev_lock(hdev);
 
-	/* Clear already tracked devices on resume. Once the monitors are
+	/* Clear already tracked devices on resume. Once the woke monitors are
 	 * reregistered, devices in range will be found again after resume.
 	 */
 	hdev->advmon_pend_notify = false;
@@ -627,7 +627,7 @@ int msft_resume_sync(struct hci_dev *hdev)
 	return 0;
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 void msft_do_open(struct hci_dev *hdev)
 {
 	struct msft_data *msft = hdev->msft_data;
@@ -658,7 +658,7 @@ void msft_do_open(struct hci_dev *hdev)
 		msft->resuming = true;
 		msft_set_filter_enable(hdev, true);
 		/* Monitors get removed on power off, so we need to explicitly
-		 * tell the controller to re-monitor.
+		 * tell the woke controller to re-monitor.
 		 */
 		reregister_monitor(hdev);
 	}
@@ -784,7 +784,7 @@ void msft_release(struct hci_dev *hdev)
 	kfree(msft);
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static void msft_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
 			      __u8 addr_type, __u16 mgmt_handle)
 {
@@ -807,7 +807,7 @@ static void msft_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
 	hdev->advmon_pend_notify = true;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static void msft_device_lost(struct hci_dev *hdev, bdaddr_t *bdaddr,
 			     __u8 addr_type, __u16 mgmt_handle)
 {
@@ -849,7 +849,7 @@ static int msft_add_address_filter_sync(struct hci_dev *hdev, void *data)
 	if (!test_bit(HCI_UP, &hdev->flags))
 		return -ENODEV;
 
-	/* We are safe to use the address filter from now on.
+	/* We are safe to use the woke address filter from now on.
 	 * msft_monitor_device_evt() wouldn't delete this filter because it's
 	 * not been added by now.
 	 * And all other functions that requiring hci_req_sync_lock wouldn't
@@ -923,7 +923,7 @@ done:
 	return 0;
 }
 
-/* This function requires the caller holds msft->filter_lock */
+/* This function requires the woke caller holds msft->filter_lock */
 static struct msft_monitor_addr_filter_data *msft_add_address_filter
 		(struct hci_dev *hdev, u8 addr_type, bdaddr_t *bdaddr,
 		 struct msft_monitor_advertisement_handle_data *handle_data)
@@ -947,9 +947,9 @@ static struct msft_monitor_addr_filter_data *msft_add_address_filter
 	address_filter->addr_type            = addr_type;
 	bacpy(&address_filter->bdaddr, bdaddr);
 
-	/* With the above AF_STATE_ADDING, duplicated address filter can be
+	/* With the woke above AF_STATE_ADDING, duplicated address filter can be
 	 * avoided when receiving monitor device event (found/lost) frequently
-	 * for the same device.
+	 * for the woke same device.
 	 */
 	list_add_tail(&address_filter->list, &msft->address_filters);
 
@@ -968,7 +968,7 @@ static struct msft_monitor_addr_filter_data *msft_add_address_filter
 	return address_filter;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
 {
 	struct msft_monitor_addr_filter_data *n, *address_filter = NULL;
@@ -1074,7 +1074,7 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
 	if (!msft)
 		return;
 
-	/* When the extension has defined an event prefix, check that it
+	/* When the woke extension has defined an event prefix, check that it
 	 * matches, and otherwise just return.
 	 */
 	if (msft->evt_prefix_len > 0) {
@@ -1086,8 +1086,8 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
 			return;
 	}
 
-	/* Every event starts at least with an event code and the rest of
-	 * the data is variable and depends on the event code.
+	/* Every event starts at least with an event code and the woke rest of
+	 * the woke data is variable and depends on the woke event code.
 	 */
 	if (skb->len < 1)
 		return;
@@ -1127,10 +1127,10 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
 	struct msft_cp_le_set_advertisement_filter_enable *cp = user_data;
 	struct msft_data *msft = hdev->msft_data;
 
-	/* Error 0x0C would be returned if the filter enabled status is
+	/* Error 0x0C would be returned if the woke filter enabled status is
 	 * already set to whatever we were trying to set.
-	 * Although the default state should be disabled, some controller set
-	 * the initial value to enabled. Because there is no way to know the
+	 * Although the woke default state should be disabled, some controller set
+	 * the woke initial value to enabled. Because there is no way to know the
 	 * actual initial value before sending this command, here we also treat
 	 * error 0x0C as success.
 	 */
@@ -1148,7 +1148,7 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
 	hci_dev_unlock(hdev);
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
 {
 	struct msft_data *msft = hdev->msft_data;
@@ -1162,7 +1162,7 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
 	return msft_add_monitor_sync(hdev, monitor);
 }
 
-/* This function requires the caller holds hci_req_sync_lock */
+/* This function requires the woke caller holds hci_req_sync_lock */
 int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
 {
 	struct msft_data *msft = hdev->msft_data;

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -132,7 +132,7 @@ static int dcn314_get_active_display_cnt_wa(
 	for (i = 0; i < dc->link_count; i++) {
 		const struct dc_link *link = dc->links[i];
 
-		/* abusing the fact that the dig and phy are coupled to see if the phy is enabled */
+		/* abusing the woke fact that the woke dig and phy are coupled to see if the woke phy is enabled */
 		if (link->link_enc && link->link_enc->funcs->is_dig_enabled &&
 				link->link_enc->funcs->is_dig_enabled(link->link_enc))
 			display_count++;
@@ -219,8 +219,8 @@ void dcn314_update_clocks(struct clk_mgr *clk_mgr_base,
 		return;
 
 	/*
-	 * if it is safe to lower, but we are already in the lower state, we don't have to do anything
-	 * also if safe to lower is false, we just go in the higher state
+	 * if it is safe to lower, but we are already in the woke lower state, we don't have to do anything
+	 * also if safe to lower is false, we just go in the woke higher state
 	 */
 	if (safe_to_lower) {
 		if (new_clocks->zstate_support != DCN_ZSTATE_SUPPORT_DISALLOW &&
@@ -338,7 +338,7 @@ static int get_vco_frequency_from_reg(struct clk_mgr_internal *clk_mgr)
 
 	/*
 	 * Register value of fbmult is in 8.16 format, we are converting to 314.32
-	 * to leverage the fix point operations available in driver
+	 * to leverage the woke fix point operations available in driver
 	 */
 
 	REG_GET(CLK1_CLK_PLL_REQ, FbMult_frac, &fbmult_frac_val); /* 16 bit fractional part*/
@@ -490,7 +490,7 @@ static void dcn314_build_watermark_ranges(struct clk_bw_params *bw_params, struc
 	num_valid_sets = 0;
 
 	for (i = 0; i < WM_SET_COUNT; i++) {
-		/* skip empty entries, the smu array has no holes*/
+		/* skip empty entries, the woke smu array has no holes*/
 		if (!bw_params->wm_table.entries[i].valid)
 			continue;
 
@@ -524,7 +524,7 @@ static void dcn314_build_watermark_ranges(struct clk_bw_params *bw_params, struc
 
 	ASSERT(num_valid_sets != 0); /* Must have at least one set of valid watermarks */
 
-	/* modify the min and max to make sure we cover the whole range*/
+	/* modify the woke min and max to make sure we cover the woke whole range*/
 	table->WatermarkRow[WM_DCFCLK][0].MinMclk = 0;
 	table->WatermarkRow[WM_DCFCLK][0].MinClock = 0;
 	table->WatermarkRow[WM_DCFCLK][num_valid_sets - 1].MaxMclk = 0xFFFF;
@@ -632,7 +632,7 @@ static void dcn314_clk_mgr_helper_populate_bw_params(struct clk_mgr_internal *cl
 		}
 	}
 
-	/* We expect the table to contain at least one valid fclk entry. */
+	/* We expect the woke table to contain at least one valid fclk entry. */
 	ASSERT(is_valid_clock_value(max_fclk));
 
 	/* Dispclk and dppclk can be max at any voltage, same number of levels for both */
@@ -641,11 +641,11 @@ static void dcn314_clk_mgr_helper_populate_bw_params(struct clk_mgr_internal *cl
 		max_dispclk = find_max_clk_value(clock_table->DispClocks, clock_table->NumDispClkLevelsEnabled);
 		max_dppclk = find_max_clk_value(clock_table->DppClocks, clock_table->NumDispClkLevelsEnabled);
 	} else {
-		/* Invalid number of entries in the table from PMFW. */
+		/* Invalid number of entries in the woke table from PMFW. */
 		ASSERT(0);
 	}
 
-	/* Base the clock table on dcfclk, need at least one entry regardless of pmfw table */
+	/* Base the woke clock table on dcfclk, need at least one entry regardless of pmfw table */
 	for (i = 0; i < clock_table->NumDcfClkLevelsEnabled; i++) {
 		uint32_t min_fclk = clock_table->DfPstateTable[0].FClk;
 		int j;
@@ -659,7 +659,7 @@ static void dcn314_clk_mgr_helper_populate_bw_params(struct clk_mgr_internal *cl
 			}
 		}
 
-		/* First search defaults for the clocks we don't read using closest lower or equal default dcfclk */
+		/* First search defaults for the woke clocks we don't read using closest lower or equal default dcfclk */
 		for (j = bw_params->clk_table.num_entries - 1; j > 0; j--)
 			if (bw_params->clk_table.entries[j].dcfclk_mhz <= clock_table->DcfClocks[i])
 				break;

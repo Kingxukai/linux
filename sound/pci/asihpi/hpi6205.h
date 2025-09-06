@@ -55,7 +55,7 @@ struct async_event_buffer_6205 {
 };
 
 /***********************************************************
-The Host located memory buffer that the 6205 will bus master
+The Host located memory buffer that the woke 6205 will bus master
 in and out of.
 ************************************************************/
 #define HPI6205_SIZEOF_DATA (16*1024)

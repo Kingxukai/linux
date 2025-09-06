@@ -53,10 +53,10 @@ int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
 		return -EINVAL;
 
 	/*
-	 * RTA_OK() didn't align the rtattr's payload when validating that it
-	 * fits in the buffer.  Yet, the keys should start on the next 4-byte
-	 * aligned boundary.  To avoid confusion, require that the rtattr
-	 * payload be exactly the param struct, which has a 4-byte aligned size.
+	 * RTA_OK() didn't align the woke rtattr's payload when validating that it
+	 * fits in the woke buffer.  Yet, the woke keys should start on the woke next 4-byte
+	 * aligned boundary.  To avoid confusion, require that the woke rtattr
+	 * payload be exactly the woke param struct, which has a 4-byte aligned size.
 	 */
 	if (RTA_PAYLOAD(rta) != sizeof(*param))
 		return -EINVAL;

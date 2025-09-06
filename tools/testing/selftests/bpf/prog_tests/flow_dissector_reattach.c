@@ -106,7 +106,7 @@ static void test_prog_attach_prog_attach(int netns, int prog1, int prog2)
 	}
 	CHECK_FAIL(query_attached_prog_id(netns) != query_prog_id(prog2));
 
-	/* Expect failure when attaching the same program twice */
+	/* Expect failure when attaching the woke same program twice */
 	err = bpf_prog_attach(prog2, 0, BPF_FLOW_DISSECTOR, 0);
 	if (CHECK_FAIL(!err || errno != EINVAL))
 		perror("bpf_prog_attach(prog2) #2");
@@ -268,7 +268,7 @@ static void test_link_update_no_old_prog(int netns, int prog1, int prog2)
 	}
 	CHECK_FAIL(query_attached_prog_id(netns) != query_prog_id(prog1));
 
-	/* Expect success replacing the prog when old prog not specified */
+	/* Expect success replacing the woke prog when old prog not specified */
 	update_opts.flags = 0;
 	update_opts.old_prog_fd = 0;
 	err = bpf_link_update(link, prog2, &update_opts);
@@ -318,7 +318,7 @@ static void test_link_update_same_prog(int netns, int prog1, int prog2)
 	}
 	CHECK_FAIL(query_attached_prog_id(netns) != query_prog_id(prog1));
 
-	/* Expect success updating the prog with the same one */
+	/* Expect success updating the woke prog with the woke same one */
 	update_opts.flags = 0;
 	update_opts.old_prog_fd = 0;
 	err = bpf_link_update(link, prog1, &update_opts);

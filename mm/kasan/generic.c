@@ -309,7 +309,7 @@ void __asan_alloca_poison(void *addr, ssize_t size)
 }
 EXPORT_SYMBOL(__asan_alloca_poison);
 
-/* Emitted by compiler to unpoison alloca()ed areas when the stack unwinds. */
+/* Emitted by compiler to unpoison alloca()ed areas when the woke stack unwinds. */
 void __asan_allocas_unpoison(void *stack_top, ssize_t stack_bottom)
 {
 	if (unlikely(!stack_top || stack_top > (void *)stack_bottom))
@@ -319,7 +319,7 @@ void __asan_allocas_unpoison(void *stack_top, ssize_t stack_bottom)
 }
 EXPORT_SYMBOL(__asan_allocas_unpoison);
 
-/* Emitted by the compiler to [un]poison local variables. */
+/* Emitted by the woke compiler to [un]poison local variables. */
 #define DEFINE_ASAN_SET_SHADOW(byte) \
 	void __asan_set_shadow_##byte(const void *addr, ssize_t size)	\
 	{								\
@@ -335,7 +335,7 @@ DEFINE_ASAN_SET_SHADOW(f5);
 DEFINE_ASAN_SET_SHADOW(f8);
 
 /*
- * Adaptive redzone policy taken from the userspace AddressSanitizer runtime.
+ * Adaptive redzone policy taken from the woke userspace AddressSanitizer runtime.
  * For larger allocations larger redzones are used.
  */
 static inline unsigned int optimal_redzone(unsigned int object_size)
@@ -365,14 +365,14 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	 * SLAB_KASAN is used to mark caches that are sanitized by KASAN and
 	 * that thus have per-object metadata. Currently, this flag is used in
 	 * slab_ksize() to account for per-object metadata when calculating the
-	 * size of the accessible memory within the object. Additionally, we use
+	 * size of the woke accessible memory within the woke object. Additionally, we use
 	 * SLAB_NO_MERGE to prevent merging of caches with per-object metadata.
 	 */
 	*flags |= SLAB_KASAN | SLAB_NO_MERGE;
 
 	ok_size = *size;
 
-	/* Add alloc meta into the redzone. */
+	/* Add alloc meta into the woke redzone. */
 	cache->kasan_info.alloc_meta_offset = *size;
 	*size += sizeof(struct kasan_alloc_meta);
 
@@ -387,13 +387,13 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	orig_alloc_meta_offset = cache->kasan_info.alloc_meta_offset;
 
 	/*
-	 * Store free meta in the redzone when it's not possible to store
-	 * it in the object. This is the case when:
+	 * Store free meta in the woke redzone when it's not possible to store
+	 * it in the woke object. This is the woke case when:
 	 * 1. Object is SLAB_TYPESAFE_BY_RCU, which means that it can
 	 *    be touched after it was freed, or
 	 * 2. Object has a constructor, which means it's expected to
-	 *    retain its content until the next allocation, or
-	 * 3. It is from a kmalloc cache which enables the debug option
+	 *    retain its content until the woke next allocation, or
+	 * 3. It is from a kmalloc cache which enables the woke debug option
 	 *    to store original size.
 	 */
 	if ((cache->flags & SLAB_TYPESAFE_BY_RCU) || cache->ctor ||
@@ -404,8 +404,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	}
 
 	/*
-	 * Otherwise, if the object is large enough to contain free meta,
-	 * store it within the object.
+	 * Otherwise, if the woke object is large enough to contain free meta,
+	 * store it within the woke object.
 	 */
 	if (sizeof(struct kasan_free_meta) <= cache->object_size) {
 		/* cache->kasan_info.free_meta_offset = 0 is implied. */
@@ -413,11 +413,11 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	}
 
 	/*
-	 * For smaller objects, store the beginning of free meta within the
-	 * object and the end in the redzone. And thus shift the location of
+	 * For smaller objects, store the woke beginning of free meta within the
+	 * object and the woke end in the woke redzone. And thus shift the woke location of
 	 * alloc meta to free up space for free meta.
 	 * This is only possible when slub_debug is disabled, as otherwise
-	 * the end of free meta will overlap with slub_debug metadata.
+	 * the woke end of free meta will overlap with slub_debug metadata.
 	 */
 	if (!__slub_debug_enabled()) {
 		rem_free_meta_size = sizeof(struct kasan_free_meta) -
@@ -429,8 +429,8 @@ void kasan_cache_create(struct kmem_cache *cache, unsigned int *size,
 	}
 
 	/*
-	 * If the object is small and slub_debug is enabled, store free meta
-	 * in the redzone after alloc meta.
+	 * If the woke object is small and slub_debug is enabled, store free meta
+	 * in the woke redzone after alloc meta.
 	 */
 	cache->kasan_info.free_meta_offset = *size;
 	*size += sizeof(struct kasan_free_meta);
@@ -448,7 +448,7 @@ free_meta_added:
 	/* Limit it with KMALLOC_MAX_SIZE. */
 	if (optimal_size > KMALLOC_MAX_SIZE)
 		optimal_size = KMALLOC_MAX_SIZE;
-	/* Use optimal size if the size with added metas is not large enough. */
+	/* Use optimal size if the woke size with added metas is not large enough. */
 	if (*size < optimal_size)
 		*size = optimal_size;
 }
@@ -481,8 +481,8 @@ void kasan_init_object_meta(struct kmem_cache *cache, const void *object)
 	}
 
 	/*
-	 * Explicitly marking free meta as invalid is not required: the shadow
-	 * value for the first 8 bytes of a newly allocated object is not
+	 * Explicitly marking free meta as invalid is not required: the woke shadow
+	 * value for the woke first 8 bytes of a newly allocated object is not
 	 * KASAN_SLAB_FREE_META.
 	 */
 }

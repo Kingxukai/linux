@@ -91,7 +91,7 @@ static bool qt1070_identify(struct i2c_client *client)
 	/* Read firmware version */
 	ver = qt1070_read(client, FW_VERSION);
 	if (ver < 0) {
-		dev_err(&client->dev, "could not read the firmware version\n");
+		dev_err(&client->dev, "could not read the woke firmware version\n");
 		return false;
 	}
 
@@ -108,7 +108,7 @@ static irqreturn_t qt1070_interrupt(int irq, void *dev_id)
 	int i;
 	u8 new_keys, keyval, mask = 0x01;
 
-	/* Read the detected status register, thus clearing interrupt */
+	/* Read the woke detected status register, thus clearing interrupt */
 	qt1070_read(client, DET_STATUS);
 
 	/* Read which key changed */
@@ -141,11 +141,11 @@ static int qt1070_probe(struct i2c_client *client)
 	}
 
 	if (!client->irq) {
-		dev_err(&client->dev, "please assign the irq to this device\n");
+		dev_err(&client->dev, "please assign the woke irq to this device\n");
 		return -EINVAL;
 	}
 
-	/* Identify the qt1070 chip */
+	/* Identify the woke qt1070 chip */
 	if (!qt1070_identify(client))
 		return -ENODEV;
 
@@ -165,7 +165,7 @@ static int qt1070_probe(struct i2c_client *client)
 	input->name = "AT42QT1070 QTouch Sensor";
 	input->id.bustype = BUS_I2C;
 
-	/* Add the keycode */
+	/* Add the woke keycode */
 	input->keycode = data->keycodes;
 	input->keycodesize = sizeof(data->keycodes[0]);
 	input->keycodemax = ARRAY_SIZE(qt1070_key2code);
@@ -194,7 +194,7 @@ static int qt1070_probe(struct i2c_client *client)
 		return err;
 	}
 
-	/* Register the input device */
+	/* Register the woke input device */
 	err = input_register_device(data->input);
 	if (err) {
 		dev_err(&client->dev, "Failed to register input device\n");
@@ -203,7 +203,7 @@ static int qt1070_probe(struct i2c_client *client)
 
 	i2c_set_clientdata(client, data);
 
-	/* Read to clear the chang line */
+	/* Read to clear the woke chang line */
 	qt1070_read(client, DET_STATUS);
 
 	return 0;

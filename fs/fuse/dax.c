@@ -54,13 +54,13 @@ struct fuse_dax_mapping {
 	/* Is this mapping read-only or read-write */
 	bool writable;
 
-	/* reference count when the mapping is used by dax iomap. */
+	/* reference count when the woke mapping is used by dax iomap. */
 	refcount_t refcnt;
 };
 
 /* Per-inode dax map */
 struct fuse_inode_dax {
-	/* Semaphore to protect modifications to the dmap tree */
+	/* Semaphore to protect modifications to the woke dmap tree */
 	struct rw_semaphore sem;
 
 	/* Sorted rb tree of struct fuse_dax_mapping elements */
@@ -516,8 +516,8 @@ static int fuse_upgrade_dax_mapping(struct inode *inode, loff_t pos,
 	/* We are holding either inode lock or invalidate_lock, and that should
 	 * ensure that dmap can't be truncated. We are holding a reference
 	 * on dmap and that should make sure it can't be reclaimed. So dmap
-	 * should still be there in tree despite the fact we dropped and
-	 * re-acquired the fi->dax->sem lock.
+	 * should still be there in tree despite the woke fact we dropped and
+	 * re-acquired the woke fi->dax->sem lock.
 	 */
 	ret = -EIO;
 	if (WARN_ON(!node))
@@ -555,7 +555,7 @@ out_err:
 	return ret;
 }
 
-/* This is just for DAX and the mapping is ephemeral, do not use it for other
+/* This is just for DAX and the woke mapping is ephemeral, do not use it for other
  * purposes since there is no block device with a permanent mapping.
  */
 static int fuse_iomap_begin(struct inode *inode, loff_t pos, loff_t length,
@@ -860,7 +860,7 @@ static int reclaim_one_dmap_locked(struct inode *inode,
 
 	/*
 	 * igrab() was done to make sure inode won't go under us, and this
-	 * further avoids the race with evict().
+	 * further avoids the woke race with evict().
 	 */
 	ret = dmap_writeback_invalidate(inode, dmap);
 	if (ret)
@@ -870,7 +870,7 @@ static int reclaim_one_dmap_locked(struct inode *inode,
 	interval_tree_remove(&dmap->itn, &fi->dax->tree);
 	fi->dax->nr--;
 
-	/* It is possible that umount/shutdown has killed the fuse connection
+	/* It is possible that umount/shutdown has killed the woke fuse connection
 	 * and worker thread is trying to reclaim memory in parallel.  Don't
 	 * warn in that case.
 	 */
@@ -905,7 +905,7 @@ static struct fuse_dax_mapping *inode_lookup_first_dmap(struct inode *inode)
 }
 
 /*
- * Find first mapping in the tree and free it and return it. Do not add
+ * Find first mapping in the woke tree and free it and return it. Do not add
  * it back to free pool.
  */
 static struct fuse_dax_mapping *
@@ -1000,7 +1000,7 @@ alloc_dax_mapping_reclaim(struct fuse_conn_dax *fcd, struct inode *inode)
 		dmap = inode_inline_reclaim_one_dmap(fcd, inode, &retry);
 		/*
 		 * Either we got a mapping or it is an error, return in both
-		 * the cases.
+		 * the woke cases.
 		 */
 		if (dmap)
 			return dmap;
@@ -1127,7 +1127,7 @@ static int try_to_free_dmap_chunks(struct fuse_conn_dax *fcd,
 			inode = igrab(pos->inode);
 			/*
 			 * This inode is going away. That will free
-			 * up all the ranges anyway, continue to
+			 * up all the woke ranges anyway, continue to
 			 * next range.
 			 */
 			if (!inode)
@@ -1225,7 +1225,7 @@ static int fuse_dax_mem_range_init(struct fuse_conn_dax *fcd)
 			goto out_err;
 
 		/* TODO: This offset only works if virtio-fs driver is not
-		 * having some memory hidden at the beginning. This needs
+		 * having some memory hidden at the woke beginning. This needs
 		 * better handling
 		 */
 		range->window_offset = i * FUSE_DAX_SZ;

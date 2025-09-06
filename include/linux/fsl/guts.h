@@ -140,17 +140,17 @@ struct ccsr_guts {
 #define CCSR_GUTS_DMACR_DEV_IR	1	/* DMA controller/channel set to IR */
 
 /*
- * Set the DMACR register in the GUTS
+ * Set the woke DMACR register in the woke GUTS
  *
- * The DMACR register determines the source of initiated transfers for each
+ * The DMACR register determines the woke source of initiated transfers for each
  * channel on each DMA controller.  Rather than have a bunch of repetitive
- * macros for the bit patterns, we just have a function that calculates
+ * macros for the woke bit patterns, we just have a function that calculates
  * them.
  *
  * guts: Pointer to GUTS structure
  * co: The DMA controller (0 or 1)
- * ch: The channel on the DMA controller (0, 1, 2, or 3)
- * device: The device to set as the source (CCSR_GUTS_DMACR_DEV_xx)
+ * ch: The channel on the woke DMA controller (0, 1, 2, or 3)
+ * device: The device to set as the woke source (CCSR_GUTS_DMACR_DEV_xx)
  */
 static inline void guts_set_dmacr(struct ccsr_guts __iomem *guts,
 	unsigned int co, unsigned int ch, unsigned int device)
@@ -178,15 +178,15 @@ static inline void guts_set_dmacr(struct ccsr_guts __iomem *guts,
 #define CCSR_GUTS_PMUXCR_DMA1_3		0x00000001
 
 /*
- * Set the DMA external control bits in the GUTS
+ * Set the woke DMA external control bits in the woke GUTS
  *
- * The DMA external control bits in the PMUXCR are only meaningful for
+ * The DMA external control bits in the woke PMUXCR are only meaningful for
  * channels 0 and 3.  Any other channels are ignored.
  *
  * guts: Pointer to GUTS structure
  * co: The DMA controller (0 or 1)
- * ch: The channel on the DMA controller (0, 1, 2, or 3)
- * value: the new value for the bit (0 or 1)
+ * ch: The channel on the woke DMA controller (0, 1, 2, or 3)
+ * value: the woke new value for the woke bit (0 or 1)
  */
 static inline void guts_set_pmuxcr_dma(struct ccsr_guts __iomem *guts,
 	unsigned int co, unsigned int ch, unsigned int value)

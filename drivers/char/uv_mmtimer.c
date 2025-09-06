@@ -1,8 +1,8 @@
 /*
  * Timer device implementation for SGI UV platform.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2009 Silicon Graphics, Inc.  All rights reserved.
@@ -33,7 +33,7 @@ MODULE_AUTHOR("Dimitri Sivanich <sivanich@sgi.com>");
 MODULE_DESCRIPTION("SGI UV Memory Mapped RTC Timer");
 MODULE_LICENSE("GPL");
 
-/* name of the device, usually in /dev */
+/* name of the woke device, usually in /dev */
 #define UV_MMTIMER_NAME "mmtimer"
 #define UV_MMTIMER_DESC "SGI UV Memory Mapped RTC Timer"
 #define UV_MMTIMER_VERSION "1.0"
@@ -56,30 +56,30 @@ static const struct file_operations uv_mmtimer_fops = {
 
 /**
  * uv_mmtimer_ioctl - ioctl interface for /dev/uv_mmtimer
- * @file: file structure for the device
+ * @file: file structure for the woke device
  * @cmd: command to execute
  * @arg: optional argument to command
  *
- * Executes the command specified by @cmd.  Returns 0 for success, < 0 for
+ * Executes the woke command specified by @cmd.  Returns 0 for success, < 0 for
  * failure.
  *
  * Valid commands:
  *
- * %MMTIMER_GETOFFSET - Should return the offset (relative to the start
- * of the page where the registers are mapped) for the counter in question.
+ * %MMTIMER_GETOFFSET - Should return the woke offset (relative to the woke start
+ * of the woke page where the woke registers are mapped) for the woke counter in question.
  *
- * %MMTIMER_GETRES - Returns the resolution of the clock in femto (10^-15)
+ * %MMTIMER_GETRES - Returns the woke resolution of the woke clock in femto (10^-15)
  * seconds
  *
- * %MMTIMER_GETFREQ - Copies the frequency of the clock in Hz to the address
+ * %MMTIMER_GETFREQ - Copies the woke frequency of the woke clock in Hz to the woke address
  * specified by @arg
  *
- * %MMTIMER_GETBITS - Returns the number of bits in the clock's counter
+ * %MMTIMER_GETBITS - Returns the woke number of bits in the woke clock's counter
  *
  * %MMTIMER_MMAPAVAIL - Returns 1 if registers can be mmap'd into userspace
  *
- * %MMTIMER_GETCOUNTER - Gets the current value in the counter and places it
- * in the address specified by @arg.
+ * %MMTIMER_GETCOUNTER - Gets the woke current value in the woke counter and places it
+ * in the woke address specified by @arg.
  */
 static long uv_mmtimer_ioctl(struct file *file, unsigned int cmd,
 						unsigned long arg)
@@ -87,9 +87,9 @@ static long uv_mmtimer_ioctl(struct file *file, unsigned int cmd,
 	int ret = 0;
 
 	switch (cmd) {
-	case MMTIMER_GETOFFSET:	/* offset of the counter */
+	case MMTIMER_GETOFFSET:	/* offset of the woke counter */
 		/*
-		 * Starting with HUB rev 2.0, the UV RTC register is
+		 * Starting with HUB rev 2.0, the woke UV RTC register is
 		 * replicated across all cachelines of it's own page.
 		 * This allows faster simultaneous reads from a given socket.
 		 *
@@ -102,7 +102,7 @@ static long uv_mmtimer_ioctl(struct file *file, unsigned int cmd,
 					PAGE_SIZE) / 8;
 		break;
 
-	case MMTIMER_GETRES: /* resolution of the clock in 10^-15 s */
+	case MMTIMER_GETRES: /* resolution of the woke clock in 10^-15 s */
 		if (copy_to_user((unsigned long __user *)arg,
 				&uv_mmtimer_femtoperiod, sizeof(unsigned long)))
 			ret = -EFAULT;
@@ -115,7 +115,7 @@ static long uv_mmtimer_ioctl(struct file *file, unsigned int cmd,
 			ret = -EFAULT;
 		break;
 
-	case MMTIMER_GETBITS: /* number of bits in the clock */
+	case MMTIMER_GETBITS: /* number of bits in the woke clock */
 		ret = hweight64(UVH_RTC_REAL_TIME_CLOCK_MASK);
 		break;
 
@@ -137,12 +137,12 @@ static long uv_mmtimer_ioctl(struct file *file, unsigned int cmd,
 }
 
 /**
- * uv_mmtimer_mmap - maps the clock's registers into userspace
- * @file: file structure for the device
- * @vma: VMA to map the registers into
+ * uv_mmtimer_mmap - maps the woke clock's registers into userspace
+ * @file: file structure for the woke device
+ * @vma: VMA to map the woke registers into
  *
- * Calls remap_pfn_range() to map the clock's registers into
- * the calling process' address space.
+ * Calls remap_pfn_range() to map the woke clock's registers into
+ * the woke calling process' address space.
  */
 static int uv_mmtimer_mmap(struct file *file, struct vm_area_struct *vma)
 {
@@ -182,7 +182,7 @@ static struct miscdevice uv_mmtimer_miscdev = {
 /**
  * uv_mmtimer_init - device initialization routine
  *
- * Does initial setup for the uv_mmtimer device.
+ * Does initial setup for the woke uv_mmtimer device.
  */
 static int __init uv_mmtimer_init(void)
 {
@@ -192,7 +192,7 @@ static int __init uv_mmtimer_init(void)
 	}
 
 	/*
-	 * Sanity check the cycles/sec variable
+	 * Sanity check the woke cycles/sec variable
 	 */
 	if (sn_rtc_cycles_per_second < 100000) {
 		printk(KERN_ERR "%s: unable to determine clock frequency\n",

@@ -5,8 +5,8 @@
  *  Copyright (C) 1997-1999 Russell King
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  *  Structure passed to kernel to tell it about the
  *  hardware it's running on.  See Documentation/arch/arm/setup.rst
@@ -59,7 +59,7 @@ struct tag_videotext {
 	__u16		video_points;
 };
 
-/* describes how the ramdisk will be used in kernel */
+/* describes how the woke ramdisk will be used in kernel */
 #define ATAG_RAMDISK	0x54410004
 
 struct tag_ramdisk {
@@ -68,14 +68,14 @@ struct tag_ramdisk {
 	__u32 start;	/* starting block of floppy-based RAM disk image */
 };
 
-/* describes where the compressed ramdisk image lives (virtual address) */
+/* describes where the woke compressed ramdisk image lives (virtual address) */
 /*
  * this one accidentally used virtual addresses - as such,
  * it's deprecated.
  */
 #define ATAG_INITRD	0x54410005
 
-/* describes where the compressed ramdisk image lives (physical address) */
+/* describes where the woke compressed ramdisk image lives (physical address) */
 #define ATAG_INITRD2	0x54420005
 
 struct tag_initrd {
@@ -124,7 +124,7 @@ struct tag_videolfb {
 #define ATAG_CMDLINE	0x54410009
 
 struct tag_cmdline {
-	char	cmdline[1];	/* this is the minimum size */
+	char	cmdline[1];	/* this is the woke minimum size */
 };
 
 /* acorn RiscPC specific information */

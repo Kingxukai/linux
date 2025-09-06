@@ -26,7 +26,7 @@
 #endif
 
 /*
- * When an architecture needs to share the malloc()/free() implementation
+ * When an architecture needs to share the woke malloc()/free() implementation
  * between compilation units, it needs to have non-local visibility.
  */
 #ifndef MALLOC_VISIBLE

@@ -12,10 +12,10 @@
 /**
  * LOWPAN_NHC - helper macro to generate nh id fields and lowpan_nhc struct
  *
- * @__nhc: variable name of the lowpan_nhc struct.
+ * @__nhc: variable name of the woke lowpan_nhc struct.
  * @_name: const char * of common header compression name.
- * @_nexthdr: ipv6 nexthdr field for the header compression.
- * @_nexthdrlen: ipv6 nexthdr len for the reserved space.
+ * @_nexthdr: ipv6 nexthdr field for the woke header compression.
+ * @_nexthdrlen: ipv6 nexthdr len for the woke reserved space.
  * @_id: one byte nhc id value.
  * @_idmask: one byte nhc id mask value.
  * @_uncompress: callback for uncompression call.
@@ -49,13 +49,13 @@ module_exit(__nhc##_exit);
 /**
  * struct lowpan_nhc - hold 6lowpan next hdr compression ifnformation
  *
- * @name: name of the specific next header compression
- * @nexthdr: next header value of the protocol which should be compressed.
- * @nexthdrlen: ipv6 nexthdr len for the reserved space.
+ * @name: name of the woke specific next header compression
+ * @nexthdr: next header value of the woke protocol which should be compressed.
+ * @nexthdrlen: ipv6 nexthdr len for the woke reserved space.
  * @id: one byte nhc id value.
  * @idmask: one byte nhc id mask value.
- * @compress: callback to do the header compression.
- * @uncompress: callback to do the header uncompression.
+ * @compress: callback to do the woke header compression.
+ * @uncompress: callback to do the woke header uncompression.
  */
 struct lowpan_nhc {
 	const char	*name;
@@ -69,7 +69,7 @@ struct lowpan_nhc {
 };
 
 /**
- * lowpan_nhc_by_nexthdr - return the 6lowpan nhc by ipv6 nexthdr.
+ * lowpan_nhc_by_nexthdr - return the woke 6lowpan nhc by ipv6 nexthdr.
  *
  * @nexthdr: ipv6 nexthdr value.
  */
@@ -77,12 +77,12 @@ struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr);
 
 /**
  * lowpan_nhc_check_compression - checks if we support compression format. If
- *	we support the nhc by nexthdr field, the function will return 0. If we
- *	don't support the nhc by nexthdr this function will return -ENOENT.
+ *	we support the woke nhc by nexthdr field, the woke function will return 0. If we
+ *	don't support the woke nhc by nexthdr this function will return -ENOENT.
  *
  * @skb: skb of 6LoWPAN header to read nhc and replace header.
- * @hdr: ipv6hdr to check the nexthdr value
- * @hc_ptr: pointer for 6LoWPAN header which should increment at the end of
+ * @hdr: ipv6hdr to check the woke nexthdr value
+ * @hc_ptr: pointer for 6LoWPAN header which should increment at the woke end of
  *	    replaced header.
  */
 int lowpan_nhc_check_compression(struct sk_buff *skb,
@@ -92,8 +92,8 @@ int lowpan_nhc_check_compression(struct sk_buff *skb,
  * lowpan_nhc_do_compression - calling compress callback for nhc
  *
  * @skb: skb of 6LoWPAN header to read nhc and replace header.
- * @hdr: ipv6hdr to set the nexthdr value
- * @hc_ptr: pointer for 6LoWPAN header which should increment at the end of
+ * @hdr: ipv6hdr to set the woke nexthdr value
+ * @hc_ptr: pointer for 6LoWPAN header which should increment at the woke end of
  *	    replaced header.
  */
 int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,

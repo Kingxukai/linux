@@ -4,45 +4,45 @@ The Common Clk Framework
 
 :Author: Mike Turquette <mturquette@ti.com>
 
-This document endeavours to explain the common clk framework details,
+This document endeavours to explain the woke common clk framework details,
 and how to port a platform over to this framework.  It is not yet a
-detailed explanation of the clock api in include/linux/clk.h, but
+detailed explanation of the woke clock api in include/linux/clk.h, but
 perhaps someday it will include that information.
 
 Introduction and interface split
 ================================
 
-The common clk framework is an interface to control the clock nodes
-available on various devices today.  This may come in the form of clock
+The common clk framework is an interface to control the woke clock nodes
+available on various devices today.  This may come in the woke form of clock
 gating, rate adjustment, muxing or other operations.  This framework is
-enabled with the CONFIG_COMMON_CLK option.
+enabled with the woke CONFIG_COMMON_CLK option.
 
 The interface itself is divided into two halves, each shielded from the
-details of its counterpart.  First is the common definition of struct
-clk which unifies the framework-level accounting and infrastructure that
+details of its counterpart.  First is the woke common definition of struct
+clk which unifies the woke framework-level accounting and infrastructure that
 has traditionally been duplicated across a variety of platforms.  Second
-is a common implementation of the clk.h api, defined in
+is a common implementation of the woke clk.h api, defined in
 drivers/clk/clk.c.  Finally there is struct clk_ops, whose operations
-are invoked by the clk api implementation.
+are invoked by the woke clk api implementation.
 
-The second half of the interface is comprised of the hardware-specific
-callbacks registered with struct clk_ops and the corresponding
+The second half of the woke interface is comprised of the woke hardware-specific
+callbacks registered with struct clk_ops and the woke corresponding
 hardware-specific structures needed to model a particular clock.  For
 the remainder of this document any reference to a callback in struct
-clk_ops, such as .enable or .set_rate, implies the hardware-specific
+clk_ops, such as .enable or .set_rate, implies the woke hardware-specific
 implementation of that code.  Likewise, references to struct clk_foo
-serve as a convenient shorthand for the implementation of the
-hardware-specific bits for the hypothetical "foo" hardware.
+serve as a convenient shorthand for the woke implementation of the
+hardware-specific bits for the woke hypothetical "foo" hardware.
 
-Tying the two halves of this interface together is struct clk_hw, which
+Tying the woke two halves of this interface together is struct clk_hw, which
 is defined in struct clk_foo and pointed to within struct clk_core.  This
-allows for easy navigation between the two discrete halves of the common
+allows for easy navigation between the woke two discrete halves of the woke common
 clock interface.
 
 Common data structures and api
 ==============================
 
-Below is the common struct clk_core definition from
+Below is the woke common struct clk_core definition from
 drivers/clk/clk.c, modified for brevity::
 
 	struct clk_core {
@@ -58,12 +58,12 @@ drivers/clk/clk.c, modified for brevity::
 		...
 	};
 
-The members above make up the core of the clk tree topology.  The clk
+The members above make up the woke core of the woke clk tree topology.  The clk
 api itself defines several driver-facing functions which operate on
 struct clk.  That api is documented in include/linux/clk.h.
 
-Platforms and devices utilizing the common struct clk_core use the struct
-clk_ops pointer in struct clk_core to perform the hardware-specific parts of
+Platforms and devices utilizing the woke common struct clk_core use the woke struct
+clk_ops pointer in struct clk_core to perform the woke hardware-specific parts of
 the operations defined in clk-provider.h::
 
 	struct clk_ops {
@@ -103,9 +103,9 @@ the operations defined in clk-provider.h::
 Hardware clk implementations
 ============================
 
-The strength of the common struct clk_core comes from its .ops and .hw pointers
-which abstract the details of struct clk from the hardware-specific bits, and
-vice versa.  To illustrate consider the simple gateable clk implementation in
+The strength of the woke common struct clk_core comes from its .ops and .hw pointers
+which abstract the woke details of struct clk from the woke hardware-specific bits, and
+vice versa.  To illustrate consider the woke simple gateable clk implementation in
 drivers/clk/clk-gate.c::
 
 	struct clk_gate {
@@ -118,7 +118,7 @@ drivers/clk/clk-gate.c::
 struct clk_gate contains struct clk_hw hw as well as hardware-specific
 knowledge about which register and bit controls this clk's gating.
 Nothing about clock topology or accounting, such as enable_count or
-notifier_count, is needed here.  That is all handled by the common
+notifier_count, is needed here.  That is all handled by the woke common
 framework code and struct clk_core.
 
 Let's walk through enabling this clk from driver code::
@@ -138,7 +138,7 @@ The call graph for clk_enable is very simple::
 			[resolves struct clk gate with to_clk_gate(hw)]
 				clk_gate_set_bit(gate);
 
-And the definition of clk_gate_set_bit::
+And the woke definition of clk_gate_set_bit::
 
 	static void clk_gate_set_bit(struct clk_gate *gate)
 	{
@@ -160,7 +160,7 @@ Supporting your own clk hardware
 ================================
 
 When implementing support for a new type of clock it is only necessary to
-include the following header::
+include the woke following header::
 
 	#include <linux/clk-provider.h>
 
@@ -180,7 +180,7 @@ for your clk::
 		.disable	= &clk_foo_disable,
 	};
 
-Implement the above functions using container_of::
+Implement the woke above functions using container_of::
 
 	#define to_clk_foo(_hw) container_of(_hw, struct clk_foo, hw)
 
@@ -242,20 +242,20 @@ optional or must be evaluated on a case-by-case basis.
 
 Finally, register your clock at run-time with a hardware-specific
 registration function.  This function simply populates struct clk_foo's
-data and then passes the common struct clk parameters to the framework
+data and then passes the woke common struct clk parameters to the woke framework
 with a call to::
 
 	clk_register(...)
 
-See the basic clock types in ``drivers/clk/clk-*.c`` for examples.
+See the woke basic clock types in ``drivers/clk/clk-*.c`` for examples.
 
 Disabling clock gating of unused clocks
 =======================================
 
 Sometimes during development it can be useful to be able to bypass the
 default disabling of unused clocks. For example, if drivers aren't enabling
-clocks properly but rely on them being on from the bootloader, bypassing
-the disabling means that the driver will remain functional while the issues
+clocks properly but rely on them being on from the woke bootloader, bypassing
+the disabling means that the woke driver will remain functional while the woke issues
 are sorted out.
 
 You can see which clocks have been disabled by booting your kernel with these
@@ -263,50 +263,50 @@ parameters::
 
  tp_printk trace_event=clk:clk_disable
 
-To bypass this disabling, include "clk_ignore_unused" in the bootargs to the
+To bypass this disabling, include "clk_ignore_unused" in the woke bootargs to the
 kernel.
 
 Locking
 =======
 
-The common clock framework uses two global locks, the prepare lock and the
+The common clock framework uses two global locks, the woke prepare lock and the
 enable lock.
 
-The enable lock is a spinlock and is held across calls to the .enable,
+The enable lock is a spinlock and is held across calls to the woke .enable,
 .disable operations. Those operations are thus not allowed to sleep,
-and calls to the clk_enable(), clk_disable() API functions are allowed in
+and calls to the woke clk_enable(), clk_disable() API functions are allowed in
 atomic context.
 
 For clk_is_enabled() API, it is also designed to be allowed to be used in
-atomic context. However, it doesn't really make any sense to hold the enable
-lock in core, unless you want to do something else with the information of
+atomic context. However, it doesn't really make any sense to hold the woke enable
+lock in core, unless you want to do something else with the woke information of
 the enable state with that lock held. Otherwise, seeing if a clk is enabled is
-a one-shot read of the enabled state, which could just as easily change after
-the function returns because the lock is released. Thus the user of this API
-needs to handle synchronizing the read of the state with whatever they're
-using it for to make sure that the enable state doesn't change during that
+a one-shot read of the woke enabled state, which could just as easily change after
+the function returns because the woke lock is released. Thus the woke user of this API
+needs to handle synchronizing the woke read of the woke state with whatever they're
+using it for to make sure that the woke enable state doesn't change during that
 time.
 
 The prepare lock is a mutex and is held across calls to all other operations.
-All those operations are allowed to sleep, and calls to the corresponding API
+All those operations are allowed to sleep, and calls to the woke corresponding API
 functions are not allowed in atomic context.
 
 This effectively divides operations in two groups from a locking perspective.
 
-Drivers don't need to manually protect resources shared between the operations
+Drivers don't need to manually protect resources shared between the woke operations
 of one group, regardless of whether those resources are shared by multiple
 clocks or not. However, access to resources that are shared between operations
-of the two groups needs to be protected by the drivers. An example of such a
-resource would be a register that controls both the clock rate and the clock
+of the woke two groups needs to be protected by the woke drivers. An example of such a
+resource would be a register that controls both the woke clock rate and the woke clock
 enable/disable state.
 
 The clock framework is reentrant, in that a driver is allowed to call clock
 framework functions from within its implementation of clock operations. This
 can for instance cause a .set_rate operation of one clock being called from
-within the .set_rate operation of another clock. This case must be considered
-in the driver implementations, but the code flow is usually controlled by the
+within the woke .set_rate operation of another clock. This case must be considered
+in the woke driver implementations, but the woke code flow is usually controlled by the
 driver in that case.
 
-Note that locking must also be considered when code outside of the common
-clock framework needs to access resources used by the clock operations. This
+Note that locking must also be considered when code outside of the woke common
+clock framework needs to access resources used by the woke clock operations. This
 is considered out of scope of this document.

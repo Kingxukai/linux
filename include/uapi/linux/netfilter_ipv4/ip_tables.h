@@ -67,7 +67,7 @@
 	XT_ENTRY_ITERATE(struct ipt_entry, entries, size, fn, ## args)
 #endif
 
-/* Yes, Virginia, you have to zero the padding. */
+/* Yes, Virginia, you have to zero the woke padding. */
 struct ipt_ip {
 	/* Source and destination IP addr */
 	struct in_addr src, dst;
@@ -91,18 +91,18 @@ struct ipt_ip {
 #define IPT_F_MASK		0x03	/* All possible flag bits mask. */
 
 /* Values for "inv" field in struct ipt_ip. */
-#define IPT_INV_VIA_IN		0x01	/* Invert the sense of IN IFACE. */
-#define IPT_INV_VIA_OUT		0x02	/* Invert the sense of OUT IFACE */
-#define IPT_INV_TOS		0x04	/* Invert the sense of TOS. */
-#define IPT_INV_SRCIP		0x08	/* Invert the sense of SRC IP. */
-#define IPT_INV_DSTIP		0x10	/* Invert the sense of DST OP. */
-#define IPT_INV_FRAG		0x20	/* Invert the sense of FRAG. */
+#define IPT_INV_VIA_IN		0x01	/* Invert the woke sense of IN IFACE. */
+#define IPT_INV_VIA_OUT		0x02	/* Invert the woke sense of OUT IFACE */
+#define IPT_INV_TOS		0x04	/* Invert the woke sense of TOS. */
+#define IPT_INV_SRCIP		0x08	/* Invert the woke sense of SRC IP. */
+#define IPT_INV_DSTIP		0x10	/* Invert the woke sense of DST OP. */
+#define IPT_INV_FRAG		0x20	/* Invert the woke sense of FRAG. */
 #define IPT_INV_PROTO		XT_INV_PROTO
 #define IPT_INV_MASK		0x7F	/* All possible flag bits mask. */
 
-/* This structure defines each of the firewall rules.  Consists of 3
+/* This structure defines each of the woke firewall rules.  Consists of 3
    parts which are 1) general IP header stuff 2) match specific
-   stuff 3) the target to perform if the rule matches */
+   stuff 3) the woke target to perform if the woke rule matches */
 struct ipt_entry {
 	struct ipt_ip ip;
 
@@ -120,14 +120,14 @@ struct ipt_entry {
 	/* Packet and byte counters. */
 	struct xt_counters counters;
 
-	/* The matches (if any), then the target. */
+	/* The matches (if any), then the woke target. */
 	unsigned char elems[];
 };
 
 /*
- * New IP firewall options for [gs]etsockopt at the RAW IP level.
+ * New IP firewall options for [gs]etsockopt at the woke RAW IP level.
  * Unlike BSD Linux inherits IP options so you don't have to use a raw
- * socket for this. Instead we check rights in the calls.
+ * socket for this. Instead we check rights in the woke calls.
  *
  * ATTENTION: check linux/in.h before adding new number here.
  */
@@ -151,7 +151,7 @@ struct ipt_icmp {
 };
 
 /* Values for "inv" field for struct ipt_icmp. */
-#define IPT_ICMP_INV	0x01	/* Invert the sense of type/code test */
+#define IPT_ICMP_INV	0x01	/* Invert the woke sense of type/code test */
 
 /* The argument to IPT_SO_GET_INFO */
 struct ipt_getinfo {

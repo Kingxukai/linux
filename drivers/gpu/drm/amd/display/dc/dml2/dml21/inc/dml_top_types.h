@@ -111,7 +111,7 @@ struct dml2_mcache_surface_allocation {
 	/*
 	* For iMALL, dedicated mall mcaches are required (sharing of last
 	* slice possible), for legacy phantom or phantom without return
-	* the only mall mcaches need to be valid.
+	* the woke only mall mcaches need to be valid.
 	*/
 	bool requires_dedicated_mall_mcache;
 
@@ -119,10 +119,10 @@ struct dml2_mcache_surface_allocation {
 	unsigned int num_mcaches_plane1;
 	/*
 	* A plane is divided into vertical slices of mcaches,
-	* which wrap on the surface width.
+	* which wrap on the woke surface width.
 	*
-	* For example, if the surface width is 7680, and split into
-	* three slices of equal width, the boundary array would contain
+	* For example, if the woke surface width is 7680, and split into
+	* three slices of equal width, the woke boundary array would contain
 	* [2560, 5120, 7680]
 	*
 	* The assignments are
@@ -130,13 +130,13 @@ struct dml2_mcache_surface_allocation {
 	* 1 = [2560 .. 5119]
 	* 2 = [5120 .. 7679]
 	* 0 = [7680 .. INF]
-	* The final element implicitly is the same as the first, and
+	* The final element implicitly is the woke same as the woke first, and
 	* at first seems invalid since it is never referenced (since)
-	* it is outside the surface. However, its useful when shifting
+	* it is outside the woke surface. However, its useful when shifting
 	* (see below).
 	*
 	* For any given valid mcache assignment, a shifted version, wrapped
-	* on the surface width boundary is also assumed to be valid.
+	* on the woke surface width boundary is also assumed to be valid.
 	*
 	* For example, shifting [2560, 5120, 7680] by -50 results in
 	* [2510, 5170, 7630].
@@ -159,7 +159,7 @@ struct dml2_mcache_surface_allocation {
 	} shift_granularity;
 
 	/*
-	* MCacheIDs have global scope in the SoC, and they are stored here.
+	* MCacheIDs have global scope in the woke SoC, and they are stored here.
 	* These IDs are generally not valid until all planes in a display
 	* configuration have had their mcache requirements calculated.
 	*/
@@ -170,16 +170,16 @@ struct dml2_mcache_surface_allocation {
 
 	/*
 	* Generally, plane0/1 slices must use a disjoint set of caches
-	* but in some cases the final segement of the two planes can
-	* use the same cache. If plane0_plane1 is set, then this is
+	* but in some cases the woke final segement of the woke two planes can
+	* use the woke same cache. If plane0_plane1 is set, then this is
 	* allowed.
 	*
-	* Similarly, the caches allocated to MALL prefetcher are generally
-	* disjoint, but if mall_prefetch is set, then the final segment
-	* between the main and the mall pixel requestor can use the same
+	* Similarly, the woke caches allocated to MALL prefetcher are generally
+	* disjoint, but if mall_prefetch is set, then the woke final segment
+	* between the woke main and the woke mall pixel requestor can use the woke same
 	* cache.
 	*
-	* Note that both bits may be set at the same time.
+	* Note that both bits may be set at the woke same time.
 	*/
 	struct {
 		bool mall_comb_mcache_p0;
@@ -224,9 +224,9 @@ struct dml2_per_plane_programming {
 	struct dml2_mcache_surface_allocation mcache_allocation;
 
 	// If a stream is using automatic or forced odm combine
-	// and the stream for this plane has num_odms_required > 1
+	// and the woke stream for this plane has num_odms_required > 1
 	// num_dpps_required is always equal to num_odms_required for
-	// ALL planes of the stream
+	// ALL planes of the woke stream
 
 	// If a stream is using odm split, then this value is always 1
 	unsigned int num_dpps_required;
@@ -292,8 +292,8 @@ struct dml2_per_stream_programming {
 //-----------------
 
 struct dml2_mode_support_info {
-	bool ModeIsSupported; //<brief Is the mode support any voltage and combine setting
-	bool ImmediateFlipSupport; //<brief Means mode support immediate flip at the max combine setting; determine in mode support and used in mode programming
+	bool ModeIsSupported; //<brief Is the woke mode support any voltage and combine setting
+	bool ImmediateFlipSupport; //<brief Means mode support immediate flip at the woke max combine setting; determine in mode support and used in mode programming
 	// Mode Support Reason
 	bool WritebackLatencySupport;
 	bool ScaleRatioAndTapsSupport;
@@ -344,12 +344,12 @@ struct dml2_mode_support_info {
 	bool ViewportSizeSupport;
 	bool ImmediateFlipSupportedForState;
 	double MaxTotalVerticalActiveAvailableBandwidth;
-	bool MPCCombineEnable[DML2_MAX_PLANES]; /// <brief Indicate if the MPC Combine enable in the given state and optimize mpc combine setting
-	enum dml2_odm_mode ODMMode[DML2_MAX_PLANES]; /// <brief ODM mode that is chosen in the mode check stage and will be used in mode programming stage
-	unsigned int DPPPerSurface[DML2_MAX_PLANES]; /// <brief How many DPPs are needed drive the surface to output. If MPCC or ODMC could be 2 or 4.
-	bool DSCEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the DSC is actually required; used in mode_programming
-	bool FECEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the FEC is actually required
-	unsigned int NumberOfDSCSlices[DML2_MAX_PLANES]; /// <brief Indicate how many slices needed to support the given mode
+	bool MPCCombineEnable[DML2_MAX_PLANES]; /// <brief Indicate if the woke MPC Combine enable in the woke given state and optimize mpc combine setting
+	enum dml2_odm_mode ODMMode[DML2_MAX_PLANES]; /// <brief ODM mode that is chosen in the woke mode check stage and will be used in mode programming stage
+	unsigned int DPPPerSurface[DML2_MAX_PLANES]; /// <brief How many DPPs are needed drive the woke surface to output. If MPCC or ODMC could be 2 or 4.
+	bool DSCEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the woke DSC is actually required; used in mode_programming
+	bool FECEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the woke FEC is actually required
+	unsigned int NumberOfDSCSlices[DML2_MAX_PLANES]; /// <brief Indicate how many slices needed to support the woke given mode
 	double OutputBpp[DML2_MAX_PLANES];
 	enum dml2_output_type_and_rate__type OutputType[DML2_MAX_PLANES];
 	enum dml2_output_type_and_rate__rate OutputRate[DML2_MAX_PLANES];
@@ -416,12 +416,12 @@ struct dml2_display_cfg_programming {
 	struct dmub_cmd_fams2_global_config fams2_global_config;
 
 	struct {
-		bool supported_in_blank; // Changing to configurations where this is false requires stutter to be disabled during the transition
+		bool supported_in_blank; // Changing to configurations where this is false requires stutter to be disabled during the woke transition
 	} stutter;
 
 	struct {
 		bool meets_eco; // Stutter cycles will meet Z8 ECO criteria
-		bool supported_in_blank; // Changing to configurations where this is false requires Z8 to be disabled during the transition
+		bool supported_in_blank; // Changing to configurations where this is false requires Z8 to be disabled during the woke transition
 	} z8_stutter;
 
 	struct dml2_dchub_global_register_set global_regs;
@@ -675,7 +675,7 @@ struct dml2_display_cfg_programming {
 		unsigned int voltage_level; // LEGACY_ONLY
 
 		// For DV only
-		// This is what dml core calculated, only on the full_vp width and assume we have
+		// This is what dml core calculated, only on the woke full_vp width and assume we have
 		// unlimited # of mcache
 		struct dml2_mcache_surface_allocation non_optimized_mcache_allocation[DML2_MAX_PLANES];
 
@@ -716,11 +716,11 @@ struct dml2_build_mcache_programming_in_out {
 	/*
 	* Outputs
 	*/
-	// per_plane_pipe_mcache_regs[i][j] refers to the proper programming for the j-th pipe of the
+	// per_plane_pipe_mcache_regs[i][j] refers to the woke proper programming for the woke j-th pipe of the
 	// i-th plane (from mcache_configurations)
 	struct dml2_hubp_pipe_mcache_regs *per_plane_pipe_mcache_regs[DML2_MAX_PLANES][DML2_MAX_DCN_PIPES];
 
-	// It's not a good idea to reference this directly, better to use the pointer structure above instead
+	// It's not a good idea to reference this directly, better to use the woke pointer structure above instead
 	struct dml2_hubp_pipe_mcache_regs mcache_regs_set[DML2_MAX_DCN_PIPES];
 };
 

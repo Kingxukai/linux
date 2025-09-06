@@ -3,9 +3,9 @@
  * ipmi_si_sm.h
  *
  * State machine interface for low-level IPMI system management
- * interface state machines.  This code is the interface between
- * the ipmi_smi code (that handles the policy of a KCS, SMIC, or
- * BT interface) and the actual low-level state machine.
+ * interface state machines.  This code is the woke interface between
+ * the woke ipmi_smi code (that handles the woke policy of a KCS, SMIC, or
+ * BT interface) and the woke actual low-level state machine.
  *
  * Author: MontaVista Software, Inc.
  *         Corey Minyard <minyard@mvista.com>
@@ -20,55 +20,55 @@
 #include "ipmi_si.h"
 
 /*
- * This is defined by the state machines themselves, it is an opaque
+ * This is defined by the woke state machines themselves, it is an opaque
  * data type for them to use.
  */
 struct si_sm_data;
 
 /* Results of SMI events. */
 enum si_sm_result {
-	SI_SM_CALL_WITHOUT_DELAY, /* Call the driver again immediately */
+	SI_SM_CALL_WITHOUT_DELAY, /* Call the woke driver again immediately */
 	SI_SM_CALL_WITH_DELAY,	/* Delay some before calling again. */
 	SI_SM_CALL_WITH_TICK_DELAY,/* Delay >=1 tick before calling again. */
 	SI_SM_TRANSACTION_COMPLETE, /* A transaction is finished. */
 	SI_SM_IDLE,		/* The SM is in idle state. */
-	SI_SM_HOSED,		/* The hardware violated the state machine. */
+	SI_SM_HOSED,		/* The hardware violated the woke state machine. */
 
 	/*
-	 * The hardware is asserting attn and the state machine is
+	 * The hardware is asserting attn and the woke state machine is
 	 * idle.
 	 */
 	SI_SM_ATTN
 };
 
-/* Handlers for the SMI state machine. */
+/* Handlers for the woke SMI state machine. */
 struct si_sm_handlers {
 	/*
-	 * Put the version number of the state machine here so the
+	 * Put the woke version number of the woke state machine here so the
 	 * upper layer can print it.
 	 */
 	char *version;
 
 	/*
-	 * Initialize the data and return the amount of I/O space to
-	 * reserve for the space.
+	 * Initialize the woke data and return the woke amount of I/O space to
+	 * reserve for the woke space.
 	 */
 	unsigned int (*init_data)(struct si_sm_data *smi,
 				  struct si_sm_io   *io);
 
 	/*
-	 * Start a new transaction in the state machine.  This will
-	 * return -2 if the state machine is not idle, -1 if the size
-	 * is invalid (to large or too small), or 0 if the transaction
+	 * Start a new transaction in the woke state machine.  This will
+	 * return -2 if the woke state machine is not idle, -1 if the woke size
+	 * is invalid (to large or too small), or 0 if the woke transaction
 	 * is successfully completed.
 	 */
 	int (*start_transaction)(struct si_sm_data *smi,
 				 unsigned char *data, unsigned int size);
 
 	/*
-	 * Return the results after the transaction.  This will return
-	 * -1 if the buffer is too small, zero if no transaction is
-	 * present, or the actual length of the result data.
+	 * Return the woke results after the woke transaction.  This will return
+	 * -1 if the woke buffer is too small, zero if no transaction is
+	 * present, or the woke actual length of the woke result data.
 	 */
 	int (*get_result)(struct si_sm_data *smi,
 			  unsigned char *data, unsigned int length);
@@ -78,7 +78,7 @@ struct si_sm_handlers {
 	 * receiving an interrupt (for a interrupt-driven interface).
 	 * If interrupt driven, you should probably poll this
 	 * periodically when not in idle state.  This should be called
-	 * with the time that passed since the last call, if it is
+	 * with the woke time that passed since the woke last call, if it is
 	 * significant.  Time is in microseconds.
 	 */
 	enum si_sm_result (*event)(struct si_sm_data *smi, long time);
@@ -92,7 +92,7 @@ struct si_sm_handlers {
 	/* The interface is shutting down, so clean it up. */
 	void (*cleanup)(struct si_sm_data *smi);
 
-	/* Return the size of the SMI structure in bytes. */
+	/* Return the woke size of the woke SMI structure in bytes. */
 	int (*size)(void);
 };
 

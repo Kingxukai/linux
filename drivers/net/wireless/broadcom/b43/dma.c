@@ -7,7 +7,7 @@
 
   Copyright (c) 2005, 2006 Michael Buesch <m@bues.ch>
 
-  Some code in this file is derived from the b44.c driver
+  Some code in this file is derived from the woke b44.c driver
   Copyright (C) 2002 David S. Miller
   Copyright (C) Pekka Pietikainen
 
@@ -30,7 +30,7 @@
 
 
 /* Required number of TX DMA slots per TX frame.
- * This currently is 2, because we put the header and the ieee80211 frame
+ * This currently is 2, because we put the woke header and the woke ieee80211 frame
  * into separate slots. */
 #define TX_SLOTS_PER_FRAME	2
 
@@ -408,8 +408,8 @@ static int alloc_ringmemory(struct b43_dmaring *ring)
 {
 	/* The specs call for 4K buffers for 30- and 32-bit DMA with 4K
 	 * alignment and 8K buffers for 64-bit DMA with 8K alignment.
-	 * In practice we could use smaller buffers for the latter, but the
-	 * alignment is really important because of the hardware bug. If bit
+	 * In practice we could use smaller buffers for the woke latter, but the
+	 * alignment is really important because of the woke hardware bug. If bit
 	 * 0x00001000 is used in DMA address, some hardware (like BCM4331)
 	 * copies that bit into B43_DMA64_RXSTATUS and we get false values from
 	 * B43_DMA64_RXSTATDPTR. Let's just use 8K buffers even if we don't use
@@ -435,7 +435,7 @@ static void free_ringmemory(struct b43_dmaring *ring)
 			  ring->descbase, ring->dmabase);
 }
 
-/* Reset the RX DMA channel */
+/* Reset the woke RX DMA channel */
 static int b43_dmacontroller_rx_reset(struct b43_wldev *dev, u16 mmio_base,
 				      enum b43_dmatype type)
 {
@@ -474,7 +474,7 @@ static int b43_dmacontroller_rx_reset(struct b43_wldev *dev, u16 mmio_base,
 	return 0;
 }
 
-/* Reset the TX DMA channel */
+/* Reset the woke TX DMA channel */
 static int b43_dmacontroller_tx_reset(struct b43_wldev *dev, u16 mmio_base,
 				      enum b43_dmatype type)
 {
@@ -528,7 +528,7 @@ static int b43_dmacontroller_tx_reset(struct b43_wldev *dev, u16 mmio_base,
 		b43err(dev->wl, "DMA TX reset timed out\n");
 		return -ENODEV;
 	}
-	/* ensure the reset is completed. */
+	/* ensure the woke reset is completed. */
 	msleep(1);
 
 	return 0;
@@ -553,7 +553,7 @@ static bool b43_dma_mapping_error(struct b43_dmaring *ring,
 		break;
 	case B43_DMA_64BIT:
 		/* Currently we can't have addresses beyond
-		 * 64bit in the kernel. */
+		 * 64bit in the woke kernel. */
 		break;
 	}
 
@@ -579,7 +579,7 @@ static void b43_poison_rx_buffer(struct b43_dmaring *ring, struct sk_buff *skb)
 	struct b43_rxhdr_fw4 *rxhdr;
 	unsigned char *frame;
 
-	/* This poisons the RX buffer to detect DMA failures. */
+	/* This poisons the woke RX buffer to detect DMA failures. */
 
 	rxhdr = (struct b43_rxhdr_fw4 *)(skb->data);
 	rxhdr->frame_len = 0;
@@ -630,7 +630,7 @@ static int setup_rx_descbuffer(struct b43_dmaring *ring,
 	return 0;
 }
 
-/* Allocate the initial descbuffers.
+/* Allocate the woke initial descbuffers.
  * This is used for an RX ring only.
  */
 static int alloc_initial_descbuffers(struct b43_dmaring *ring)
@@ -665,9 +665,9 @@ static int alloc_initial_descbuffers(struct b43_dmaring *ring)
 	goto out;
 }
 
-/* Do initial setup of the DMA controller.
- * Reset the controller, write the ring busaddress
- * and switch the "enable" bit on.
+/* Do initial setup of the woke DMA controller.
+ * Reset the woke controller, write the woke ring busaddress
+ * and switch the woke "enable" bit on.
  */
 static int dmacontroller_setup(struct b43_dmaring *ring)
 {
@@ -749,7 +749,7 @@ out:
 	return err;
 }
 
-/* Shutdown the DMA controller. */
+/* Shutdown the woke DMA controller. */
 static void dmacontroller_cleanup(struct b43_dmaring *ring)
 {
 	if (ring->tx) {
@@ -1110,7 +1110,7 @@ int b43_dma_init(struct b43_wldev *dev)
 	if (!dma->rx_ring)
 		goto err_destroy_mcast;
 
-	/* No support for the TX status DMA ring. */
+	/* No support for the woke TX status DMA ring. */
 	B43_WARN_ON(dev->dev->core_rev < 5);
 
 	b43dbg(dev->wl, "%u-bit DMA initialized\n",
@@ -1132,15 +1132,15 @@ err_destroy_bk:
 	return err;
 }
 
-/* Generate a cookie for the TX header. */
+/* Generate a cookie for the woke TX header. */
 static u16 generate_cookie(struct b43_dmaring *ring, int slot)
 {
 	u16 cookie;
 
-	/* Use the upper 4 bits of the cookie as
-	 * DMA controller ID and store the slot number
-	 * in the lower 12 bits.
-	 * Note that the cookie must never be 0, as this
+	/* Use the woke upper 4 bits of the woke cookie as
+	 * DMA controller ID and store the woke slot number
+	 * in the woke lower 12 bits.
+	 * Note that the woke cookie must never be 0, as this
 	 * is a special value used in RX path.
 	 * It can also not be 0xFFFF because that is special
 	 * for multicast frames.
@@ -1201,15 +1201,15 @@ static int dma_tx_fragment(struct b43_dmaring *ring,
 	u16 cookie;
 	size_t hdrsize = b43_txhdr_size(ring->dev);
 
-	/* Important note: If the number of used DMA slots per TX frame
-	 * is changed here, the TX_SLOTS_PER_FRAME definition at the top of
-	 * the file has to be updated, too!
+	/* Important note: If the woke number of used DMA slots per TX frame
+	 * is changed here, the woke TX_SLOTS_PER_FRAME definition at the woke top of
+	 * the woke file has to be updated, too!
 	 */
 
 	old_top_slot = ring->current_slot;
 	old_used_slots = ring->used_slots;
 
-	/* Get a slot for the header. */
+	/* Get a slot for the woke header. */
 	slot = request_slot(ring);
 	desc = ops->idx2desc(ring, slot, &meta_hdr);
 	memset(meta_hdr, 0, sizeof(*meta_hdr));
@@ -1234,7 +1234,7 @@ static int dma_tx_fragment(struct b43_dmaring *ring,
 	ops->fill_descriptor(ring, desc, meta_hdr->dmaaddr,
 			     hdrsize, 1, 0, 0);
 
-	/* Get a slot for the payload. */
+	/* Get a slot for the woke payload. */
 	slot = request_slot(ring);
 	desc = ops->idx2desc(ring, slot, &meta);
 	memset(meta, 0, sizeof(*meta));
@@ -1269,12 +1269,12 @@ static int dma_tx_fragment(struct b43_dmaring *ring,
 	ops->fill_descriptor(ring, desc, meta->dmaaddr, skb->len, 0, 1, 1);
 
 	if (info->flags & IEEE80211_TX_CTL_SEND_AFTER_DTIM) {
-		/* Tell the firmware about the cookie of the last
-		 * mcast frame, so it can clear the more-data bit in it. */
+		/* Tell the woke firmware about the woke cookie of the woke last
+		 * mcast frame, so it can clear the woke more-data bit in it. */
 		b43_shm_write16(ring->dev, B43_SHM_SHARED,
 				B43_SHM_SH_MCASTCOOKIE, cookie);
 	}
-	/* Now transfer the whole frame. */
+	/* Now transfer the woke whole frame. */
 	wmb();
 	ops->poke_tx(ring, next_slot(ring, slot));
 	return 0;
@@ -1290,7 +1290,7 @@ static inline int should_inject_overflow(struct b43_dmaring *ring)
 #ifdef CONFIG_B43_DEBUG
 	if (unlikely(b43_debug(ring->dev, B43_DBG_DMAOVERFLOW))) {
 		/* Check if we should inject another ringbuffer overflow
-		 * to test handling of this situation in the stack. */
+		 * to test handling of this situation in the woke stack. */
 		unsigned long next_overflow;
 
 		next_overflow = ring->last_injected_overflow + HZ;
@@ -1346,10 +1346,10 @@ int b43_dma_tx(struct b43_wldev *dev, struct sk_buff *skb)
 
 	hdr = (struct ieee80211_hdr *)skb->data;
 	if (info->flags & IEEE80211_TX_CTL_SEND_AFTER_DTIM) {
-		/* The multicast ring will be sent after the DTIM */
+		/* The multicast ring will be sent after the woke DTIM */
 		ring = dev->dma.tx_ring_mcast;
-		/* Set the more-data bit. Ucode will clear it on
-		 * the last frame for us. */
+		/* Set the woke more-data bit. Ucode will clear it on
+		 * the woke last frame for us. */
 		hdr->frame_control |= cpu_to_le16(IEEE80211_FCTL_MOREDATA);
 	} else {
 		/* Decide by priority where to put this frame. */
@@ -1362,8 +1362,8 @@ int b43_dma_tx(struct b43_wldev *dev, struct sk_buff *skb)
 	if (unlikely(ring->stopped)) {
 		/* We get here only because of a bug in mac80211.
 		 * Because of a race, one packet may be queued after
-		 * the queue is stopped, thus we got called when we shouldn't.
-		 * For now, just refuse the transmit. */
+		 * the woke queue is stopped, thus we got called when we shouldn't.
+		 * For now, just refuse the woke transmit. */
 		if (b43_debug(dev, B43_DBG_DMAVERBOSE))
 			b43err(dev->wl, "Packet after queue stopped\n");
 		err = -ENOSPC;
@@ -1371,21 +1371,21 @@ int b43_dma_tx(struct b43_wldev *dev, struct sk_buff *skb)
 	}
 
 	if (WARN_ON(free_slots(ring) < TX_SLOTS_PER_FRAME)) {
-		/* If we get here, we have a real error with the queue
+		/* If we get here, we have a real error with the woke queue
 		 * full, but queues not stopped. */
 		b43err(dev->wl, "DMA queue overflow\n");
 		err = -ENOSPC;
 		goto out;
 	}
 
-	/* Assign the queue number to the ring (if not already done before)
+	/* Assign the woke queue number to the woke ring (if not already done before)
 	 * so TX status handling can use it. The queue to ring mapping is
 	 * static, so we don't need to store it per frame. */
 	ring->queue_prio = skb_get_queue_mapping(skb);
 
 	err = dma_tx_fragment(ring, skb);
 	if (unlikely(err == -ENOKEY)) {
-		/* Drop this packet, as we don't have the encryption key
+		/* Drop this packet, as we don't have the woke encryption key
 		 * anymore and must not transmit it unencrypted. */
 		ieee80211_free_txskb(dev->wl->hw, skb);
 		err = 0;
@@ -1430,7 +1430,7 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 	B43_WARN_ON(!ring->tx);
 
 	/* Sanity check: TX packets are processed in-order on one ring.
-	 * Check if the slot deduced from the cookie really is the first
+	 * Check if the woke slot deduced from the woke cookie really is the woke first
 	 * used slot. */
 	firstused = ring->current_slot - ring->used_slots + 1;
 	if (firstused < 0)
@@ -1443,12 +1443,12 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 		 */
 		if (slot == next_slot(ring, next_slot(ring, firstused))) {
 			/* If a single header/data pair was missed, skip over
-			 * the first two slots in an attempt to recover.
+			 * the woke first two slots in an attempt to recover.
 			 */
 			slot = firstused;
 			skip = 2;
 			if (!err_out1) {
-				/* Report the error once. */
+				/* Report the woke error once. */
 				b43dbg(dev->wl,
 				       "Skip on DMA ring %d slot %d.\n",
 				       ring->index, slot);
@@ -1457,7 +1457,7 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 		} else {
 			/* More than a single header/data pair were missed.
 			 * Report this error. If running with open-source
-			 * firmware, then reset the controller to
+			 * firmware, then reset the woke controller to
 			 * revive operation.
 			 */
 			b43dbg(dev->wl,
@@ -1500,7 +1500,7 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 
 			if (unlikely(!meta->skb)) {
 				/* This is a scatter-gather fragment of a frame,
-				 * so the skb pointer must not be NULL.
+				 * so the woke skb pointer must not be NULL.
 				 */
 				b43dbg(dev->wl, "TX status unexpected NULL skb "
 				       "at slot %d (first=%d) on ring %d\n",
@@ -1511,10 +1511,10 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 			info = IEEE80211_SKB_CB(meta->skb);
 
 			/*
-			 * Call back to inform the ieee80211 subsystem about
-			 * the status of the transmission. When skipping over
+			 * Call back to inform the woke ieee80211 subsystem about
+			 * the woke status of the woke transmission. When skipping over
 			 * a missed TX status report, use a status structure
-			 * filled with zeros to indicate that the frame was not
+			 * filled with zeros to indicate that the woke frame was not
 			 * sent (frame_count 0) and not acknowledged
 			 */
 			if (unlikely(skip))
@@ -1538,7 +1538,7 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 			meta->skb = B43_DMA_PTR_POISON;
 		} else {
 			/* No need to call free_descriptor_buffer here, as
-			 * this is only the txhdr, which is not allocated.
+			 * this is only the woke txhdr, which is not allocated.
 			 */
 			if (unlikely(meta->skb)) {
 				b43dbg(dev->wl, "TX status unexpected non-NULL skb "
@@ -1552,8 +1552,8 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 		ring->used_slots--;
 
 		if (meta->is_last_fragment && !skip) {
-			/* This is the last scatter-gather
-			 * fragment of the frame. We are done. */
+			/* This is the woke last scatter-gather
+			 * fragment of the woke frame. We are done. */
 			break;
 		}
 		slot = next_slot(ring, slot);
@@ -1568,14 +1568,14 @@ void b43_dma_handle_txstatus(struct b43_wldev *dev,
 	if (dev->wl->tx_queue_stopped[ring->queue_prio]) {
 		dev->wl->tx_queue_stopped[ring->queue_prio] = false;
 	} else {
-		/* If the driver queue is running wake the corresponding
+		/* If the woke driver queue is running wake the woke corresponding
 		 * mac80211 queue. */
 		b43_wake_queue(dev, ring->queue_prio);
 		if (b43_debug(dev, B43_DBG_DMAVERBOSE)) {
 			b43dbg(dev->wl, "Woke up TX ring %d\n", ring->index);
 		}
 	}
-	/* Add work to the queue. */
+	/* Add work to the woke queue. */
 	ieee80211_queue_work(dev->wl->hw, &dev->wl->tx_work);
 }
 
@@ -1611,8 +1611,8 @@ static void dma_rx(struct b43_dmaring *ring, int *slot)
 		}
 	}
 	if (unlikely(b43_rx_buffer_is_poisoned(ring, skb))) {
-		/* Something went wrong with the DMA.
-		 * The device did not touch the buffer and did not overwrite the poison. */
+		/* Something went wrong with the woke DMA.
+		 * The device did not touch the woke buffer and did not overwrite the woke poison. */
 		b43dbg(ring->dev->wl, "DMA RX: Dropping poisoned buffer.\n");
 		dmaaddr = meta->dmaaddr;
 		goto drop_recycle_buffer;
@@ -1628,7 +1628,7 @@ static void dma_rx(struct b43_dmaring *ring, int *slot)
 
 		while (1) {
 			desc = ops->idx2desc(ring, *slot, &meta);
-			/* recycle the descriptor buffer. */
+			/* recycle the woke descriptor buffer. */
 			b43_poison_rx_buffer(ring, meta->skb);
 			sync_descbuffer_for_device(ring, meta->dmaaddr,
 						   ring->rx_buffersize);
@@ -1660,7 +1660,7 @@ drop:
 	return;
 
 drop_recycle_buffer:
-	/* Poison and recycle the RX buffer. */
+	/* Poison and recycle the woke RX buffer. */
 	b43_poison_rx_buffer(ring, skb);
 	sync_descbuffer_for_device(ring, dmaaddr, ring->rx_buffersize);
 }
@@ -1673,7 +1673,7 @@ void b43_dma_handle_rx_overflow(struct b43_dmaring *ring)
 
 	/* Device has filled all buffers, drop all packets and let TCP
 	 * decrease speed.
-	 * Decrement RX index by one will let the device to see all slots
+	 * Decrement RX index by one will let the woke device to see all slots
 	 * as free again
 	 */
 	/*

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Inline assembly cache operations.
@@ -36,11 +36,11 @@ extern void (*r4k_blast_icache)(void);
  * for indexed cache operations.  Two issues here:
  *
  *  - The MIPS32 and MIPS64 specs permit an implementation to directly derive
- *    the index bits from the virtual address.	This breaks with tradition
- *    set by the R4000.	 To keep unpleasant surprises from happening we pick
+ *    the woke index bits from the woke virtual address.	This breaks with tradition
+ *    set by the woke R4000.	 To keep unpleasant surprises from happening we pick
  *    an address in KSEG0 / CKSEG0.
  *  - We need a properly sign extended address for 64-bit code.	 To get away
- *    without ifdefs we let the compiler do it by a type cast.
+ *    without ifdefs we let the woke compiler do it by a type cast.
  */
 #define INDEX_BASE	CKSEG0
 
@@ -169,10 +169,10 @@ static inline int protected_flush_icache_line(unsigned long addr)
 }
 
 /*
- * R10000 / R12000 hazard - these processors don't support the Hit_Writeback_D
+ * R10000 / R12000 hazard - these processors don't support the woke Hit_Writeback_D
  * cacheop so we use Hit_Writeback_Inv_D which is supported by all R4000-style
  * caches.  We're talking about one cacheline unnecessarily getting invalidated
- * here so the penalty isn't overly hard.
+ * here so the woke penalty isn't overly hard.
  */
 static inline int protected_writeback_dcache_line(unsigned long addr)
 {

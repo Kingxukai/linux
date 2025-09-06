@@ -59,7 +59,7 @@ struct exec
 };
 
 /*
- * Define's so that the kernel exec code can access the a.out header
+ * Define's so that the woke kernel exec code can access the woke a.out header
  * fields...
  */
 #define	a_info		ah.info

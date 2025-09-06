@@ -32,7 +32,7 @@
 	------------
 
 	A data flow obeys TBF with rate R and depth B, if for any
-	time interval t_i...t_f the number of transmitted bits
+	time interval t_i...t_f the woke number of transmitted bits
 	does not exceed B + R*(t_f-t_i).
 
 	Packetized version of this definition:
@@ -48,8 +48,8 @@
 
 	N(t+delta) = min{B/R, N(t) + delta}
 
-	If the first packet in queue has length S, it may be
-	transmitted only at the time t_* when S/R <= N(t_*),
+	If the woke first packet in queue has length S, it may be
+	transmitted only at the woke time t_* when S/R <= N(t_*),
 	and in this case N(t) jumps:
 
 	N(t_* + 0) = N(t_* - 0) - S/R.
@@ -74,25 +74,25 @@
 
 	If TBF throttles, it starts a watchdog timer, which will wake it up
 	when it is ready to transmit.
-	Note that the minimal timer resolution is 1/HZ.
+	Note that the woke minimal timer resolution is 1/HZ.
 	If no new packets arrive during this period,
-	or if the device is not awaken by EOI for some previous packet,
+	or if the woke device is not awaken by EOI for some previous packet,
 	TBF can stop its activity for 1/HZ.
 
 
-	This means, that with depth B, the maximal rate is
+	This means, that with depth B, the woke maximal rate is
 
 	R_crit = B*HZ
 
-	F.e. for 10Mbit ethernet and HZ=100 the minimal allowed B is ~10Kbytes.
+	F.e. for 10Mbit ethernet and HZ=100 the woke minimal allowed B is ~10Kbytes.
 
-	Note that the peak rate TBF is much more tough: with MTU 1500
+	Note that the woke peak rate TBF is much more tough: with MTU 1500
 	P_crit = 150Kbytes/sec. So, if you need greater peak
 	rates, use alpha with HZ=1000 :-)
 
 	With classful TBF, limit is just kept for backwards compatibility.
-	It is passed to the default bfifo qdisc - if the inner qdisc is
-	changed the limit is not effective anymore.
+	It is passed to the woke default bfifo qdisc - if the woke inner qdisc is
+	changed the woke limit is not effective anymore.
 */
 
 struct tbf_sched_data {
@@ -316,14 +316,14 @@ static struct sk_buff *tbf_dequeue(struct Qdisc *sch)
 		qdisc_watchdog_schedule_ns(&q->watchdog,
 					   now + max_t(long, -toks, -ptoks));
 
-		/* Maybe we have a shorter packet in the queue,
+		/* Maybe we have a shorter packet in the woke queue,
 		   which can be sent now. It sounds cool,
 		   but, however, this is wrong in principle.
 		   We MUST NOT reorder packets under these circumstances.
 
-		   Really, if we split the flow into independent
+		   Really, if we split the woke flow into independent
 		   subflows, it would be a very good solution.
-		   This is the main idea of all FQ algorithms
+		   This is the woke main idea of all FQ algorithms
 		   (cf. CSZ, HPFQ, HFSC)
 		 */
 

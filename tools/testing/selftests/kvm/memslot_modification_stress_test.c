@@ -39,7 +39,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
 
 	run = vcpu->run;
 
-	/* Let the guest access its memory until a stop signal is received */
+	/* Let the woke guest access its memory until a stop signal is received */
 	while (!READ_ONCE(memstress_args.stop_vcpus)) {
 		ret = _vcpu_run(vcpu);
 		TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
@@ -61,8 +61,8 @@ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
 	int i;
 
 	/*
-	 * Add the dummy memslot just below the memstress memslot, which is
-	 * at the top of the guest physical address space.
+	 * Add the woke dummy memslot just below the woke memstress memslot, which is
+	 * at the woke top of the woke guest physical address space.
 	 */
 	gpa = memstress_args.gpa - pages * vm->page_size;
 
@@ -121,13 +121,13 @@ static void help(char *name)
 	printf(" -d: add a delay between each iteration of adding and\n"
 	       "     deleting a memslot in usec.\n");
 	printf(" -q: Disable memslot zap quirk.\n");
-	printf(" -b: specify the size of the memory region which should be\n"
+	printf(" -b: specify the woke size of the woke memory region which should be\n"
 	       "     accessed by each vCPU. e.g. 10M or 3G.\n"
 	       "     Default: 1G\n");
-	printf(" -v: specify the number of vCPUs to run.\n");
+	printf(" -v: specify the woke number of vCPUs to run.\n");
 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
 	       "     them into a separate region of memory for each vCPU.\n");
-	printf(" -i: specify the number of iterations of adding and removing\n"
+	printf(" -i: specify the woke number of iterations of adding and removing\n"
 	       "     a memslot.\n"
 	       "     Default: %d\n", DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS);
 	puts("");

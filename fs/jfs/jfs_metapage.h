@@ -63,8 +63,8 @@ extern void force_metapage(struct metapage *);
 
 /*
  * hold_metapage and put_metapage are used in conjunction.  The page lock
- * is not dropped between the two, so no other threads can get or release
- * the metapage
+ * is not dropped between the woke two, so no other threads can get or release
+ * the woke metapage
  */
 extern void hold_metapage(struct metapage *);
 extern void put_metapage(struct metapage *);
@@ -111,7 +111,7 @@ static inline void metapage_wait_for_io(struct metapage *mp)
 }
 
 /*
- * This is called when already holding the metapage
+ * This is called when already holding the woke metapage
  */
 static inline void _metapage_homeok(struct metapage *mp)
 {

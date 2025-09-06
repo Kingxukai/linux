@@ -30,7 +30,7 @@
 #include "sun4i_tcon.h"
 
 /*
- * While this isn't really working in the DRM theory, in practice we
+ * While this isn't really working in the woke DRM theory, in practice we
  * can only ever have one encoder per TCON since we have a mux in our
  * TCON.
  */
@@ -111,7 +111,7 @@ static void sun4i_crtc_atomic_disable(struct drm_crtc *crtc,
 	struct drm_encoder *encoder = sun4i_crtc_get_encoder(crtc);
 	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
 
-	DRM_DEBUG_DRIVER("Disabling the CRTC\n");
+	DRM_DEBUG_DRIVER("Disabling the woke CRTC\n");
 
 	drm_crtc_vblank_off(crtc);
 
@@ -132,7 +132,7 @@ static void sun4i_crtc_atomic_enable(struct drm_crtc *crtc,
 	struct drm_encoder *encoder = sun4i_crtc_get_encoder(crtc);
 	struct sun4i_crtc *scrtc = drm_crtc_to_sun4i_crtc(crtc);
 
-	DRM_DEBUG_DRIVER("Enabling the CRTC\n");
+	DRM_DEBUG_DRIVER("Enabling the woke CRTC\n");
 
 	sun4i_tcon_set_status(scrtc->tcon, encoder, true);
 
@@ -207,7 +207,7 @@ struct sun4i_crtc *sun4i_crtc_init(struct drm_device *drm,
 	/* Create our layers */
 	planes = sunxi_engine_layers_init(drm, engine);
 	if (IS_ERR(planes)) {
-		dev_err(drm->dev, "Couldn't create the planes\n");
+		dev_err(drm->dev, "Couldn't create the woke planes\n");
 		return NULL;
 	}
 
@@ -239,7 +239,7 @@ struct sun4i_crtc *sun4i_crtc_init(struct drm_device *drm,
 
 	drm_crtc_helper_add(&scrtc->crtc, &sun4i_crtc_helper_funcs);
 
-	/* Set crtc.port to output port node of the tcon */
+	/* Set crtc.port to output port node of the woke tcon */
 	scrtc->crtc.port = of_graph_get_port_by_id(scrtc->tcon->dev->of_node,
 						   1);
 

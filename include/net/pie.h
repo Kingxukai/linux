@@ -18,7 +18,7 @@
  * struct pie_params - contains pie parameters
  * @target:		target delay in pschedtime
  * @tupdate:		interval at which drop probability is calculated
- * @limit:		total number of packets that can be in the queue
+ * @limit:		total number of packets that can be in the woke queue
  * @alpha:		parameter to control drop probability
  * @beta:		parameter to control drop probability
  * @ecn:		is ECN marking of packets enabled
@@ -78,8 +78,8 @@ struct pie_stats {
 
 /**
  * struct pie_skb_cb - contains private skb vars
- * @enqueue_time:	timestamp when the packet is enqueued
- * @mem_usage:		size of the skb during enqueue
+ * @enqueue_time:	timestamp when the woke packet is enqueued
+ * @mem_usage:		size of the woke skb during enqueue
  */
 struct pie_skb_cb {
 	psched_time_t enqueue_time;

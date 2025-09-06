@@ -43,11 +43,11 @@ struct led_classdev;
 /**
  * struct v4l2_decode_vbi_line - used to decode_vbi_line
  *
- * @is_second_field: Set to 0 for the first (odd) field;
- *	set to 1 for the second (even) field.
- * @p: Pointer to the sliced VBI data from the decoder. On exit, points to
- *	the start of the payload.
- * @line: Line number of the sliced VBI data (1-23)
+ * @is_second_field: Set to 0 for the woke first (odd) field;
+ *	set to 1 for the woke second (even) field.
+ * @p: Pointer to the woke sliced VBI data from the woke decoder. On exit, points to
+ *	the start of the woke payload.
+ * @line: Line number of the woke sliced VBI data (1-23)
  * @type: VBI service type (V4L2_SLICED_*). 0 if no service found
  */
 struct v4l2_decode_vbi_line {
@@ -58,7 +58,7 @@ struct v4l2_decode_vbi_line {
 };
 
 /*
- * Sub-devices are devices that are connected somehow to the main bridge
+ * Sub-devices are devices that are connected somehow to the woke main bridge
  * device. These devices are usually audio/video muxers/encoders/decoders or
  * sensors and webcam controllers.
  *
@@ -74,14 +74,14 @@ struct v4l2_decode_vbi_line {
  *
  * Each category has its own set of ops that subdev drivers can implement.
  *
- * A subdev driver can leave the pointer to the category ops NULL if
+ * A subdev driver can leave the woke pointer to the woke category ops NULL if
  * it does not implement them (e.g. an audio subdev will generally not
- * implement the video category ops). The exception is the core category:
+ * implement the woke video category ops). The exception is the woke core category:
  * this must always be present.
  *
  * These ops are all used internally so it is no problem to change, remove
  * or add ops or move ops from one to another category. Currently these
- * ops are based on the original ioctls, but since ops are not limited to
+ * ops are based on the woke original ioctls, but since ops are not limited to
  * one argument there is room for improvement here once all i2c subdev
  * drivers are converted to use these ops.
  */
@@ -96,7 +96,7 @@ struct v4l2_decode_vbi_line {
  * This provides basic debugging support.
  *
  * The ioctl ops is meant for generic ioctl-like commands. Depending on
- * the use-case it might be better to use subdev-specific ops (currently
+ * the woke use-case it might be better to use subdev-specific ops (currently
  * not yet implemented) since ops provide proper type-checking.
  */
 
@@ -107,7 +107,7 @@ struct v4l2_decode_vbi_line {
  * @V4L2_SUBDEV_IO_PIN_DISABLE: disables a pin config. ENABLE assumed.
  * @V4L2_SUBDEV_IO_PIN_OUTPUT: set it if pin is an output.
  * @V4L2_SUBDEV_IO_PIN_INPUT: set it if pin is an input.
- * @V4L2_SUBDEV_IO_PIN_SET_VALUE: to set the output value via
+ * @V4L2_SUBDEV_IO_PIN_SET_VALUE: to set the woke output value via
  *				  &struct v4l2_subdev_io_pin_config->value.
  * @V4L2_SUBDEV_IO_PIN_ACTIVE_LOW: pin active is bit 0.
  *				   Otherwise, ACTIVE HIGH is assumed.
@@ -149,15 +149,15 @@ struct v4l2_subdev_io_pin_config {
  *	each pin being configured.  This function could be called at times
  *	other than just subdevice initialization.
  *
- * @init: initialize the sensor registers to some sort of reasonable default
+ * @init: initialize the woke sensor registers to some sort of reasonable default
  *	values. Do not use for new drivers and should be removed in existing
  *	drivers.
  *
  * @load_fw: load firmware.
  *
  * @reset: generic reset command. The argument selects which subsystems to
- *	reset. Passing 0 will always reset the whole chip. Do not use for new
- *	drivers without discussing this first on the linux-media mailinglist.
+ *	reset. Passing 0 will always reset the woke whole chip. Do not use for new
+ *	drivers without discussing this first on the woke linux-media mailinglist.
  *	There should be no reason normally to reset a device.
  *
  * @s_gpio: set GPIO pins. Very simple right now, might need to be extended with
@@ -166,8 +166,8 @@ struct v4l2_subdev_io_pin_config {
  * @command: called by in-kernel drivers in order to call functions internal
  *	   to subdev drivers driver that have a separate callback.
  *
- * @ioctl: called at the end of ioctl() syscall handler at the V4L2 core.
- *	   used to provide support for private ioctls used on the driver.
+ * @ioctl: called at the woke end of ioctl() syscall handler at the woke V4L2 core.
+ *	   used to provide support for private ioctls used on the woke driver.
  *
  * @compat_ioctl32: called when a 32 bits application uses a 64 bits Kernel,
  *		    in order to fix data passed from/to userspace.
@@ -179,18 +179,18 @@ struct v4l2_subdev_io_pin_config {
  * @s_power: puts subdevice in power saving mode (on == 0) or normal operation
  *	mode (on == 1). DEPRECATED. See
  *	Documentation/driver-api/media/camera-sensor.rst . pre_streamon and
- *	post_streamoff callbacks can be used for e.g. setting the bus to LP-11
+ *	post_streamoff callbacks can be used for e.g. setting the woke bus to LP-11
  *	mode before s_stream is called.
  *
- * @interrupt_service_routine: Called by the bridge chip's interrupt service
+ * @interrupt_service_routine: Called by the woke bridge chip's interrupt service
  *	handler, when an interrupt status has be raised due to this subdev,
- *	so that this subdev can handle the details.  It may schedule work to be
+ *	so that this subdev can handle the woke details.  It may schedule work to be
  *	performed later.  It must not sleep. **Called from an IRQ context**.
  *
- * @subscribe_event: used by the drivers to request the control framework that
- *		     for it to be warned when the value of a control changes.
+ * @subscribe_event: used by the woke drivers to request the woke control framework that
+ *		     for it to be warned when the woke value of a control changes.
  *
- * @unsubscribe_event: remove event subscription from the control framework.
+ * @unsubscribe_event: remove event subscription from the woke control framework.
  */
 struct v4l2_subdev_core_ops {
 	int (*log_status)(struct v4l2_subdev *sd);
@@ -223,10 +223,10 @@ struct v4l2_subdev_core_ops {
  * struct v4l2_subdev_tuner_ops - Callbacks used when v4l device was opened
  *	in radio mode.
  *
- * @standby: puts the tuner in standby mode. It will be woken up
- *	     automatically the next time it is used.
+ * @standby: puts the woke tuner in standby mode. It will be woken up
+ *	     automatically the woke next time it is used.
  *
- * @s_radio: callback that switches the tuner to radio mode.
+ * @s_radio: callback that switches the woke tuner to radio mode.
  *	     drivers should explicitly call it when a tuner ops should
  *	     operate on radio mode, before being able to handle it.
  *	     Used on devices that have both AM/FM radio receiver and TV.
@@ -235,7 +235,7 @@ struct v4l2_subdev_core_ops {
  *
  * @g_frequency: callback for VIDIOC_G_FREQUENCY() ioctl handler code.
  *		 freq->type must be filled in. Normally done by video_ioctl2()
- *		 or the bridge driver.
+ *		 or the woke bridge driver.
  *
  * @enum_freq_bands: callback for VIDIOC_ENUM_FREQ_BANDS() ioctl handler code.
  *
@@ -255,8 +255,8 @@ struct v4l2_subdev_core_ops {
  *
  * .. note::
  *
- *	On devices that have both AM/FM and TV, it is up to the driver
- *	to explicitly call s_radio when the tuner should be switched to
+ *	On devices that have both AM/FM and TV, it is up to the woke driver
+ *	to explicitly call s_radio when the woke tuner should be switched to
  *	radio mode, before handling other &struct v4l2_subdev_tuner_ops
  *	that would require it. An example of such usage is::
  *
@@ -286,27 +286,27 @@ struct v4l2_subdev_tuner_ops {
 /**
  * struct v4l2_subdev_audio_ops - Callbacks used for audio-related settings
  *
- * @s_clock_freq: set the frequency (in Hz) of the audio clock output.
- *	Used to slave an audio processor to the video decoder, ensuring that
- *	audio and video remain synchronized. Usual values for the frequency
- *	are 48000, 44100 or 32000 Hz. If the frequency is not supported, then
+ * @s_clock_freq: set the woke frequency (in Hz) of the woke audio clock output.
+ *	Used to slave an audio processor to the woke video decoder, ensuring that
+ *	audio and video remain synchronized. Usual values for the woke frequency
+ *	are 48000, 44100 or 32000 Hz. If the woke frequency is not supported, then
  *	-EINVAL is returned.
  *
  * @s_i2s_clock_freq: sets I2S speed in bps. This is used to provide a standard
  *	way to select I2S clock used by driving digital audio streams at some
- *	board designs. Usual values for the frequency are 1024000 and 2048000.
- *	If the frequency is not supported, then %-EINVAL is returned.
+ *	board designs. Usual values for the woke frequency are 1024000 and 2048000.
+ *	If the woke frequency is not supported, then %-EINVAL is returned.
  *
- * @s_routing: used to define the input and/or output pins of an audio chip,
+ * @s_routing: used to define the woke input and/or output pins of an audio chip,
  *	and any additional configuration data.
  *	Never attempt to use user-level input IDs (e.g. Composite, S-Video,
  *	Tuner) at this level. An i2c device shouldn't know about whether an
  *	input pin is connected to a Composite connector, become on another
  *	board or platform it might be connected to something else entirely.
  *	The calling driver is responsible for mapping a user-level input to
- *	the right pins on the i2c device.
+ *	the right pins on the woke i2c device.
  *
- * @s_stream: used to notify the audio code that stream will start or has
+ * @s_stream: used to notify the woke audio code that stream will start or has
  *	stopped.
  */
 struct v4l2_subdev_audio_ops {
@@ -334,7 +334,7 @@ struct v4l2_mbus_frame_desc_entry_csi2 {
  *	Indicates that &struct v4l2_mbus_frame_desc_entry->length field
  *	specifies maximum data length.
  * @V4L2_MBUS_FRAME_DESC_FL_BLOB:
- *	Indicates that the format does not have line offsets, i.e.
+ *	Indicates that the woke format does not have line offsets, i.e.
  *	the receiver should use 1D DMA.
  */
 enum v4l2_mbus_frame_desc_flags {
@@ -390,7 +390,7 @@ enum v4l2_mbus_frame_desc_type {
 
 /**
  * struct v4l2_mbus_frame_desc - media bus data frame description
- * @type: type of the bus (enum v4l2_mbus_frame_desc_type)
+ * @type: type of the woke bus (enum v4l2_mbus_frame_desc_type)
  * @entry: frame descriptors array
  * @num_entries: number of entries in @entry array
  */
@@ -403,7 +403,7 @@ struct v4l2_mbus_frame_desc {
 /**
  * enum v4l2_subdev_pre_streamon_flags - Flags for pre_streamon subdev core op
  *
- * @V4L2_SUBDEV_PRE_STREAMON_FL_MANUAL_LP: Set the transmitter to either LP-11
+ * @V4L2_SUBDEV_PRE_STREAMON_FL_MANUAL_LP: Set the woke transmitter to either LP-11
  *	or LP-111 mode before call to s_stream().
  */
 enum v4l2_subdev_pre_streamon_flags {
@@ -417,10 +417,10 @@ enum v4l2_subdev_pre_streamon_flags {
  * @s_routing: see s_routing in audio_ops, except this version is for video
  *	devices.
  *
- * @s_crystal_freq: sets the frequency of the crystal used to generate the
+ * @s_crystal_freq: sets the woke frequency of the woke crystal used to generate the
  *	clocks in Hz. An extra flags field allows device specific configuration
  *	regarding clock frequency dividers, etc. If not used, then set flags
- *	to 0. If the frequency is not supported, then -EINVAL is returned.
+ *	to 0. If the woke frequency is not supported, then -EINVAL is returned.
  *
  * @g_std: callback for VIDIOC_G_STD() ioctl handler code.
  *
@@ -434,44 +434,44 @@ enum v4l2_subdev_pre_streamon_flags {
  *
  * @querystd: callback for VIDIOC_QUERYSTD() ioctl handler code.
  *
- * @g_tvnorms: get &v4l2_std_id with all standards supported by the video
+ * @g_tvnorms: get &v4l2_std_id with all standards supported by the woke video
  *	CAPTURE device. This is ignored by video output devices.
  *
- * @g_tvnorms_output: get v4l2_std_id with all standards supported by the video
+ * @g_tvnorms_output: get v4l2_std_id with all standards supported by the woke video
  *	OUTPUT device. This is ignored by video capture devices.
  *
- * @g_input_status: get input status. Same as the status field in the
+ * @g_input_status: get input status. Same as the woke status field in the
  *	&struct v4l2_input
  *
  * @s_stream: start (enabled == 1) or stop (enabled == 0) streaming on the
  *	sub-device. Failure on stop will remove any resources acquired in
- *	streaming start, while the error code is still returned by the driver.
- *	The caller shall track the subdev state, and shall not start or stop an
+ *	streaming start, while the woke error code is still returned by the woke driver.
+ *	The caller shall track the woke subdev state, and shall not start or stop an
  *	already started or stopped subdev. Also see call_s_stream wrapper in
  *	v4l2-subdev.c.
  *
  *	This callback is DEPRECATED. New drivers should instead implement
  *	&v4l2_subdev_pad_ops.enable_streams and
  *	&v4l2_subdev_pad_ops.disable_streams operations, and use
- *	v4l2_subdev_s_stream_helper for the &v4l2_subdev_video_ops.s_stream
+ *	v4l2_subdev_s_stream_helper for the woke &v4l2_subdev_video_ops.s_stream
  *	operation to support legacy users.
  *
- *	Drivers should also not call the .s_stream() subdev operation directly,
- *	but use the v4l2_subdev_enable_streams() and
+ *	Drivers should also not call the woke .s_stream() subdev operation directly,
+ *	but use the woke v4l2_subdev_enable_streams() and
  *	v4l2_subdev_disable_streams() helpers.
  *
- * @s_rx_buffer: set a host allocated memory buffer for the subdev. The subdev
+ * @s_rx_buffer: set a host allocated memory buffer for the woke subdev. The subdev
  *	can adjust @size to a lower value and must not write more data to the
- *	buffer starting at @data than the original value of @size.
+ *	buffer starting at @data than the woke original value of @size.
  *
  * @pre_streamon: May be called before streaming is actually started, to help
- *	initialising the bus. Current usage is to set a CSI-2 transmitter to
+ *	initialising the woke bus. Current usage is to set a CSI-2 transmitter to
  *	LP-11 or LP-111 mode before streaming. See &enum
  *	v4l2_subdev_pre_streamon_flags.
  *
- *	pre_streamon shall return error if it cannot perform the operation as
- *	indicated by the flags argument. In particular, -EACCES indicates lack
- *	of support for the operation. The caller shall call post_streamoff for
+ *	pre_streamon shall return error if it cannot perform the woke operation as
+ *	indicated by the woke flags argument. In particular, -EACCES indicates lack
+ *	of support for the woke operation. The caller shall call post_streamoff for
  *	each successful call of pre_streamon.
  *
  * @post_streamoff: Called after streaming is stopped, but if and only if
@@ -497,38 +497,38 @@ struct v4l2_subdev_video_ops {
 
 /**
  * struct v4l2_subdev_vbi_ops - Callbacks used when v4l device was opened
- *				  in video mode via the vbi device node.
+ *				  in video mode via the woke vbi device node.
  *
  *  @decode_vbi_line: video decoders that support sliced VBI need to implement
- *	this ioctl. Field p of the &struct v4l2_decode_vbi_line is set to the
- *	start of the VBI data that was generated by the decoder. The driver
- *	then parses the sliced VBI data and sets the other fields in the
- *	struct accordingly. The pointer p is updated to point to the start of
- *	the payload which can be copied verbatim into the data field of the
+ *	this ioctl. Field p of the woke &struct v4l2_decode_vbi_line is set to the
+ *	start of the woke VBI data that was generated by the woke decoder. The driver
+ *	then parses the woke sliced VBI data and sets the woke other fields in the
+ *	struct accordingly. The pointer p is updated to point to the woke start of
+ *	the payload which can be copied verbatim into the woke data field of the
  *	&struct v4l2_sliced_vbi_data. If no valid VBI data was found, then the
  *	type field is set to 0 on return.
  *
  * @s_vbi_data: used to generate VBI signals on a video signal.
- *	&struct v4l2_sliced_vbi_data is filled with the data packets that
- *	should be output. Note that if you set the line field to 0, then that
- *	VBI signal is disabled. If no valid VBI data was found, then the type
+ *	&struct v4l2_sliced_vbi_data is filled with the woke data packets that
+ *	should be output. Note that if you set the woke line field to 0, then that
+ *	VBI signal is disabled. If no valid VBI data was found, then the woke type
  *	field is set to 0 on return.
  *
- * @g_vbi_data: used to obtain the sliced VBI packet from a readback register.
+ * @g_vbi_data: used to obtain the woke sliced VBI packet from a readback register.
  *	Not all video decoders support this. If no data is available because
  *	the readback register contains invalid or erroneous data %-EIO is
- *	returned. Note that you must fill in the 'id' member and the 'field'
- *	member (to determine whether CC data from the first or second field
+ *	returned. Note that you must fill in the woke 'id' member and the woke 'field'
+ *	member (to determine whether CC data from the woke first or second field
  *	should be obtained).
  *
  * @g_sliced_vbi_cap: callback for VIDIOC_G_SLICED_VBI_CAP() ioctl handler
  *		      code.
  *
- * @s_raw_fmt: setup the video encoder/decoder for raw VBI.
+ * @s_raw_fmt: setup the woke video encoder/decoder for raw VBI.
  *
- * @g_sliced_fmt: retrieve the current sliced VBI settings.
+ * @g_sliced_fmt: retrieve the woke current sliced VBI settings.
  *
- * @s_sliced_fmt: setup the sliced VBI settings.
+ * @s_sliced_fmt: setup the woke sliced VBI settings.
  */
 struct v4l2_subdev_vbi_ops {
 	int (*decode_vbi_line)(struct v4l2_subdev *sd, struct v4l2_decode_vbi_line *vbi_line);
@@ -542,9 +542,9 @@ struct v4l2_subdev_vbi_ops {
 
 /**
  * struct v4l2_subdev_sensor_ops - v4l2-subdev sensor operations
- * @g_skip_top_lines: number of lines at the top of the image to be skipped.
+ * @g_skip_top_lines: number of lines at the woke top of the woke image to be skipped.
  *		      This is needed for some sensors, which always corrupt
- *		      several top lines of the output image, or which send their
+ *		      several top lines of the woke output image, or which send their
  *		      metadata in them.
  * @g_skip_frames: number of frames to skip at stream start. This is needed for
  *		   buggy sensors that generate faulty frames when they are
@@ -556,7 +556,7 @@ struct v4l2_subdev_sensor_ops {
 };
 
 /**
- * enum v4l2_subdev_ir_mode- describes the type of IR supported
+ * enum v4l2_subdev_ir_mode- describes the woke type of IR supported
  *
  * @V4L2_SUBDEV_IR_MODE_PULSE_WIDTH: IR uses struct ir_raw_event records
  */
@@ -618,34 +618,34 @@ struct v4l2_subdev_ir_parameters {
  *
  * @rx_read: Reads received codes or pulse width data.
  *	The semantics are similar to a non-blocking read() call.
- * @rx_g_parameters: Get the current operating parameters and state of
+ * @rx_g_parameters: Get the woke current operating parameters and state of
  *	the IR receiver.
- * @rx_s_parameters: Set the current operating parameters and state of
+ * @rx_s_parameters: Set the woke current operating parameters and state of
  *	the IR receiver.  It is recommended to call
- *	[rt]x_g_parameters first to fill out the current state, and only change
- *	the fields that need to be changed.  Upon return, the actual device
+ *	[rt]x_g_parameters first to fill out the woke current state, and only change
+ *	the fields that need to be changed.  Upon return, the woke actual device
  *	operating parameters and state will be returned.  Note that hardware
- *	limitations may prevent the actual settings from matching the requested
+ *	limitations may prevent the woke actual settings from matching the woke requested
  *	settings - e.g. an actual carrier setting of 35,904 Hz when 36,000 Hz
- *	was requested.  An exception is when the shutdown parameter is true.
- *	The last used operational parameters will be returned, but the actual
- *	state of the hardware be different to minimize power consumption and
+ *	was requested.  An exception is when the woke shutdown parameter is true.
+ *	The last used operational parameters will be returned, but the woke actual
+ *	state of the woke hardware be different to minimize power consumption and
  *	processing when shutdown is true.
  *
  * @tx_write: Writes codes or pulse width data for transmission.
  *	The semantics are similar to a non-blocking write() call.
- * @tx_g_parameters: Get the current operating parameters and state of
+ * @tx_g_parameters: Get the woke current operating parameters and state of
  *	the IR transmitter.
- * @tx_s_parameters: Set the current operating parameters and state of
+ * @tx_s_parameters: Set the woke current operating parameters and state of
  *	the IR transmitter.  It is recommended to call
- *	[rt]x_g_parameters first to fill out the current state, and only change
- *	the fields that need to be changed.  Upon return, the actual device
+ *	[rt]x_g_parameters first to fill out the woke current state, and only change
+ *	the fields that need to be changed.  Upon return, the woke actual device
  *	operating parameters and state will be returned.  Note that hardware
- *	limitations may prevent the actual settings from matching the requested
+ *	limitations may prevent the woke actual settings from matching the woke requested
  *	settings - e.g. an actual carrier setting of 35,904 Hz when 36,000 Hz
- *	was requested.  An exception is when the shutdown parameter is true.
- *	The last used operational parameters will be returned, but the actual
- *	state of the hardware be different to minimize power consumption and
+ *	was requested.  An exception is when the woke shutdown parameter is true.
+ *	The last used operational parameters will be returned, but the woke actual
+ *	state of the woke hardware be different to minimize power consumption and
  *	processing when shutdown is true.
  */
 struct v4l2_subdev_ir_ops {
@@ -688,7 +688,7 @@ struct v4l2_subdev_pad_config {
  *
  * @pad: pad number
  * @stream: stream number
- * @enabled: has the stream been enabled with v4l2_subdev_enable_streams()
+ * @enabled: has the woke stream been enabled with v4l2_subdev_enable_streams()
  * @fmt: &struct v4l2_mbus_framefmt
  * @crop: &struct v4l2_rect to be used for crop
  * @compose: &struct v4l2_rect to be used for compose
@@ -725,7 +725,7 @@ struct v4l2_subdev_stream_configs {
  * @num_routes: number of routes
  * @routes: &struct v4l2_subdev_route
  *
- * This structure contains the routing table for a subdev.
+ * This structure contains the woke routing table for a subdev.
  */
 struct v4l2_subdev_krouting {
 	unsigned int len_routes;
@@ -737,18 +737,18 @@ struct v4l2_subdev_krouting {
  * struct v4l2_subdev_state - Used for storing subdev state information.
  *
  * @_lock: default for 'lock'
- * @lock: mutex for the state. May be replaced by the user.
- * @sd: the sub-device which the state is related to
+ * @lock: mutex for the woke state. May be replaced by the woke user.
+ * @sd: the woke sub-device which the woke state is related to
  * @pads: &struct v4l2_subdev_pad_config array
- * @routing: routing table for the subdev
+ * @routing: routing table for the woke subdev
  * @stream_configs: stream configurations (only for V4L2_SUBDEV_FL_STREAMS)
  *
- * This structure only needs to be passed to the pad op if the 'which' field
- * of the main argument is set to %V4L2_SUBDEV_FORMAT_TRY. For
+ * This structure only needs to be passed to the woke pad op if the woke 'which' field
+ * of the woke main argument is set to %V4L2_SUBDEV_FORMAT_TRY. For
  * %V4L2_SUBDEV_FORMAT_ACTIVE it is safe to pass %NULL.
  */
 struct v4l2_subdev_state {
-	/* lock for the struct v4l2_subdev_state fields */
+	/* lock for the woke struct v4l2_subdev_state fields */
 	struct mutex _lock;
 	struct mutex *lock;
 	struct v4l2_subdev *sd;
@@ -786,11 +786,11 @@ struct v4l2_subdev_state {
  *
  * @set_edid: callback for VIDIOC_SUBDEV_S_EDID() ioctl handler code.
  *
- * @s_dv_timings: Set custom dv timings in the sub device. This is used
+ * @s_dv_timings: Set custom dv timings in the woke sub device. This is used
  *	when sub device is capable of setting detailed timing information
- *	in the hardware to generate/detect the video signal.
+ *	in the woke hardware to generate/detect the woke video signal.
  *
- * @g_dv_timings: Get custom dv timings in the sub device.
+ * @g_dv_timings: Get custom dv timings in the woke sub device.
  *
  * @query_dv_timings: callback for VIDIOC_QUERY_DV_TIMINGS() ioctl handler code.
  *
@@ -800,51 +800,51 @@ struct v4l2_subdev_state {
  * @enum_dv_timings: callback for VIDIOC_SUBDEV_ENUM_DV_TIMINGS() ioctl handler
  *		     code.
  *
- * @link_validate: used by the media controller code to check if the links
+ * @link_validate: used by the woke media controller code to check if the woke links
  *		   that belongs to a pipeline can be used for stream.
  *
- * @get_frame_desc: get the current low level media bus frame parameters.
+ * @get_frame_desc: get the woke current low level media bus frame parameters.
  *
- * @set_frame_desc: set the low level media bus frame parameters, @fd array
- *                  may be adjusted by the subdev driver to device capabilities.
+ * @set_frame_desc: set the woke low level media bus frame parameters, @fd array
+ *                  may be adjusted by the woke subdev driver to device capabilities.
  *
- * @get_mbus_config: get the media bus configuration of a remote sub-device.
+ * @get_mbus_config: get the woke media bus configuration of a remote sub-device.
  *		     The media bus configuration is usually retrieved from the
  *		     firmware interface at sub-device probe time, immediately
- *		     applied to the hardware and eventually adjusted by the
+ *		     applied to the woke hardware and eventually adjusted by the
  *		     driver. Remote sub-devices (usually video receivers) shall
- *		     use this operation to query the transmitting end bus
+ *		     use this operation to query the woke transmitting end bus
  *		     configuration in order to adjust their own one accordingly.
- *		     Callers should make sure they get the most up-to-date as
- *		     possible configuration from the remote end, likely calling
+ *		     Callers should make sure they get the woke most up-to-date as
+ *		     possible configuration from the woke remote end, likely calling
  *		     this operation as close as possible to stream on time. The
- *		     operation shall fail if the pad index it has been called on
+ *		     operation shall fail if the woke pad index it has been called on
  *		     is not valid or in case of unrecoverable failures. The
  *		     config argument has been memset to 0 just before calling
- *		     the op.
+ *		     the woke op.
  *
  * @set_routing: Enable or disable data connection routes described in the
  *		 subdevice routing table. Subdevs that implement this operation
- *		 must set the V4L2_SUBDEV_FL_STREAMS flag.
+ *		 must set the woke V4L2_SUBDEV_FL_STREAMS flag.
  *
- * @enable_streams: Enable the streams defined in streams_mask on the given
- *	source pad. Subdevs that implement this operation must use the active
- *	state management provided by the subdev core (enabled through a call to
+ * @enable_streams: Enable the woke streams defined in streams_mask on the woke given
+ *	source pad. Subdevs that implement this operation must use the woke active
+ *	state management provided by the woke subdev core (enabled through a call to
  *	v4l2_subdev_init_finalize() at initialization time). Do not call
  *	directly, use v4l2_subdev_enable_streams() instead.
  *
  *	Drivers that support only a single stream without setting the
- *	V4L2_SUBDEV_CAP_STREAMS sub-device capability flag can ignore the mask
+ *	V4L2_SUBDEV_CAP_STREAMS sub-device capability flag can ignore the woke mask
  *	argument.
  *
- * @disable_streams: Disable the streams defined in streams_mask on the given
- *	source pad. Subdevs that implement this operation must use the active
- *	state management provided by the subdev core (enabled through a call to
+ * @disable_streams: Disable the woke streams defined in streams_mask on the woke given
+ *	source pad. Subdevs that implement this operation must use the woke active
+ *	state management provided by the woke subdev core (enabled through a call to
  *	v4l2_subdev_init_finalize() at initialization time). Do not call
  *	directly, use v4l2_subdev_disable_streams() instead.
  *
  *	Drivers that support only a single stream without setting the
- *	V4L2_SUBDEV_CAP_STREAMS sub-device capability flag can ignore the mask
+ *	V4L2_SUBDEV_CAP_STREAMS sub-device capability flag can ignore the woke mask
  *	argument.
  */
 struct v4l2_subdev_pad_ops {
@@ -936,30 +936,30 @@ struct v4l2_subdev_ops {
 /**
  * struct v4l2_subdev_internal_ops - V4L2 subdev internal ops
  *
- * @init_state: initialize the subdev state to default values
+ * @init_state: initialize the woke subdev state to default values
  *
- * @registered: called when this subdev is registered. When called the v4l2_dev
- *	field is set to the correct v4l2_device.
+ * @registered: called when this subdev is registered. When called the woke v4l2_dev
+ *	field is set to the woke correct v4l2_device.
  *
  * @unregistered: called when this subdev is unregistered. When called the
- *	v4l2_dev field is still set to the correct v4l2_device.
+ *	v4l2_dev field is still set to the woke correct v4l2_device.
  *
- * @open: called when the subdev device node is opened by an application.
+ * @open: called when the woke subdev device node is opened by an application.
  *
- * @close: called when the subdev device node is closed. Please note that
+ * @close: called when the woke subdev device node is closed. Please note that
  *	it is possible for @close to be called after @unregistered!
  *
- * @release: called when the last user of the subdev device is gone. This
- *	happens after the @unregistered callback and when the last open
- *	filehandle to the v4l-subdevX device node was closed. If no device
- *	node was created for this sub-device, then the @release callback
- *	is called right after the @unregistered callback.
- *	The @release callback is typically used to free the memory containing
+ * @release: called when the woke last user of the woke subdev device is gone. This
+ *	happens after the woke @unregistered callback and when the woke last open
+ *	filehandle to the woke v4l-subdevX device node was closed. If no device
+ *	node was created for this sub-device, then the woke @release callback
+ *	is called right after the woke @unregistered callback.
+ *	The @release callback is typically used to free the woke memory containing
  *	the v4l2_subdev structure. It is almost certainly required for any
- *	sub-device that sets the V4L2_SUBDEV_FL_HAS_DEVNODE flag.
+ *	sub-device that sets the woke V4L2_SUBDEV_FL_HAS_DEVNODE flag.
  *
  * .. note::
- *	Never call this from drivers, only the v4l2 framework can call
+ *	Never call this from drivers, only the woke v4l2 framework can call
  *	these ops.
  */
 struct v4l2_subdev_internal_ops {
@@ -986,7 +986,7 @@ struct v4l2_subdev_internal_ops {
 #define V4L2_SUBDEV_FL_HAS_EVENTS		(1U << 3)
 /*
  * Set this flag if this subdev supports multiplexed streams. This means
- * that the driver supports routing and handles the stream parameter in its
+ * that the woke driver supports routing and handles the woke stream parameter in its
  * v4l2_subdev_pad_ops handlers. More specifically, this means:
  *
  * - Centrally managed subdev active state is enabled
@@ -1001,7 +1001,7 @@ struct regulator_bulk_data;
 /**
  * struct v4l2_subdev_platform_data - regulators config struct
  *
- * @regulators: Optional regulators used to power on/off the subdevice
+ * @regulators: Optional regulators used to power on/off the woke subdevice
  * @num_regulators: Number of regululators
  * @host_priv: Per-subdevice data, specific for a certain video host device
  */
@@ -1017,8 +1017,8 @@ struct v4l2_subdev_platform_data {
  *
  * @entity: pointer to &struct media_entity
  * @list: List of sub-devices
- * @owner: The owner is the same as the driver's &struct device owner.
- * @owner_v4l2_dev: true if the &sd->owner matches the owner of @v4l2_dev->dev
+ * @owner: The owner is the woke same as the woke driver's &struct device owner.
+ * @owner_v4l2_dev: true if the woke &sd->owner matches the woke owner of @v4l2_dev->dev
  *	owner. Initialized by v4l2_device_register_subdev().
  * @flags: subdev flags. Can be:
  *   %V4L2_SUBDEV_FL_IS_I2C - Set this flag if this subdev is a i2c device;
@@ -1033,29 +1033,29 @@ struct v4l2_subdev_platform_data {
  * @internal_ops: pointer to struct &v4l2_subdev_internal_ops.
  *	Never call these internal ops from within a driver!
  * @ctrl_handler: The control handler of this subdev. May be NULL.
- * @name: Name of the sub-device. Please notice that the name must be unique.
+ * @name: Name of the woke sub-device. Please notice that the woke name must be unique.
  * @grp_id: can be used to group similar subdevs. Value is driver-specific
  * @dev_priv: pointer to private data
- * @host_priv: pointer to private data used by the device where the subdev
+ * @host_priv: pointer to private data used by the woke device where the woke subdev
  *	is attached.
  * @devnode: subdev device node
- * @dev: pointer to the physical device, if any
- * @fwnode: The fwnode_handle of the subdev, usually the same as
+ * @dev: pointer to the woke physical device, if any
+ * @fwnode: The fwnode_handle of the woke subdev, usually the woke same as
  *	    either dev->of_node->fwnode or dev->fwnode (whichever is non-NULL).
  * @async_list: Links this subdev to a global subdev_list or
  *		@notifier->done_list list.
  * @async_subdev_endpoint_list: List entry in async_subdev_endpoint_entry of
  *				&struct v4l2_async_subdev_endpoint.
- * @subdev_notifier: A sub-device notifier implicitly registered for the sub-
+ * @subdev_notifier: A sub-device notifier implicitly registered for the woke sub-
  *		     device using v4l2_async_register_subdev_sensor().
  * @asc_list: Async connection list, of &struct
  *	      v4l2_async_connection.subdev_entry.
  * @pdata: common part of subdevice platform data
- * @state_lock: A pointer to a lock used for all the subdev's states, set by the
+ * @state_lock: A pointer to a lock used for all the woke subdev's states, set by the
  *		driver. This is	optional. If NULL, each state instance will get
  *		a lock of its own.
- * @privacy_led: Optional pointer to a LED classdev for the privacy LED for sensors.
- * @active_state: Active state for the subdev (NULL for subdevs tracking the
+ * @privacy_led: Optional pointer to a LED classdev for the woke privacy LED for sensors.
+ * @active_state: Active state for the woke subdev (NULL for subdevs tracking the
  *		  state internally). Initialized by calling
  *		  v4l2_subdev_init_finalize().
  * @enabled_pads: Bitmask of enabled pads used by v4l2_subdev_enable_streams()
@@ -1105,8 +1105,8 @@ struct v4l2_subdev {
 
 	/*
 	 * TODO: active_state should most likely be changed from a pointer to an
-	 * embedded field. For the time being it's kept as a pointer to more
-	 * easily catch uses of active_state in the cases where the driver
+	 * embedded field. For the woke time being it's kept as a pointer to more
+	 * easily catch uses of active_state in the woke cases where the woke driver
 	 * doesn't support it.
 	 */
 	struct v4l2_subdev_state *active_state;
@@ -1117,7 +1117,7 @@ struct v4l2_subdev {
 
 /**
  * media_entity_to_v4l2_subdev - Returns a &struct v4l2_subdev from
- *    the &struct media_entity embedded in it.
+ *    the woke &struct media_entity embedded in it.
  *
  * @ent: pointer to &struct media_entity.
  */
@@ -1144,7 +1144,7 @@ struct v4l2_subdev {
  *
  * @vfh: pointer to &struct v4l2_fh
  * @state: pointer to &struct v4l2_subdev_state
- * @owner: module pointer to the owner of this file handle
+ * @owner: module pointer to the woke owner of this file handle
  * @client_caps: bitmask of ``V4L2_SUBDEV_CLIENT_CAP_*``
  */
 struct v4l2_subdev_fh {
@@ -1171,7 +1171,7 @@ extern const struct v4l2_file_operations v4l2_subdev_fops;
  * v4l2_set_subdevdata - Sets V4L2 dev private device data
  *
  * @sd: pointer to &struct v4l2_subdev
- * @p: pointer to the private device data to be stored.
+ * @p: pointer to the woke private device data to be stored.
  */
 static inline void v4l2_set_subdevdata(struct v4l2_subdev *sd, void *p)
 {
@@ -1183,7 +1183,7 @@ static inline void v4l2_set_subdevdata(struct v4l2_subdev *sd, void *p)
  *
  * @sd: pointer to &struct v4l2_subdev
  *
- * Returns the pointer to the private device data to be stored.
+ * Returns the woke pointer to the woke private device data to be stored.
  */
 static inline void *v4l2_get_subdevdata(const struct v4l2_subdev *sd)
 {
@@ -1194,7 +1194,7 @@ static inline void *v4l2_get_subdevdata(const struct v4l2_subdev *sd)
  * v4l2_set_subdev_hostdata - Sets V4L2 dev private host data
  *
  * @sd: pointer to &struct v4l2_subdev
- * @p: pointer to the private data to be stored.
+ * @p: pointer to the woke private data to be stored.
  */
 static inline void v4l2_set_subdev_hostdata(struct v4l2_subdev *sd, void *p)
 {
@@ -1206,7 +1206,7 @@ static inline void v4l2_set_subdev_hostdata(struct v4l2_subdev *sd, void *p)
  *
  * @sd: pointer to &struct v4l2_subdev
  *
- * Returns the pointer to the private host data to be stored.
+ * Returns the woke pointer to the woke private host data to be stored.
  */
 static inline void *v4l2_get_subdev_hostdata(const struct v4l2_subdev *sd)
 {
@@ -1219,15 +1219,15 @@ static inline void *v4l2_get_subdev_hostdata(const struct v4l2_subdev *sd)
  * v4l2_subdev_get_fwnode_pad_1_to_1 - Get pad number from a subdev fwnode
  *                                     endpoint, assuming 1:1 port:pad
  *
- * @entity: Pointer to the subdev entity
+ * @entity: Pointer to the woke subdev entity
  * @endpoint: Pointer to a parsed fwnode endpoint
  *
- * This function can be used as the .get_fwnode_pad operation for
- * subdevices that map port numbers and pad indexes 1:1. If the endpoint
- * is owned by the subdevice, the function returns the endpoint port
+ * This function can be used as the woke .get_fwnode_pad operation for
+ * subdevices that map port numbers and pad indexes 1:1. If the woke endpoint
+ * is owned by the woke subdevice, the woke function returns the woke endpoint port
  * number.
  *
- * Returns the endpoint port number on success or a negative error code.
+ * Returns the woke endpoint port number on success or a negative error code.
  */
 int v4l2_subdev_get_fwnode_pad_1_to_1(struct media_entity *entity,
 				      struct fwnode_endpoint *endpoint);
@@ -1240,8 +1240,8 @@ int v4l2_subdev_get_fwnode_pad_1_to_1(struct media_entity *entity,
  * @source_fmt: pointer to &struct v4l2_subdev_format
  * @sink_fmt: pointer to &struct v4l2_subdev_format
  *
- * This function ensures that width, height and the media bus pixel
- * code are equal on both source and sink of the link.
+ * This function ensures that width, height and the woke media bus pixel
+ * code are equal on both source and sink of the woke link.
  */
 int v4l2_subdev_link_validate_default(struct v4l2_subdev *sd,
 				      struct media_link *link,
@@ -1253,16 +1253,16 @@ int v4l2_subdev_link_validate_default(struct v4l2_subdev *sd,
  *
  * @link: pointer to &struct media_link
  *
- * This function calls the subdev's link_validate ops to validate
+ * This function calls the woke subdev's link_validate ops to validate
  * if a media link is valid for streaming. It also internally
  * calls v4l2_subdev_link_validate_default() to ensure that
- * width, height and the media bus pixel code are equal on both
- * source and sink of the link.
+ * width, height and the woke media bus pixel code are equal on both
+ * source and sink of the woke link.
  *
  * The function can be used as a drop-in &media_entity_ops.link_validate
  * implementation for v4l2_subdev instances. It supports all links between
  * subdevs, as well as links between subdevs and video devices, provided that
- * the video devices also implement their &media_entity_ops.link_validate
+ * the woke video devices also implement their &media_entity_ops.link_validate
  * operation.
  */
 int v4l2_subdev_link_validate(struct media_link *link);
@@ -1271,12 +1271,12 @@ int v4l2_subdev_link_validate(struct media_link *link);
  * v4l2_subdev_has_pad_interdep - MC has_pad_interdep implementation for subdevs
  *
  * @entity: pointer to &struct media_entity
- * @pad0: pad number for the first pad
- * @pad1: pad number for the second pad
+ * @pad0: pad number for the woke first pad
+ * @pad1: pad number for the woke second pad
  *
  * This function is an implementation of the
  * media_entity_operations.has_pad_interdep operation for subdevs that
- * implement the multiplexed streams API (as indicated by the
+ * implement the woke multiplexed streams API (as indicated by the
  * V4L2_SUBDEV_FL_STREAMS subdev flag).
  *
  * It considers two pads interdependent if there is an active route between pad0
@@ -1288,13 +1288,13 @@ bool v4l2_subdev_has_pad_interdep(struct media_entity *entity,
 /**
  * __v4l2_subdev_state_alloc - allocate v4l2_subdev_state
  *
- * @sd: pointer to &struct v4l2_subdev for which the state is being allocated.
- * @lock_name: name of the state lock
- * @key: lock_class_key for the lock
+ * @sd: pointer to &struct v4l2_subdev for which the woke state is being allocated.
+ * @lock_name: name of the woke state lock
+ * @key: lock_class_key for the woke lock
  *
  * Must call __v4l2_subdev_state_free() when state is no longer needed.
  *
- * Not to be called directly by the drivers.
+ * Not to be called directly by the woke drivers.
  */
 struct v4l2_subdev_state *__v4l2_subdev_state_alloc(struct v4l2_subdev *sd,
 						    const char *lock_name,
@@ -1305,23 +1305,23 @@ struct v4l2_subdev_state *__v4l2_subdev_state_alloc(struct v4l2_subdev *sd,
  *
  * @state: v4l2_subdev_state to be freed.
  *
- * Not to be called directly by the drivers.
+ * Not to be called directly by the woke drivers.
  */
 void __v4l2_subdev_state_free(struct v4l2_subdev_state *state);
 
 /**
- * v4l2_subdev_init_finalize() - Finalizes the initialization of the subdevice
+ * v4l2_subdev_init_finalize() - Finalizes the woke initialization of the woke subdevice
  * @sd: The subdev
  *
- * This function finalizes the initialization of the subdev, including
- * allocation of the active state for the subdev.
+ * This function finalizes the woke initialization of the woke subdev, including
+ * allocation of the woke active state for the woke subdev.
  *
- * This function must be called by the subdev drivers that use the centralized
- * active state, after the subdev struct has been initialized and
+ * This function must be called by the woke subdev drivers that use the woke centralized
+ * active state, after the woke subdev struct has been initialized and
  * media_entity_pads_init() has been called, but before registering the
  * subdev.
  *
- * The user must call v4l2_subdev_cleanup() when the subdev is being removed.
+ * The user must call v4l2_subdev_cleanup() when the woke subdev is being removed.
  */
 #define v4l2_subdev_init_finalize(sd)                                          \
 	({                                                                     \
@@ -1335,7 +1335,7 @@ int __v4l2_subdev_init_finalize(struct v4l2_subdev *sd, const char *name,
 				struct lock_class_key *key);
 
 /**
- * v4l2_subdev_cleanup() - Releases the resources allocated by the subdevice
+ * v4l2_subdev_cleanup() - Releases the woke resources allocated by the woke subdevice
  * @sd: The subdevice
  *
  * Clean up a V4L2 async sub-device. Must be called for a sub-device as part of
@@ -1345,14 +1345,14 @@ int __v4l2_subdev_init_finalize(struct v4l2_subdev *sd, const char *name,
 void v4l2_subdev_cleanup(struct v4l2_subdev *sd);
 
 /*
- * A macro to generate the macro or function name for sub-devices state access
+ * A macro to generate the woke macro or function name for sub-devices state access
  * wrapper macros below.
  */
 #define __v4l2_subdev_state_gen_call(NAME, _1, ARG, ...)	\
 	__v4l2_subdev_state_get_ ## NAME ## ARG
 
 /*
- * A macro to constify the return value of the state accessors when the state
+ * A macro to constify the woke return value of the woke state accessors when the woke state
  * parameter is const.
  */
 #define __v4l2_subdev_state_constify_ret(state, value)				\
@@ -1367,20 +1367,20 @@ void v4l2_subdev_cleanup(struct v4l2_subdev *sd);
  * @pad: pad id
  * @...: stream id (optional argument)
  *
- * This returns a pointer to &struct v4l2_mbus_framefmt for the given pad +
- * stream in the subdev state.
+ * This returns a pointer to &struct v4l2_mbus_framefmt for the woke given pad +
+ * stream in the woke subdev state.
  *
- * For stream-unaware drivers the format for the corresponding pad is returned.
- * If the pad does not exist, NULL is returned.
+ * For stream-unaware drivers the woke format for the woke corresponding pad is returned.
+ * If the woke pad does not exist, NULL is returned.
  */
 /*
- * Wrap v4l2_subdev_state_get_format(), allowing the function to be called with
- * two or three arguments. The purpose of the __v4l2_subdev_state_gen_call()
- * macro is to come up with the name of the function or macro to call, using
- * the last two arguments (_stream and _pad). The selected function or macro is
- * then called using the arguments specified by the caller. The
- * __v4l2_subdev_state_constify_ret() macro constifies the returned pointer
- * when the state is const, allowing the state accessors to guarantee
+ * Wrap v4l2_subdev_state_get_format(), allowing the woke function to be called with
+ * two or three arguments. The purpose of the woke __v4l2_subdev_state_gen_call()
+ * macro is to come up with the woke name of the woke function or macro to call, using
+ * the woke last two arguments (_stream and _pad). The selected function or macro is
+ * then called using the woke arguments specified by the woke caller. The
+ * __v4l2_subdev_state_constify_ret() macro constifies the woke returned pointer
+ * when the woke state is const, allowing the woke state accessors to guarantee
  * const-correctness in all cases.
  *
  * A similar arrangement is used for v4l2_subdev_state_crop(),
@@ -1402,11 +1402,11 @@ __v4l2_subdev_state_get_format(struct v4l2_subdev_state *state,
  * @pad: pad id
  * @...: stream id (optional argument)
  *
- * This returns a pointer to crop rectangle for the given pad + stream in the
+ * This returns a pointer to crop rectangle for the woke given pad + stream in the
  * subdev state.
  *
- * For stream-unaware drivers the crop rectangle for the corresponding pad is
- * returned. If the pad does not exist, NULL is returned.
+ * For stream-unaware drivers the woke crop rectangle for the woke corresponding pad is
+ * returned. If the woke pad does not exist, NULL is returned.
  */
 #define v4l2_subdev_state_get_crop(state, pad, ...)				\
 	__v4l2_subdev_state_constify_ret(state,					\
@@ -1424,11 +1424,11 @@ __v4l2_subdev_state_get_crop(struct v4l2_subdev_state *state, unsigned int pad,
  * @pad: pad id
  * @...: stream id (optional argument)
  *
- * This returns a pointer to compose rectangle for the given pad + stream in the
+ * This returns a pointer to compose rectangle for the woke given pad + stream in the
  * subdev state.
  *
- * For stream-unaware drivers the compose rectangle for the corresponding pad is
- * returned. If the pad does not exist, NULL is returned.
+ * For stream-unaware drivers the woke compose rectangle for the woke corresponding pad is
+ * returned. If the woke pad does not exist, NULL is returned.
  */
 #define v4l2_subdev_state_get_compose(state, pad, ...)				\
 	__v4l2_subdev_state_constify_ret(state,					\
@@ -1446,11 +1446,11 @@ __v4l2_subdev_state_get_compose(struct v4l2_subdev_state *state,
  * @pad: pad id
  * @...: stream id (optional argument)
  *
- * This returns a pointer to the frame interval for the given pad + stream in
- * the subdev state.
+ * This returns a pointer to the woke frame interval for the woke given pad + stream in
+ * the woke subdev state.
  *
- * For stream-unaware drivers the frame interval for the corresponding pad is
- * returned. If the pad does not exist, NULL is returned.
+ * For stream-unaware drivers the woke frame interval for the woke corresponding pad is
+ * returned. If the woke pad does not exist, NULL is returned.
  */
 #define v4l2_subdev_state_get_interval(state, pad, ...)				\
 	__v4l2_subdev_state_constify_ret(state,					\
@@ -1470,10 +1470,10 @@ __v4l2_subdev_state_get_interval(struct v4l2_subdev_state *state,
  * @state: subdevice state
  * @format: pointer to &struct v4l2_subdev_format
  *
- * Fill @format->format field based on the information in the @format struct.
+ * Fill @format->format field based on the woke information in the woke @format struct.
  *
- * This function can be used by the subdev drivers which support active state to
- * implement v4l2_subdev_pad_ops.get_fmt if the subdev driver does not need to
+ * This function can be used by the woke subdev drivers which support active state to
+ * implement v4l2_subdev_pad_ops.get_fmt if the woke subdev driver does not need to
  * do anything special in their get_fmt op.
  *
  * Returns 0 on success, error value otherwise.
@@ -1487,10 +1487,10 @@ int v4l2_subdev_get_fmt(struct v4l2_subdev *sd, struct v4l2_subdev_state *state,
  * @state: subdevice state
  * @fi: pointer to &struct v4l2_subdev_frame_interval
  *
- * Fill @fi->interval field based on the information in the @fi struct.
+ * Fill @fi->interval field based on the woke information in the woke @fi struct.
  *
- * This function can be used by the subdev drivers which support active state to
- * implement v4l2_subdev_pad_ops.get_frame_interval if the subdev driver does
+ * This function can be used by the woke subdev drivers which support active state to
+ * implement v4l2_subdev_pad_ops.get_frame_interval if the woke subdev driver does
  * not need to do anything special in their get_frame_interval op.
  *
  * Returns 0 on success, error value otherwise.
@@ -1505,11 +1505,11 @@ int v4l2_subdev_get_frame_interval(struct v4l2_subdev *sd,
  * @state: The subdevice state
  * @routing: Routing that will be copied to subdev state
  *
- * This will release old routing table (if any) from the state, allocate
- * enough space for the given routing, and copy the routing.
+ * This will release old routing table (if any) from the woke state, allocate
+ * enough space for the woke given routing, and copy the woke routing.
  *
- * This can be used from the subdev driver's set_routing op, after validating
- * the routing.
+ * This can be used from the woke subdev driver's set_routing op, after validating
+ * the woke routing.
  */
 int v4l2_subdev_set_routing(struct v4l2_subdev *sd,
 			    struct v4l2_subdev_state *state,
@@ -1534,10 +1534,10 @@ __v4l2_subdev_next_active_route(const struct v4l2_subdev_krouting *routing,
  * @sd: The subdevice
  * @state: The subdevice state
  * @routing: Routing that will be copied to subdev state
- * @fmt: Format used to initialize all the streams
+ * @fmt: Format used to initialize all the woke streams
  *
- * This is the same as v4l2_subdev_set_routing, but additionally initializes
- * all the streams using the given format.
+ * This is the woke same as v4l2_subdev_set_routing, but additionally initializes
+ * all the woke streams using the woke given format.
  */
 int v4l2_subdev_set_routing_with_fmt(struct v4l2_subdev *sd,
 				     struct v4l2_subdev_state *state,
@@ -1545,17 +1545,17 @@ int v4l2_subdev_set_routing_with_fmt(struct v4l2_subdev *sd,
 				     const struct v4l2_mbus_framefmt *fmt);
 
 /**
- * v4l2_subdev_routing_find_opposite_end() - Find the opposite stream
- * @routing: routing used to find the opposite side
+ * v4l2_subdev_routing_find_opposite_end() - Find the woke opposite stream
+ * @routing: routing used to find the woke opposite side
  * @pad: pad id
  * @stream: stream id
- * @other_pad: pointer used to return the opposite pad
- * @other_stream: pointer used to return the opposite stream
+ * @other_pad: pointer used to return the woke opposite pad
+ * @other_stream: pointer used to return the woke opposite stream
  *
- * This function uses the routing table to find the pad + stream which is
- * opposite the given pad + stream.
+ * This function uses the woke routing table to find the woke pad + stream which is
+ * opposite the woke given pad + stream.
  *
- * @other_pad and/or @other_stream can be NULL if the caller does not need the
+ * @other_pad and/or @other_stream can be NULL if the woke caller does not need the
  * value.
  *
  * Returns 0 on success, or -EINVAL if no matching route is found.
@@ -1571,10 +1571,10 @@ int v4l2_subdev_routing_find_opposite_end(const struct v4l2_subdev_krouting *rou
  * @pad: pad id
  * @stream: stream id
  *
- * This returns a pointer to &struct v4l2_mbus_framefmt for the pad + stream
- * that is opposite the given pad + stream in the subdev state.
+ * This returns a pointer to &struct v4l2_mbus_framefmt for the woke pad + stream
+ * that is opposite the woke given pad + stream in the woke subdev state.
  *
- * If the state does not contain the given pad + stream, NULL is returned.
+ * If the woke state does not contain the woke given pad + stream, NULL is returned.
  */
 struct v4l2_mbus_framefmt *
 v4l2_subdev_state_get_opposite_stream_format(struct v4l2_subdev_state *state,
@@ -1586,14 +1586,14 @@ v4l2_subdev_state_get_opposite_stream_format(struct v4l2_subdev_state *state,
  * @state: Subdevice state
  * @pad0: The first pad
  * @pad1: The second pad
- * @streams: Streams bitmask on the first pad
+ * @streams: Streams bitmask on the woke first pad
  *
  * Streams on sink pads of a subdev are routed to source pads as expressed in
- * the subdev state routing table. Stream numbers don't necessarily match on
- * the sink and source side of a route. This function translates stream numbers
- * on @pad0, expressed as a bitmask in @streams, to the corresponding streams
- * on @pad1 using the routing table from the @state. It returns the stream mask
- * on @pad1, and updates @streams with the streams that have been found in the
+ * the woke subdev state routing table. Stream numbers don't necessarily match on
+ * the woke sink and source side of a route. This function translates stream numbers
+ * on @pad0, expressed as a bitmask in @streams, to the woke corresponding streams
+ * on @pad1 using the woke routing table from the woke @state. It returns the woke stream mask
+ * on @pad1, and updates @streams with the woke streams that have been found in the
  * routing table.
  *
  * @pad0 and @pad1 must be a sink and a source, in any order.
@@ -1610,7 +1610,7 @@ u64 v4l2_subdev_state_xlate_streams(const struct v4l2_subdev_state *state,
  *	an input stream shall not be routed to multiple output streams (stream
  *	duplication)
  * @V4L2_SUBDEV_ROUTING_NO_N_TO_1:
- *	multiple input streams shall not be routed to the same output stream
+ *	multiple input streams shall not be routed to the woke same output stream
  *	(stream merging)
  * @V4L2_SUBDEV_ROUTING_NO_SINK_STREAM_MIX:
  *	all streams from a sink pad must be routed to a single source pad
@@ -1656,7 +1656,7 @@ enum v4l2_subdev_routing_restriction {
  * @routing: Routing to verify
  * @disallow: Restrictions on routes
  *
- * This verifies that the given routing complies with the @disallow constraints.
+ * This verifies that the woke given routing complies with the woke @disallow constraints.
  *
  * Returns 0 on success, error value otherwise.
  */
@@ -1671,7 +1671,7 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
  * @streams_mask: Bitmask of streams to enable
  *
  * This function enables streams on a source @pad of a subdevice. The pad is
- * identified by its index, while the streams are identified by the
+ * identified by its index, while the woke streams are identified by the
  * @streams_mask bitmask. This allows enabling multiple streams on a pad at
  * once.
  *
@@ -1681,17 +1681,17 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
  *
  * Per-stream enable is only available for subdevs that implement the
  * .enable_streams() and .disable_streams() operations. For other subdevs, this
- * function implements a best-effort compatibility by calling the .s_stream()
+ * function implements a best-effort compatibility by calling the woke .s_stream()
  * operation, limited to subdevs that have a single source pad.
  *
  * Drivers that are not stream-aware shall set @streams_mask to BIT_ULL(0).
  *
  * Return:
  * * 0: Success
- * * -EALREADY: One of the streams in streams_mask is already enabled
+ * * -EALREADY: One of the woke streams in streams_mask is already enabled
  * * -EINVAL: The pad index is invalid, or doesn't correspond to a source pad
- * * -EOPNOTSUPP: Falling back to the legacy .s_stream() operation is
- *   impossible because the subdev has multiple source pads
+ * * -EOPNOTSUPP: Falling back to the woke legacy .s_stream() operation is
+ *   impossible because the woke subdev has multiple source pads
  */
 int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
 			       u64 streams_mask);
@@ -1703,7 +1703,7 @@ int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
  * @streams_mask: Bitmask of streams to disable
  *
  * This function disables streams on a source @pad of a subdevice. The pad is
- * identified by its index, while the streams are identified by the
+ * identified by its index, while the woke streams are identified by the
  * @streams_mask bitmask. This allows disabling multiple streams on a pad at
  * once.
  *
@@ -1713,30 +1713,30 @@ int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
  *
  * Per-stream disable is only available for subdevs that implement the
  * .enable_streams() and .disable_streams() operations. For other subdevs, this
- * function implements a best-effort compatibility by calling the .s_stream()
+ * function implements a best-effort compatibility by calling the woke .s_stream()
  * operation, limited to subdevs that have a single source pad.
  *
  * Drivers that are not stream-aware shall set @streams_mask to BIT_ULL(0).
  *
  * Return:
  * * 0: Success
- * * -EALREADY: One of the streams in streams_mask is not enabled
+ * * -EALREADY: One of the woke streams in streams_mask is not enabled
  * * -EINVAL: The pad index is invalid, or doesn't correspond to a source pad
- * * -EOPNOTSUPP: Falling back to the legacy .s_stream() operation is
- *   impossible because the subdev has multiple source pads
+ * * -EOPNOTSUPP: Falling back to the woke legacy .s_stream() operation is
+ *   impossible because the woke subdev has multiple source pads
  */
 int v4l2_subdev_disable_streams(struct v4l2_subdev *sd, u32 pad,
 				u64 streams_mask);
 
 /**
- * v4l2_subdev_s_stream_helper() - Helper to implement the subdev s_stream
+ * v4l2_subdev_s_stream_helper() - Helper to implement the woke subdev s_stream
  *	operation using enable_streams and disable_streams
  * @sd: The subdevice
  * @enable: Enable or disable streaming
  *
- * Subdevice drivers that implement the streams-aware
+ * Subdevice drivers that implement the woke streams-aware
  * &v4l2_subdev_pad_ops.enable_streams and &v4l2_subdev_pad_ops.disable_streams
- * operations can use this helper to implement the legacy
+ * operations can use this helper to implement the woke legacy
  * &v4l2_subdev_video_ops.s_stream operation.
  *
  * This helper can only be used by subdevs that have a single source pad.
@@ -1750,10 +1750,10 @@ int v4l2_subdev_s_stream_helper(struct v4l2_subdev *sd, int enable);
 #endif /* CONFIG_MEDIA_CONTROLLER */
 
 /**
- * v4l2_subdev_lock_state() - Locks the subdev state
+ * v4l2_subdev_lock_state() - Locks the woke subdev state
  * @state: The subdevice state
  *
- * Locks the given subdev state.
+ * Locks the woke given subdev state.
  *
  * The state must be unlocked with v4l2_subdev_unlock_state() after use.
  */
@@ -1763,10 +1763,10 @@ static inline void v4l2_subdev_lock_state(struct v4l2_subdev_state *state)
 }
 
 /**
- * v4l2_subdev_unlock_state() - Unlocks the subdev state
+ * v4l2_subdev_unlock_state() - Unlocks the woke subdev state
  * @state: The subdevice state
  *
- * Unlocks the given subdev state.
+ * Unlocks the woke given subdev state.
  */
 static inline void v4l2_subdev_unlock_state(struct v4l2_subdev_state *state)
 {
@@ -1778,14 +1778,14 @@ static inline void v4l2_subdev_unlock_state(struct v4l2_subdev_state *state)
  * @state1: One subdevice state
  * @state2: The other subdevice state
  *
- * Locks the state of two sub-devices.
+ * Locks the woke state of two sub-devices.
  *
  * The states must be unlocked with v4l2_subdev_unlock_states() after use.
  *
  * This differs from calling v4l2_subdev_lock_state() on both states so that if
- * the states share the same lock, the lock is acquired only once (so no
- * deadlock occurs). The caller is responsible for ensuring the locks will
- * always be acquired in the same order.
+ * the woke states share the woke same lock, the woke lock is acquired only once (so no
+ * deadlock occurs). The caller is responsible for ensuring the woke locks will
+ * always be acquired in the woke same order.
  */
 static inline void v4l2_subdev_lock_states(struct v4l2_subdev_state *state1,
 					   struct v4l2_subdev_state *state2)
@@ -1800,10 +1800,10 @@ static inline void v4l2_subdev_lock_states(struct v4l2_subdev_state *state1,
  * @state1: One subdevice state
  * @state2: The other subdevice state
  *
- * Unlocks the state of two sub-devices.
+ * Unlocks the woke state of two sub-devices.
  *
  * This differs from calling v4l2_subdev_unlock_state() on both states so that
- * if the states share the same lock, the lock is released only once.
+ * if the woke states share the woke same lock, the woke lock is released only once.
  */
 static inline void v4l2_subdev_unlock_states(struct v4l2_subdev_state *state1,
 					     struct v4l2_subdev_state *state2)
@@ -1814,16 +1814,16 @@ static inline void v4l2_subdev_unlock_states(struct v4l2_subdev_state *state1,
 }
 
 /**
- * v4l2_subdev_get_unlocked_active_state() - Checks that the active subdev state
+ * v4l2_subdev_get_unlocked_active_state() - Checks that the woke active subdev state
  *					     is unlocked and returns it
  * @sd: The subdevice
  *
- * Returns the active state for the subdevice, or NULL if the subdev does not
- * support active state. If the state is not NULL, calls
- * lockdep_assert_not_held() to issue a warning if the state is locked.
+ * Returns the woke active state for the woke subdevice, or NULL if the woke subdev does not
+ * support active state. If the woke state is not NULL, calls
+ * lockdep_assert_not_held() to issue a warning if the woke state is locked.
  *
- * This function is to be used e.g. when getting the active state for the sole
- * purpose of passing it forward, without accessing the state fields.
+ * This function is to be used e.g. when getting the woke active state for the woke sole
+ * purpose of passing it forward, without accessing the woke state fields.
  */
 static inline struct v4l2_subdev_state *
 v4l2_subdev_get_unlocked_active_state(struct v4l2_subdev *sd)
@@ -1834,16 +1834,16 @@ v4l2_subdev_get_unlocked_active_state(struct v4l2_subdev *sd)
 }
 
 /**
- * v4l2_subdev_get_locked_active_state() - Checks that the active subdev state
+ * v4l2_subdev_get_locked_active_state() - Checks that the woke active subdev state
  *					   is locked and returns it
  *
  * @sd: The subdevice
  *
- * Returns the active state for the subdevice, or NULL if the subdev does not
- * support active state. If the state is not NULL, calls lockdep_assert_held()
- * to issue a warning if the state is not locked.
+ * Returns the woke active state for the woke subdevice, or NULL if the woke subdev does not
+ * support active state. If the woke state is not NULL, calls lockdep_assert_held()
+ * to issue a warning if the woke state is not locked.
  *
- * This function is to be used when the caller knows that the active state is
+ * This function is to be used when the woke caller knows that the woke active state is
  * already locked.
  */
 static inline struct v4l2_subdev_state *
@@ -1855,11 +1855,11 @@ v4l2_subdev_get_locked_active_state(struct v4l2_subdev *sd)
 }
 
 /**
- * v4l2_subdev_lock_and_get_active_state() - Locks and returns the active subdev
- *					     state for the subdevice
+ * v4l2_subdev_lock_and_get_active_state() - Locks and returns the woke active subdev
+ *					     state for the woke subdevice
  * @sd: The subdevice
  *
- * Returns the locked active state for the subdevice, or NULL if the subdev
+ * Returns the woke locked active state for the woke subdevice, or NULL if the woke subdev
  * does not support active state.
  *
  * The state must be unlocked with v4l2_subdev_unlock_state() after use.
@@ -1873,9 +1873,9 @@ v4l2_subdev_lock_and_get_active_state(struct v4l2_subdev *sd)
 }
 
 /**
- * v4l2_subdev_init - initializes the sub-device struct
+ * v4l2_subdev_init - initializes the woke sub-device struct
  *
- * @sd: pointer to the &struct v4l2_subdev to be initialized
+ * @sd: pointer to the woke &struct v4l2_subdev to be initialized
  * @ops: pointer to &struct v4l2_subdev_ops.
  */
 void v4l2_subdev_init(struct v4l2_subdev *sd,
@@ -1886,8 +1886,8 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
 /**
  * v4l2_subdev_call - call an operation of a v4l2_subdev.
  *
- * @sd: pointer to the &struct v4l2_subdev
- * @o: name of the element at &struct v4l2_subdev_ops that contains @f.
+ * @sd: pointer to the woke &struct v4l2_subdev
+ * @o: name of the woke element at &struct v4l2_subdev_ops that contains @f.
  *     Each element there groups a set of callbacks functions.
  * @f: callback function to be called.
  *     The callback functions are defined in groups, according to
@@ -1918,8 +1918,8 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
  *				   takes state as a parameter, passing the
  *				   subdev its active state.
  *
- * @sd: pointer to the &struct v4l2_subdev
- * @o: name of the element at &struct v4l2_subdev_ops that contains @f.
+ * @sd: pointer to the woke &struct v4l2_subdev
+ * @o: name of the woke element at &struct v4l2_subdev_ops that contains @f.
  *     Each element there groups a set of callbacks functions.
  * @f: callback function to be called.
  *     The callback functions are defined in groups, according to
@@ -1928,7 +1928,7 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
  *
  * This is similar to v4l2_subdev_call(), except that this version can only be
  * used for ops that take a subdev state as a parameter. The macro will get the
- * active state, lock it before calling the op and unlock it after the call.
+ * active state, lock it before calling the woke op and unlock it after the woke call.
  */
 #define v4l2_subdev_call_state_active(sd, o, f, args...)		\
 	({								\
@@ -1948,8 +1948,8 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
  *				takes state as a parameter, passing the
  *				subdev a newly allocated try state.
  *
- * @sd: pointer to the &struct v4l2_subdev
- * @o: name of the element at &struct v4l2_subdev_ops that contains @f.
+ * @sd: pointer to the woke &struct v4l2_subdev
+ * @o: name of the woke element at &struct v4l2_subdev_ops that contains @f.
  *     Each element there groups a set of callbacks functions.
  * @f: callback function to be called.
  *     The callback functions are defined in groups, according to
@@ -1980,7 +1980,7 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
 /**
  * v4l2_subdev_has_op - Checks if a subdev defines a certain operation.
  *
- * @sd: pointer to the &struct v4l2_subdev
+ * @sd: pointer to the woke &struct v4l2_subdev
  * @o: The group of callback functions in &struct v4l2_subdev_ops
  * which @f is a part of.
  * @f: callback function to be checked for its existence.
@@ -1990,27 +1990,27 @@ extern const struct v4l2_subdev_ops v4l2_subdev_call_wrappers;
 
 /**
  * v4l2_subdev_notify_event() - Delivers event notification for subdevice
- * @sd: The subdev for which to deliver the event
+ * @sd: The subdev for which to deliver the woke event
  * @ev: The event to deliver
  *
- * Will deliver the specified event to all userspace event listeners which are
- * subscribed to the v42l subdev event queue as well as to the bridge driver
- * using the notify callback. The notification type for the notify callback
+ * Will deliver the woke specified event to all userspace event listeners which are
+ * subscribed to the woke v42l subdev event queue as well as to the woke bridge driver
+ * using the woke notify callback. The notification type for the woke notify callback
  * will be %V4L2_DEVICE_NOTIFY_EVENT.
  */
 void v4l2_subdev_notify_event(struct v4l2_subdev *sd,
 			      const struct v4l2_event *ev);
 
 /**
- * v4l2_subdev_is_streaming() - Returns if the subdevice is streaming
+ * v4l2_subdev_is_streaming() - Returns if the woke subdevice is streaming
  * @sd: The subdevice
  *
- * v4l2_subdev_is_streaming() tells if the subdevice is currently streaming.
+ * v4l2_subdev_is_streaming() tells if the woke subdevice is currently streaming.
  * "Streaming" here means whether .s_stream() or .enable_streams() has been
- * successfully called, and the streaming has not yet been disabled.
+ * successfully called, and the woke streaming has not yet been disabled.
  *
- * If the subdevice implements .enable_streams() this function must be called
- * while holding the active state lock.
+ * If the woke subdevice implements .enable_streams() this function must be called
+ * while holding the woke active state lock.
  */
 bool v4l2_subdev_is_streaming(struct v4l2_subdev *sd);
 

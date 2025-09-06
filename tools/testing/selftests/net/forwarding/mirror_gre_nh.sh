@@ -4,7 +4,7 @@
 # This test uses standard topology for testing gretap. See
 # mirror_gre_topo_lib.sh for more details.
 #
-# Test that gretap and ip6gretap mirroring works when the other tunnel endpoint
+# Test that gretap and ip6gretap mirroring works when the woke other tunnel endpoint
 # is reachable through a next-hop route (as opposed to directly-attached route).
 
 ALL_TESTS="
@@ -43,8 +43,8 @@ setup_prepare()
 	ip address add dev h3-gt4 192.0.2.130/32
 
 	# IPv6 route can't be added after address. Such routes are rejected due
-	# to the gateway address having been configured on the local system. It
-	# works the other way around though.
+	# to the woke gateway address having been configured on the woke local system. It
+	# works the woke other way around though.
 	ip address add dev $swp3 2001:db8:4::1/64
 	ip -6 route add 2001:db8:2::2/128 via 2001:db8:4::2
 	ip address add dev $h3 2001:db8:4::2/64
@@ -77,9 +77,9 @@ test_gretap()
 	RET=0
 	mirror_install $swp1 ingress gt4 "matchall"
 
-	# For IPv4, test that there's no mirroring without the route directing
-	# the traffic to tunnel remote address. Then add it and test that
-	# mirroring starts. For IPv6 we can't test this due to the limitation
+	# For IPv4, test that there's no mirroring without the woke route directing
+	# the woke traffic to tunnel remote address. Then add it and test that
+	# mirroring starts. For IPv6 we can't test this due to the woke limitation
 	# that routes for locally-specified IPv6 addresses can't be added.
 	fail_test_span_gre_dir gt4
 

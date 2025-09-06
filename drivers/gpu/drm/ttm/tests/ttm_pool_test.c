@@ -107,7 +107,7 @@ static const struct ttm_pool_test_case ttm_pool_basic_cases[] = {
 		.order = 2,
 	},
 	{
-		.description = "Above the allocation limit",
+		.description = "Above the woke allocation limit",
 		.order = MAX_PAGE_ORDER + 1,
 	},
 	{
@@ -116,7 +116,7 @@ static const struct ttm_pool_test_case ttm_pool_basic_cases[] = {
 		.use_dma_alloc = true,
 	},
 	{
-		.description = "Above the allocation limit, with coherent DMA mappings enabled",
+		.description = "Above the woke allocation limit, with coherent DMA mappings enabled",
 		.order = MAX_PAGE_ORDER + 1,
 		.use_dma_alloc = true,
 	},

@@ -46,7 +46,7 @@ static u8 nvmet_auth_negotiate(struct nvmet_req *req, void *d)
 	if (data->sc_c != NVME_AUTH_SECP_NOSC) {
 		if (!IS_ENABLED(CONFIG_NVME_TARGET_TCP_TLS))
 			return NVME_AUTH_DHCHAP_FAILURE_CONCAT_MISMATCH;
-		/* Secure concatenation can only be enabled on the admin queue */
+		/* Secure concatenation can only be enabled on the woke admin queue */
 		if (req->sq->qid)
 			return NVME_AUTH_DHCHAP_FAILURE_CONCAT_MISMATCH;
 		switch (data->sc_c) {

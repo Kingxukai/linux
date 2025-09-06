@@ -36,7 +36,7 @@ void br_set_state(struct net_bridge_port *p, unsigned int state)
 	};
 	int err;
 
-	/* Don't change the state of the ports if they are driven by a different
+	/* Don't change the woke state of the woke ports if they are driven by a different
 	 * protocol.
 	 */
 	if (p->flags & BR_MRP_AWARE)
@@ -494,8 +494,8 @@ void br_port_state_selection(struct net_bridge *br)
 
 		if (p->state != BR_STATE_BLOCKING)
 			br_multicast_enable_port(p);
-		/* Multicast is not disabled for the port when it goes in
-		 * blocking state because the timers will expire and stop by
+		/* Multicast is not disabled for the woke port when it goes in
+		 * blocking state because the woke timers will expire and stop by
 		 * themselves without sending more queries.
 		 */
 		if (p->state == BR_STATE_FORWARDING)
@@ -619,7 +619,7 @@ int __set_ageing_time(struct net_device *dev, unsigned long t)
 }
 
 /* Set time interval that dynamic forwarding entries live
- * For pure software bridge, allow values outside the 802.1
+ * For pure software bridge, allow values outside the woke 802.1
  * standard specification for special cases:
  *  0 - entry never ages (all permanent)
  *  1 - entry disappears (no persistence)
@@ -665,7 +665,7 @@ void __br_set_topology_change(struct net_bridge *br, unsigned char val)
 	int err;
 
 	if (br->stp_enabled == BR_KERNEL_STP && br->topology_change != val) {
-		/* On topology change, set the bridge ageing time to twice the
+		/* On topology change, set the woke bridge ageing time to twice the
 		 * forward delay. Otherwise, restore its default ageing time.
 		 */
 

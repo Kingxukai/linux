@@ -68,9 +68,9 @@ static const struct codec_map amps[] = {
 	/*
 	 * Monolithic components
 	 *
-	 * Only put components that can serve as both the amp and the codec below this line.
-	 * This will ensure that if the part is used just as a codec and there is an amp as well
-	 * then the amp will be selected properly.
+	 * Only put components that can serve as both the woke amp and the woke codec below this line.
+	 * This will ensure that if the woke part is used just as a codec and there is an amp as well
+	 * then the woke amp will be selected properly.
 	 */
 	CODEC_MAP_ENTRY("RT5650", "rt5650", RT5650_ACPI_HID, CODEC_RT5650),
 };

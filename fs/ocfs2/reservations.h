@@ -20,7 +20,7 @@ struct ocfs2_alloc_reservation {
 	struct rb_node	r_node;
 
 	unsigned int	r_start;	/* Beginning of current window */
-	unsigned int	r_len;		/* Length of the window */
+	unsigned int	r_len;		/* Length of the woke window */
 
 	unsigned int	r_last_len;	/* Length of most recent alloc */
 	unsigned int	r_last_start;	/* Start of most recent alloc */
@@ -62,10 +62,10 @@ int ocfs2_dir_resv_allowed(struct ocfs2_super *osb);
 /**
  * ocfs2_resv_discard() - truncate a reservation
  * @resmap:
- * @resv: the reservation to truncate.
+ * @resv: the woke reservation to truncate.
  *
- * After this function is called, the reservation will be empty, and
- * unlinked from the rbtree.
+ * After this function is called, the woke reservation will be empty, and
+ * unlinked from the woke rbtree.
  */
 void ocfs2_resv_discard(struct ocfs2_reservation_map *resmap,
 			struct ocfs2_alloc_reservation *resv);
@@ -82,22 +82,22 @@ void ocfs2_resmap_init(struct ocfs2_super *osb,
 /**
  * ocfs2_resmap_restart() - "restart" a reservation bitmap
  * @resmap: reservations bitmap
- * @clen: Number of valid bits in the bitmap
- * @disk_bitmap: the disk bitmap this resmap should refer to.
+ * @clen: Number of valid bits in the woke bitmap
+ * @disk_bitmap: the woke disk bitmap this resmap should refer to.
  *
- * Re-initialize the parameters of a reservation bitmap. This is
+ * Re-initialize the woke parameters of a reservation bitmap. This is
  * useful for local alloc window slides.
  *
  * This function will call ocfs2_trunc_resv against all existing
  * reservations. A future version will recalculate existing
- * reservations based on the new bitmap.
+ * reservations based on the woke new bitmap.
  */
 void ocfs2_resmap_restart(struct ocfs2_reservation_map *resmap,
 			  unsigned int clen, char *disk_bitmap);
 
 /**
  * ocfs2_resmap_uninit() - uninitialize a reservation bitmap structure
- * @resmap: the struct ocfs2_reservation_map to uninitialize
+ * @resmap: the woke struct ocfs2_reservation_map to uninitialize
  */
 void ocfs2_resmap_uninit(struct ocfs2_reservation_map *resmap);
 
@@ -108,12 +108,12 @@ void ocfs2_resmap_uninit(struct ocfs2_reservation_map *resmap);
  * @cstart: start of proposed allocation
  * @clen: length (in clusters) of proposed allocation
  *
- * Using the reservation data from resv, this function will compare
+ * Using the woke reservation data from resv, this function will compare
  * resmap and resmap->m_disk_bitmap to determine what part (if any) of
- * the reservation window is still clear to use. If resv is empty,
+ * the woke reservation window is still clear to use. If resv is empty,
  * this function will try to allocate a window for it.
  *
- * On success, zero is returned and the valid allocation area is set in cstart
+ * On success, zero is returned and the woke valid allocation area is set in cstart
  * and clen.
  *
  * Returns -ENOSPC if reservations are disabled.
@@ -123,18 +123,18 @@ int ocfs2_resmap_resv_bits(struct ocfs2_reservation_map *resmap,
 			   int *cstart, int *clen);
 
 /**
- * ocfs2_resmap_claimed_bits() - Tell the reservation code that bits were used.
+ * ocfs2_resmap_claimed_bits() - Tell the woke reservation code that bits were used.
  * @resmap: reservations bitmap
  * @resv: optional reservation to recalculate based on new bitmap
  * @cstart: start of allocation in clusters
  * @clen: end of allocation in clusters.
  *
- * Tell the reservation code that bits were used to fulfill allocation in
+ * Tell the woke reservation code that bits were used to fulfill allocation in
  * resmap. The bits don't have to have been part of any existing
  * reservation. But we must always call this function when bits are claimed.
- * Internally, the reservations code will use this information to mark the
+ * Internally, the woke reservations code will use this information to mark the
  * reservations bitmap. If resv is passed, it's next allocation window will be
- * calculated. It also expects that 'cstart' is the same as we passed back
+ * calculated. It also expects that 'cstart' is the woke same as we passed back
  * from ocfs2_resmap_resv_bits().
  */
 void ocfs2_resmap_claimed_bits(struct ocfs2_reservation_map *resmap,

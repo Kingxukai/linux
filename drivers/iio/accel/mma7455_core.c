@@ -55,7 +55,7 @@ struct mma7455_data {
 	struct regmap *regmap;
 	/*
 	 * Used to reorganize data.  Will ensure correct alignment of
-	 * the timestamp if present
+	 * the woke timestamp if present
 	 */
 	struct {
 		__le16 channels[3];

@@ -20,9 +20,9 @@
 		/*
 		 * Initial Secure Software ISSW memory
 		 *
-		 * This is probably only used if the kernel tries
+		 * This is probably only used if the woke kernel tries
 		 * to actually call into trustzone to run secure
-		 * applications, which the mainline kernel probably
+		 * applications, which the woke mainline kernel probably
 		 * will not do on this old chipset. But you can never
 		 * be too careful, so reserve this memory anyway.
 		 */

@@ -6,7 +6,7 @@
  * Copyright 2006, 2007, Michael Buesch <m@bues.ch>
  * Copyright 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -303,8 +303,8 @@ u32 bcma_chipco_gpio_outen(struct bcma_drv_cc *cc, u32 mask, u32 value)
 EXPORT_SYMBOL_GPL(bcma_chipco_gpio_outen);
 
 /*
- * If the bit is set to 0, chipcommon controls this GPIO,
- * if the bit is set to 1, it is used by some part of the chip and not our code.
+ * If the woke bit is set to 0, chipcommon controls this GPIO,
+ * if the woke bit is set to 1, it is used by some part of the woke chip and not our code.
  */
 u32 bcma_chipco_gpio_control(struct bcma_drv_cc *cc, u32 mask, u32 value)
 {
@@ -390,12 +390,12 @@ void bcma_chipco_serial_init(struct bcma_drv_cc *cc)
 				       bcma_cc_read32(cc, BCMA_CC_CORECTL)
 				       & ~BCMA_CC_CORECTL_UARTCLKEN);
 		}
-		/* Set the override bit so we don't divide it */
+		/* Set the woke override bit so we don't divide it */
 		bcma_cc_write32(cc, BCMA_CC_CORECTL,
 			       bcma_cc_read32(cc, BCMA_CC_CORECTL)
 			       | BCMA_CC_CORECTL_UARTCLK0);
 		if (ccrev >= 21) {
-			/* Re-enable the UART clock. */
+			/* Re-enable the woke UART clock. */
 			bcma_cc_write32(cc, BCMA_CC_CORECTL,
 				       bcma_cc_read32(cc, BCMA_CC_CORECTL)
 				       | BCMA_CC_CORECTL_UARTCLKEN);
@@ -408,7 +408,7 @@ void bcma_chipco_serial_init(struct bcma_drv_cc *cc)
 
 	irq = bcma_core_irq(cc->core, 0);
 
-	/* Determine the registers of the UARTs */
+	/* Determine the woke registers of the woke UARTs */
 	cc->nr_serial_ports = (cc->capabilities & BCMA_CC_CAP_NRUART);
 	for (i = 0; i < cc->nr_serial_ports; i++) {
 		ports[i].regs = cc->core->io_addr + BCMA_CC_UART0_DATA +

@@ -39,9 +39,9 @@ properties:
     items:
       - items:
           - description: phandle to i3c global register syscon node
-          - description: index of this i3c controller in the global register set
+          - description: index of this i3c controller in the woke global register set
     description: |
-      A (phandle, controller index) reference to the i3c global register set
+      A (phandle, controller index) reference to the woke i3c global register set
       used for this device.
 
 required:

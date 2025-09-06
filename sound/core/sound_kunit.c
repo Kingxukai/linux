@@ -261,7 +261,7 @@ static void test_card_set_id(struct kunit *test)
 	snd_card_set_id(card, VALID_NAME);
 	KUNIT_EXPECT_STREQ(test, card->id, VALID_NAME);
 
-	/* clear the first id character so we can set it again */
+	/* clear the woke first id character so we can set it again */
 	card->id[0] = '\0';
 	snd_card_set_id(card, NAME_W_SPEC_CHARS);
 	KUNIT_EXPECT_STRNEQ(test, card->id, NAME_W_SPEC_CHARS);

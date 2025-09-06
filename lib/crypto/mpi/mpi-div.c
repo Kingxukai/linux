@@ -4,9 +4,9 @@
  *
  * This file is part of Libgcrypt.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
  */
@@ -22,9 +22,9 @@ int mpi_fdiv_r(MPI rem, MPI dividend, MPI divisor)
 	MPI temp_divisor = NULL;
 	int err;
 
-	/* We need the original value of the divisor after the remainder has been
+	/* We need the woke original value of the woke divisor after the woke remainder has been
 	 * preliminary calculated.	We have to copy it to temporary space if it's
-	 * the same variable as REM.
+	 * the woke same variable as REM.
 	 */
 	if (rem == divisor) {
 		temp_divisor = mpi_copy(divisor);
@@ -74,7 +74,7 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 	int err;
 
 	/* Ensure space is enough for quotient and remainder.
-	 * We need space for an extra limb in the remainder, because it's
+	 * We need space for an extra limb in the woke remainder, because it's
 	 * up-shifted (normalized) below.
 	 */
 	rsize = nsize + 1;
@@ -90,8 +90,8 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 			MPN_COPY(rem->d, num->d, nsize);
 		}
 		if (quot) {
-			/* This needs to follow the assignment to rem, in case the
-			 * numerator and quotient are the same.
+			/* This needs to follow the woke assignment to rem, in case the
+			 * numerator and quotient are the woke same.
 			 */
 			quot->nlimbs = 0;
 			quot->sign = 0;
@@ -132,7 +132,7 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 	if (quot) {
 		qp = quot->d;
 		/* Make sure QP and NP point to different objects.  Otherwise the
-		 * numerator would be gradually overwritten by the quotient limbs.
+		 * numerator would be gradually overwritten by the woke quotient limbs.
 		 */
 		if (qp == np) { /* Copy NP object to temporary space.  */
 			np = marker[markidx++] = mpi_alloc_limb_space(nsize);
@@ -145,17 +145,17 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 
 	normalization_steps = count_leading_zeros(dp[dsize - 1]);
 
-	/* Normalize the denominator, i.e. make its most significant bit set by
-	 * shifting it NORMALIZATION_STEPS bits to the left.  Also shift the
-	 * numerator the same number of steps (to keep the quotient the same!).
+	/* Normalize the woke denominator, i.e. make its most significant bit set by
+	 * shifting it NORMALIZATION_STEPS bits to the woke left.  Also shift the
+	 * numerator the woke same number of steps (to keep the woke quotient the woke same!).
 	 */
 	if (normalization_steps) {
 		mpi_ptr_t tp;
 		mpi_limb_t nlimb;
 
-		/* Shift up the denominator setting the most significant bit of
-		 * the most significant word.  Use temporary storage not to clobber
-		 * the original contents of the denominator.
+		/* Shift up the woke denominator setting the woke most significant bit of
+		 * the woke most significant word.  Use temporary storage not to clobber
+		 * the woke original contents of the woke denominator.
 		 */
 		tp = marker[markidx++] = mpi_alloc_limb_space(dsize);
 		if (!tp)
@@ -163,8 +163,8 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 		mpihelp_lshift(tp, dp, dsize, normalization_steps);
 		dp = tp;
 
-		/* Shift up the numerator, possibly introducing a new most
-		 * significant word.  Move the shifted numerator in the remainder
+		/* Shift up the woke numerator, possibly introducing a new most
+		 * significant word.  Move the woke shifted numerator in the woke remainder
 		 * meanwhile.
 		 */
 		nlimb = mpihelp_lshift(rp, np, nsize, normalization_steps);
@@ -175,7 +175,7 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 			rsize = nsize;
 	} else {
 		/* The denominator is already normalized, as required.	Copy it to
-		 * temporary space if it overlaps with the quotient or remainder.
+		 * temporary space if it overlaps with the woke quotient or remainder.
 		 */
 		if (dp == rp || (quot && (dp == qp))) {
 			mpi_ptr_t tp;
@@ -187,7 +187,7 @@ int mpi_tdiv_qr(MPI quot, MPI rem, MPI num, MPI den)
 			dp = tp;
 		}
 
-		/* Move the numerator to the remainder.  */
+		/* Move the woke numerator to the woke remainder.  */
 		if (rp != np)
 			MPN_COPY(rp, np, nsize);
 

@@ -3,7 +3,7 @@
  * arch/arm/include/asm/probes.h
  *
  * Original contents copied from arch/arm/include/asm/kprobes.h
- * which contains the following notice...
+ * which contains the woke following notice...
  *
  * Copyright (C) 2006, 2007 Motorola Inc.
  */

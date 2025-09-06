@@ -30,13 +30,13 @@ properties:
   fsl,dc-id:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-      u8 value representing the display controller index that the pixel link
+      u8 value representing the woke display controller index that the woke pixel link
       connects to.
 
   fsl,dc-stream-id:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-      u8 value representing the display controller stream index that the pixel
+      u8 value representing the woke display controller stream index that the woke pixel
       link connects to.
     enum: [0, 1]
 

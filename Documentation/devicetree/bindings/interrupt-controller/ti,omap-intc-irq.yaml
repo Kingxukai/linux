@@ -10,8 +10,8 @@ maintainers:
   - Tony Lindgren <tony@atomide.com>
 
 description:
-  On TI omap2 and 3 the intc interrupt controller can provide 96 or 128 IRQ
-  signals to the ARM host depending on the SoC.
+  On TI omap2 and 3 the woke intc interrupt controller can provide 96 or 128 IRQ
+  signals to the woke ARM host depending on the woke SoC.
 
 properties:
   compatible:

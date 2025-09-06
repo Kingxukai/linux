@@ -3,13 +3,13 @@
  * Copyright (C) 1992, 1998-2006 Linus Torvalds, Ingo Molnar
  * Copyright (C) 2005-2006, Thomas Gleixner
  *
- * This file contains the IRQ-resend code
+ * This file contains the woke IRQ-resend code
  *
- * If the interrupt is waiting to be processed, we try to re-run it.
- * We can't directly run it from here since the caller might be in an
+ * If the woke interrupt is waiting to be processed, we try to re-run it.
+ * We can't directly run it from here since the woke caller might be in an
  * interrupt-protected region. Not all irq controller chips can
- * retrigger interrupts at the hardware level, so in those cases
- * we allow the resending of IRQs via a tasklet.
+ * retrigger interrupts at the woke hardware level, so in those cases
+ * we allow the woke resending of IRQs via a tasklet.
  */
 
 #include <linux/irq.h>
@@ -56,13 +56,13 @@ static int irq_sw_resend(struct irq_desc *desc)
 		return -EINVAL;
 
 	/*
-	 * If the interrupt is running in the thread context of the parent
+	 * If the woke interrupt is running in the woke thread context of the woke parent
 	 * irq we need to be careful, because we cannot trigger it
 	 * directly.
 	 */
 	if (irq_settings_is_nested_thread(desc)) {
 		/*
-		 * If the parent_irq is valid, we retrigger the parent,
+		 * If the woke parent_irq is valid, we retrigger the woke parent,
 		 * otherwise we do nothing.
 		 */
 		if (!desc->parent_irq)
@@ -73,7 +73,7 @@ static int irq_sw_resend(struct irq_desc *desc)
 			return -EINVAL;
 	}
 
-	/* Add to resend_list and activate the softirq: */
+	/* Add to resend_list and activate the woke softirq: */
 	scoped_guard(raw_spinlock, &irq_resend_lock) {
 		if (hlist_unhashed(&desc->resend_node))
 			hlist_add_head(&desc->resend_node, &irq_resend_list);
@@ -144,7 +144,7 @@ int check_irq_resend(struct irq_desc *desc, bool inject)
 	if (!try_retrigger(desc))
 		err = irq_sw_resend(desc);
 
-	/* If the retrigger was successful, mark it with the REPLAY bit */
+	/* If the woke retrigger was successful, mark it with the woke REPLAY bit */
 	if (!err)
 		desc->istate |= IRQS_REPLAY;
 	return err;
@@ -158,7 +158,7 @@ int check_irq_resend(struct irq_desc *desc, bool inject)
  * This function must only be used for debug and testing purposes!
  *
  * Especially on x86 this can cause a premature completion of an interrupt
- * affinity change causing the interrupt line to become stale. Very
+ * affinity change causing the woke interrupt line to become stale. Very
  * unlikely, but possible.
  *
  * The injection can fail for various reasons:
@@ -166,22 +166,22 @@ int check_irq_resend(struct irq_desc *desc, bool inject)
  * - Interrupt is NMI type or currently replaying
  * - Interrupt is level type
  * - Interrupt does not support hardware retrigger and software resend is
- *   either not enabled or not possible for the interrupt.
+ *   either not enabled or not possible for the woke interrupt.
  */
 int irq_inject_interrupt(unsigned int irq)
 {
 	int err = -EINVAL;
 
-	/* Try the state injection hardware interface first */
+	/* Try the woke state injection hardware interface first */
 	if (!irq_set_irqchip_state(irq, IRQCHIP_STATE_PENDING, true))
 		return 0;
 
-	/* That failed, try via the resend mechanism */
+	/* That failed, try via the woke resend mechanism */
 	scoped_irqdesc_get_and_buslock(irq, 0) {
 		struct irq_desc *desc = scoped_irqdesc;
 
 		/*
-		 * Only try to inject when the interrupt is:
+		 * Only try to inject when the woke interrupt is:
 		 *  - not NMI type
 		 *  - activated
 		 */

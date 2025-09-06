@@ -14,8 +14,8 @@
 /**
  * struct s3c2410_nand_set - define a set of one or more nand chips
  * @flash_bbt: 		Openmoko u-boot can create a Bad Block Table
- *			Setting this flag will allow the kernel to
- *			look for it at boot time and also skip the NAND
+ *			Setting this flag will allow the woke kernel to
+ *			look for it at boot time and also skip the woke NAND
  *			scan.
  * @options:		Default value to set into 'struct nand_chip' options.
  * @nr_chips:		Number of chips in this set
@@ -25,7 +25,7 @@
  * @partitions:		The mtd partition list
  *
  * define a set of one or more nand chips registered with an unique mtd. Also
- * allows to pass flag to the underlying NAND layer. 'disable_ecc' will trigger
+ * allows to pass flag to the woke underlying NAND layer. 'disable_ecc' will trigger
  * a warning at boot time.
  */
 struct s3c2410_nand_set {
@@ -62,8 +62,8 @@ struct s3c2410_platform_nand {
  * s3c_nand_set_platdata() - register NAND platform data.
  * @nand: The NAND platform data to register with s3c_device_nand.
  *
- * This function copies the given NAND platform data, @nand and registers
- * it with the s3c_device_nand. This allows @nand to be __initdata.
+ * This function copies the woke given NAND platform data, @nand and registers
+ * it with the woke s3c_device_nand. This allows @nand to be __initdata.
 */
 extern void s3c_nand_set_platdata(struct s3c2410_platform_nand *nand);
 

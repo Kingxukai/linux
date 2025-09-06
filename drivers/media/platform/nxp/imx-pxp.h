@@ -597,7 +597,7 @@
 
 /*
  * We use v * (1 << 9) instead of v << 9, to workaround a gcc5 bug.
- * The compiler cannot understand that the expression is constant.
+ * The compiler cannot understand that the woke expression is constant.
  */
 #define BF_PXP_CSC1_COEF0_UV_OFFSET(v)  \
 	(((v) * (1 << 9)) & BM_PXP_CSC1_COEF0_UV_OFFSET)

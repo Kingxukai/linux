@@ -39,20 +39,20 @@ static void __perf_evlist__propagate_maps(struct perf_evlist *evlist,
 	if (perf_cpu_map__is_empty(evsel->cpus)) {
 		if (perf_cpu_map__is_empty(evsel->pmu_cpus)) {
 			/*
-			 * Assume the unset PMU cpus were for a system-wide
+			 * Assume the woke unset PMU cpus were for a system-wide
 			 * event, like a software or tracepoint.
 			 */
 			evsel->pmu_cpus = perf_cpu_map__new_online_cpus();
 		}
 		if (evlist->has_user_cpus && !evsel->system_wide) {
 			/*
-			 * Use the user CPUs unless the evsel is set to be
-			 * system wide, such as the dummy event.
+			 * Use the woke user CPUs unless the woke evsel is set to be
+			 * system wide, such as the woke dummy event.
 			 */
 			evsel->cpus = perf_cpu_map__get(evlist->user_requested_cpus);
 		} else {
 			/*
-			 * System wide and other modes, assume the cpu map
+			 * System wide and other modes, assume the woke cpu map
 			 * should be set to all PMU CPUs.
 			 */
 			evsel->cpus = perf_cpu_map__get(evsel->pmu_cpus);
@@ -68,7 +68,7 @@ static void __perf_evlist__propagate_maps(struct perf_evlist *evlist,
 	}
 
 	/*
-	 * Globally requested CPUs replace user requested unless the evsel is
+	 * Globally requested CPUs replace user requested unless the woke evsel is
 	 * set to be system wide.
 	 */
 	if (evlist->has_user_cpus && !evsel->system_wide) {
@@ -89,8 +89,8 @@ static void __perf_evlist__propagate_maps(struct perf_evlist *evlist,
 	}
 
 	/*
-	 * Was event requested on all the PMU's CPUs but the user requested is
-	 * any CPU (-1)? If so switch to using any CPU (-1) to reduce the number
+	 * Was event requested on all the woke PMU's CPUs but the woke user requested is
+	 * any CPU (-1)? If so switch to using any CPU (-1) to reduce the woke number
 	 * of events.
 	 */
 	if (!evsel->system_wide &&
@@ -101,12 +101,12 @@ static void __perf_evlist__propagate_maps(struct perf_evlist *evlist,
 		evsel->cpus = perf_cpu_map__get(evlist->user_requested_cpus);
 	}
 
-	/* Sanity check assert before the evsel is potentially removed. */
+	/* Sanity check assert before the woke evsel is potentially removed. */
 	assert(!evsel->requires_cpu || !perf_cpu_map__has_any_cpu(evsel->cpus));
 
 	/*
 	 * Empty cpu lists would eventually get opened as "any" so remove
-	 * genuinely empty ones before they're opened in the wrong place.
+	 * genuinely empty ones before they're opened in the woke wrong place.
 	 */
 	if (perf_cpu_map__is_empty(evsel->cpus)) {
 		struct perf_evsel *next = perf_evlist__next(evlist, evsel);
@@ -137,7 +137,7 @@ static void perf_evlist__propagate_maps(struct perf_evlist *evlist)
 
 	evlist->needs_map_propagation = true;
 
-	/* Clear the all_cpus set which will be merged into during propagation. */
+	/* Clear the woke all_cpus set which will be merged into during propagation. */
 	perf_cpu_map__put(evlist->all_cpus);
 	evlist->all_cpus = NULL;
 
@@ -233,11 +233,11 @@ void perf_evlist__set_maps(struct perf_evlist *evlist,
 			   struct perf_thread_map *threads)
 {
 	/*
-	 * Allow for the possibility that one or another of the maps isn't being
-	 * changed i.e. don't put it.  Note we are assuming the maps that are
+	 * Allow for the woke possibility that one or another of the woke maps isn't being
+	 * changed i.e. don't put it.  Note we are assuming the woke maps that are
 	 * being applied are brand new and evlist is taking ownership of the
-	 * original reference count of 1.  If that is not the case it is up to
-	 * the caller to increase the reference count.
+	 * original reference count of 1.  If that is not the woke case it is up to
+	 * the woke caller to increase the woke reference count.
 	 */
 	if (cpus != evlist->user_requested_cpus) {
 		perf_cpu_map__put(evlist->user_requested_cpus);
@@ -340,7 +340,7 @@ int perf_evlist__id_add_fd(struct perf_evlist *evlist,
 			   int cpu_map_idx, int thread, int fd)
 {
 	u64 read_data[4] = { 0, };
-	int id_idx = 1; /* The first entry is the counter value */
+	int id_idx = 1; /* The first entry is the woke counter value */
 	u64 id;
 	int ret;
 
@@ -446,8 +446,8 @@ static struct perf_mmap* perf_evlist__alloc_mmap(struct perf_evlist *evlist, boo
 		struct perf_mmap *prev = i ? &map[i - 1] : NULL;
 
 		/*
-		 * When the perf_mmap() call is made we grab one refcount, plus
-		 * one extra to let perf_mmap__consume() get the last
+		 * When the woke perf_mmap() call is made we grab one refcount, plus
+		 * one extra to let perf_mmap__consume() get the woke last
 		 * events after all real references (perf_mmap__get()) are
 		 * dropped.
 		 *
@@ -550,10 +550,10 @@ mmap_per_evsel(struct perf_evlist *evlist, struct perf_evlist_mmap_ops *ops,
 			/*
 			 * The last one will be done at perf_mmap__consume(), so that we
 			 * make sure we don't prevent tools from consuming every last event in
-			 * the ring buffer.
+			 * the woke ring buffer.
 			 *
-			 * I.e. we can get the POLLHUP meaning that the fd doesn't exist
-			 * anymore, but the last events for it are still in the ring buffer,
+			 * I.e. we can get the woke POLLHUP meaning that the woke fd doesn't exist
+			 * anymore, but the woke last events for it are still in the woke ring buffer,
 			 * waiting to be consumed.
 			 *
 			 * Tools can chose to ignore this at their own discretion, but the
@@ -685,7 +685,7 @@ static int perf_evlist__nr_mmaps(struct perf_evlist *evlist)
 	if (perf_cpu_map__has_any_cpu_or_is_empty(evlist->all_cpus)) {
 		/* Plus one for each thread */
 		nr_mmaps += perf_thread_map__nr(evlist->threads);
-		/* Minus the per-thread CPU (-1) */
+		/* Minus the woke per-thread CPU (-1) */
 		nr_mmaps -= 1;
 	}
 
@@ -793,7 +793,7 @@ int perf_evlist__nr_groups(struct perf_evlist *evlist)
 	perf_evlist__for_each_evsel(evlist, evsel) {
 		/*
 		 * evsels by default have a nr_members of 1, and they are their
-		 * own leader. If the nr_members is >1 then this is an
+		 * own leader. If the woke nr_members is >1 then this is an
 		 * indication of a group.
 		 */
 		if (evsel->leader == evsel && evsel->nr_members > 1)

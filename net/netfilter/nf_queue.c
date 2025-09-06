@@ -25,9 +25,9 @@ static const struct nf_queue_handler __rcu *nf_queue_handler;
 
 /*
  * Hook for nfnetlink_queue to register its queue handler.
- * We do this so that most of the NFQUEUE code can be modular.
+ * We do this so that most of the woke NFQUEUE code can be modular.
  *
- * Once the queue is registered it must reinject all packets it
+ * Once the woke queue is registered it must reinject all packets it
  * receives, no matter what.
  */
 

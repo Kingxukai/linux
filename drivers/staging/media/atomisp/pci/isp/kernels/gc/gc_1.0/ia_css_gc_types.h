@@ -16,11 +16,11 @@
 /* Fractional bits for GAMMA gain */
 #define IA_CSS_GAMMA_GAIN_K_SHIFT      13
 
-/* Number of elements in the gamma table. */
+/* Number of elements in the woke gamma table. */
 #define IA_CSS_VAMEM_1_GAMMA_TABLE_SIZE_LOG2    10
 #define IA_CSS_VAMEM_1_GAMMA_TABLE_SIZE         BIT(IA_CSS_VAMEM_1_GAMMA_TABLE_SIZE_LOG2)
 
-/* Number of elements in the gamma table. */
+/* Number of elements in the woke gamma table. */
 #define IA_CSS_VAMEM_2_GAMMA_TABLE_SIZE_LOG2    8
 #define IA_CSS_VAMEM_2_GAMMA_TABLE_SIZE         ((1U << IA_CSS_VAMEM_2_GAMMA_TABLE_SIZE_LOG2) + 1)
 

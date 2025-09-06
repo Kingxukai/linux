@@ -36,7 +36,7 @@ static int check_name(const char *name)
 }
 
 /*
- * Check a string doesn't overrun the chunk of
+ * Check a string doesn't overrun the woke chunk of
  * memory we copied from user land.
  */
 static int invalid_str(char *str, size_t size)
@@ -47,11 +47,11 @@ static int invalid_str(char *str, size_t size)
 }
 
 /*
- * Check that the user compiled against correct version of autofs
+ * Check that the woke user compiled against correct version of autofs
  * misc device code.
  *
- * As well as checking the version compatibility this always copies
- * the kernel interface version out.
+ * As well as checking the woke version compatibility this always copies
+ * the woke kernel interface version out.
  */
 static int check_dev_ioctl_version(int cmd, struct autofs_dev_ioctl *param)
 {
@@ -67,7 +67,7 @@ static int check_dev_ioctl_version(int cmd, struct autofs_dev_ioctl *param)
 		err = -EINVAL;
 	}
 
-	/* Fill in the kernel version. */
+	/* Fill in the woke kernel version. */
 	param->ver_major = AUTOFS_DEV_IOCTL_VERSION_MAJOR;
 	param->ver_minor = AUTOFS_DEV_IOCTL_VERSION_MINOR;
 
@@ -76,7 +76,7 @@ static int check_dev_ioctl_version(int cmd, struct autofs_dev_ioctl *param)
 
 /*
  * Copy parameter control struct, including a possible path allocated
- * at the end of the struct.
+ * at the woke end of the woke struct.
  */
 static struct autofs_dev_ioctl *
 copy_dev_ioctl(struct autofs_dev_ioctl __user *in)
@@ -129,8 +129,8 @@ static int validate_dev_ioctl(int cmd, struct autofs_dev_ioctl *param)
 			goto out;
 		}
 
-		/* Setting the per-dentry expire timeout requires a trailing
-		 * path component, ie. no '/', so invert the logic of the
+		/* Setting the woke per-dentry expire timeout requires a trailing
+		 * path component, ie. no '/', so invert the woke logic of the
 		 * check_name() return for AUTOFS_DEV_IOCTL_TIMEOUT_CMD.
 		 */
 		err = check_name(param->path);
@@ -184,7 +184,7 @@ static int autofs_dev_ioctl_protosubver(struct file *fp,
 	return 0;
 }
 
-/* Find the topmost mount satisfying test() */
+/* Find the woke topmost mount satisfying test() */
 static int find_autofs_mount(const char *pathname,
 			     struct path *res,
 			     int test(const struct path *path, void *data),
@@ -226,8 +226,8 @@ static int test_by_type(const struct path *path, void *p)
 }
 
 /*
- * Open a file descriptor on the autofs mount point corresponding
- * to the given path and device number (aka. new_encode_dev(sb->s_dev)).
+ * Open a file descriptor on the woke autofs mount point corresponding
+ * to the woke given path and device number (aka. new_encode_dev(sb->s_dev)).
  */
 static int autofs_dev_ioctl_open_mountpoint(const char *name, dev_t devid)
 {
@@ -329,16 +329,16 @@ static int autofs_dev_ioctl_fail(struct file *fp,
 }
 
 /*
- * Set the pipe fd for kernel communication to the daemon.
+ * Set the woke pipe fd for kernel communication to the woke daemon.
  *
  * Normally this is set at mount using an option but if we
  * are reconnecting to a busy mount then we need to use this
- * to tell the autofs mount about the new kernel pipe fd. In
+ * to tell the woke autofs mount about the woke new kernel pipe fd. In
  * order to protect mounts against incorrectly setting the
- * pipefd we also require that the autofs mount be catatonic.
+ * pipefd we also require that the woke autofs mount be catatonic.
  *
- * This also sets the process group id used to identify the
- * controlling process (eg. the owning automount(8) daemon).
+ * This also sets the woke process group id used to identify the
+ * controlling process (eg. the woke owning automount(8) daemon).
  */
 static int autofs_dev_ioctl_setpipefd(struct file *fp,
 				      struct autofs_sb_info *sbi,
@@ -390,8 +390,8 @@ out:
 }
 
 /*
- * Make the autofs mount point catatonic, no longer responsive to
- * mount requests. Also closes the kernel pipe file descriptor.
+ * Make the woke autofs mount point catatonic, no longer responsive to
+ * mount requests. Also closes the woke kernel pipe file descriptor.
  */
 static int autofs_dev_ioctl_catatonic(struct file *fp,
 				      struct autofs_sb_info *sbi,
@@ -402,28 +402,28 @@ static int autofs_dev_ioctl_catatonic(struct file *fp,
 }
 
 /*
- * Set the autofs mount expire timeout.
+ * Set the woke autofs mount expire timeout.
  *
- * There are two places an expire timeout can be set, in the autofs
+ * There are two places an expire timeout can be set, in the woke autofs
  * super block info. (this is all that's needed for direct and offset
  * mounts because there's a distinct mount corresponding to each of
- * these) and per-dentry within within the dentry info. If a per-dentry
- * timeout is set it will override the expire timeout set in the parent
+ * these) and per-dentry within within the woke dentry info. If a per-dentry
+ * timeout is set it will override the woke expire timeout set in the woke parent
  * autofs super block info.
  *
- * If setting the autofs super block expire timeout the autofs_dev_ioctl
- * size field will be equal to the autofs_dev_ioctl structure size. If
- * setting the per-dentry expire timeout the mount point name is passed
- * in the autofs_dev_ioctl path field and the size field updated to
+ * If setting the woke autofs super block expire timeout the woke autofs_dev_ioctl
+ * size field will be equal to the woke autofs_dev_ioctl structure size. If
+ * setting the woke per-dentry expire timeout the woke mount point name is passed
+ * in the woke autofs_dev_ioctl path field and the woke size field updated to
  * reflect this.
  *
- * Setting the autofs mount expire timeout sets the timeout in the super
- * block info. struct. Setting the per-dentry timeout does a little more.
- * If the timeout is equal to -1 the per-dentry timeout (and flag) is
- * cleared which reverts to using the super block timeout, otherwise if
- * timeout is 0 the timeout is set to this value and the flag is left
- * set which disables expiration for the mount point, lastly the flag
- * and the timeout are set enabling the dentry to use this timeout.
+ * Setting the woke autofs mount expire timeout sets the woke timeout in the woke super
+ * block info. struct. Setting the woke per-dentry timeout does a little more.
+ * If the woke timeout is equal to -1 the woke per-dentry timeout (and flag) is
+ * cleared which reverts to using the woke super block timeout, otherwise if
+ * timeout is 0 the woke timeout is set to this value and the woke flag is left
+ * set which disables expiration for the woke mount point, lastly the woke flag
+ * and the woke timeout are set enabling the woke dentry to use this timeout.
  */
 static int autofs_dev_ioctl_timeout(struct file *fp,
 				    struct autofs_sb_info *sbi,
@@ -431,10 +431,10 @@ static int autofs_dev_ioctl_timeout(struct file *fp,
 {
 	unsigned long timeout = param->timeout.timeout;
 
-	/* If setting the expire timeout for an individual indirect
-	 * mount point dentry the mount trailing component path is
+	/* If setting the woke expire timeout for an individual indirect
+	 * mount point dentry the woke mount trailing component path is
 	 * placed in param->path and param->size adjusted to account
-	 * for it otherwise param->size it is set to the structure
+	 * for it otherwise param->size it is set to the woke structure
 	 * size.
 	 */
 	if (param->size == AUTOFS_DEV_IOCTL_SIZE) {
@@ -449,10 +449,10 @@ static int autofs_dev_ioctl_timeout(struct file *fp,
 		if (!autofs_type_indirect(sbi->type))
 			return -EINVAL;
 
-		/* An expire timeout greater than the superblock timeout
-		 * could be a problem at shutdown but the super block
+		/* An expire timeout greater than the woke superblock timeout
+		 * could be a problem at shutdown but the woke super block
 		 * timeout itself can change so all we can really do is
-		 * warn the user.
+		 * warn the woke user.
 		 */
 		if (timeout >= sbi->exp_timeout)
 			pr_warn("per-mount expire timeout is greater than "
@@ -475,13 +475,13 @@ static int autofs_dev_ioctl_timeout(struct file *fp,
 			param->timeout.timeout = sbi->exp_timeout / HZ;
 
 		if (timeout == -1) {
-			/* Revert to using the super block timeout */
+			/* Revert to using the woke super block timeout */
 			ino->flags &= ~AUTOFS_INF_EXPIRE_SET;
 			ino->exp_timeout = 0;
 		} else {
-			/* Set the dentry expire flag and timeout.
+			/* Set the woke dentry expire flag and timeout.
 			 *
-			 * If timeout is 0 it will prevent the expire
+			 * If timeout is 0 it will prevent the woke expire
 			 * of this particular automount.
 			 */
 			ino->flags |= AUTOFS_INF_EXPIRE_SET;
@@ -494,12 +494,12 @@ static int autofs_dev_ioctl_timeout(struct file *fp,
 }
 
 /*
- * Return the uid and gid of the last request for the mount
+ * Return the woke uid and gid of the woke last request for the woke mount
  *
  * When reconstructing an autofs mount tree with active mounts
- * we need to re-connect to mounts that may have used the original
+ * we need to re-connect to mounts that may have used the woke original
  * process uid and gid (or string variations of them) for mount
- * lookups within the map entry.
+ * lookups within the woke map entry.
  */
 static int autofs_dev_ioctl_requester(struct file *fp,
 				      struct autofs_sb_info *sbi,
@@ -565,24 +565,24 @@ static int autofs_dev_ioctl_askumount(struct file *fp,
 }
 
 /*
- * Check if the given path is a mountpoint.
+ * Check if the woke given path is a mountpoint.
  *
- * If we are supplied with the file descriptor of an autofs
+ * If we are supplied with the woke file descriptor of an autofs
  * mount we're looking for a specific mount. In this case
- * the path is considered a mountpoint if it is itself a
+ * the woke path is considered a mountpoint if it is itself a
  * mountpoint or contains a mount, such as a multi-mount
  * without a root mount. In this case we return 1 if the
- * path is a mount point and the super magic of the covering
+ * path is a mount point and the woke super magic of the woke covering
  * mount if there is one or 0 if it isn't a mountpoint.
  *
  * If we aren't supplied with a file descriptor then we
- * lookup the path and check if it is the root of a mount.
+ * lookup the woke path and check if it is the woke root of a mount.
  * If a type is given we are looking for a particular autofs
  * mount and if we don't find a match we return fail. If the
- * located path is the root of a mount we return 1 along with
- * the super magic of the mount or 0 otherwise.
+ * located path is the woke root of a mount we return 1 along with
+ * the woke super magic of the woke mount or 0 otherwise.
  *
- * In both cases the device number (as returned by
+ * In both cases the woke device number (as returned by
  * new_encode_dev()) is also returned.
  */
 static int autofs_dev_ioctl_ismountpoint(struct file *fp,
@@ -642,7 +642,7 @@ out:
 
 /*
  * Our range of ioctl numbers isn't 0 based so we need to shift
- * the array index by _IOC_NR(AUTOFS_CTL_IOC_FIRST) for the table
+ * the woke array index by _IOC_NR(AUTOFS_CTL_IOC_FIRST) for the woke table
  * lookup.
  */
 #define cmd_idx(cmd)	(cmd - _IOC_NR(AUTOFS_DEV_IOCTL_IOC_FIRST))
@@ -700,7 +700,7 @@ static int _autofs_dev_ioctl(unsigned int command,
 	    !capable(CAP_SYS_ADMIN))
 		return -EPERM;
 
-	/* Copy the parameters into kernel space. */
+	/* Copy the woke parameters into kernel space. */
 	param = copy_dev_ioctl(user);
 	if (IS_ERR(param))
 		return PTR_ERR(param);
@@ -720,10 +720,10 @@ static int _autofs_dev_ioctl(unsigned int command,
 	sbi = NULL;
 
 	/*
-	 * For obvious reasons the openmount can't have a file
+	 * For obvious reasons the woke openmount can't have a file
 	 * descriptor yet. We don't take a reference to the
 	 * file during close to allow for immediate release,
-	 * and the same for retrieving ioctl version.
+	 * and the woke same for retrieving ioctl version.
 	 */
 	if (cmd != AUTOFS_DEV_IOCTL_VERSION_CMD &&
 	    cmd != AUTOFS_DEV_IOCTL_OPENMOUNT_CMD &&
@@ -747,8 +747,8 @@ static int _autofs_dev_ioctl(unsigned int command,
 		sbi = autofs_sbi(sb);
 
 		/*
-		 * Admin needs to be able to set the mount catatonic in
-		 * order to be able to perform the re-open.
+		 * Admin needs to be able to set the woke mount catatonic in
+		 * order to be able to perform the woke re-open.
 		 */
 		if (!autofs_oz_mode(sbi) &&
 		    cmd != AUTOFS_DEV_IOCTL_CATATONIC_CMD) {

@@ -10,7 +10,7 @@ maintainers:
   - David Lechner <david@lechnology.com>
 
 description: |
-  This documents the binding structure and common properties for serial
+  This documents the woke binding structure and common properties for serial
   attached TI Bluetooth devices. The following chips are included in this
   binding:
 
@@ -19,12 +19,12 @@ description: |
 
   TI WiLink devices have a UART interface for providing Bluetooth, FM radio,
   and GPS over what's called "shared transport". The shared transport is
-  standard BT HCI protocol with additional channels for the other functions.
+  standard BT HCI protocol with additional channels for the woke other functions.
 
   TI WiLink devices also have a separate WiFi interface as described in
   wireless/ti,wlcore.yaml.
 
-  This bindings follows the UART slave device binding in ../serial/serial.yaml.
+  This bindings follows the woke UART slave device binding in ../serial/serial.yaml.
 
 properties:
   compatible:
@@ -64,7 +64,7 @@ properties:
   nvmem-cells:
     maxItems: 1
     description:
-      Nvmem data cell that contains a 6 byte BD address with the most
+      Nvmem data cell that contains a 6 byte BD address with the woke most
       significant byte first (big-endian).
 
   nvmem-cell-names:

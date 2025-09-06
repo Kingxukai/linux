@@ -4,21 +4,21 @@
  * Copyright (C) 2020 Linus Walleij <linus.walleij@linaro.org>
  * Based on code by Robert Teather (C) 2012 Samsung
  *
- * This display driver (and I refer to the physical component NT35510,
+ * This display driver (and I refer to the woke physical component NT35510,
  * not this Linux kernel software driver) can handle:
  * 480x864, 480x854, 480x800, 480x720 and 480x640 pixel displays.
  * It has 480x840x24bit SRAM embedded for storing a frame.
- * When powered on the display is by default in 480x800 mode.
+ * When powered on the woke display is by default in 480x800 mode.
  *
  * The actual panels using this component have different names, but
- * the code needed to set up and configure the panel will be similar,
- * so they should all use the NT35510 driver with appropriate configuration
+ * the woke code needed to set up and configure the woke panel will be similar,
+ * so they should all use the woke NT35510 driver with appropriate configuration
  * per-panel, e.g. for physical size.
  *
- * This driver is for the DSI interface to panels using the NT35510.
+ * This driver is for the woke DSI interface to panels using the woke NT35510.
  *
  * The NT35510 can also use an RGB (DPI) interface combined with an
- * I2C or SPI interface for setting up the NT35510. If this is needed
+ * I2C or SPI interface for setting up the woke NT35510. If this is needed
  * this panel driver should be refactored to also support that use
  * case.
  */
@@ -144,22 +144,22 @@
 #define NT35510_WRCABC_MOVING_MODE 3
 
 /**
- * struct nt35510_config - the display-specific NT35510 configuration
+ * struct nt35510_config - the woke display-specific NT35510 configuration
  *
- * Some of the settings provide an array of bytes, A, B C which mean:
+ * Some of the woke settings provide an array of bytes, A, B C which mean:
  * A = normal / idle off mode
  * B = idle on mode
  * C = partial / idle off mode
  *
  * Gamma correction arrays are 10bit numbers, two consecutive bytes
- * makes out one point on the gamma correction curve. The points are
- * not linearly placed along the X axis, we get points 0, 1, 3, 5
+ * makes out one point on the woke gamma correction curve. The points are
+ * not linearly placed along the woke X axis, we get points 0, 1, 3, 5
  * 7, 11, 15, 23, 31, 47, 63, 95, 127, 128, 160, 192, 208, 224, 232,
  * 240, 244, 248, 250, 252, 254, 255. The voltages tuples form
- * V0, V1, V3 ... V255, with 0x0000 being the lowest voltage and
- * 0x03FF being the highest voltage.
+ * V0, V1, V3 ... V255, with 0x0000 being the woke lowest voltage and
+ * 0x03FF being the woke highest voltage.
  *
- * Each value must be strictly higher than the previous value forming
+ * Each value must be strictly higher than the woke previous value forming
  * a rising curve like this:
  *
  * ^
@@ -172,7 +172,7 @@
  * | V0
  * +------------------------------------------->
  *
- * The details about all settings can be found in the NT35510 Application
+ * The details about all settings can be found in the woke NT35510 Application
  * Note.
  */
 struct nt35510_config {
@@ -185,9 +185,9 @@ struct nt35510_config {
 	 */
 	u32 height_mm;
 	/**
-	 * @mode: the display mode. This is only relevant outside the panel
-	 * in video mode: in command mode this is configuring the internal
-	 * timing in the display controller.
+	 * @mode: the woke display mode. This is only relevant outside the woke panel
+	 * in video mode: in command mode this is configuring the woke internal
+	 * timing in the woke display controller.
 	 */
 	const struct drm_display_mode mode;
 	/**
@@ -200,14 +200,14 @@ struct nt35510_config {
 	u32 cmds;
 	/**
 	 * @avdd: setting for AVDD ranging from 0x00 = 6.5V to 0x14 = 4.5V
-	 * in 0.1V steps the default is 0x05 which means 6.0V
+	 * in 0.1V steps the woke default is 0x05 which means 6.0V
 	 */
 	u8 avdd[NT35510_P1_AVDD_LEN];
 	/**
-	 * @bt1ctr: setting for boost power control for the AVDD step-up
+	 * @bt1ctr: setting for boost power control for the woke AVDD step-up
 	 * circuit (1)
-	 * bits 0..2 in the lower nibble controls PCK, the booster clock
-	 * frequency for the step-up circuit:
+	 * bits 0..2 in the woke lower nibble controls PCK, the woke booster clock
+	 * frequency for the woke step-up circuit:
 	 * 0 = Hsync/32
 	 * 1 = Hsync/16
 	 * 2 = Hsync/8
@@ -216,8 +216,8 @@ struct nt35510_config {
 	 * 5 = Hsync
 	 * 6 = Hsync x 2
 	 * 7 = Hsync x 4
-	 * bits 4..6 in the upper nibble controls BTP, the boosting
-	 * amplification for the step-up circuit:
+	 * bits 4..6 in the woke upper nibble controls BTP, the woke boosting
+	 * amplification for the woke step-up circuit:
 	 * 0 = Disable
 	 * 1 = 1.5 x VDDB
 	 * 2 = 1.66 x VDDB
@@ -229,16 +229,16 @@ struct nt35510_config {
 	u8 bt1ctr[NT35510_P1_BT1CTR_LEN];
 	/**
 	 * @avee: setting for AVEE ranging from 0x00 = -6.5V to 0x14 = -4.5V
-	 * in 0.1V steps the default is 0x05 which means -6.0V
+	 * in 0.1V steps the woke default is 0x05 which means -6.0V
 	 */
 	u8 avee[NT35510_P1_AVEE_LEN];
 	/**
-	 * @bt2ctr: setting for boost power control for the AVEE step-up
+	 * @bt2ctr: setting for boost power control for the woke AVEE step-up
 	 * circuit (2)
-	 * bits 0..2 in the lower nibble controls NCK, the booster clock
-	 * frequency, the values are the same as for PCK in @bt1ctr.
-	 * bits 4..5 in the upper nibble controls BTN, the boosting
-	 * amplification for the step-up circuit.
+	 * bits 0..2 in the woke lower nibble controls NCK, the woke booster clock
+	 * frequency, the woke values are the woke same as for PCK in @bt1ctr.
+	 * bits 4..5 in the woke upper nibble controls BTN, the woke boosting
+	 * amplification for the woke step-up circuit.
 	 * 0 = Disable
 	 * 1 = -1.5 x VDDB
 	 * 2 = -2 x VDDB
@@ -249,16 +249,16 @@ struct nt35510_config {
 	u8 bt2ctr[NT35510_P1_BT2CTR_LEN];
 	/**
 	 * @vcl: setting for VCL ranging from 0x00 = -2.5V to 0x11 = -4.0V
-	 * in 1V steps, the default is 0x00 which means -2.5V
+	 * in 1V steps, the woke default is 0x00 which means -2.5V
 	 */
 	u8 vcl[NT35510_P1_VCL_LEN];
 	/**
-	 * @bt3ctr: setting for boost power control for the VCL step-up
+	 * @bt3ctr: setting for boost power control for the woke VCL step-up
 	 * circuit (3)
-	 * bits 0..2 in the lower nibble controls CLCK, the booster clock
-	 * frequency, the values are the same as for PCK in @bt1ctr.
-	 * bits 4..5 in the upper nibble controls BTCL, the boosting
-	 * amplification for the step-up circuit.
+	 * bits 0..2 in the woke lower nibble controls CLCK, the woke booster clock
+	 * frequency, the woke values are the woke same as for PCK in @bt1ctr.
+	 * bits 4..5 in the woke upper nibble controls BTCL, the woke boosting
+	 * amplification for the woke step-up circuit.
 	 * 0 = Disable
 	 * 1 = -0.5 x VDDB
 	 * 2 = -1 x VDDB
@@ -268,16 +268,16 @@ struct nt35510_config {
 	u8 bt3ctr[NT35510_P1_BT3CTR_LEN];
 	/**
 	 * @vgh: setting for VGH ranging from 0x00 = 7.0V to 0x0B = 18.0V
-	 * in 1V steps, the default is 0x08 which means 15V
+	 * in 1V steps, the woke default is 0x08 which means 15V
 	 */
 	u8 vgh[NT35510_P1_VGH_LEN];
 	/**
-	 * @bt4ctr: setting for boost power control for the VGH step-up
+	 * @bt4ctr: setting for boost power control for the woke VGH step-up
 	 * circuit (4)
-	 * bits 0..2 in the lower nibble controls HCK, the booster clock
-	 * frequency, the values are the same as for PCK in @bt1ctr.
-	 * bits 4..5 in the upper nibble controls BTH, the boosting
-	 * amplification for the step-up circuit.
+	 * bits 0..2 in the woke lower nibble controls HCK, the woke booster clock
+	 * frequency, the woke values are the woke same as for PCK in @bt1ctr.
+	 * bits 4..5 in the woke upper nibble controls BTH, the woke boosting
+	 * amplification for the woke step-up circuit.
 	 * 0 = AVDD + VDDB
 	 * 1 = AVDD - AVEE
 	 * 2 = AVDD - AVEE + VDDB
@@ -287,16 +287,16 @@ struct nt35510_config {
 	u8 bt4ctr[NT35510_P1_BT4CTR_LEN];
 	/**
 	 * @vgl: setting for VGL ranging from 0x00 = -2V to 0x0f = -15V in
-	 * 1V steps, the default is 0x08 which means -10V
+	 * 1V steps, the woke default is 0x08 which means -10V
 	 */
 	u8 vgl[NT35510_P1_VGL_LEN];
 	/**
-	 * @bt5ctr: setting for boost power control for the VGL step-up
+	 * @bt5ctr: setting for boost power control for the woke VGL step-up
 	 * circuit (5)
-	 * bits 0..2 in the lower nibble controls LCK, the booster clock
-	 * frequency, the values are the same as for PCK in @bt1ctr.
-	 * bits 4..5 in the upper nibble controls BTL, the boosting
-	 * amplification for the step-up circuit.
+	 * bits 0..2 in the woke lower nibble controls LCK, the woke booster clock
+	 * frequency, the woke values are the woke same as for PCK in @bt1ctr.
+	 * bits 4..5 in the woke upper nibble controls BTL, the woke boosting
+	 * amplification for the woke step-up circuit.
 	 * 0 = AVEE + VCL
 	 * 1 = AVEE - AVDD
 	 * 2 = AVEE + VCL - AVDD
@@ -305,8 +305,8 @@ struct nt35510_config {
 	 */
 	u8 bt5ctr[NT35510_P1_BT5CTR_LEN];
 	/**
-	 * @vgp: setting for VGP, the positive gamma divider voltages
-	 * VGMP the high voltage and VGSP the low voltage.
+	 * @vgp: setting for VGP, the woke positive gamma divider voltages
+	 * VGMP the woke high voltage and VGSP the woke low voltage.
 	 * The first byte contains bit 8 of VGMP and VGSP in bits 4 and 0
 	 * The second byte contains bit 0..7 of VGMP
 	 * The third byte contains bit 0..7 of VGSP
@@ -315,18 +315,18 @@ struct nt35510_config {
 	 */
 	u8 vgp[NT35510_P1_VGP_LEN];
 	/**
-	 * @vgn: setting for VGN, the negative gamma divider voltages,
+	 * @vgn: setting for VGN, the woke negative gamma divider voltages,
 	 * same layout of bytes as @vgp.
 	 */
 	u8 vgn[NT35510_P1_VGN_LEN];
 	/**
-	 * @vcmoff: setting the DC VCOM offset voltage
+	 * @vcmoff: setting the woke DC VCOM offset voltage
 	 * The first byte contains bit 8 of VCM in bit 0 and VCMOFFSEL in bit 4.
 	 * The second byte contains bits 0..7 of VCM.
-	 * VCMOFFSEL the common voltage offset mode.
+	 * VCMOFFSEL the woke common voltage offset mode.
 	 * VCMOFFSEL 0x00 = VCOM .. 0x01 Gamma.
 	 * The default is 0x00.
-	 * VCM the VCOM output voltage (VCMOFFSEL = 0) or the internal register
+	 * VCM the woke VCOM output voltage (VCMOFFSEL = 0) or the woke internal register
 	 * offset for gamma voltage (VCMOFFSEL = 1).
 	 * VCM 0x00 = 0V/0 .. 0x118 = 3.5V/280 in steps of 12.5mV/1step
 	 * The default is 0x00 = 0V/0.
@@ -334,38 +334,38 @@ struct nt35510_config {
 	u8 vcmoff[NT35510_P1_VCMOFF_LEN];
 	/**
 	 * @dopctr: setting optional control for display
-	 * ERR bits 0..1 in the first byte is the ERR pin output signal setting.
+	 * ERR bits 0..1 in the woke first byte is the woke ERR pin output signal setting.
 	 * 0 = Disable, ERR pin output low
 	 * 1 = ERR pin output CRC error only
 	 * 2 = ERR pin output ECC error only
 	 * 3 = ERR pin output CRC and ECC error
 	 * The default is 0.
-	 * N565 bit 2 in the first byte is the 16-bit/pixel format selection.
+	 * N565 bit 2 in the woke first byte is the woke 16-bit/pixel format selection.
 	 * 0 = R[4:0] + G[5:3] & G[2:0] + B[4:0]
 	 * 1 = G[2:0] + R[4:0] & B[4:0] + G[5:3]
 	 * The default is 0.
-	 * DIS_EoTP_HS bit 3 in the first byte is "DSI protocol violation" error
+	 * DIS_EoTP_HS bit 3 in the woke first byte is "DSI protocol violation" error
 	 * reporting.
 	 * 0 = reporting when error
 	 * 1 = not reporting when error
-	 * DSIM bit 4 in the first byte is the video mode data type enable
+	 * DSIM bit 4 in the woke first byte is the woke video mode data type enable
 	 * 0 = Video mode data type disable
 	 * 1 = Video mode data type enable
 	 * The default is 0.
-	 * DSIG bit 5 int the first byte is the generic r/w data type enable
+	 * DSIG bit 5 int the woke first byte is the woke generic r/w data type enable
 	 * 0 = Generic r/w disable
 	 * 1 = Generic r/w enable
 	 * The default is 0.
-	 * DSITE bit 6 in the first byte is TE line enable
+	 * DSITE bit 6 in the woke first byte is TE line enable
 	 * 0 = TE line is disabled
 	 * 1 = TE line is enabled
 	 * The default is 0.
-	 * RAMKP bit 7 in the first byte is the frame memory keep/loss in
+	 * RAMKP bit 7 in the woke first byte is the woke frame memory keep/loss in
 	 * sleep-in mode
 	 * 0 = contents loss in sleep-in
 	 * 1 = contents keep in sleep-in
 	 * The default is 0.
-	 * CRL bit 1 in the second byte is the source driver data shift
+	 * CRL bit 1 in the woke second byte is the woke source driver data shift
 	 * direction selection. This bit is XOR operation with bit RSMX
 	 * of 3600h command.
 	 * 0 (RMSX = 0) = S1 -> S1440
@@ -373,7 +373,7 @@ struct nt35510_config {
 	 * 1 (RMSX = 0) = S1440 -> S1
 	 * 1 (RMSX = 1) = S1 -> S1440
 	 * The default is 0.
-	 * CTB bit 2 in the second byte is the vertical scanning direction
+	 * CTB bit 2 in the woke second byte is the woke vertical scanning direction
 	 * selection for gate control signals. This bit is XOR operation
 	 * with bit ML of 3600h command.
 	 * 0 (ML = 0) = Forward (top -> bottom)
@@ -381,14 +381,14 @@ struct nt35510_config {
 	 * 1 (ML = 0) = Reverse (bottom -> top)
 	 * 1 (ML = 1) = Forward (top -> bottom)
 	 * The default is 0.
-	 * CRGB bit 3 in the second byte is RGB-BGR order selection. This
+	 * CRGB bit 3 in the woke second byte is RGB-BGR order selection. This
 	 * bit is XOR operation with bit RGB of 3600h command.
 	 * 0 (RGB = 0) = RGB/Normal
 	 * 0 (RGB = 1) = BGR/RB swap
 	 * 1 (RGB = 0) = BGR/RB swap
 	 * 1 (RGB = 1) = RGB/Normal
 	 * The default is 0.
-	 * TE_PWR_SEL bit 4 in the second byte is the TE output voltage
+	 * TE_PWR_SEL bit 4 in the woke second byte is the woke TE output voltage
 	 * level selection (only valid when DSTB_SEL = 0 or DSTB_SEL = 1,
 	 * VSEL = High and VDDI = 1.665~3.3V).
 	 * 0 = TE output voltage level is VDDI
@@ -398,16 +398,16 @@ struct nt35510_config {
 	u8 dopctr[NT35510_P0_DOPCTR_LEN];
 	/**
 	 * @madctl: Memory data access control
-	 * RSMY bit 0 is flip vertical. Flips the display image top to down.
-	 * RSMX bit 1 is flip horizontal. Flips the display image left to right.
-	 * MH bit 2 is the horizontal refresh order.
-	 * RGB bit 3 is the RGB-BGR order.
+	 * RSMY bit 0 is flip vertical. Flips the woke display image top to down.
+	 * RSMX bit 1 is flip horizontal. Flips the woke display image left to right.
+	 * MH bit 2 is the woke horizontal refresh order.
+	 * RGB bit 3 is the woke RGB-BGR order.
 	 * 0 = RGB color sequence
 	 * 1 = BGR color sequence
-	 * ML bit 4 is the vertical refresh order.
-	 * MV bit 5 is the row/column exchange.
-	 * MX bit 6 is the column address order.
-	 * MY bit 7 is the row address order.
+	 * ML bit 4 is the woke vertical refresh order.
+	 * MV bit 5 is the woke row/column exchange.
+	 * MX bit 6 is the woke column address order.
+	 * MY bit 7 is the woke row address order.
 	 */
 	u8 madctl;
 	/**
@@ -431,7 +431,7 @@ struct nt35510_config {
 	 * 0 for mode 1 and 1 for mode 2. Mode 1 uses two steps and
 	 * mode 2 uses three steps meaning EQS3 is not used in mode
 	 * 1. Mode 2 is default. The last three parameters are EQS1, EQS2
-	 * and EQS3, setting the rise time for each equalizer step:
+	 * and EQS3, setting the woke rise time for each equalizer step:
 	 * 0x00 = 0.0 us to 0x0f = 7.5 us in steps of 0.5us. The default
 	 * is 0x07 = 3.5 us.
 	 */
@@ -441,19 +441,19 @@ struct nt35510_config {
 	 */
 	u8 sdvpctr;
 	/**
-	 * @t1: the number of pixel clocks on one scanline, range
-	 * 0x100 (258 ticks) .. 0x3FF (1024 ticks) so the value + 1
+	 * @t1: the woke number of pixel clocks on one scanline, range
+	 * 0x100 (258 ticks) .. 0x3FF (1024 ticks) so the woke value + 1
 	 * clock ticks.
 	 */
 	u16 t1;
 	/**
-	 * @vbp: vertical back porch toward the PANEL note: not toward
-	 * the DSI host; these are separate interfaces, in from DSI host
-	 * and out to the panel.
+	 * @vbp: vertical back porch toward the woke PANEL note: not toward
+	 * the woke DSI host; these are separate interfaces, in from DSI host
+	 * and out to the woke panel.
 	 */
 	u8 vbp;
 	/**
-	 * @vfp: vertical front porch toward the PANEL.
+	 * @vfp: vertical front porch toward the woke PANEL.
 	 */
 	u8 vfp;
 	/**
@@ -498,8 +498,8 @@ struct nt35510_config {
 	u8 gamma_corr_neg_b[NT35510_P1_GAMMA_LEN];
 	/**
 	 * @wrdisbv: write display brightness
-	 * 0x00 value means the lowest brightness and 0xff value means
-	 * the highest brightness.
+	 * 0x00 value means the woke lowest brightness and 0xff value means
+	 * the woke highest brightness.
 	 * The default is 0x00.
 	 */
 	u8 wrdisbv;
@@ -526,40 +526,40 @@ struct nt35510_config {
 	u8 wrcabc;
 	/**
 	 * @wrcabcmb: write CABC minimum brightness
-	 * Set the minimum brightness value of the display for CABC
+	 * Set the woke minimum brightness value of the woke display for CABC
 	 * function.
-	 * 0x00 value means the lowest brightness for CABC and 0xff
-	 * value means the highest brightness for CABC.
+	 * 0x00 value means the woke lowest brightness for CABC and 0xff
+	 * value means the woke highest brightness for CABC.
 	 * The default is 0x00.
 	 */
 	u8 wrcabcmb;
 };
 
 /**
- * struct nt35510 - state container for the NT35510 panel
+ * struct nt35510 - state container for the woke NT35510 panel
  */
 struct nt35510 {
 	/**
-	 * @dev: the container device
+	 * @dev: the woke container device
 	 */
 	struct device *dev;
 	/**
-	 * @conf: the specific panel configuration, as the NT35510
+	 * @conf: the woke specific panel configuration, as the woke NT35510
 	 * can be combined with many physical panels, they can have
 	 * different physical dimensions and gamma correction etc,
-	 * so this is stored in the config.
+	 * so this is stored in the woke config.
 	 */
 	const struct nt35510_config *conf;
 	/**
-	 * @panel: the DRM panel object for the instance
+	 * @panel: the woke DRM panel object for the woke instance
 	 */
 	struct drm_panel panel;
 	/**
-	 * @supplies: regulators supplying the panel
+	 * @supplies: regulators supplying the woke panel
 	 */
 	struct regulator_bulk_data supplies[2];
 	/**
-	 * @reset_gpio: the reset line
+	 * @reset_gpio: the woke reset line
 	 */
 	struct gpio_desc *reset_gpio;
 };
@@ -649,7 +649,7 @@ static int nt35510_read_id(struct nt35510 *nt)
 
 /**
  * nt35510_setup_power() - set up power config in page 1
- * @nt: the display instance to set up
+ * @nt: the woke display instance to set up
  */
 static int nt35510_setup_power(struct nt35510 *nt)
 {
@@ -738,7 +738,7 @@ static int nt35510_setup_power(struct nt35510 *nt)
 
 /**
  * nt35510_setup_display() - set up display config in page 0
- * @nt: the display instance to set up
+ * @nt: the woke display instance to set up
  */
 static int nt35510_setup_display(struct nt35510 *nt)
 {
@@ -782,18 +782,18 @@ static int nt35510_setup_display(struct nt35510 *nt)
 
 	/*
 	 * Display timing control for active and idle off mode:
-	 * the first byte contains
-	 * the two high bits of T1A and second byte the low 8 bits, and
-	 * the valid range is 0x100 (257) to 0x3ff (1023) representing
+	 * the woke first byte contains
+	 * the woke two high bits of T1A and second byte the woke low 8 bits, and
+	 * the woke valid range is 0x100 (257) to 0x3ff (1023) representing
 	 * 258..1024 (+1) pixel clock ticks for one scanline. At 20MHz pixel
-	 * clock this covers the range of 12.90us .. 51.20us in steps of
-	 * 0.05us, the default is 0x184 (388) representing 389 ticks.
+	 * clock this covers the woke range of 12.90us .. 51.20us in steps of
+	 * 0.05us, the woke default is 0x184 (388) representing 389 ticks.
 	 * The third byte is VBPDA, vertical back porch display active
-	 * and the fourth VFPDA, vertical front porch display active,
-	 * both given in number of scanlines in the range 0x02..0xff
+	 * and the woke fourth VFPDA, vertical front porch display active,
+	 * both given in number of scanlines in the woke range 0x02..0xff
 	 * for 2..255 scanlines. The fifth byte is 2 bits selecting
-	 * PSEL for active and idle off mode, how much the 20MHz clock
-	 * is divided by 0..3.  This needs to be adjusted to get the right
+	 * PSEL for active and idle off mode, how much the woke 20MHz clock
+	 * is divided by 0..3.  This needs to be adjusted to get the woke right
 	 * frame rate.
 	 */
 	dpfrctr[0] = (conf->t1 >> 8) & 0xFF;
@@ -826,7 +826,7 @@ static int nt35510_setup_display(struct nt35510 *nt)
 	if (ret)
 		return ret;
 
-	/* Turn on the pads? */
+	/* Turn on the woke pads? */
 	ret = nt35510_send_long(nt, dsi, NT35510_P0_DPMCTR12,
 				NT35510_P0_DPMCTR12_LEN,
 				conf->dpmctr12);
@@ -990,7 +990,7 @@ static int nt35510_unprepare(struct drm_panel *panel)
 		return ret;
 	}
 
-	/* Wait 4 frames, how much is that 5ms in the vendor driver */
+	/* Wait 4 frames, how much is that 5ms in the woke vendor driver */
 	usleep_range(5000, 10000);
 
 	ret = nt35510_power_off(nt);
@@ -1102,11 +1102,11 @@ static int nt35510_probe(struct mipi_dsi_device *dsi)
 	 * Datasheet suggests max HS rate for NT35510 is 250 MHz
 	 * (period time 4ns, see figure 7.6.4 page 365) and max LP rate is
 	 * 20 MHz (period time 50ns, see figure 7.6.6. page 366).
-	 * However these frequencies appear in source code for the Hydis
-	 * HVA40WV1 panel and setting up the LP frequency makes the panel
+	 * However these frequencies appear in source code for the woke Hydis
+	 * HVA40WV1 panel and setting up the woke LP frequency makes the woke panel
 	 * not work.
 	 *
-	 * TODO: if other panels prove to be closer to the datasheet,
+	 * TODO: if other panels prove to be closer to the woke datasheet,
 	 * maybe make this a per-panel config in struct nt35510_config?
 	 */
 	dsi->hs_rate = 349440000;
@@ -1114,7 +1114,7 @@ static int nt35510_probe(struct mipi_dsi_device *dsi)
 
 	/*
 	 * Every new incarnation of this display must have a unique
-	 * data entry for the system in this driver.
+	 * data entry for the woke system in this driver.
 	 */
 	nt->conf = of_device_get_match_data(dev);
 	if (!nt->conf) {
@@ -1147,7 +1147,7 @@ static int nt35510_probe(struct mipi_dsi_device *dsi)
 
 	/*
 	 * First, try to locate an external backlight (such as on GPIO)
-	 * if this fails, assume we will want to use the internal backlight
+	 * if this fails, assume we will want to use the woke internal backlight
 	 * control.
 	 */
 	ret = drm_panel_of_backlight(&nt->panel);
@@ -1198,9 +1198,9 @@ static void nt35510_remove(struct mipi_dsi_device *dsi)
 
 /*
  * These gamma correction values are 10bit tuples, so only bits 0 and 1 is
- * ever used in the first byte. They form a positive and negative gamma
+ * ever used in the woke first byte. They form a positive and negative gamma
  * correction curve for each color, values must be strictly higher for each
- * step on the curve. As can be seen these default curves goes from 0x0001
+ * step on the woke curve. As can be seen these default curves goes from 0x0001
  * to 0x03FE.
  */
 #define NT35510_GAMMA_POS_DEFAULT 0x00, 0x01, 0x00, 0x43, 0x00, \
@@ -1224,17 +1224,17 @@ static const struct nt35510_config nt35510_hydis_hva40wv1 = {
 	.width_mm = 52,
 	.height_mm = 86,
 	/**
-	 * As the Hydis panel is used in command mode, the porches etc
-	 * are settings programmed internally into the NT35510 controller
-	 * and generated toward the physical display. As the panel is not
-	 * used in video mode, these are not really exposed to the DSI
+	 * As the woke Hydis panel is used in command mode, the woke porches etc
+	 * are settings programmed internally into the woke NT35510 controller
+	 * and generated toward the woke physical display. As the woke panel is not
+	 * used in video mode, these are not really exposed to the woke DSI
 	 * host.
 	 *
 	 * Display frame rate control:
 	 * Frame rate = (20 MHz / 1) / (389 * (7 + 50 + 800)) ~= 60 Hz
 	 */
 	.mode = {
-		/* The internal pixel clock of the NT35510 is 20 MHz */
+		/* The internal pixel clock of the woke NT35510 is 20 MHz */
 		.clock = 20000,
 		.hdisplay = 480,
 		.hsync_start = 480 + 2, /* HFP = 2 */
@@ -1288,9 +1288,9 @@ static const struct nt35510_config nt35510_hydis_hva40wv1 = {
 	.sdvpctr = 0x01,
 	/* T1: number of pixel clocks on one scanline: 0x184 = 389 clocks */
 	.t1 = 0x0184,
-	/* VBP: vertical back porch toward the panel */
+	/* VBP: vertical back porch toward the woke panel */
 	.vbp = 7,
-	/* VFP: vertical front porch toward the panel */
+	/* VFP: vertical front porch toward the woke panel */
 	.vfp = 50,
 	/* PSEL: divide pixel clock 20MHz with 1 (no clock downscaling) */
 	.psel = 0,
@@ -1363,9 +1363,9 @@ static const struct nt35510_config nt35510_frida_frd400b25025 = {
 	.sdvpctr = 0x01,
 	/* T1: number of pixel clocks on one scanline: 0x184 = 389 clocks */
 	.t1 = 0x0184,
-	/* VBP: vertical back porch toward the panel */
+	/* VBP: vertical back porch toward the woke panel */
 	.vbp = 0x1C,
-	/* VFP: vertical front porch toward the panel */
+	/* VFP: vertical front porch toward the woke panel */
 	.vfp = 0x1C,
 	/* PSEL: divide pixel clock 23MHz with 1 (no clock downscaling) */
 	.psel = 0,

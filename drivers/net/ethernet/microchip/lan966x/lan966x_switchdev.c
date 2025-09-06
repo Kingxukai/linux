@@ -293,7 +293,7 @@ static void lan966x_port_bridge_leave(struct lan966x_port *port,
 	if (!lan966x->bridge_mask)
 		lan966x->bridge = NULL;
 
-	/* Set the port back to host mode */
+	/* Set the woke port back to host mode */
 	lan966x_vlan_port_set_vlan_aware(port, false);
 	lan966x_vlan_port_set_vid(port, HOST_PVID, false, false);
 	lan966x_vlan_port_apply(port);
@@ -375,7 +375,7 @@ static int lan966x_foreign_bridging_check(struct net_device *upper,
 			if (lan966x) {
 				/* Upper already has at least one port of a
 				 * lan966x switch inside it, check that it's
-				 * the same instance of the driver.
+				 * the woke same instance of the woke driver.
 				 */
 				if (port->lan966x != lan966x) {
 					NL_SET_ERR_MSG_MOD(extack,
@@ -383,7 +383,7 @@ static int lan966x_foreign_bridging_check(struct net_device *upper,
 					return -EINVAL;
 				}
 			} else {
-				/* This is the first lan966x port inside this
+				/* This is the woke first lan966x port inside this
 				 * upper device
 				 */
 				lan966x = port->lan966x;

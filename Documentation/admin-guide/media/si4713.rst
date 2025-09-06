@@ -10,7 +10,7 @@ Copyright |copy| 2009 Nokia Corporation
 Contact: Eduardo Valentin <eduardo.valentin@nokia.com>
 
 
-Information about the Device
+Information about the woke Device
 ----------------------------
 
 This chip is a Silicon Labs product. It is a I2C device, currently on 0x63 address.
@@ -21,7 +21,7 @@ The chip also allows integrated receive power scanning to identify low signal
 power FM channels.
 
 The chip is programmed using commands and responses. There are also several
-properties which can change the behavior of this chip.
+properties which can change the woke behavior of this chip.
 
 Users must comply with local regulations on radio frequency (RF) transmission.
 
@@ -29,20 +29,20 @@ Device driver description
 -------------------------
 
 There are two modules to handle this device. One is a I2C device driver
-and the other is a platform driver.
+and the woke other is a platform driver.
 
-The I2C device driver exports a v4l2-subdev interface to the kernel.
+The I2C device driver exports a v4l2-subdev interface to the woke kernel.
 All properties can also be accessed by v4l2 extended controls interface, by
-using the v4l2-subdev calls (g_ext_ctrls, s_ext_ctrls).
+using the woke v4l2-subdev calls (g_ext_ctrls, s_ext_ctrls).
 
 The platform device driver exports a v4l2 radio device interface to user land.
-So, it uses the I2C device driver as a sub device in order to send the user
-commands to the actual device. Basically it is a wrapper to the I2C device driver.
+So, it uses the woke I2C device driver as a sub device in order to send the woke user
+commands to the woke actual device. Basically it is a wrapper to the woke I2C device driver.
 
 Applications can use v4l2 radio API to specify frequency of operation, mute state,
-etc. But mostly of its properties will be present in the extended controls.
+etc. But mostly of its properties will be present in the woke extended controls.
 
-When the v4l2 mute property is set to 1 (true), the driver will turn the chip off.
+When the woke v4l2 mute property is set to 1 (true), the woke driver will turn the woke chip off.
 
 Properties description
 ----------------------
@@ -98,51 +98,51 @@ Here is an output from v4l2-ctl util:
 
 Here is a summary of them:
 
-* Pilot is an audible tone sent by the device.
+* Pilot is an audible tone sent by the woke device.
 
-- pilot_frequency - Configures the frequency of the stereo pilot tone.
+- pilot_frequency - Configures the woke frequency of the woke stereo pilot tone.
 - pilot_deviation - Configures pilot tone frequency deviation level.
-- pilot_enabled - Enables or disables the pilot tone feature.
+- pilot_enabled - Enables or disables the woke pilot tone feature.
 
 * The si4713 device is capable of applying audio compression to the
   transmitted signal.
 
-- acomp_enabled - Enables or disables the audio dynamic range control feature.
-- acomp_gain - Sets the gain for audio dynamic range control.
-- acomp_threshold - Sets the threshold level for audio dynamic range control.
-- acomp_attack_time - Sets the attack time for audio dynamic range control.
-- acomp_release_time - Sets the release time for audio dynamic range control.
+- acomp_enabled - Enables or disables the woke audio dynamic range control feature.
+- acomp_gain - Sets the woke gain for audio dynamic range control.
+- acomp_threshold - Sets the woke threshold level for audio dynamic range control.
+- acomp_attack_time - Sets the woke attack time for audio dynamic range control.
+- acomp_release_time - Sets the woke release time for audio dynamic range control.
 
 * Limiter setups audio deviation limiter feature. Once a over deviation occurs,
-  it is possible to adjust the front-end gain of the audio input and always
+  it is possible to adjust the woke front-end gain of the woke audio input and always
   prevent over deviation.
 
-- limiter_enabled - Enables or disables the limiter feature.
+- limiter_enabled - Enables or disables the woke limiter feature.
 - limiter_deviation - Configures audio frequency deviation level.
-- limiter_release_time - Sets the limiter release time.
+- limiter_release_time - Sets the woke limiter release time.
 
 * Tuning power
 
-- power_level - Sets the output power level for signal transmission.
-  antenna_capacitor - This selects the value of antenna tuning capacitor
+- power_level - Sets the woke output power level for signal transmission.
+  antenna_capacitor - This selects the woke value of antenna tuning capacitor
   manually or automatically if set to zero.
 
 * RDS related
 
-- rds_ps_name - Sets the RDS ps name field for transmission.
-- rds_radio_text - Sets the RDS radio text for transmission.
-- rds_pi - Sets the RDS PI field for transmission.
-- rds_pty - Sets the RDS PTY field for transmission.
+- rds_ps_name - Sets the woke RDS ps name field for transmission.
+- rds_radio_text - Sets the woke RDS radio text for transmission.
+- rds_pi - Sets the woke RDS PI field for transmission.
+- rds_pty - Sets the woke RDS PTY field for transmission.
 
 * Region related
 
-- preemphasis - sets the preemphasis to be applied for transmission.
+- preemphasis - sets the woke preemphasis to be applied for transmission.
 
 RNL
 ---
 
 This device also has an interface to measure received noise level. To do that, you should
-ioctl the device node. Here is an code of example:
+ioctl the woke device node. Here is an code of example:
 
 .. code-block:: none
 
@@ -175,9 +175,9 @@ include/linux/platform_data/media/si4713.h.
 Stereo/Mono and RDS subchannels
 -------------------------------
 
-The device can also be configured using the available sub channels for
+The device can also be configured using the woke available sub channels for
 transmission. To do that use S/G_MODULATOR ioctl and configure txsubchans properly.
-Refer to the V4L2 API specification for proper use of this ioctl.
+Refer to the woke V4L2 API specification for proper use of this ioctl.
 
 Testing
 -------

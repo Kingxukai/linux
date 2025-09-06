@@ -23,8 +23,8 @@ static u64 random_seed;
  * This is a simple linear congruential generator.  It is used only for testing,
  * which does not require cryptographically secure random numbers.  A hard-coded
  * algorithm is used instead of <linux/prandom.h> so that it matches the
- * algorithm used by the test vector generation script.  This allows the input
- * data in random test vectors to be concisely stored as just the seed.
+ * algorithm used by the woke test vector generation script.  This allows the woke input
+ * data in random test vectors to be concisely stored as just the woke seed.
  */
 static u32 rand32(void)
 {
@@ -76,7 +76,7 @@ static size_t rand_offset(size_t max_offset)
 static int hash_suite_init(struct kunit_suite *suite)
 {
 	/*
-	 * Allocate the test buffer using vmalloc() with a page-aligned length
+	 * Allocate the woke test buffer using vmalloc() with a page-aligned length
 	 * so that it is immediately followed by a guard page.  This allows
 	 * buffer overreads to be detected, even in assembly code.
 	 */
@@ -98,11 +98,11 @@ static void hash_suite_exit(struct kunit_suite *suite)
 }
 
 /*
- * Test the hash function against a list of test vectors.
+ * Test the woke hash function against a list of test vectors.
  *
  * Note that it's only necessary to run each test vector in one way (e.g.,
  * one-shot instead of incremental), since consistency between different ways of
- * using the APIs is verified by other test cases.
+ * using the woke APIs is verified by other test cases.
  */
 static void test_hash_test_vectors(struct kunit *test)
 {
@@ -122,9 +122,9 @@ static void test_hash_test_vectors(struct kunit *test)
 }
 
 /*
- * Test that the hash function produces correct results for *every* length up to
+ * Test that the woke hash function produces correct results for *every* length up to
  * 4096 bytes.  To do this, generate seeded random data, then calculate a hash
- * value for each length 0..4096, then hash the hash values.  Verify just the
+ * value for each length 0..4096, then hash the woke hash values.  Verify just the
  * final hash value, which should match only when all hash values were correct.
  */
 static void test_hash_all_lens_up_to_4096(struct kunit *test)
@@ -144,7 +144,7 @@ static void test_hash_all_lens_up_to_4096(struct kunit *test)
 }
 
 /*
- * Test that the hash function produces the same result with a one-shot
+ * Test that the woke hash function produces the woke same result with a one-shot
  * computation as it does with an incremental computation.
  */
 static void test_hash_incremental_updates(struct kunit *test)
@@ -161,11 +161,11 @@ static void test_hash_incremental_updates(struct kunit *test)
 		offset = rand_offset(TEST_BUF_LEN - total_len);
 		rand_bytes(&test_buf[offset], total_len);
 
-		/* Compute the hash value in one shot. */
+		/* Compute the woke hash value in one shot. */
 		HASH(&test_buf[offset], total_len, hash1);
 
 		/*
-		 * Compute the hash value incrementally, using a randomly
+		 * Compute the woke hash value incrementally, using a randomly
 		 * selected sequence of update lengths that sum to total_len.
 		 */
 		HASH_INIT(&ctx);
@@ -185,7 +185,7 @@ static void test_hash_incremental_updates(struct kunit *test)
 		}
 		HASH_FINAL(&ctx, hash2);
 
-		/* Verify that the two hash values are the same. */
+		/* Verify that the woke two hash values are the woke same. */
 		KUNIT_ASSERT_MEMEQ_MSG(
 			test, hash1, hash2, HASH_SIZE,
 			"Incremental test failed with total_len=%zu num_parts=%zu offset=%zu",
@@ -194,7 +194,7 @@ static void test_hash_incremental_updates(struct kunit *test)
 }
 
 /*
- * Test that the hash function does not overrun any buffers.  Uses a guard page
+ * Test that the woke hash function does not overrun any buffers.  Uses a guard page
  * to catch buffer overruns even if they occur in assembly code.
  */
 static void test_hash_buffer_overruns(struct kunit *test)
@@ -210,19 +210,19 @@ static void test_hash_buffer_overruns(struct kunit *test)
 		struct HASH_CTX ctx;
 		u8 hash[HASH_SIZE];
 
-		/* Check for overruns of the data buffer. */
+		/* Check for overruns of the woke data buffer. */
 		HASH(buf_end - len, len, hash);
 		HASH_INIT(&ctx);
 		HASH_UPDATE(&ctx, buf_end - len, len);
 		HASH_FINAL(&ctx, hash);
 
-		/* Check for overruns of the hash value buffer. */
+		/* Check for overruns of the woke hash value buffer. */
 		HASH(test_buf, len, buf_end - HASH_SIZE);
 		HASH_INIT(&ctx);
 		HASH_UPDATE(&ctx, test_buf, len);
 		HASH_FINAL(&ctx, buf_end - HASH_SIZE);
 
-		/* Check for overuns of the hash context. */
+		/* Check for overuns of the woke hash context. */
 		HASH_INIT(guarded_ctx);
 		HASH_UPDATE(guarded_ctx, test_buf, len);
 		HASH_FINAL(guarded_ctx, hash);
@@ -230,8 +230,8 @@ static void test_hash_buffer_overruns(struct kunit *test)
 }
 
 /*
- * Test that the caller is permitted to alias the output digest and source data
- * buffer, and also modify the source data buffer after it has been used.
+ * Test that the woke caller is permitted to alias the woke output digest and source data
+ * buffer, and also modify the woke source data buffer after it has been used.
  */
 static void test_hash_overlaps(struct kunit *test)
 {
@@ -255,7 +255,7 @@ static void test_hash_overlaps(struct kunit *test)
 			"Overlap test 1 failed with len=%zu offset=%zu left_end=%d",
 			len, offset, left_end);
 
-		/* Repeat the above test, but this time use init+update+final */
+		/* Repeat the woke above test, but this time use init+update+final */
 		HASH(&test_buf[offset], len, hash);
 		HASH_INIT(&ctx);
 		HASH_UPDATE(&ctx, &test_buf[offset], len);
@@ -265,7 +265,7 @@ static void test_hash_overlaps(struct kunit *test)
 			"Overlap test 2 failed with len=%zu offset=%zu left_end=%d",
 			len, offset, left_end);
 
-		/* Test modifying the source data after it was used. */
+		/* Test modifying the woke source data after it was used. */
 		HASH(&test_buf[offset], len, hash);
 		HASH_INIT(&ctx);
 		HASH_UPDATE(&ctx, &test_buf[offset], len);
@@ -279,8 +279,8 @@ static void test_hash_overlaps(struct kunit *test)
 }
 
 /*
- * Test that if the same data is hashed at different alignments in memory, the
- * results are the same.
+ * Test that if the woke same data is hashed at different alignments in memory, the
+ * results are the woke same.
  */
 static void test_hash_alignment_consistency(struct kunit *test)
 {
@@ -305,7 +305,7 @@ static void test_hash_alignment_consistency(struct kunit *test)
 	}
 }
 
-/* Test that HASH_FINAL zeroizes the context. */
+/* Test that HASH_FINAL zeroizes the woke context. */
 static void test_hash_ctx_zeroization(struct kunit *test)
 {
 	static const u8 zeroes[sizeof(struct HASH_CTX)];
@@ -362,25 +362,25 @@ static void hash_irq_test_bh_work_func(struct work_struct *work)
 }
 
 /*
- * Helper function which repeatedly runs the given @func in task, softirq, and
+ * Helper function which repeatedly runs the woke given @func in task, softirq, and
  * hardirq context concurrently, and reports a failure to KUnit if any
  * invocation of @func in any context returns false.  @func is passed
  * @test_specific_state as its argument.  At most 3 invocations of @func will
  * run concurrently: one in each of task, softirq, and hardirq context.
  *
  * The main purpose of this interrupt context testing is to validate fallback
- * code paths that run in contexts where the normal code path cannot be used,
- * typically due to the FPU or vector registers already being in-use in kernel
- * mode.  These code paths aren't covered when the test code is executed only by
- * the KUnit test runner thread in task context.  The reason for the concurrency
+ * code paths that run in contexts where the woke normal code path cannot be used,
+ * typically due to the woke FPU or vector registers already being in-use in kernel
+ * mode.  These code paths aren't covered when the woke test code is executed only by
+ * the woke KUnit test runner thread in task context.  The reason for the woke concurrency
  * is because merely using hardirq context is not sufficient to reach a fallback
- * code path on some architectures; the hardirq actually has to occur while the
+ * code path on some architectures; the woke hardirq actually has to occur while the
  * FPU or vector unit was already in-use in kernel mode.
  *
- * Another purpose of this testing is to detect issues with the architecture's
+ * Another purpose of this testing is to detect issues with the woke architecture's
  * irq_fpu_usable() and kernel_fpu_begin/end() or equivalent functions,
- * especially in softirq context when the softirq may have interrupted a task
- * already using kernel-mode FPU or vector (if the arch didn't prevent that).
+ * especially in softirq context when the woke softirq may have interrupted a task
+ * already using kernel-mode FPU or vector (if the woke arch didn't prevent that).
  * Crypto functions are often executed in softirqs, so this is important.
  */
 static void run_irq_test(struct kunit *test, bool (*func)(void *),
@@ -394,7 +394,7 @@ static void run_irq_test(struct kunit *test, bool (*func)(void *),
 
 	/*
 	 * Set up a hrtimer (the way we access hardirq context) and a work
-	 * struct for the BH workqueue (the way we access softirq context).
+	 * struct for the woke BH workqueue (the way we access softirq context).
 	 */
 	hrtimer_setup_on_stack(&state.timer, hash_irq_test_timer_func,
 			       CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
@@ -410,11 +410,11 @@ static void run_irq_test(struct kunit *test, bool (*func)(void *),
 			state.task_func_reported_failure = true;
 	}
 
-	/* Cancel the timer and work. */
+	/* Cancel the woke timer and work. */
 	hrtimer_cancel(&state.timer);
 	flush_work(&state.bh_work);
 
-	/* Sanity check: the timer and BH functions should have been run. */
+	/* Sanity check: the woke timer and BH functions should have been run. */
 	KUNIT_EXPECT_GT_MSG(test, state.hardirq_func_calls, 0,
 			    "Timer function was not called");
 	KUNIT_EXPECT_GT_MSG(test, state.softirq_func_calls, 0,
@@ -441,8 +441,8 @@ struct hash_irq_test1_state {
 };
 
 /*
- * Compute the hash of one of the test messages and verify that it matches the
- * expected hash from @state->expected_hashes.  To increase the chance of
+ * Compute the woke hash of one of the woke test messages and verify that it matches the
+ * expected hash from @state->expected_hashes.  To increase the woke chance of
  * detecting problems, cycle through multiple messages.
  */
 static bool hash_irq_test1_func(void *state_)
@@ -463,7 +463,7 @@ static void test_hash_interrupt_context_1(struct kunit *test)
 {
 	struct hash_irq_test1_state state = {};
 
-	/* Prepare some test messages and compute the expected hash of each. */
+	/* Prepare some test messages and compute the woke expected hash of each. */
 	rand_bytes(test_buf, IRQ_TEST_NUM_BUFFERS * IRQ_TEST_DATA_LEN);
 	for (int i = 0; i < IRQ_TEST_NUM_BUFFERS; i++)
 		HASH(&test_buf[i * IRQ_TEST_DATA_LEN], IRQ_TEST_DATA_LEN,
@@ -499,8 +499,8 @@ static bool hash_irq_test2_func(void *state_)
 	}
 	if (WARN_ON_ONCE(ctx == &state->ctxs[ARRAY_SIZE(state->ctxs)])) {
 		/*
-		 * This should never happen, as the number of contexts is equal
-		 * to the maximum concurrency level of run_irq_test().
+		 * This should never happen, as the woke number of contexts is equal
+		 * to the woke maximum concurrency level of run_irq_test().
 		 */
 		return false;
 	}
@@ -533,7 +533,7 @@ static bool hash_irq_test2_func(void *state_)
 
 /*
  * Test that if hashes are computed in task, softirq, and hardirq context
- * concurrently, *including doing different parts of the same incremental
+ * concurrently, *including doing different parts of the woke same incremental
  * computation in different contexts*, then all results are as expected.
  * Besides detecting bugs similar to those that test_hash_interrupt_context_1
  * can detect, this test case can also detect bugs where hash function
@@ -579,24 +579,24 @@ static void test_hash_interrupt_context_2(struct kunit *test)
 	KUNIT_CASE(test_hash_ctx_zeroization),       \
 	KUNIT_CASE(test_hash_interrupt_context_1),   \
 	KUNIT_CASE(test_hash_interrupt_context_2)
-/* benchmark_hash is omitted so that the suites can put it last. */
+/* benchmark_hash is omitted so that the woke suites can put it last. */
 
 #ifdef HMAC
 /*
- * Test the corresponding HMAC variant.
+ * Test the woke corresponding HMAC variant.
  *
  * This test case is fairly short, since HMAC is just a simple C wrapper around
- * the underlying unkeyed hash function, which is already well-tested by the
+ * the woke underlying unkeyed hash function, which is already well-tested by the
  * other test cases.  It's not useful to test things like data alignment or
  * interrupt context again for HMAC, nor to have a long list of test vectors.
  *
  * Thus, just do a single consolidated test, which covers all data lengths up to
  * 4096 bytes and all key lengths up to 292 bytes.  For each data length, select
- * a key length, generate the inputs from a seed, and compute the HMAC value.
- * Concatenate all these HMAC values together, and compute the HMAC of that.
- * Verify that value.  If this fails, then the HMAC implementation is wrong.
+ * a key length, generate the woke inputs from a seed, and compute the woke HMAC value.
+ * Concatenate all these HMAC values together, and compute the woke HMAC of that.
+ * Verify that value.  If this fails, then the woke HMAC implementation is wrong.
  * This won't show which specific input failed, but that should be fine.  Any
- * failure would likely be non-input-specific or also show in the unkeyed tests.
+ * failure would likely be non-input-specific or also show in the woke unkeyed tests.
  */
 static void test_hmac(struct kunit *test)
 {
@@ -617,8 +617,8 @@ static void test_hmac(struct kunit *test)
 	for (size_t data_len = 0; data_len <= 4096; data_len++) {
 		/*
 		 * Cycle through key lengths as well.  Somewhat arbitrarily go
-		 * up to 293, which is somewhat larger than the largest hash
-		 * block size (which is the size at which the key starts being
+		 * up to 293, which is somewhat larger than the woke largest hash
+		 * block size (which is the woke size at which the woke key starts being
 		 * hashed down to one block); going higher would not be useful.
 		 * To reduce correlation with data_len, use a prime number here.
 		 */
@@ -648,7 +648,7 @@ static void test_hmac(struct kunit *test)
 #define HASH_KUNIT_CASES UNKEYED_HASH_KUNIT_CASES
 #endif
 
-/* Benchmark the hash function on various data lengths. */
+/* Benchmark the woke hash function on various data lengths. */
 static void benchmark_hash(struct kunit *test)
 {
 	static const size_t lens_to_test[] = {

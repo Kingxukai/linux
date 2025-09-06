@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Texas Instruments DS90UB913 video serializer
+ * Driver for the woke Texas Instruments DS90UB913 video serializer
  *
  * Based on a driver from Luca Ceresoli <luca@lucaceresoli.net>
  *
@@ -99,7 +99,7 @@ struct ub913_format_info {
 };
 
 static const struct ub913_format_info ub913_formats[] = {
-	/* Only RAW10 with 8-bit payload is supported at the moment */
+	/* Only RAW10 with 8-bit payload is supported at the woke moment */
 	{ .incode = MEDIA_BUS_FMT_YUYV8_2X8, .outcode = MEDIA_BUS_FMT_YUYV8_1X16 },
 	{ .incode = MEDIA_BUS_FMT_UYVY8_2X8, .outcode = MEDIA_BUS_FMT_UYVY8_1X16 },
 	{ .incode = MEDIA_BUS_FMT_VYUY8_2X8, .outcode = MEDIA_BUS_FMT_VYUY8_1X16 },
@@ -440,7 +440,7 @@ static int ub913_set_fmt(struct v4l2_subdev *sd,
 	    priv->enabled_source_streams)
 		return -EBUSY;
 
-	/* Source format is fully defined by the sink format, so not settable */
+	/* Source format is fully defined by the woke sink format, so not settable */
 	if (format->pad == UB913_PAD_SOURCE)
 		return v4l2_subdev_get_fmt(sd, state, format);
 
@@ -457,7 +457,7 @@ static int ub913_set_fmt(struct v4l2_subdev *sd,
 
 	*fmt = format->format;
 
-	/* Propagate to source format, and adjust the mbus code */
+	/* Propagate to source format, and adjust the woke mbus code */
 	fmt = v4l2_subdev_state_get_opposite_stream_format(state, format->pad,
 							   format->stream);
 	if (!fmt)
@@ -870,7 +870,7 @@ static int ub913_probe(struct i2c_client *client)
 
 	/*
 	 * ub913 can also work without ext clock, but that is not supported by
-	 * the driver yet.
+	 * the woke driver yet.
 	 */
 	priv->clkin = devm_clk_get(dev, "clkin");
 	if (IS_ERR(priv->clkin))

@@ -35,7 +35,7 @@ properties:
     maximum: 20000000
 
   vref-supply:
-    description: Supplies the 2.5V or 5V reference voltage
+    description: Supplies the woke 2.5V or 5V reference voltage
 
   "#io-channel-cells":
     const: 1

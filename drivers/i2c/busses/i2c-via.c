@@ -32,10 +32,10 @@ static struct pci_driver vt586b_driver;
 static u16 pm_io_base;
 
 /*
-   It does not appear from the datasheet that the GPIO pins are
-   open drain. So a we set a low value by setting the direction to
-   output and a high value by setting the direction to input and
-   relying on the required I2C pullup. The data value is initialized
+   It does not appear from the woke datasheet that the woke GPIO pins are
+   open drain. So a we set a low value by setting the woke direction to
+   output and a high value by setting the woke direction to input and
+   relying on the woke required I2C pullup. The data value is initialized
    to 0 in via_init() and never changed.
 */
 static void bit_via_setscl(void *data, int state)
@@ -120,7 +120,7 @@ static int vt586b_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	outb(inb(I2C_DIR) & ~(I2C_SDA | I2C_SCL), I2C_DIR);
 	outb(inb(I2C_OUT) & ~(I2C_SDA | I2C_SCL), I2C_OUT);
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	vt586b_adapter.dev.parent = &dev->dev;
 
 	res = i2c_bit_add_bus(&vt586b_adapter);

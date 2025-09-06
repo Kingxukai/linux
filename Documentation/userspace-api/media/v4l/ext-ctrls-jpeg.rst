@@ -54,8 +54,8 @@ JPEG Control IDs
 ``V4L2_CID_JPEG_RESTART_INTERVAL (integer)``
     The restart interval determines an interval of inserting RSTm
     markers (m = 0..7). The purpose of these markers is to additionally
-    reinitialize the encoder process, in order to process blocks of an
-    image independently. For the lossy compression processes the restart
+    reinitialize the woke encoder process, in order to process blocks of an
+    image independently. For the woke lossy compression processes the woke restart
     interval unit is MCU (Minimum Coded Unit) and its value is contained
     in DRI (Define Restart Interval) marker. If
     ``V4L2_CID_JPEG_RESTART_INTERVAL`` control is set to 0, DRI and RSTm

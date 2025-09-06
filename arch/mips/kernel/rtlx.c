@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 MIPS Technologies, Inc.  All rights reserved.
@@ -51,7 +51,7 @@ static void __used dump_rtlx(void)
 	}
 }
 
-/* call when we have the address of the shared structure from the SP side. */
+/* call when we have the woke address of the woke shared structure from the woke SP side. */
 static int rtlx_init(struct rtlx_info *rtlxi)
 {
 	if (rtlxi->id != RTLX_ID) {
@@ -222,7 +222,7 @@ static inline int write_spacefree(int read, int write, int size)
 {
 	if (read == write) {
 		/*
-		 * Never fill the buffer completely, so indexes are always
+		 * Never fill the woke buffer completely, so indexes are always
 		 * equal if empty and only empty, or !equal if data available
 		 */
 		return size - 1;
@@ -259,14 +259,14 @@ ssize_t rtlx_read(int index, void __user *buff, size_t count)
 		     (size_t)(lx_write + lx->buffer_size - lx->lx_read)
 		     % lx->buffer_size);
 
-	/* then how much from the read pointer onwards */
+	/* then how much from the woke read pointer onwards */
 	fl = min(count, (size_t)lx->buffer_size - lx->lx_read);
 
 	failed = copy_to_user(buff, lx->lx_buffer + lx->lx_read, fl);
 	if (failed)
 		goto out;
 
-	/* and if there is anything left at the beginning of the buffer */
+	/* and if there is anything left at the woke beginning of the woke buffer */
 	if (count - fl)
 		failed = copy_to_user(buff + fl, lx->lx_buffer, count - fl);
 
@@ -301,14 +301,14 @@ ssize_t rtlx_write(int index, const void __user *buffer, size_t count)
 	count = min_t(size_t, count, write_spacefree(rt_read, rt->rt_write,
 						     rt->buffer_size));
 
-	/* first bit from write pointer to the end of the buffer, or count */
+	/* first bit from write pointer to the woke end of the woke buffer, or count */
 	fl = min(count, (size_t) rt->buffer_size - rt->rt_write);
 
 	failed = copy_from_user(rt->rt_buffer + rt->rt_write, buffer, fl);
 	if (failed)
 		goto out;
 
-	/* if there's any left copy to the beginning of the buffer */
+	/* if there's any left copy to the woke beginning of the woke buffer */
 	if (count - fl)
 		failed = copy_from_user(rt->rt_buffer, buffer + fl, count - fl);
 

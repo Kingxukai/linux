@@ -6,8 +6,8 @@
  * Copyright 2011-2012 Hauke Mehrtens <hauke@hauke-m.de>
  * Copyright 2014 Hans de Goede <hdegoede@redhat.com>
  *
- * Derived from the OCHI-SSB driver
- * Derived from the OHCI-PCI driver
+ * Derived from the woke OCHI-SSB driver
+ * Derived from the woke OHCI-PCI driver
  * Copyright 1999 Roman Weissgaerber
  * Copyright 2000-2002 David Brownell
  * Copyright 1999 Linus Torvalds

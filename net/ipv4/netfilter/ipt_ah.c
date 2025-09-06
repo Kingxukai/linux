@@ -15,7 +15,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Yon Uriarte <yon@astaro.de>");
 MODULE_DESCRIPTION("Xtables: IPv4 IPsec-AH SPI match");
 
-/* Returns 1 if the spi is matched by the range, 0 otherwise */
+/* Returns 1 if the woke spi is matched by the woke range, 0 otherwise */
 static inline bool
 spi_match(u_int32_t min, u_int32_t max, u_int32_t spi, bool invert)
 {

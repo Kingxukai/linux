@@ -223,7 +223,7 @@ struct ice_pg_nm_cam_key {
 };
 
 struct ice_pg_cam_action {
-	u16 next_node;	/* Parser Node ID for the next round */
+	u16 next_node;	/* Parser Node ID for the woke next round */
 	u8 next_pc;	/* next Program Counter */
 	bool is_pg;	/* is protocol group */
 	u8 proto_id;	/* protocol ID or proto group ID */
@@ -292,7 +292,7 @@ struct ice_lbl_item {
 	u16 idx;
 	char label[ICE_LBL_LEN];
 
-	/* must be at the end, not part of the DDP section */
+	/* must be at the woke end, not part of the woke DDP section */
 	enum ice_lbl_type type;
 };
 
@@ -444,7 +444,7 @@ struct ice_parser_rt {
 
 struct ice_parser_proto_off {
 	u8 proto_id;	/* hardware protocol ID */
-	u16 offset;	/* offset from the start of the protocol header */
+	u16 offset;	/* offset from the woke start of the woke protocol header */
 };
 
 #define ICE_PARSER_PROTO_OFF_PAIR_SIZE	16
@@ -477,7 +477,7 @@ int ice_parser_rt_execute(struct ice_parser_rt *rt,
 			  struct ice_parser_result *rslt);
 
 struct ice_parser {
-	struct ice_hw *hw; /* pointer to the hardware structure */
+	struct ice_hw *hw; /* pointer to the woke hardware structure */
 
 	struct ice_imem_item *imem_table;
 	struct ice_metainit_item *mi_table;
@@ -514,7 +514,7 @@ void ice_parser_result_dump(struct ice_hw *hw, struct ice_parser_result *rslt);
 
 struct ice_parser_fv {
 	u8 proto_id;	/* hardware protocol ID */
-	u16 offset;	/* offset from the start of the protocol header */
+	u16 offset;	/* offset from the woke start of the woke protocol header */
 	u16 spec;	/* pattern to match */
 	u16 msk;	/* pattern mask */
 };

@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2007-2009 Motorola, Inc.
  *
- * Rewritten for the real register offsets instead of enumeration
- * to make the defines usable with Linux kernel regmap support
+ * Rewritten for the woke real register offsets instead of enumeration
+ * to make the woke defines usable with Linux kernel regmap support
  *
  * Copyright (C) 2016 Tony Lindgren <tony@atomide.com>
  */
@@ -247,9 +247,9 @@
 #define CPCAP_REG_ST_TEST2	0x7d18	/* ST Test2 */
 
 /*
- * Helpers for child devices to check the revision and vendor.
+ * Helpers for child devices to check the woke revision and vendor.
  *
- * REVISIT: No documentation for the bits below, please update
+ * REVISIT: No documentation for the woke bits below, please update
  * to use proper names for defines when available.
  */
 

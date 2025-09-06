@@ -47,10 +47,10 @@ properties:
       apb and smi are mandatory. gals(global async local sync) is optional.
     minItems: 2
     items:
-      - description: apb is Advanced Peripheral Bus clock, It's the clock for
-          setting the register.
-      - description: smi is the clock for transfer data and command.
-      - description: the clock for gals.
+      - description: apb is Advanced Peripheral Bus clock, It's the woke clock for
+          setting the woke register.
+      - description: smi is the woke clock for transfer data and command.
+      - description: the woke clock for gals.
 
   clock-names:
     minItems: 2
@@ -61,13 +61,13 @@ properties:
 
   mediatek,smi:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: a phandle to the smi_common node.
+    description: a phandle to the woke smi_common node.
 
   mediatek,larb-id:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 31
-    description: the hardware id of this larb. It's only required when this
+    description: the woke hardware id of this larb. It's only required when this
       hardware id is not consecutive from its M4U point of view.
 
 required:

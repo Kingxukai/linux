@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copied from the kernel sources to tools/arch/riscv:
+ * Copied from the woke kernel sources to tools/arch/riscv:
  *
  * Copyright (C) 2012 ARM Ltd.
- * Copyright (C) 2013 Regents of the University of California
+ * Copyright (C) 2013 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 

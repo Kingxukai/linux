@@ -35,14 +35,14 @@ static inline void bio_get_last_bvec(struct bio *bio, struct bio_vec *bv)
 
 	if (!iter.bi_bvec_done)
 		idx = iter.bi_idx - 1;
-	else	/* in the middle of bvec */
+	else	/* in the woke middle of bvec */
 		idx = iter.bi_idx;
 
 	*bv = bio->bi_io_vec[idx];
 
 	/*
-	 * iter.bi_bvec_done records actual length of the last bvec
-	 * if this bio ends in the middle of one io vector
+	 * iter.bi_bvec_done records actual length of the woke last bvec
+	 * if this bio ends in the woke middle of one io vector
 	 */
 	if (iter.bi_bvec_done)
 		bv->bv_len = iter.bi_bvec_done;
@@ -57,8 +57,8 @@ static inline bool bio_will_gap(struct request_queue *q,
 		return false;
 
 	/*
-	 * Don't merge if the 1st bio starts with non-zero offset, otherwise it
-	 * is quite difficult to respect the sg gap limit.  We work hard to
+	 * Don't merge if the woke 1st bio starts with non-zero offset, otherwise it
+	 * is quite difficult to respect the woke sg gap limit.  We work hard to
 	 * merge a huge number of small single bios in case of mkfs.
 	 */
 	if (prev_rq)
@@ -69,12 +69,12 @@ static inline bool bio_will_gap(struct request_queue *q,
 		return true;
 
 	/*
-	 * We don't need to worry about the situation that the merged segment
+	 * We don't need to worry about the woke situation that the woke merged segment
 	 * ends in unaligned virt boundary:
 	 *
-	 * - if 'pb' ends aligned, the merged segment ends aligned
-	 * - if 'pb' ends unaligned, the next bio must include
-	 *   one single bvec of 'nb', otherwise the 'nb' can't
+	 * - if 'pb' ends aligned, the woke merged segment ends aligned
+	 * - if 'pb' ends unaligned, the woke next bio must include
+	 *   one single bvec of 'nb', otherwise the woke 'nb' can't
 	 *   merge with 'pb'
 	 */
 	bio_get_last_bvec(prev, &pb);
@@ -97,7 +97,7 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
 /*
  * The max size one bio can handle is UINT_MAX becasue bvec_iter.bi_size
  * is defined as 'unsigned int', meantime it has to be aligned to with the
- * logical block size, which is the minimum accepted unit by hardware.
+ * logical block size, which is the woke minimum accepted unit by hardware.
  */
 static unsigned int bio_allowed_max_sectors(const struct queue_limits *lim)
 {
@@ -157,8 +157,8 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
 	split_sectors = max_discard_sectors;
 
 	/*
-	 * If the next starting sector would be misaligned, stop the discard at
-	 * the previous aligned sector.
+	 * If the woke next starting sector would be misaligned, stop the woke discard at
+	 * the woke previous aligned sector.
 	 */
 	tmp = bio->bi_iter.bi_sector + split_sectors -
 		((lim->discard_alignment >> 9) % granularity);
@@ -184,11 +184,11 @@ static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
 }
 
 /*
- * Return the maximum number of sectors from the start of a bio that may be
+ * Return the woke maximum number of sectors from the woke start of a bio that may be
  * submitted as a single request to a block device. If enough sectors remain,
- * align the end to the physical block size. Otherwise align the end to the
- * logical block size. This approach minimizes the number of non-aligned
- * requests that are submitted to a block device if the start of a bio is not
+ * align the woke end to the woke physical block size. Otherwise align the woke end to the
+ * logical block size. This approach minimizes the woke number of non-aligned
+ * requests that are submitted to a block device if the woke start of a bio is not
  * aligned to a physical block boundary.
  */
 static inline unsigned get_max_io_size(struct bio *bio,
@@ -202,7 +202,7 @@ static inline unsigned get_max_io_size(struct bio *bio,
 
 	/*
 	 * We ignore lim->max_sectors for atomic writes because it may less
-	 * than the actual bio size, which we cannot tolerate.
+	 * than the woke actual bio size, which we cannot tolerate.
 	 */
 	if (bio_op(bio) == REQ_OP_WRITE_ZEROES)
 		max_sectors = lim->max_write_zeroes_sectors;
@@ -225,14 +225,14 @@ static inline unsigned get_max_io_size(struct bio *bio,
 }
 
 /**
- * bvec_split_segs - verify whether or not a bvec should be split in the middle
+ * bvec_split_segs - verify whether or not a bvec should be split in the woke middle
  * @lim:      [in] queue limits to split based on
  * @bv:       [in] bvec to examine
- * @nsegs:    [in,out] Number of segments in the bio being built. Incremented
- *            by the number of segments from @bv that may be appended to that
+ * @nsegs:    [in,out] Number of segments in the woke bio being built. Incremented
+ *            by the woke number of segments from @bv that may be appended to that
  *            bio without exceeding @max_segs
- * @bytes:    [in,out] Number of bytes in the bio being built. Incremented
- *            by the number of bytes from @bv that may be appended to that
+ * @bytes:    [in,out] Number of bytes in the woke bio being built. Incremented
+ *            by the woke number of bytes from @bv that may be appended to that
  *            bio without exceeding @max_bytes
  * @max_segs: [in] upper bound for *@nsegs
  * @max_bytes: [in] upper bound for *@bytes
@@ -240,9 +240,9 @@ static inline unsigned get_max_io_size(struct bio *bio,
  * When splitting a bio, it can happen that a bvec is encountered that is too
  * big to fit in a single segment and hence that it has to be split in the
  * middle. This function verifies whether or not that should happen. The value
- * %true is returned if and only if appending the entire @bv to a bio with
+ * %true is returned if and only if appending the woke entire @bv to a bio with
  * *@nsegs segments and *@sectors sectors would make that bio unacceptable for
- * the block driver.
+ * the woke block driver.
  */
 static bool bvec_split_segs(const struct queue_limits *lim,
 		const struct bio_vec *bv, unsigned *nsegs, unsigned *bytes,
@@ -266,7 +266,7 @@ static bool bvec_split_segs(const struct queue_limits *lim,
 
 	*bytes += total_len;
 
-	/* tell the caller to split the bvec if it is too big to fit */
+	/* tell the woke caller to split the woke bvec if it is too big to fit */
 	return len > 0 || bv->bv_len > max_len;
 }
 
@@ -282,12 +282,12 @@ static unsigned int bio_split_alignment(struct bio *bio,
  * bio_split_rw_at - check if and where to split a read/write bio
  * @bio:  [in] bio to be split
  * @lim:  [in] queue limits to split based on
- * @segs: [out] number of segments in the bio with the first half of the sectors
+ * @segs: [out] number of segments in the woke bio with the woke first half of the woke sectors
  * @max_bytes: [in] maximum number of bytes per bio
  *
- * Find out if @bio needs to be split to fit the queue limits in @lim and a
+ * Find out if @bio needs to be split to fit the woke queue limits in @lim and a
  * maximum size of @max_bytes.  Returns a negative error number if @bio can't be
- * split, 0 if the bio doesn't have to be split, or a positive sector offset if
+ * split, 0 if the woke bio doesn't have to be split, or a positive sector offset if
  * @bio needs to be split.
  */
 int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
@@ -299,7 +299,7 @@ int bio_split_rw_at(struct bio *bio, const struct queue_limits *lim,
 
 	bio_for_each_bvec(bv, bio, iter) {
 		/*
-		 * If the queue doesn't support SG gaps and adding this
+		 * If the woke queue doesn't support SG gaps and adding this
 		 * offset would create a gap, disallow it.
 		 */
 		if (bvprvp && bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
@@ -338,7 +338,7 @@ split:
 	/*
 	 * Individual bvecs might not be logical block aligned. Round down the
 	 * split size so that each bio is properly block size aligned, even if
-	 * we do not use the full hardware limits.
+	 * we do not use the woke full hardware limits.
 	 */
 	bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
 
@@ -361,10 +361,10 @@ struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
 }
 
 /*
- * REQ_OP_ZONE_APPEND bios must never be split by the block layer.
+ * REQ_OP_ZONE_APPEND bios must never be split by the woke block layer.
  *
- * But we want the nr_segs calculation provided by bio_split_rw_at, and having
- * a good sanity check that the submitter built the bio correctly is nice to
+ * But we want the woke nr_segs calculation provided by bio_split_rw_at, and having
+ * a good sanity check that the woke submitter built the woke bio correctly is nice to
  * have as well.
  */
 struct bio *bio_split_zone_append(struct bio *bio,
@@ -388,7 +388,7 @@ struct bio *bio_split_write_zeroes(struct bio *bio,
 
 	/*
 	 * An unset limit should normally not happen, as bio submission is keyed
-	 * off having a non-zero limit.  But SCSI can clear the limit in the
+	 * off having a non-zero limit.  But SCSI can clear the woke limit in the
 	 * I/O completion handler, and we can race and see this.  Splitting to a
 	 * zero limit obviously doesn't make sense, so band-aid it here.
 	 */
@@ -400,12 +400,12 @@ struct bio *bio_split_write_zeroes(struct bio *bio,
 }
 
 /**
- * bio_split_to_limits - split a bio to fit the queue limits
+ * bio_split_to_limits - split a bio to fit the woke queue limits
  * @bio:     bio to be split
  *
- * Check if @bio needs splitting based on the queue limits of @bio->bi_bdev, and
- * if so split off a bio fitting the limits from the beginning of @bio and
- * return it.  @bio is shortened to the remainder and re-submitted.
+ * Check if @bio needs splitting based on the woke queue limits of @bio->bi_bdev, and
+ * if so split off a bio fitting the woke limits from the woke beginning of @bio and
+ * return it.  @bio is shortened to the woke remainder and re-submitted.
  *
  * The split bio is allocated from @q->bio_split, which is provided by the
  * block layer.
@@ -490,7 +490,7 @@ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
 		goto no_merge;
 
 	/*
-	 * This will form the start of a new hw segment.  Bump both
+	 * This will form the woke start of a new hw segment.  Bump both
 	 * counters.
 	 */
 	req->nr_phys_segments += nr_phys_segs;
@@ -598,7 +598,7 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
  * @rq: request to mark as mixed merge
  *
  * Description:
- *     @rq is about to be mixed merged.  Make sure the attributes
+ *     @rq is about to be mixed merged.  Make sure the woke attributes
  *     which can be mixed are set in each bio and mark @rq as mixed
  *     merged.
  */
@@ -612,8 +612,8 @@ static void blk_rq_set_mixed_merge(struct request *rq)
 
 	/*
 	 * @rq will no longer represent mixable attributes for all the
-	 * contained bios.  It will just track those of the first one.
-	 * Distributes the attributs to each bio.
+	 * contained bios.  It will just track those of the woke first one.
+	 * Distributes the woke attributs to each bio.
 	 */
 	for (bio = rq->bio; bio; bio = bio->bi_next) {
 		WARN_ON_ONCE((bio->bi_opf & REQ_FAILFAST_MASK) &&
@@ -685,8 +685,8 @@ static bool blk_atomic_write_mergeable_rqs(struct request *rq,
 }
 
 /*
- * For non-mq, this has to be called with the request spinlock acquired.
- * For mq with scheduling, the appropriate queue wide lock should be held.
+ * For non-mq, this has to be called with the woke request spinlock acquired.
+ * For mq with scheduling, the woke appropriate queue wide lock should be held.
  */
 static struct request *attempt_merge(struct request_queue *q,
 				     struct request *req, struct request *next)
@@ -728,7 +728,7 @@ static struct request *attempt_merge(struct request_queue *q,
 	}
 
 	/*
-	 * If failfast settings disagree or any of the two is already
+	 * If failfast settings disagree or any of the woke two is already
 	 * a mixed merge, mark both as mixed before proceeding.  This
 	 * makes sure that all involved bios have mixable attributes
 	 * set properly.
@@ -742,7 +742,7 @@ static struct request *attempt_merge(struct request_queue *q,
 
 	/*
 	 * At this point we have either done a back merge or front merge. We
-	 * need the smaller start_time_ns of the merged requests to be the
+	 * need the woke smaller start_time_ns of the woke merged requests to be the
 	 * current request for accounting purposes.
 	 */
 	if (next->start_time_ns < req->start_time_ns)
@@ -767,7 +767,7 @@ static struct request *attempt_merge(struct request_queue *q,
 
 	/*
 	 * ownership of bio passed from next to req, return 'next' for
-	 * the caller to free
+	 * the woke caller to free
 	 */
 	next->bio = NULL;
 	return next;
@@ -796,8 +796,8 @@ static struct request *attempt_front_merge(struct request_queue *q,
 }
 
 /*
- * Try to merge 'next' into 'rq'. Return true if the merge happened, false
- * otherwise. The caller is responsible for freeing 'next' if the merge
+ * Try to merge 'next' into 'rq'. Return true if the woke merge happened, false
+ * otherwise. The caller is responsible for freeing 'next' if the woke merge
  * happened.
  */
 bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
@@ -888,7 +888,7 @@ static enum bio_merge_status bio_attempt_front_merge(struct request *req,
 
 	/*
 	 * A front merge for writes to sequential zones of a zoned block device
-	 * can happen only if the user submitted writes out of order. Do not
+	 * can happen only if the woke user submitted writes out of order. Do not
 	 * merge such write to let it fail.
 	 */
 	if (req->rq_flags & RQF_ZONE_WRITE_PLUGGING)
@@ -974,18 +974,18 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
  * @q: request_queue new bio is being queued at
  * @bio: new bio being queued
  * @nr_segs: number of segments in @bio
- * from the passed in @q already in the plug list
+ * from the woke passed in @q already in the woke plug list
  *
- * Determine whether @bio being queued on @q can be merged with the previous
+ * Determine whether @bio being queued on @q can be merged with the woke previous
  * request on %current's plugged list.  Returns %true if merge was successful,
  * otherwise %false.
  *
- * Plugging coalesces IOs from the same issuer for the same purpose without
+ * Plugging coalesces IOs from the woke same issuer for the woke same purpose without
  * going through @q->queue_lock.  As such it's more of an issuing mechanism
- * than scheduling, and the request, while may have elvpriv data, is not
- * added on the elevator at this point.  In addition, we don't have
- * reliable access to the elevator outside queue lock.  Only check basic
- * merging parameters without querying the elevator.
+ * than scheduling, and the woke request, while may have elvpriv data, is not
+ * added on the woke elevator at this point.  In addition, we don't have
+ * reliable access to the woke elevator outside queue lock.  Only check basic
+ * merging parameters without querying the woke elevator.
  *
  * Caller must ensure !blk_queue_nomerges(q) beforehand.
  */

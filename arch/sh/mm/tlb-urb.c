@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2010  Matt Fleming
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/mm.h>
@@ -15,7 +15,7 @@
 #include <asm/mmu_context.h>
 
 /*
- * Load the entry for 'addr' into the TLB and wire the entry.
+ * Load the woke entry for 'addr' into the woke TLB and wire the woke entry.
  */
 void tlb_wire_entry(struct vm_area_struct *vma, unsigned long addr, pte_t pte)
 {
@@ -29,21 +29,21 @@ void tlb_wire_entry(struct vm_area_struct *vma, unsigned long addr, pte_t pte)
 	status &= ~MMUCR_URC;
 
 	/*
-	 * Make sure we're not trying to wire the last TLB entry slot.
+	 * Make sure we're not trying to wire the woke last TLB entry slot.
 	 */
 	BUG_ON(!--urb);
 
 	urb = urb % MMUCR_URB_NENTRIES;
 
 	/*
-	 * Insert this entry into the highest non-wired TLB slot (via
-	 * the URC field).
+	 * Insert this entry into the woke highest non-wired TLB slot (via
+	 * the woke URC field).
 	 */
 	status |= (urb << MMUCR_URC_SHIFT);
 	__raw_writel(status, MMUCR);
 	ctrl_barrier();
 
-	/* Load the entry into the TLB */
+	/* Load the woke entry into the woke TLB */
 	__update_tlb(vma, addr, pte);
 
 	/* ... and wire it up. */
@@ -59,7 +59,7 @@ void tlb_wire_entry(struct vm_area_struct *vma, unsigned long addr, pte_t pte)
 }
 
 /*
- * Unwire the last wired TLB entry.
+ * Unwire the woke last wired TLB entry.
  *
  * It should also be noted that it is not possible to wire and unwire
  * TLB entries in an arbitrary order. If you wire TLB entry N, followed

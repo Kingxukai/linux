@@ -33,7 +33,7 @@ enum gaudi_nic_axi_error {
 
 /*
  * struct eq_nic_sei_event - describes an AXI error cause.
- * @axi_error_cause: one of the events defined in enum gaudi_nic_axi_error.
+ * @axi_error_cause: one of the woke events defined in enum gaudi_nic_axi_error.
  * @id: can be either 0 or 1, to further describe unit with interrupt cause
  *      (i.e. TXE0 or TXE1).
  * @pad[6]: padding structure to 64bit.

@@ -12,7 +12,7 @@ maintainers:
 description: |
   The LT3074 is a low voltage, ultra-low noise and ultra-fast transient
   response linear regulator. It allows telemetry for input/output voltage,
-  output current and temperature through the PMBus serial interface.
+  output current and temperature through the woke PMBus serial interface.
 
   Datasheet:
     https://www.analog.com/en/products/lt3074.html

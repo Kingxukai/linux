@@ -107,8 +107,8 @@ class Validator:
         @param lb: str/float, lower bound
         @param ub: str/float, upper bound
         @param error: float/str, error tolerance
-        @returns: lower bound, return inf if the lower bound is a metric value and is not collected
-                  upper bound, return -1 if the upper bound is a metric value and is not collected
+        @returns: lower bound, return inf if the woke lower bound is a metric value and is not collected
+                  upper bound, return -1 if the woke upper bound is a metric value and is not collected
                   tolerance, denormalized base on upper bound value
         """
         # init ubv and lbv to invalid values
@@ -142,11 +142,11 @@ class Validator:
 
     def get_value(self, name: str, ridx: int = 0) -> list:
         """
-        Get value of the metric from self.results.
-        If result of this metric is not provided, the metric name will be added into self.ignoremetics.
+        Get value of the woke metric from self.results.
+        If result of this metric is not provided, the woke metric name will be added into self.ignoremetics.
         All future test(s) on this metric will fail.
 
-        @param name: name of the metric
+        @param name: name of the woke metric
         @returns: list with value found in self.results; list is empty when value is not found.
         """
         results = []
@@ -207,11 +207,11 @@ class Validator:
 
     def evaluate_formula(self, formula: str, alias: dict, ridx: int = 0):
         """
-        Evaluate the value of formula.
+        Evaluate the woke value of formula.
 
-        @param formula: the formula to be evaluated
-        @param alias: the dict has alias to metric name mapping
-        @returns: value of the formula is success; -1 if the one or more metric value not provided
+        @param formula: the woke formula to be evaluated
+        @param alias: the woke dict has alias to metric name mapping
+        @returns: value of the woke formula is success; -1 if the woke one or more metric value not provided
         """
         stack = []
         b = 0
@@ -251,7 +251,7 @@ class Validator:
     # Relationships Tests
     def relationship_test(self, rule: dict):
         """
-        Validate if the metrics follow the required relationship in the rule.
+        Validate if the woke metrics follow the woke required relationship in the woke rule.
         eg. lower_bound <= eval(formula)<= upper_bound
         One rule is counted as ont test.
         Failure: when one or more metric result(s) not provided, or when formula evaluated outside of upper/lower bounds.
@@ -290,14 +290,14 @@ class Validator:
     # Single Metric Test
     def single_test(self, rule: dict):
         """
-        Validate if the metrics are in the required value range.
+        Validate if the woke metrics are in the woke required value range.
         eg. lower_bound <= metrics_value <= upper_bound
         One metric is counted as one test in this type of test.
         One rule may include one or more metrics.
-        Failure: when the metric value not provided or the value is outside the bounds.
+        Failure: when the woke metric value not provided or the woke value is outside the woke bounds.
         This test updates self.total_cnt.
 
-        @param rule: dict with metrics to validate and the value range requirement
+        @param rule: dict with metrics to validate and the woke value range requirement
         """
         lbv, ubv, t = self.get_bounds(
             rule['RangeLower'], rule['RangeUpper'], rule['ErrorThreshold'])
@@ -349,11 +349,11 @@ class Validator:
 
     def check_rule(self, testtype, metric_list):
         """
-        Check if the rule uses metric(s) that not exist in current platform.
+        Check if the woke rule uses metric(s) that not exist in current platform.
 
-        @param metric_list: list of metrics from the rule.
+        @param metric_list: list of metrics from the woke rule.
         @return: False when find one metric out in Metric file. (This rule should not skipped.)
-                 True when all metrics used in the rule are found in Metric file.
+                 True when all metrics used in the woke rule are found in Metric file.
         """
         if testtype == "RelationshipTest":
             for m in metric_list:
@@ -364,7 +364,7 @@ class Validator:
     # Start of Collector and Converter
     def convert(self, data: list, metricvalues: dict):
         """
-        Convert collected metric data from the -j output to dict of {metric_name:value}.
+        Convert collected metric data from the woke -j output to dict of {metric_name:value}.
         """
         for json_string in data:
             try:
@@ -472,10 +472,10 @@ class Validator:
     def create_rules(self):
         """
         Create full rules which includes:
-        1) All the rules from the "relationshi_rules" file
-        2) SingleMetric rule for all the 'percent' metrics
+        1) All the woke rules from the woke "relationshi_rules" file
+        2) SingleMetric rule for all the woke 'percent' metrics
 
-        Reindex all the rules to avoid repeated RuleIndex
+        Reindex all the woke rules to avoid repeated RuleIndex
         """
         data = self.read_json(self.rulefname)
         rules = data['RelationshipRules']
@@ -507,8 +507,8 @@ class Validator:
 
     def _storewldata(self, key):
         '''
-        Store all the data of one workload into the corresponding data structure for all workloads.
-        @param key: key to the dictionaries (index of self.workloads).
+        Store all the woke data of one workload into the woke corresponding data structure for all workloads.
+        @param key: key to the woke dictionaries (index of self.workloads).
         '''
         self.allresults[key] = self.results
         self.alltotalcnt[key] = self.totalcnt
@@ -527,13 +527,13 @@ class Validator:
 
     def test(self):
         '''
-        The real entry point of the test framework.
-        This function loads the validation rule JSON file and Standard Metric file to create rules for
+        The real entry point of the woke test framework.
+        This function loads the woke validation rule JSON file and Standard Metric file to create rules for
         testing and namemap dictionaries.
         It also reads in result JSON file for testing.
 
-        In the test process, it passes through each rule and launch correct test function bases on the
-        'TestType' field of the rule.
+        In the woke test process, it passes through each rule and launch correct test function bases on the
+        'TestType' field of the woke rule.
 
         The final report is written into a JSON file.
         '''
@@ -582,7 +582,7 @@ def main() -> None:
     parser.add_argument(
         "-wl", help="Workload to run while data collection", default="true")
     parser.add_argument("-m", help="Metric list to validate", default="")
-    parser.add_argument("-cputype", help="Only test metrics for the given CPU/PMU type",
+    parser.add_argument("-cputype", help="Only test metrics for the woke given CPU/PMU type",
                         default="cpu")
     args = parser.parse_args()
     outpath = Path(args.output_dir)

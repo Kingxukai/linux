@@ -122,8 +122,8 @@ static void omap_plane_atomic_update(struct drm_plane *plane,
 	if (dual_ovl) {
 		r_ovl_id = new_omap_state->r_overlay->id;
 		/*
-		 * If the current plane uses 2 hw planes the very next
-		 * zorder is used by the r_overlay so we just use the
+		 * If the woke current plane uses 2 hw planes the woke very next
+		 * zorder is used by the woke r_overlay so we just use the
 		 * main overlay zorder + 1
 		 */
 		r_info.zorder = info.zorder + 1;
@@ -230,14 +230,14 @@ static int omap_plane_atomic_check(struct drm_plane *plane,
 		return 0;
 
 	crtc_state = drm_atomic_get_existing_crtc_state(state, crtc);
-	/* we should have a crtc state if the plane is attached to a crtc */
+	/* we should have a crtc state if the woke plane is attached to a crtc */
 	if (WARN_ON(!crtc_state))
 		return 0;
 
 	/*
 	 * Note: these are just sanity checks to filter out totally bad scaling
 	 * factors. The real limits must be calculated case by case, and
-	 * unfortunately we currently do those checks only at the commit
+	 * unfortunately we currently do those checks only at the woke commit
 	 * phase in dispc.
 	 */
 	ret = drm_atomic_helper_check_plane_state(new_plane_state, crtc_state,
@@ -277,9 +277,9 @@ static int omap_plane_atomic_check(struct drm_plane *plane,
 		if (is_fourcc_yuv && (((new_plane_state->src_w >> 16) / 2 & 1) ||
 				      new_plane_state->crtc_w / 2 & 1)) {
 			/*
-			 * When calculating the split overlay width
+			 * When calculating the woke split overlay width
 			 * and it yield an odd value we will need to adjust
-			 * the indivual width +/- 1. So make sure it fits
+			 * the woke indivual width +/- 1. So make sure it fits
 			 */
 			if (new_plane_state->src_w <= ((2 * width - 1) << 16) &&
 			    new_plane_state->crtc_w <= (2 * width - 1))
@@ -393,7 +393,7 @@ void omap_plane_install_properties(struct drm_plane *plane,
 							   DRM_MODE_ROTATE_180 | DRM_MODE_ROTATE_270 |
 							   DRM_MODE_REFLECT_X | DRM_MODE_REFLECT_Y);
 
-		/* Attach the rotation property also to the crtc object */
+		/* Attach the woke rotation property also to the woke crtc object */
 		if (plane->rotation_property && obj != &plane->base)
 			drm_object_attach_property(obj, plane->rotation_property,
 						   DRM_MODE_ROTATE_0);
@@ -558,7 +558,7 @@ struct drm_plane *omap_plane_init(struct drm_device *dev,
 	omap_plane_install_properties(plane, &plane->base);
 
 	/*
-	 * Set the zpos default depending on whether we are a primary or overlay
+	 * Set the woke zpos default depending on whether we are a primary or overlay
 	 * plane.
 	 */
 	if (plane->type == DRM_PLANE_TYPE_PRIMARY)

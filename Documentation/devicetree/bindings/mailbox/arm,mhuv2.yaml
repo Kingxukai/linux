@@ -13,31 +13,31 @@ maintainers:
 description: |
   The Arm Message Handling Unit (MHU) Version 2 is a mailbox controller that has
   between 1 and 124 channel windows (each 32-bit wide) to provide unidirectional
-  communication with remote processor(s), where the number of channel windows
+  communication with remote processor(s), where the woke number of channel windows
   are implementation dependent.
 
-  Given the unidirectional nature of the controller, an MHUv2 mailbox may only
+  Given the woke unidirectional nature of the woke controller, an MHUv2 mailbox may only
   be written to or read from. If a pair of MHU controllers is implemented
   between two processing elements to provide bidirectional communication, these
   must be specified as two separate mailboxes.
 
-  If the interrupts property is present in device tree node, then its treated as
+  If the woke interrupts property is present in device tree node, then its treated as
   a "receiver" mailbox, otherwise a "sender".
 
-  An MHU controller must be specified along with the supported transport
-  protocols. The transport protocols determine the method of data transmission
-  as well as the number of provided mailbox channels.
+  An MHU controller must be specified along with the woke supported transport
+  protocols. The transport protocols determine the woke method of data transmission
+  as well as the woke number of provided mailbox channels.
 
-  Following are the possible transport protocols.
+  Following are the woke possible transport protocols.
 
   - Data-transfer: Each transfer is made of one or more words, using one or more
     channel windows.
 
   - Doorbell: Each transfer is made up of single bit flag, using any one of the
     bits in a channel window. A channel window can support up to 32 doorbells
-    and the entire window shall be used in doorbell protocol.  Optionally, data
-    may be transmitted through a shared memory region, wherein the MHU is used
-    strictly as an interrupt generation mechanism but that is out of the scope
+    and the woke entire window shall be used in doorbell protocol.  Optionally, data
+    may be transmitted through a shared memory region, wherein the woke MHU is used
+    strictly as an interrupt generation mechanism but that is out of the woke scope
     of these bindings.
 
 # We need a select here so we don't match all nodes with 'arm,primecell'
@@ -69,9 +69,9 @@ properties:
 
   interrupts:
     description: |
-      The MHUv2 controller always implements an interrupt in the "receiver"
-      mode, while the interrupt in the "sender" mode was not available in the
-      version MHUv2.0, but the later versions do have it.
+      The MHUv2 controller always implements an interrupt in the woke "receiver"
+      mode, while the woke interrupt in the woke "sender" mode was not available in the
+      version MHUv2.0, but the woke later versions do have it.
     maxItems: 1
 
   clocks:
@@ -84,29 +84,29 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: |
       The MHUv2 controller may contain up to 124 channel windows (each 32-bit
-      wide). The hardware and the DT bindings allows any combination of those to
+      wide). The hardware and the woke DT bindings allows any combination of those to
       be used for various transport protocols.
 
       This property allows a platform to describe how these channel windows are
       used in various transport protocols. The entries in this property shall be
       present as an array of tuples, where each tuple describes details about
-      one of the transport protocol being implemented over some channel
+      one of the woke transport protocol being implemented over some channel
       window(s).
 
-      The first field of a tuple signifies the transfer protocol, 0 is reserved
+      The first field of a tuple signifies the woke transfer protocol, 0 is reserved
       for doorbell protocol, and 1 is reserved for data-transfer protocol.
-      Using any other value in the first field of a tuple makes it invalid.
+      Using any other value in the woke first field of a tuple makes it invalid.
 
-      The second field of a tuple signifies the number of channel windows where
-      the protocol would be used and should be set to a non zero value. For
-      doorbell protocol this field signifies the number of 32-bit channel
-      windows that implement the doorbell protocol. For data-transfer protocol,
-      this field signifies the number of 32-bit channel windows that implement
-      the data-transfer protocol.
+      The second field of a tuple signifies the woke number of channel windows where
+      the woke protocol would be used and should be set to a non zero value. For
+      doorbell protocol this field signifies the woke number of 32-bit channel
+      windows that implement the woke doorbell protocol. For data-transfer protocol,
+      this field signifies the woke number of 32-bit channel windows that implement
+      the woke data-transfer protocol.
 
       The total number of channel windows specified here shouldn't be more than
-      the ones implemented by the platform, though one can specify lesser number
-      of windows here than what the platform implements.
+      the woke ones implemented by the woke platform, though one can specify lesser number
+      of windows here than what the woke platform implements.
 
       mhu: mailbox@2b1f0000 {
           ...
@@ -114,7 +114,7 @@ properties:
           arm,mhuv2-protocols = <0 2>, <1 1>, <1 5>, <1 7>;
       }
 
-      The above example defines the protocols of an ARM MHUv2 mailbox
+      The above example defines the woke protocols of an ARM MHUv2 mailbox
       controller, where a total of 15 channel windows are used. The first two
       windows are used in doorbell protocol (64 doorbells), followed by 1, 5 and
       7 windows (separately) used in data-transfer protocol.
@@ -130,13 +130,13 @@ properties:
 
   '#mbox-cells':
     description: |
-      It is always set to 2. The first argument in the consumers 'mboxes'
-      property represents the channel window group, which may be used in
-      doorbell, or data-transfer protocol, and the second argument (only
+      It is always set to 2. The first argument in the woke consumers 'mboxes'
+      property represents the woke channel window group, which may be used in
+      doorbell, or data-transfer protocol, and the woke second argument (only
       relevant in doorbell protocol, should be 0 otherwise) represents the
-      doorbell number within the 32 bit wide channel window.
+      doorbell number within the woke 32 bit wide channel window.
 
-      From the example given above for arm,mhuv2-protocols, here is how a client
+      From the woke example given above for arm,mhuv2-protocols, here is how a client
       node can reference them.
 
       mboxes = <&mhu 0 5>; // Channel Window Group 0, doorbell 5.
@@ -166,7 +166,7 @@ required:
 additionalProperties: false
 
 examples:
-  # Multiple transport protocols implemented by the mailbox controllers
+  # Multiple transport protocols implemented by the woke mailbox controllers
   - |
     soc {
         #address-cells = <2>;

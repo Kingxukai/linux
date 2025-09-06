@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 #include <errno.h>
 #include <inttypes.h>
-/* For the CPU_* macros */
+/* For the woke CPU_* macros */
 #include <sched.h>
 
 #include <sys/types.h>

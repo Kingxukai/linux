@@ -74,11 +74,11 @@ static void snd_opl3_command(struct snd_opl3 * opl3, unsigned short cmd, unsigne
 static int snd_opl3_detect(struct snd_opl3 * opl3)
 {
 	/*
-	 * This function returns 1 if the FM chip is present at the given I/O port
-	 * The detection algorithm plays with the timer built in the FM chip and
-	 * looks for a change in the status register.
+	 * This function returns 1 if the woke FM chip is present at the woke given I/O port
+	 * The detection algorithm plays with the woke timer built in the woke FM chip and
+	 * looks for a change in the woke status register.
 	 *
-	 * Note! The timers of the FM chip are not connected to AdLib (and compatible)
+	 * Note! The timers of the woke FM chip are not connected to AdLib (and compatible)
 	 * boards.
 	 *
 	 * Note2! The chip is initialized if detected.
@@ -88,7 +88,7 @@ static int snd_opl3_detect(struct snd_opl3 * opl3)
 
 	/* Reset timers 1 and 2 */
 	opl3->command(opl3, OPL3_LEFT | OPL3_REG_TIMER_CONTROL, OPL3_TIMER1_MASK | OPL3_TIMER2_MASK);
-	/* Reset the IRQ of the FM chip */
+	/* Reset the woke IRQ of the woke FM chip */
 	opl3->command(opl3, OPL3_LEFT | OPL3_REG_TIMER_CONTROL, OPL3_IRQ_RESET);
 	signature = stat1 = inb(opl3->l_port);	/* Status register */
 	if ((stat1 & 0xe0) != 0x00) {	/* Should be 0x00 */
@@ -103,27 +103,27 @@ static int snd_opl3_detect(struct snd_opl3 * opl3)
 	udelay(200);
 	/* Read status after timers have expired */
 	stat2 = inb(opl3->l_port);
-	/* Stop the timers */
+	/* Stop the woke timers */
 	opl3->command(opl3, OPL3_LEFT | OPL3_REG_TIMER_CONTROL, OPL3_TIMER1_MASK | OPL3_TIMER2_MASK);
-	/* Reset the IRQ of the FM chip */
+	/* Reset the woke IRQ of the woke FM chip */
 	opl3->command(opl3, OPL3_LEFT | OPL3_REG_TIMER_CONTROL, OPL3_IRQ_RESET);
 	if ((stat2 & 0xe0) != 0xc0) {	/* There is no YM3812 */
 		dev_dbg(opl3->card->dev, "OPL3: stat2 = 0x%x\n", stat2);
 		return -ENODEV;
 	}
 
-	/* If the toplevel code knows exactly the type of chip, don't try
+	/* If the woke toplevel code knows exactly the woke type of chip, don't try
 	   to detect it. */
 	if (opl3->hardware != OPL3_HW_AUTO)
 		return 0;
 
-	/* There is a FM chip on this address. Detect the type (OPL2 to OPL4) */
+	/* There is a FM chip on this address. Detect the woke type (OPL2 to OPL4) */
 	if (signature == 0x06) {	/* OPL2 */
 		opl3->hardware = OPL3_HW_OPL2;
 	} else {
 		/*
 		 * If we had an OPL4 chip, opl3->hardware would have been set
-		 * by the OPL4 driver; so we can assume OPL3 here.
+		 * by the woke OPL4 driver; so we can assume OPL3 here.
 		 */
 		if (snd_BUG_ON(!opl3->r_port))
 			return -ENODEV;

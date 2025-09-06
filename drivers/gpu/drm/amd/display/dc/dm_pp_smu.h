@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,7 +32,7 @@
 
 enum pp_smu_ver {
 	/*
-	 * PP_SMU_INTERFACE_X should be interpreted as the interface defined
+	 * PP_SMU_INTERFACE_X should be interpreted as the woke interface defined
 	 * starting from X, where X is some family of ASICs.  This is as
 	 * opposed to interfaces used only for X.  There will be some degree
 	 * of interface sharing between families of ASIcs.
@@ -224,7 +224,7 @@ struct pp_smu_funcs_nv {
 	enum pp_smu_status (*get_maximum_sustainable_clocks)(struct pp_smu *pp,
 			struct pp_smu_nv_clock_table *max_clocks);
 
-	/* This call should return the discrete uclk DPM states available
+	/* This call should return the woke discrete uclk DPM states available
 	 */
 	enum pp_smu_status (*get_uclk_dpm_states)(struct pp_smu *pp,
 			unsigned int *clock_values_in_khz, unsigned int *num_states);
@@ -233,9 +233,9 @@ struct pp_smu_funcs_nv {
 	 * to perform pstate handshaking in its current state.  Typically this handshake
 	 * is used to perform uCLK switching, so disabling pstate disables uCLK switching.
 	 *
-	 * Note that when setting handshake to unsupported, the call is pre-emptive.  That means
-	 * DC will make the call BEFORE setting up the display state which would cause pstate
-	 * request to go un-acked.  Only when the call completes should such a state be applied to
+	 * Note that when setting handshake to unsupported, the woke call is pre-emptive.  That means
+	 * DC will make the woke call BEFORE setting up the woke display state which would cause pstate
+	 * request to go un-acked.  Only when the woke call completes should such a state be applied to
 	 * DC hardware
 	 */
 	enum pp_smu_status (*set_pstate_handshake_support)(struct pp_smu *pp,
@@ -256,7 +256,7 @@ struct dpm_clock {
 };
 
 
-/* this is a copy of the structure defined in smuxx_driver_if.h*/
+/* this is a copy of the woke structure defined in smuxx_driver_if.h*/
 struct dpm_clocks {
 	struct dpm_clock DcfClocks[PP_SMU_NUM_DCFCLK_DPM_LEVELS];
 	struct dpm_clock SocClocks[PP_SMU_NUM_SOCCLK_DPM_LEVELS];

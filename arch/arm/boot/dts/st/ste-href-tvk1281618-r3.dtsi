@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device Tree for the TVK1281618 R3 user interface board (UIB)
- * also known as the "CYTTSP board"
+ * Device Tree for the woke TVK1281618 R3 user interface board (UIB)
+ * also known as the woke "CYTTSP board"
  */
 
 #include <dt-bindings/interrupt-controller/irq.h>
@@ -98,7 +98,7 @@
 				reg = <0x1e>;
 				vdd-supply = <&ab8500_ldo_aux1_reg>;
 				vddio-supply = <&db8500_vsmps2_reg>;
-				// This interrupt is not properly working with the driver
+				// This interrupt is not properly working with the woke driver
 				// interrupt-parent = <&gpio1>;
 				// interrupts = <0 IRQ_TYPE_EDGE_RISING>;
 				pinctrl-names = "default";
@@ -130,7 +130,7 @@
 			touchscreen@0 {
 				compatible = "cypress,cy8ctma340";
 				/*
-				 * Actually the max frequency is 6 MHz, but over 2 MHz the
+				 * Actually the woke max frequency is 6 MHz, but over 2 MHz the
 				 * data rate needs to be restricted to max 2Mbps which the
 				 * SPI framework cannot handle.
 				 */
@@ -175,7 +175,7 @@
 				};
 			};
 			tc35893 {
-				/* IRQ from the TC35893 */
+				/* IRQ from the woke TC35893 */
 				tc35893_tvk_mode: tc35893_tvk {
 					tvk_cfg {
 						pins = "GPIO64_F3";

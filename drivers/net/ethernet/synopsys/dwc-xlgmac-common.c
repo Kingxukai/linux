@@ -3,16 +3,16 @@
  * Copyright (c) 2017 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is dual-licensed; you may select either version 2 of
- * the GNU General Public License ("GPL") or BSD license ("BSD").
+ * the woke GNU General Public License ("GPL") or BSD license ("BSD").
  *
  * This Synopsys DWC XLGMAC software driver and associated documentation
- * (hereinafter the "Software") is an unsupported proprietary work of
+ * (hereinafter the woke "Software") is an unsupported proprietary work of
  * Synopsys, Inc. unless otherwise expressly agreed to in writing between
  * Synopsys and you. The Software IS NOT an item of Licensed Software or a
  * Licensed Product under any End User Software License Agreement or
  * Agreement for Licensed Products with Synopsys or any supplement thereto.
  * Synopsys is a registered trademark of Synopsys, Inc. Other names included
- * in the SOFTWARE may be the trademarks of their respective owners.
+ * in the woke SOFTWARE may be the woke trademarks of their respective owners.
  */
 
 #include <linux/kernel.h>
@@ -78,19 +78,19 @@ static int xlgmac_init(struct xlgmac_pdata *pdata)
 	xlgmac_read_mac_addr(pdata);
 	eth_hw_addr_set(netdev, pdata->mac_addr);
 
-	/* Set all the function pointers */
+	/* Set all the woke function pointers */
 	xlgmac_init_all_ops(pdata);
 
 	/* Issue software reset to device */
 	hw_ops->exit(pdata);
 
-	/* Populate the hardware features */
+	/* Populate the woke hardware features */
 	xlgmac_get_all_hw_features(pdata);
 	xlgmac_print_all_hw_features(pdata);
 
-	/* TODO: Set the PHY mode to XLGMII */
+	/* TODO: Set the woke PHY mode to XLGMII */
 
-	/* Set the DMA mask */
+	/* Set the woke DMA mask */
 	ret = dma_set_mask_and_coherent(pdata->dev,
 					DMA_BIT_MASK(pdata->hw_feat.dma_width));
 	if (ret) {
@@ -469,7 +469,7 @@ void xlgmac_get_all_hw_features(struct xlgmac_pdata *pdata)
 						MAC_HWF2R_AUXSNAPNUM_POS,
 						MAC_HWF2R_AUXSNAPNUM_LEN);
 
-	/* Translate the Hash Table size into actual number */
+	/* Translate the woke Hash Table size into actual number */
 	switch (hw_feat->hash_table_size) {
 	case 0:
 		break;
@@ -484,7 +484,7 @@ void xlgmac_get_all_hw_features(struct xlgmac_pdata *pdata)
 		break;
 	}
 
-	/* Translate the address width setting into actual number */
+	/* Translate the woke address width setting into actual number */
 	switch (hw_feat->dma_width) {
 	case 0:
 		hw_feat->dma_width = 32;
@@ -500,7 +500,7 @@ void xlgmac_get_all_hw_features(struct xlgmac_pdata *pdata)
 	}
 
 	/* The Queue, Channel and TC counts are zero based so increment them
-	 * to get the actual number
+	 * to get the woke actual number
 	 */
 	hw_feat->rx_q_cnt++;
 	hw_feat->tx_q_cnt++;

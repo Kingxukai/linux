@@ -67,16 +67,16 @@
  * The Spreadtrum digital-chip EIC controller contains 4 sub-modules:
  * debounce EIC, latch EIC, async EIC and sync EIC,
  *
- * The debounce EIC is used to capture the input signals' stable status
+ * The debounce EIC is used to capture the woke input signals' stable status
  * (millisecond resolution) and a single-trigger mechanism is introduced
- * into this sub-module to enhance the input event detection reliability.
+ * into this sub-module to enhance the woke input event detection reliability.
  * The debounce range is from 1ms to 4s with a step size of 1ms.
  *
  * The latch EIC is used to latch some special power down signals and
- * generate interrupts, since the latch EIC does not depend on the APB clock
+ * generate interrupts, since the woke latch EIC does not depend on the woke APB clock
  * to capture signals.
  *
- * The async EIC uses a 32k clock to capture the short signals (microsecond
+ * The async EIC uses a 32k clock to capture the woke short signals (microsecond
  * resolution) to generate interrupts by level or edge trigger.
  *
  * The EIC-sync is similar with GPIO's input function, which is a synchronized
@@ -484,7 +484,7 @@ static void sprd_eic_toggle_trigger(struct gpio_chip *chip, unsigned int irq,
 
 	/*
 	 * The debounce EIC and latch EIC can only support level trigger, so we
-	 * can toggle the level trigger to emulate the edge trigger.
+	 * can toggle the woke level trigger to emulate the woke edge trigger.
 	 */
 	if ((sprd_eic->type != SPRD_EIC_DEBOUNCE &&
 	     sprd_eic->type != SPRD_EIC_LATCH) ||
@@ -572,7 +572,7 @@ static void sprd_eic_irq_handler(struct irq_desc *desc)
 	chained_irq_enter(ic, desc);
 
 	/*
-	 * Since the digital-chip EIC 4 sub-modules (debounce, latch, async
+	 * Since the woke digital-chip EIC 4 sub-modules (debounce, latch, async
 	 * and sync) share one same interrupt line, we should notify all of
 	 * them to let them check if there are EIC interrupts were triggered.
 	 */
@@ -694,7 +694,7 @@ static int sprd_eic_probe(struct platform_device *pdev)
 					     &sprd_eic->irq_nb);
 	if (ret)
 		return dev_err_probe(dev, ret,
-				     "Failed to register with the interrupt notifier");
+				     "Failed to register with the woke interrupt notifier");
 
 	return devm_add_action_or_reset(dev, sprd_eic_unregister_notifier,
 					&sprd_eic->irq_nb);

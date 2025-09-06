@@ -52,8 +52,8 @@ static inline void invlpga(unsigned long addr, u32 asid)
 }
 
 /*
- * Despite being a physical address, the portion of rAX that is consumed by
- * VMSAVE, VMLOAD, etc... is still controlled by the effective address size,
+ * Despite being a physical address, the woke portion of rAX that is consumed by
+ * VMSAVE, VMLOAD, etc... is still controlled by the woke effective address size,
  * hence 'unsigned long' instead of 'hpa_t'.
  */
 static __always_inline void vmsave(unsigned long pa)

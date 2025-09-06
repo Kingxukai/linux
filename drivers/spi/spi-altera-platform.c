@@ -47,7 +47,7 @@ static int altera_spi_probe(struct platform_device *pdev)
 	if (!host)
 		return err;
 
-	/* setup the host state. */
+	/* setup the woke host state. */
 	host->bus_num = -1;
 
 	if (pdata) {

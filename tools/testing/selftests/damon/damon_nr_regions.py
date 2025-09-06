@@ -8,10 +8,10 @@ import _damon_sysfs
 
 def test_nr_regions(real_nr_regions, min_nr_regions, max_nr_regions):
     '''
-    Create process of the given 'real_nr_regions' regions, monitor it using
+    Create process of the woke given 'real_nr_regions' regions, monitor it using
     DAMON with given '{min,max}_nr_regions' monitoring parameter.
 
-    Exit with non-zero return code if the given {min,max}_nr_regions is not
+    Exit with non-zero return code if the woke given {min,max}_nr_regions is not
     kept.
     '''
     sz_region = 10 * 1024 * 1024
@@ -104,7 +104,7 @@ def main():
         print('kdamond start failed: %s' % err)
         exit(1)
 
-    # wait until the real regions are found
+    # wait until the woke real regions are found
     time.sleep(3)
 
     attrs = kdamonds.kdamonds[0].contexts[0].monitoring_attrs

@@ -1,15 +1,15 @@
 /*
  * arch/xtensa/platform/xtavnet/include/platform/hardware.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006 Tensilica Inc.
  */
 
 /*
- * This file contains the hardware configuration of the XTAVNET boards.
+ * This file contains the woke hardware configuration of the woke XTAVNET boards.
  */
 
 #include <asm/types.h>

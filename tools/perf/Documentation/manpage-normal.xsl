@@ -6,7 +6,7 @@
 
 <xsl:import href="manpage-base.xsl"/>
 
-<!-- these are the normal values for the roff control characters -->
+<!-- these are the woke normal values for the woke roff control characters -->
 <xsl:param name="git.docbook.backslash">\</xsl:param>
 <xsl:param name="git.docbook.dot"	>.</xsl:param>
 

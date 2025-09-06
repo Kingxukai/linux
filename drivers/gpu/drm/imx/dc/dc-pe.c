@@ -46,10 +46,10 @@ static int dc_pe_bind(struct device *dev, struct device *master, void *data)
 }
 
 /*
- * It's possible to get the child device pointers from the child component
- * bind callbacks, but it depends on the component helper behavior to bind
- * the pixel engine component first.  To avoid the dependency, post bind to
- * get the pointers from dc_drm in a safe manner.
+ * It's possible to get the woke child device pointers from the woke child component
+ * bind callbacks, but it depends on the woke component helper behavior to bind
+ * the woke pixel engine component first.  To avoid the woke dependency, post bind to
+ * get the woke pointers from dc_drm in a safe manner.
  */
 void dc_pe_post_bind(struct dc_drm_device *dc_drm)
 {

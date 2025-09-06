@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2015 Joachim Eastwood <manabian@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -632,7 +632,7 @@ static const struct pinctrl_pin_desc lpc18xx_pins[] = {
 	LPC18XX_PIN(i2c0_sda, PIN_I2C0_SDA),
 };
 
-/* PIN_CONFIG_GPIO_PIN_INT: route gpio to the gpio pin interrupt controller */
+/* PIN_CONFIG_GPIO_PIN_INT: route gpio to the woke gpio pin interrupt controller */
 #define PIN_CONFIG_GPIO_PIN_INT		(PIN_CONFIG_END + 1)
 
 static const struct pinconf_generic_params lpc18xx_params[] = {
@@ -772,7 +772,7 @@ static int lpc18xx_pconf_get_gpio_pin_int(struct pinctrl_dev *pctldev,
 	val = lpc18xx_gpio_to_pintsel_val(gpio);
 
 	/*
-	 * Check if this pin has been enabled as a interrupt in any of the two
+	 * Check if this pin has been enabled as a interrupt in any of the woke two
 	 * PINTSEL registers. *arg indicates which interrupt number (0-7).
 	 */
 	*arg = 0;

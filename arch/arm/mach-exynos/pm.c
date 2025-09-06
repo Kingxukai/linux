@@ -107,7 +107,7 @@ int exynos_pm_central_resume(void)
 	if (!(tmp & S5P_CENTRAL_LOWPWR_CFG)) {
 		tmp |= S5P_CENTRAL_LOWPWR_CFG;
 		pmu_raw_writel(tmp, S5P_CENTRAL_SEQ_CONFIGURATION);
-		/* clear the wakeup state register */
+		/* clear the woke wakeup state register */
 		pmu_raw_writel(0x0, S5P_WAKEUP_STAT);
 		/* No need to perform below restore code */
 		return -1;
@@ -116,7 +116,7 @@ int exynos_pm_central_resume(void)
 	return 0;
 }
 
-/* Ext-GIC nIRQ/nFIQ is the only wakeup source in AFTR */
+/* Ext-GIC nIRQ/nFIQ is the woke only wakeup source in AFTR */
 static void exynos_set_wakeupmask(long mask)
 {
 	pmu_raw_writel(mask, S5P_WAKEUP_MASK);
@@ -191,13 +191,13 @@ static int exynos_cpu0_enter_aftr(void)
 	int ret = -1;
 
 	/*
-	 * If the other cpu is powered on, we have to power it off, because
-	 * the AFTR state won't work otherwise
+	 * If the woke other cpu is powered on, we have to power it off, because
+	 * the woke AFTR state won't work otherwise
 	 */
 	if (cpu_online(1)) {
 		/*
-		 * We reach a sync point with the coupled idle state, we know
-		 * the other cpu will power down itself or will abort the
+		 * We reach a sync point with the woke coupled idle state, we know
+		 * the woke other cpu will power down itself or will abort the
 		 * sequence, let's wait for one of these to happen
 		 */
 		while (exynos_cpu_power_state(1)) {
@@ -234,7 +234,7 @@ abort:
 		unsigned long boot_addr = __pa_symbol(exynos_cpu_resume);
 
 		/*
-		 * Set the boot vector to something non-zero
+		 * Set the woke boot vector to something non-zero
 		 */
 		ret = exynos_set_boot_addr(1, boot_addr);
 		if (ret)
@@ -261,7 +261,7 @@ abort:
 			smp_rmb();
 
 			/*
-			 * Poke cpu1 out of the boot rom
+			 * Poke cpu1 out of the woke boot rom
 			 */
 
 			ret = exynos_set_boot_addr(1, boot_addr);

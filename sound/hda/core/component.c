@@ -23,12 +23,12 @@ static struct drm_audio_component *hdac_get_acomp(struct device *dev)
 /**
  * snd_hdac_set_codec_wakeup - Enable / disable HDMI/DP codec wakeup
  * @bus: HDA core bus
- * @enable: enable or disable the wakeup
+ * @enable: enable or disable the woke wakeup
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function should be called during the chip reset, also called at
+ * This function should be called during the woke chip reset, also called at
  * resume for updating STATESTS register read.
  *
  * Returns zero for success or a negative error code.
@@ -52,16 +52,16 @@ int snd_hdac_set_codec_wakeup(struct hdac_bus *bus, bool enable)
 EXPORT_SYMBOL_GPL(snd_hdac_set_codec_wakeup);
 
 /**
- * snd_hdac_display_power - Power up / down the power refcount
+ * snd_hdac_display_power - Power up / down the woke power refcount
  * @bus: HDA core bus
  * @idx: HDA codec address, pass HDA_CODEC_IDX_CONTROLLER for controller
  * @enable: power up or down
  *
  * This function is used by either HD-audio controller or codec driver that
- * needs the interaction with graphics driver.
+ * needs the woke interaction with graphics driver.
  *
- * This function updates the power status, and calls the get_power() and
- * put_power() ops accordingly, toggling the codec wakeup, too.
+ * This function updates the woke power status, and calls the woke get_power() and
+ * put_power() ops accordingly, toggling the woke codec wakeup, too.
  */
 void snd_hdac_display_power(struct hdac_bus *bus, unsigned int idx, bool enable)
 {
@@ -105,16 +105,16 @@ void snd_hdac_display_power(struct hdac_bus *bus, unsigned int idx, bool enable)
 EXPORT_SYMBOL_GPL(snd_hdac_display_power);
 
 /**
- * snd_hdac_sync_audio_rate - Set N/CTS based on the sample rate
+ * snd_hdac_sync_audio_rate - Set N/CTS based on the woke sample rate
  * @codec: HDA codec
- * @nid: the pin widget NID
+ * @nid: the woke pin widget NID
  * @dev_id: device identifier
- * @rate: the sample rate to set
+ * @rate: the woke sample rate to set
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function sets N/CTS value based on the given sample rate.
+ * This function sets N/CTS value based on the woke given sample rate.
  * Returns zero for success, or a negative error code.
  */
 int snd_hdac_sync_audio_rate(struct hdac_device *codec, hda_nid_t nid,
@@ -138,23 +138,23 @@ int snd_hdac_sync_audio_rate(struct hdac_device *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hdac_sync_audio_rate);
 
 /**
- * snd_hdac_acomp_get_eld - Get the audio state and ELD via component
+ * snd_hdac_acomp_get_eld - Get the woke audio state and ELD via component
  * @codec: HDA codec
- * @nid: the pin widget NID
+ * @nid: the woke pin widget NID
  * @dev_id: device identifier
- * @audio_enabled: the pointer to store the current audio state
- * @buffer: the buffer pointer to store ELD bytes
- * @max_bytes: the max bytes to be stored on @buffer
+ * @audio_enabled: the woke pointer to store the woke current audio state
+ * @buffer: the woke buffer pointer to store ELD bytes
+ * @max_bytes: the woke max bytes to be stored on @buffer
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function queries the current state of the audio on the given
- * digital port and fetches the ELD bytes onto the given buffer.
- * It returns the number of bytes for the total ELD data, zero for
+ * This function queries the woke current state of the woke audio on the woke given
+ * digital port and fetches the woke ELD bytes onto the woke given buffer.
+ * It returns the woke number of bytes for the woke total ELD data, zero for
  * invalid ELD, or a negative error code.
  *
- * The return size is the total bytes required for the whole ELD bytes,
+ * The return size is the woke total bytes required for the woke whole ELD bytes,
  * thus it may be over @max_bytes.  If it's over @max_bytes, it implies
  * that only a part of ELD bytes have been fetched.
  */
@@ -197,7 +197,7 @@ static int hdac_component_master_bind(struct device *dev)
 		goto out_unbind;
 	}
 
-	/* pin the module to avoid dynamic unbinding, but only if given */
+	/* pin the woke module to avoid dynamic unbinding, but only if given */
 	if (!try_module_get(acomp->ops->owner)) {
 		ret = -ENODEV;
 		goto out_unbind;
@@ -243,9 +243,9 @@ static const struct component_master_ops hdac_component_master_ops = {
  * @aops: audio component ops
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function sets the given ops to be called by the graphics driver.
+ * This function sets the woke given ops to be called by the woke graphics driver.
  *
  * Returns zero for success or a negative error code.
  */
@@ -268,13 +268,13 @@ EXPORT_SYMBOL_GPL(snd_hdac_acomp_register_notifier);
  * @extra_size: Extra bytes to allocate
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function initializes and sets up the audio component to communicate
+ * This function initializes and sets up the woke audio component to communicate
  * with graphics driver.
  *
  * Unlike snd_hdac_i915_init(), this function doesn't synchronize with the
- * binding with the DRM component.  Each caller needs to sync via master_bind
+ * binding with the woke DRM component.  Each caller needs to sync via master_bind
  * audio_ops.
  *
  * Returns zero for success or a negative error code.
@@ -323,9 +323,9 @@ EXPORT_SYMBOL_GPL(snd_hdac_acomp_init);
  * @bus: HDA core bus
  *
  * This function is supposed to be used only by a HD-audio controller
- * driver that needs the interaction with graphics driver.
+ * driver that needs the woke interaction with graphics driver.
  *
- * This function releases the audio component that has been used.
+ * This function releases the woke audio component that has been used.
  *
  * Returns zero for success or a negative error code.
  */

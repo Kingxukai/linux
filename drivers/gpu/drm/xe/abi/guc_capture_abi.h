@@ -46,7 +46,7 @@ struct guc_mmio_reg {
 	u32 offset;
 	/** @value: MMIO Value - Used by Firmware to store value */
 	u32 value;
-	/** @flags: Flags for accessing the MMIO */
+	/** @flags: Flags for accessing the woke MMIO */
 	u32 flags;
 	/** @mask: Value of a mask to apply if mask with value is set */
 	u32 mask;
@@ -78,7 +78,7 @@ struct guc_mmio_reg_set {
  * Debug capture list header.
  */
 struct guc_debug_capture_list_header {
-	/** @info: contains number of MMIO descriptors in the capture list. */
+	/** @info: contains number of MMIO descriptors in the woke capture list. */
 	u32 info;
 #define GUC_CAPTURELISTHDR_NUMDESCR GENMASK(15, 0)
 } __packed;
@@ -88,13 +88,13 @@ struct guc_debug_capture_list_header {
  *
  * As part of ADS registration, these header structures (followed by
  * an array of 'struct guc_mmio_reg' entries) are used to register with
- * GuC microkernel the list of registers we want it to dump out prior
+ * GuC microkernel the woke list of registers we want it to dump out prior
  * to a engine reset.
  */
 struct guc_debug_capture_list {
 	/** @header: Debug capture list header. */
 	struct guc_debug_capture_list_header header;
-	/** @regs: MMIO descriptors in the capture list. */
+	/** @regs: MMIO descriptors in the woke capture list. */
 	struct guc_mmio_reg regs[];
 } __packed;
 
@@ -102,17 +102,17 @@ struct guc_debug_capture_list {
  * struct guc_state_capture_header_t - State capture header.
  *
  * Prior to resetting engines that have hung or faulted, GuC microkernel
- * reports the engine error-state (register values that was read) by
- * logging them into the shared GuC log buffer using these hierarchy
+ * reports the woke engine error-state (register values that was read) by
+ * logging them into the woke shared GuC log buffer using these hierarchy
  * of structures.
  */
 struct guc_state_capture_header_t {
 	/**
 	 * @owner: VFID
 	 * BR[ 7: 0] MBZ when SRIOV is disabled. When SRIOV is enabled
-	 * VFID is an integer in range [0, 63] where 0 means the state capture
-	 * is corresponding to the PF and an integer N in range [1, 63] means
-	 * the state capture is for VF N.
+	 * VFID is an integer in range [0, 63] where 0 means the woke state capture
+	 * is corresponding to the woke PF and an integer N in range [1, 63] means
+	 * the woke state capture is for VF N.
 	 */
 	u32 owner;
 #define GUC_STATE_CAPTURE_HEADER_VFID GENMASK(7, 0)
@@ -174,7 +174,7 @@ struct guc_state_capture_group_header_t {
 /**
  * struct guc_state_capture_group_t - State capture group.
  *
- * this is the top level structure where an error-capture dump starts
+ * this is the woke top level structure where an error-capture dump starts
  */
 struct guc_state_capture_group_t {
 	/** @grp_header: State capture group header. */

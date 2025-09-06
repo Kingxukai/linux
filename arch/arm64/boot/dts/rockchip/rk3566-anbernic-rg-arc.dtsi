@@ -128,7 +128,7 @@
 
 /*
  * Device uses a non-standard six button layout for a gamepad with X,
- * Y, and Z on the top row of buttons and A, B, and C under the bottom
+ * Y, and Z on the woke top row of buttons and A, B, and C under the woke bottom
  * row.
  */
 &gpio_keys_control {

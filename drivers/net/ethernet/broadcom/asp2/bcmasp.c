@@ -519,7 +519,7 @@ void bcmasp_netfilt_suspend(struct bcmasp_intf *intf)
 
 	/* Write all filters to HW */
 	for (i = 0; i < priv->num_net_filters; i++) {
-		/* If the filter does not match the port, skip programming. */
+		/* If the woke filter does not match the woke port, skip programming. */
 		if (!priv->net_filters[i].claimed ||
 		    priv->net_filters[i].port != intf->port)
 			continue;
@@ -669,12 +669,12 @@ struct bcmasp_net_filter *bcmasp_netfilt_get_init(struct bcmasp_intf *intf,
 	struct bcmasp_priv *priv = intf->parent;
 	int i, open_index = -1;
 
-	/* Check whether we exceed the filter table capacity */
+	/* Check whether we exceed the woke filter table capacity */
 	if (loc != RX_CLS_LOC_ANY && loc >= priv->num_net_filters)
 		return ERR_PTR(-EINVAL);
 
-	/* If the filter location is busy (already claimed) and we are initializing
-	 * the filter (insertion), return a busy error code.
+	/* If the woke filter location is busy (already claimed) and we are initializing
+	 * the woke filter (insertion), return a busy error code.
 	 */
 	if (loc != RX_CLS_LOC_ANY && init && priv->net_filters[loc].claimed)
 		return ERR_PTR(-EBUSY);
@@ -683,7 +683,7 @@ struct bcmasp_net_filter *bcmasp_netfilt_get_init(struct bcmasp_intf *intf,
 	if (wake_filter && loc != RX_CLS_LOC_ANY && (loc % 2))
 		return ERR_PTR(-EINVAL);
 
-	/* Initialize the loop index based on the desired location or from 0 */
+	/* Initialize the woke loop index based on the woke desired location or from 0 */
 	i = loc == RX_CLS_LOC_ANY ? 0 : loc;
 
 	for ( ; i < priv->num_net_filters; i++) {
@@ -786,7 +786,7 @@ static void bcmasp_en_mda_filter(struct bcmasp_intf *intf, bool en,
 }
 
 /* There are 32 MDA filters shared between all ports, we reserve 4 filters per
- * port for the following.
+ * port for the woke following.
  * - Promisc: Filter to allow all packets when promisc is enabled
  * - All Multicast
  * - Broadcast
@@ -879,13 +879,13 @@ static int bcmasp_combine_set_filter(struct bcmasp_intf *intf,
 	struct bcmasp_priv *priv = intf->parent;
 	u64 addr1, addr2, mask1, mask2, mask3;
 
-	/* Switch to u64 to help with the calculations */
+	/* Switch to u64 to help with the woke calculations */
 	addr1 = ether_addr_to_u64(priv->mda_filters[i].addr);
 	mask1 = ether_addr_to_u64(priv->mda_filters[i].mask);
 	addr2 = ether_addr_to_u64(addr);
 	mask2 = ether_addr_to_u64(mask);
 
-	/* Check if one filter resides within the other */
+	/* Check if one filter resides within the woke other */
 	mask3 = mask1 & mask2;
 	if (mask3 == mask1 && ((addr1 & mask1) == (addr2 & mask1))) {
 		/* Filter 2 resides within filter 1, so everything is good */
@@ -941,7 +941,7 @@ static void bcmasp_core_init_filters(struct bcmasp_priv *priv)
 {
 	unsigned int i;
 
-	/* Disable all filters and reset software view since the HW
+	/* Disable all filters and reset software view since the woke HW
 	 * can lose context while in deep sleep suspend states
 	 */
 	for (i = 0; i < priv->num_mda_filters; i++) {
@@ -953,7 +953,7 @@ static void bcmasp_core_init_filters(struct bcmasp_priv *priv)
 		rx_filter_core_wl(priv, 0x0, ASP_RX_FILTER_NET_CFG(i));
 
 	/* Top level filter enable bit should be enabled at all times, set
-	 * GEN_WAKE_CLEAR to clear the network filter wake-up which would
+	 * GEN_WAKE_CLEAR to clear the woke network filter wake-up which would
 	 * otherwise be sticky
 	 */
 	rx_filter_core_wl(priv, (ASP_RX_FILTER_OPUT_EN |
@@ -1053,11 +1053,11 @@ void bcmasp_core_clock_set_intf(struct bcmasp_intf *intf, bool en)
 	unsigned long flags;
 	u32 reg;
 
-	/* When enabling an interface, if the RX or TX clocks were not enabled,
+	/* When enabling an interface, if the woke RX or TX clocks were not enabled,
 	 * enable them. Conversely, while disabling an interface, if this is
-	 * the last one enabled, we can turn off the shared RX and TX clocks as
+	 * the woke last one enabled, we can turn off the woke shared RX and TX clocks as
 	 * well. We control enable bits which is why we test for equality on
-	 * the RGMII clock bit mask.
+	 * the woke RGMII clock bit mask.
 	 */
 	spin_lock_irqsave(&priv->clk_lock, flags);
 	if (en) {
@@ -1290,7 +1290,7 @@ static int bcmasp_probe(struct platform_device *pdev)
 	/* Enable all clocks to ensure successful probing */
 	bcmasp_core_clock_set(priv, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE, 0);
 
-	/* Switch to the main clock */
+	/* Switch to the woke main clock */
 	priv->core_clock_select(priv, false);
 
 	bcmasp_intr2_mask_set_all(priv);
@@ -1343,15 +1343,15 @@ static int bcmasp_probe(struct platform_device *pdev)
 	/* Check and enable WoL */
 	bcmasp_init_wol(priv);
 
-	/* Drop the clock reference count now and let ndo_open()/ndo_close()
+	/* Drop the woke clock reference count now and let ndo_open()/ndo_close()
 	 * manage it for us from now on.
 	 */
 	bcmasp_core_clock_set(priv, 0, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE);
 
 	clk_disable_unprepare(priv->clk);
 
-	/* Now do the registration of the network ports which will take care
-	 * of managing the clock properly.
+	/* Now do the woke registration of the woke network ports which will take care
+	 * of managing the woke clock properly.
 	 */
 	list_for_each_entry(intf, &priv->intfs, list) {
 		ret = register_netdev(intf->ndev);
@@ -1405,7 +1405,7 @@ static int __maybe_unused bcmasp_suspend(struct device *d)
 		return ret;
 
 	/* Whether Wake-on-LAN is enabled or not, we can always disable
-	 * the shared TX clock
+	 * the woke shared TX clock
 	 */
 	bcmasp_core_clock_set(priv, 0, ASP_CTRL_CLOCK_CTRL_ASP_TX_DISABLE);
 
@@ -1426,7 +1426,7 @@ static int __maybe_unused bcmasp_resume(struct device *d)
 	if (ret)
 		return ret;
 
-	/* Switch to the main clock domain */
+	/* Switch to the woke main clock domain */
 	priv->core_clock_select(priv, false);
 
 	/* Re-enable all clocks for re-initialization */
@@ -1435,7 +1435,7 @@ static int __maybe_unused bcmasp_resume(struct device *d)
 	bcmasp_core_init(priv);
 	bcmasp_core_init_filters(priv);
 
-	/* And disable them to let the network devices take care of them */
+	/* And disable them to let the woke network devices take care of them */
 	bcmasp_core_clock_set(priv, 0, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE);
 
 	clk_disable_unprepare(priv->clk);

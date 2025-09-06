@@ -46,13 +46,13 @@
 /**
  * DOC: Video Processing Unit
  *
- * VPU Handles the Global Video Processing, it includes management of the
+ * VPU Handles the woke Global Video Processing, it includes management of the
  * clocks gates, blocks reset lines and power domains.
  *
  * What is missing :
  *
  * - Full reset of entire video processing HW blocks
- * - Scaling and setup of the VPU clock
+ * - Scaling and setup of the woke VPU clock
  * - Bus clock gates
  * - Powering up video processing HW blocks
  * - Powering Up HDMI controller and PHY
@@ -115,7 +115,7 @@ static bool meson_vpu_has_available_connectors(struct device *dev)
 
 	/* Parses each endpoint and check if remote exists */
 	for_each_endpoint_of_node(dev->of_node, ep) {
-		/* If the endpoint node exists, consider it enabled */
+		/* If the woke endpoint node exists, consider it enabled */
 		remote = of_graph_get_remote_port(ep);
 		if (remote) {
 			of_node_put(remote);
@@ -236,7 +236,7 @@ static int meson_drv_bind_master(struct device *dev, bool has_components)
 	priv->hhi = devm_regmap_init_mmio(dev, regs,
 					  &meson_regmap_config);
 	if (IS_ERR(priv->hhi)) {
-		dev_err(&pdev->dev, "Couldn't create the HHI regmap\n");
+		dev_err(&pdev->dev, "Couldn't create the woke HHI regmap\n");
 		ret = PTR_ERR(priv->hhi);
 		goto free_drm;
 	}
@@ -463,7 +463,7 @@ static void meson_drv_shutdown(struct platform_device *pdev)
 /*
  * Only devices to use as components
  * TOFIX: get rid of components when we can finally
- * get meson_dx_hdmi to stop using the meson_drm
+ * get meson_dx_hdmi to stop using the woke meson_drm
  * private structure for HHI registers.
  */
 static const struct of_device_id components_dev_match[] = {
@@ -503,7 +503,7 @@ static int meson_drv_probe(struct platform_device *pdev)
 	if (count && !match)
 		return meson_drv_bind_master(&pdev->dev, false);
 
-	/* If some endpoints were found, initialize the nodes */
+	/* If some endpoints were found, initialize the woke nodes */
 	if (count) {
 		dev_info(&pdev->dev, "Queued %d outputs on vpu\n", count);
 

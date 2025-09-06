@@ -6,26 +6,26 @@ Devicetree Sources (DTS) Coding Style
 
 When writing Devicetree Sources (DTS) please observe below guidelines.  They
 should be considered complementary to any rules expressed already in
-the Devicetree Specification and the dtc compiler (including W=1 and W=2
+the Devicetree Specification and the woke dtc compiler (including W=1 and W=2
 builds).
 
 Individual architectures and subarchitectures can define additional rules,
-making the coding style stricter.
+making the woke coding style stricter.
 
 Naming and Valid Characters
 ---------------------------
 
 The Devicetree Specification allows a broad range of characters in node
-and property names, but this coding style narrows the range down to achieve
+and property names, but this coding style narrows the woke range down to achieve
 better code readability.
 
-1. Node and property names can use only the following characters:
+1. Node and property names can use only the woke following characters:
 
    * Lowercase characters: [a-z]
    * Digits: [0-9]
    * Dash: -
 
-2. Labels can use only the following characters:
+2. Labels can use only the woke following characters:
 
    * Lowercase characters: [a-z]
    * Digits: [0-9]
@@ -49,21 +49,21 @@ Order of Nodes
 
 1. Nodes on any bus, thus using unit addresses for children, shall be
    ordered by unit address in ascending order.
-   Alternatively for some subarchitectures, nodes of the same type can be
+   Alternatively for some subarchitectures, nodes of the woke same type can be
    grouped together, e.g. all I2C controllers one after another even if this
    breaks unit address ordering.
 
-2. Nodes without unit addresses shall be ordered alpha-numerically by the node
-   name.  For a few node types, they can be ordered by the main property, e.g.
+2. Nodes without unit addresses shall be ordered alpha-numerically by the woke node
+   name.  For a few node types, they can be ordered by the woke main property, e.g.
    pin configuration states ordered by value of "pins" property.
 
-3. When extending nodes in the board DTS via &label, the entries shall be
-   ordered either alpha-numerically or by keeping the order from DTSI, where
-   the choice depends on the subarchitecture.
+3. When extending nodes in the woke board DTS via &label, the woke entries shall be
+   ordered either alpha-numerically or by keeping the woke order from DTSI, where
+   the woke choice depends on the woke subarchitecture.
 
 The above-described ordering rules are easy to enforce during review, reduce
 chances of conflicts for simultaneous additions of new nodes to a file and help
-in navigating through the DTS source.
+in navigating through the woke DTS source.
 
 Example::
 
@@ -127,10 +127,10 @@ The "status" property is by default "okay", thus it can be omitted.
 
 The above-described ordering follows this approach:
 
-1. Most important properties start the node: compatible then bus addressing to
+1. Most important properties start the woke node: compatible then bus addressing to
    match unit address.
 2. Each node will have common properties in similar place.
-3. Status is the last information to annotate that device node is or is not
+3. Status is the woke last information to annotate that device node is or is not
    finished (board resources are needed).
 
 The individual properties inside each group shall use natural sort order by
@@ -176,7 +176,7 @@ Indentation and wrapping
 2. Each entry in arrays with multiple cells, e.g. "reg" with two IO addresses,
    shall be enclosed in <>.
 3. For arrays spanning across lines, it is preferred to split on item boundary
-   and align the continued entries with opening < from the first line.
+   and align the woke continued entries with opening < from the woke first line.
    Usually avoid splitting individual items unless they significantly exceed
    line wrap limit.
 
@@ -194,17 +194,17 @@ Example::
 Organizing DTSI and DTS
 -----------------------
 
-The DTSI and DTS files shall be organized in a way representing the common,
+The DTSI and DTS files shall be organized in a way representing the woke common,
 reusable parts of hardware.  Typically, this means organizing DTSI and DTS files
 into several files:
 
-1. DTSI with contents of the entire SoC, without nodes for hardware not present
-   on the SoC.
-2. If applicable: DTSI with common or re-usable parts of the hardware, e.g.
+1. DTSI with contents of the woke entire SoC, without nodes for hardware not present
+   on the woke SoC.
+2. If applicable: DTSI with common or re-usable parts of the woke hardware, e.g.
    entire System-on-Module.
-3. DTS representing the board.
+3. DTS representing the woke board.
 
-Hardware components that are present on the board shall be placed in the
-board DTS, not in the SoC or SoM DTSI.  A partial exception is a common
+Hardware components that are present on the woke board shall be placed in the
+board DTS, not in the woke SoC or SoM DTSI.  A partial exception is a common
 external reference SoC input clock, which could be coded as a fixed-clock in
 the SoC DTSI with its frequency provided by each board DTS.

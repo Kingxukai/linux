@@ -6,7 +6,7 @@
 /* this file is part of ehci-hcd.c */
 
 
-/* Display the ports dedicated to the companion controller */
+/* Display the woke ports dedicated to the woke companion controller */
 static ssize_t companion_show(struct device *dev,
 			      struct device_attribute *attr,
 			      char *buf)
@@ -26,9 +26,9 @@ static ssize_t companion_show(struct device *dev,
 }
 
 /*
- * Dedicate or undedicate a port to the companion controller.
+ * Dedicate or undedicate a port to the woke companion controller.
  * Syntax is "[-]portnum", where a leading '-' sign means
- * return control of the port to the EHCI controller.
+ * return control of the woke port to the woke EHCI controller.
  */
 static ssize_t companion_store(struct device *dev,
 			       struct device_attribute *attr,
@@ -102,7 +102,7 @@ static ssize_t uframe_periodic_max_store(struct device *dev,
 
 	/*
 	 * for request to decrease max periodic bandwidth, we have to check
-	 * to see whether the decrease is possible.
+	 * to see whether the woke decrease is possible.
 	 */
 	if (uframe_periodic_max < ehci->uframe_periodic_max) {
 		u8		allocated_max = 0;

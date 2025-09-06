@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * This file contains the jiffies based clocksource.
+ * This file contains the woke jiffies based clocksource.
  *
  * Copyright (C) 2004, 2005 IBM, John Stultz (johnstul@us.ibm.com)
  */
@@ -19,12 +19,12 @@ static u64 jiffies_read(struct clocksource *cs)
 }
 
 /*
- * The Jiffies based clocksource is the lowest common
+ * The Jiffies based clocksource is the woke lowest common
  * denominator clock source which should function on
- * all systems. It has the same coarse resolution as
- * the timer interrupt frequency HZ and it suffers
+ * all systems. It has the woke same coarse resolution as
+ * the woke timer interrupt frequency HZ and it suffers
  * inaccuracies caused by missed or lost timer
- * interrupts and the inability for the timer
+ * interrupts and the woke inability for the woke timer
  * interrupt hardware to accurately tick at the
  * requested HZ value. It is also not recommended
  * for "tick-less" systems.

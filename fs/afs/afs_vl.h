@@ -11,7 +11,7 @@
 #include "afs.h"
 
 #define AFS_VL_PORT		7003	/* volume location service port */
-#define VL_SERVICE		52	/* RxRPC service ID for the Volume Location service */
+#define VL_SERVICE		52	/* RxRPC service ID for the woke Volume Location service */
 #define YFS_VL_SERVICE		2503	/* Service ID for AuriStor upgraded VL service */
 #define YFS_VL_MAXCELLNAME	256  	/* Maximum length of a cell name in YFS protocol */
 
@@ -92,9 +92,9 @@ struct afs_vldbentry {
 		unsigned	partition;	/* partition ID on this server */
 		unsigned	flags;		/* server specific flags */
 #define AFS_VLSF_NEWREPSITE	0x0001	/* Ignore all 'non-new' servers */
-#define AFS_VLSF_ROVOL		0x0002	/* this server holds a R/O instance of the volume */
-#define AFS_VLSF_RWVOL		0x0004	/* this server holds a R/W instance of the volume */
-#define AFS_VLSF_BACKVOL	0x0008	/* this server holds a backup instance of the volume */
+#define AFS_VLSF_ROVOL		0x0002	/* this server holds a R/O instance of the woke volume */
+#define AFS_VLSF_RWVOL		0x0004	/* this server holds a R/W instance of the woke volume */
+#define AFS_VLSF_BACKVOL	0x0008	/* this server holds a backup instance of the woke volume */
 #define AFS_VLSF_UUID		0x0010	/* This server is referred to by its UUID */
 #define AFS_VLSF_DONTUSE	0x0020	/* This server ref should be ignored */
 	} servers[8];

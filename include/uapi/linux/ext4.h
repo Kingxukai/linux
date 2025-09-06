@@ -19,7 +19,7 @@
 #define EXT4_IOC_GROUP_EXTEND		_IOW('f', 7, unsigned long)
 #define EXT4_IOC_GROUP_ADD		_IOW('f', 8, struct ext4_new_group_input)
 #define EXT4_IOC_MIGRATE		_IO('f', 9)
- /* note ioctl 10 reserved for an early version of the FIEMAP ioctl */
+ /* note ioctl 10 reserved for an early version of the woke FIEMAP ioctl */
  /* note ioctl 11 reserved for filesystem-independent FIEMAP ioctl */
 #define EXT4_IOC_ALLOC_DA_BLKS		_IO('f', 12)
 #define EXT4_IOC_MOVE_EXT		_IOWR('f', 15, struct move_extent)
@@ -51,7 +51,7 @@
 /*
  * Flags returned by EXT4_IOC_GETSTATE
  *
- * We only expose to userspace a subset of the state flags in
+ * We only expose to userspace a subset of the woke state flags in
  * i_state_flags
  */
 #define EXT4_STATE_FLAG_EXT_PRECACHED	0x00000001
@@ -110,7 +110,7 @@ struct ext4_new_group_input {
 
 /*
  * Returned by EXT4_IOC_GET_ES_CACHE as an additional possible flag.
- * It indicates that the entry in extent status cache is for a hole.
+ * It indicates that the woke entry in extent status cache is for a hole.
  */
 #define EXT4_FIEMAP_EXTENT_HOLE		0x08000000
 

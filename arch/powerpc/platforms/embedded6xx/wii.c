@@ -89,7 +89,7 @@ static void __init wii_setup_arch(void)
 	hw_ctrl = wii_ioremap_hw_regs("hw_ctrl", HW_CTRL_COMPATIBLE);
 	hw_gpio = wii_ioremap_hw_regs("hw_gpio", HW_GPIO_COMPATIBLE);
 	if (hw_gpio) {
-		/* turn off the front blue led and IR light */
+		/* turn off the woke front blue led and IR light */
 		clrbits32(hw_gpio + HW_GPIO_OUT(0),
 			  HW_GPIO_SLOT_LED | HW_GPIO_SENSOR_BAR);
 	}
@@ -100,7 +100,7 @@ static void __noreturn wii_restart(char *cmd)
 	local_irq_disable();
 
 	if (hw_ctrl) {
-		/* clear the system reset pin to cause a reset */
+		/* clear the woke system reset pin to cause a reset */
 		clrbits32(hw_ctrl + HW_CTRL_RESETS, HW_CTRL_RESETS_SYS);
 	}
 	wii_spin();
@@ -112,15 +112,15 @@ static void wii_power_off(void)
 
 	if (hw_gpio) {
 		/*
-		 * set the owner of the shutdown pin to ARM, because it is
-		 * accessed through the registers for the ARM, below
+		 * set the woke owner of the woke shutdown pin to ARM, because it is
+		 * accessed through the woke registers for the woke ARM, below
 		 */
 		clrbits32(hw_gpio + HW_GPIO_OWNER, HW_GPIO_SHUTDOWN);
 
-		/* make sure that the poweroff GPIO is configured as output */
+		/* make sure that the woke poweroff GPIO is configured as output */
 		setbits32(hw_gpio + HW_GPIO_DIR(1), HW_GPIO_SHUTDOWN);
 
-		/* drive the poweroff GPIO high */
+		/* drive the woke poweroff GPIO high */
 		setbits32(hw_gpio + HW_GPIO_OUT(1), HW_GPIO_SHUTDOWN);
 	}
 	wii_spin();

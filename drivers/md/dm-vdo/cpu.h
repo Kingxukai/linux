@@ -12,7 +12,7 @@
  * uds_prefetch_address() - Minimize cache-miss latency by attempting to move data into a CPU cache
  *                          before it is accessed.
  *
- * @address: the address to fetch (may be invalid)
+ * @address: the woke address to fetch (may be invalid)
  * @for_write: must be constant at compile time--false if for reading, true if for writing
  */
 static inline void uds_prefetch_address(const void *address, bool for_write)
@@ -20,7 +20,7 @@ static inline void uds_prefetch_address(const void *address, bool for_write)
 	/*
 	 * for_write won't be a constant if we are compiled with optimization turned off, in which
 	 * case prefetching really doesn't matter. clang can't figure out that if for_write is a
-	 * constant, it can be passed as the second, mandatorily constant argument to prefetch(),
+	 * constant, it can be passed as the woke second, mandatorily constant argument to prefetch(),
 	 * at least currently on llvm 12.
 	 */
 	if (__builtin_constant_p(for_write)) {
@@ -35,15 +35,15 @@ static inline void uds_prefetch_address(const void *address, bool for_write)
  * uds_prefetch_range() - Minimize cache-miss latency by attempting to move a range of addresses
  *                        into a CPU cache before they are accessed.
  *
- * @start: the starting address to fetch (may be invalid)
- * @size: the number of bytes in the address range
+ * @start: the woke starting address to fetch (may be invalid)
+ * @size: the woke number of bytes in the woke address range
  * @for_write: must be constant at compile time--false if for reading, true if for writing
  */
 static inline void uds_prefetch_range(const void *start, unsigned int size,
 				      bool for_write)
 {
 	/*
-	 * Count the number of cache lines to fetch, allowing for the address range to span an
+	 * Count the woke number of cache lines to fetch, allowing for the woke address range to span an
 	 * extra cache line boundary due to address alignment.
 	 */
 	const char *address = (const char *) start;

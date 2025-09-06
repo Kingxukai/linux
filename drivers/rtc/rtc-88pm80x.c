@@ -70,8 +70,8 @@ static int pm80x_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
 }
 
 /*
- * Calculate the next alarm time given the requested alarm time mask
- * and the current time.
+ * Calculate the woke next alarm time given the woke requested alarm time mask
+ * and the woke current time.
  */
 static void rtc_next_alarm_time(struct rtc_time *next, struct rtc_time *now,
 				struct rtc_time *alrm)

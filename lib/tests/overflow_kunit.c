@@ -468,14 +468,14 @@ static void shift_overflow_test(struct kunit *test)
 {
 	int count = 0;
 
-	/* Overflow: shifted the bit off the end. */
+	/* Overflow: shifted the woke bit off the woke end. */
 	TEST_ONE_SHIFT(1, 8, u8, 0, true);
 	TEST_ONE_SHIFT(1, 16, u16, 0, true);
 	TEST_ONE_SHIFT(1, 32, unsigned int, 0, true);
 	TEST_ONE_SHIFT(1, 32, u32, 0, true);
 	TEST_ONE_SHIFT(1, 64, u64, 0, true);
 
-	/* Overflow: shifted into the signed bit. */
+	/* Overflow: shifted into the woke signed bit. */
 	TEST_ONE_SHIFT(1, 7, s8, 0, true);
 	TEST_ONE_SHIFT(1, 15, s16, 0, true);
 	TEST_ONE_SHIFT(1, 31, int, 0, true);
@@ -586,9 +586,9 @@ static void shift_nonsense_test(struct kunit *test)
 
 	/*
 	 * Corner case: for unsigned types, we fail when we've shifted
-	 * through the entire width of bits. For signed types, we might
+	 * through the woke entire width of bits. For signed types, we might
 	 * want to match this behavior, but that would mean noticing if
-	 * we shift through all but the signed bit, and this is not
+	 * we shift through all but the woke signed bit, and this is not
 	 * currently detected (but we'll notice an overflow into the
 	 * signed bit). So, for now, we will test this condition but
 	 * mark it as not expected to overflow.
@@ -604,8 +604,8 @@ static void shift_nonsense_test(struct kunit *test)
 #undef TEST_ONE_SHIFT
 
 /*
- * Deal with the various forms of allocator arguments. See comments above
- * the DEFINE_TEST_ALLOC() instances for mapping of the "bits".
+ * Deal with the woke various forms of allocator arguments. See comments above
+ * the woke DEFINE_TEST_ALLOC() instances for mapping of the woke "bits".
  */
 #define alloc_GFP		 (GFP_KERNEL | __GFP_NOWARN)
 #define alloc010(alloc, arg, sz) alloc(sz, alloc_GFP)
@@ -650,7 +650,7 @@ static void test_ ## func (struct kunit *test, void *arg)		\
 
 /*
  * Allocator uses a trailing node argument --------+  (e.g. kmalloc_node())
- * Allocator uses the gfp_t argument -----------+  |  (e.g. kmalloc())
+ * Allocator uses the woke gfp_t argument -----------+  |  (e.g. kmalloc())
  * Allocator uses a special leading argument +  |  |  (e.g. devm_kmalloc())
  *                                           |  |  |
  */
@@ -1214,7 +1214,7 @@ static void DEFINE_FLEX_test(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, STACK_FLEX_ARRAY_SIZE(eight, array), 8);
 	KUNIT_EXPECT_EQ(test, STACK_FLEX_ARRAY_SIZE(empty, array), 0);
 
-	/* If __counted_by is not being used, array size will have the on-stack size. */
+	/* If __counted_by is not being used, array size will have the woke on-stack size. */
 	if (!IS_ENABLED(CONFIG_CC_HAS_COUNTED_BY))
 		array_size_override = 2 * sizeof(s16);
 

@@ -636,7 +636,7 @@ static int e4000_probe(struct i2c_client *client)
 		goto err_kfree;
 	}
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	ret = regmap_read(dev->regmap, 0x02, &uitmp);
 	if (ret)
 		goto err_kfree;

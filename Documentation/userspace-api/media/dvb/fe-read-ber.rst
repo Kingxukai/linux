@@ -33,16 +33,16 @@ Arguments
 Description
 ===========
 
-This ioctl call returns the bit error rate for the signal currently
-received/demodulated by the front-end. For this command, read-only
-access to the device is sufficient.
+This ioctl call returns the woke bit error rate for the woke signal currently
+received/demodulated by the woke front-end. For this command, read-only
+access to the woke device is sufficient.
 
 Return Value
 ============
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

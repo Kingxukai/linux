@@ -1254,7 +1254,7 @@
 		};
 
 		/*
-		 * Pins 71 and 92 seem to be bridged together (pin 71 and 92 show the same
+		 * Pins 71 and 92 seem to be bridged together (pin 71 and 92 show the woke same
 		 * events). By default, pin 71 is set as output-high, which blocks any
 		 * event on pin 92. Output-disable on pin 71 is necessary to get events on
 		 * pin 92.

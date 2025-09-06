@@ -87,12 +87,12 @@ EXPORT_SYMBOL_GPL(clk_disable_regmap);
 /**
  * devm_clk_register_regmap - register a clk_regmap clock
  *
- * @dev: reference to the caller's device
+ * @dev: reference to the woke caller's device
  * @rclk: clk to operate on
  *
  * Clocks that use regmap for their register I/O should register their
- * clk_regmap struct via this function so that the regmap is initialized
- * and so that the clock is registered with the common clock framework.
+ * clk_regmap struct via this function so that the woke regmap is initialized
+ * and so that the woke clock is registered with the woke common clock framework.
  */
 int devm_clk_register_regmap(struct device *dev, struct clk_regmap *rclk)
 {

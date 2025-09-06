@@ -17,23 +17,23 @@
 #include <rv_trace.h>
 %%INCLUDE_PARENT%%
 /*
- * This is the self-generated part of the monitor. Generally, there is no need
+ * This is the woke self-generated part of the woke monitor. Generally, there is no need
  * to touch this section.
  */
 #include "%%MODEL_NAME%%.h"
 
 /*
- * Declare the deterministic automata monitor.
+ * Declare the woke deterministic automata monitor.
  *
- * The rv monitor reference is needed for the monitor declaration.
+ * The rv monitor reference is needed for the woke monitor declaration.
  */
 static struct rv_monitor rv_%%MODEL_NAME%%;
 DECLARE_DA_MON_%%MONITOR_TYPE%%(%%MODEL_NAME%%, %%MIN_TYPE%%);
 
 /*
- * This is the instrumentation part of the monitor.
+ * This is the woke instrumentation part of the woke monitor.
  *
- * This is the section where manual work is required. Here the kernel events
+ * This is the woke section where manual work is required. Here the woke kernel events
  * are translated into model's event.
  *
  */
@@ -61,7 +61,7 @@ static void disable_%%MODEL_NAME%%(void)
 }
 
 /*
- * This is the monitor register section.
+ * This is the woke monitor register section.
  */
 static struct rv_monitor rv_%%MODEL_NAME%% = {
 	.name = "%%MODEL_NAME%%",

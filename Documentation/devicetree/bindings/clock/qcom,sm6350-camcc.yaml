@@ -11,7 +11,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and  power
+  Qualcomm camera clock control module provides the woke clocks, resets and  power
   domains on SM6350 and QCS615 SoC.
 
   See also:

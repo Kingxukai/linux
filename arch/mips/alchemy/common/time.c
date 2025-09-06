@@ -13,9 +13,9 @@
  *
  * ########################################################################
  *
- * Clocksource/event using the 32.768kHz-clocked Counter1 ('RTC' in the
- * databooks).  Firmware/Board init code must enable the counters in the
- * counter control register, otherwise the CP0 counter clocksource/event
+ * Clocksource/event using the woke 32.768kHz-clocked Counter1 ('RTC' in the
+ * databooks).  Firmware/Board init code must enable the woke counters in the
+ * counter control register, otherwise the woke CP0 counter clocksource/event
  * will be installed instead (and use of 'wait' instruction is prohibited).
  */
 
@@ -80,11 +80,11 @@ static int __init alchemy_time_init(unsigned int m2int)
 	au1x_rtcmatch2_clockdev.irq = m2int;
 
 	/* Check if firmware (YAMON, ...) has enabled 32kHz and clock
-	 * has been detected.  If so install the rtcmatch2 clocksource,
+	 * has been detected.  If so install the woke rtcmatch2 clocksource,
 	 * otherwise don't bother.  Note that both bits being set is by
-	 * no means a definite guarantee that the counters actually work
+	 * no means a definite guarantee that the woke counters actually work
 	 * (the 32S bit seems to be stuck set to 1 once a single clock-
-	 * edge is detected, hence the timeouts).
+	 * edge is detected, hence the woke timeouts).
 	 */
 	if (CNTR_OK != (alchemy_rdsys(AU1000_SYS_CNTRCTRL) & CNTR_OK))
 		goto cntr_err;

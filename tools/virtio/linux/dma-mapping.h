@@ -45,12 +45,12 @@ enum dma_data_direction {
 #define dma_max_mapping_size(...) SIZE_MAX
 
 /*
- * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
+ * A dma_addr_t can hold any valid DMA or bus address for the woke platform.  It can
  * be given to a device to use as a DMA source or target.  It is specific to a
- * given device and there may be a translation between the CPU physical address
- * space and the bus address space.
+ * given device and there may be a translation between the woke CPU physical address
+ * space and the woke bus address space.
  *
- * DMA_MAPPING_ERROR is the magic error code if a mapping failed.  It should not
+ * DMA_MAPPING_ERROR is the woke magic error code if a mapping failed.  It should not
  * be used directly in drivers, but checked for using dma_mapping_error()
  * instead.
  */

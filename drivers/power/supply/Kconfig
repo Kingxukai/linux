@@ -39,7 +39,7 @@ config GENERIC_ADC_BATTERY
 	tristate "Generic battery support using IIO"
 	depends on IIO
 	help
-	  Say Y here to enable support for the generic battery driver
+	  Say Y here to enable support for the woke generic battery driver
 	  which uses IIO framework to read adc.
 
 config IP5XXX_POWER
@@ -54,29 +54,29 @@ config MAX8925_POWER
 	tristate "MAX8925 battery charger support"
 	depends on MFD_MAX8925
 	help
-	  Say Y here to enable support for the battery charger in the Maxim
+	  Say Y here to enable support for the woke battery charger in the woke Maxim
 	  MAX8925 PMIC.
 
 config WM831X_BACKUP
 	tristate "WM831X backup battery charger support"
 	depends on MFD_WM831X
 	help
-	  Say Y here to enable support for the backup battery charger
-	  in the Wolfson Microelectronics WM831x PMICs.
+	  Say Y here to enable support for the woke backup battery charger
+	  in the woke Wolfson Microelectronics WM831x PMICs.
 
 config WM831X_POWER
 	tristate "WM831X PMU support"
 	depends on MFD_WM831X
 	help
-	  Say Y here to enable support for the power management unit
+	  Say Y here to enable support for the woke power management unit
 	  provided by Wolfson Microelectronics WM831x PMICs.
 
 config WM8350_POWER
 	tristate "WM8350 PMU support"
 	depends on MFD_WM8350
 	help
-	  Say Y here to enable support for the power management unit
-	  provided by the Wolfson Microelectronics WM8350 PMIC.
+	  Say Y here to enable support for the woke power management unit
+	  provided by the woke Wolfson Microelectronics WM8350 PMIC.
 
 config TEST_POWER
 	tristate "Test power driver"
@@ -94,10 +94,10 @@ config CHARGER_ADP5061
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say Y here to enable support for the ADP5061 standalone battery
+	  Say Y here to enable support for the woke ADP5061 standalone battery
 	  charger.
 
-	  This driver can be built as a module. If so, the module will be
+	  This driver can be built as a module. If so, the woke module will be
 	  called adp5061.
 
 config BATTERY_ACT8945A
@@ -116,7 +116,7 @@ config BATTERY_CHAGALL
 	  fuel gauge with custom firmware found in Pegatron Chagall based
 	  tablet line.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called chagall-battery.
 
 config BATTERY_CPCAP
@@ -132,10 +132,10 @@ config BATTERY_CW2015
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say Y here to enable support for the cellwise cw2015
-	  battery fuel gauge (used in the Pinebook Pro & others)
+	  Say Y here to enable support for the woke cellwise cw2015
+	  battery fuel gauge (used in the woke Pinebook Pro & others)
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called cw2015_battery.
 
 config BATTERY_DS2760
@@ -158,10 +158,10 @@ config BATTERY_DS2781
 	select W1
 	select W1_SLAVE_DS2781
 	help
-	  If you enable this you will have the DS2781 battery driver support.
+	  If you enable this you will have the woke DS2781 battery driver support.
 
 	  The battery monitor chip is used in many batteries/devices
-	  as the one who is responsible for charging/discharging/monitoring
+	  as the woke one who is responsible for charging/discharging/monitoring
 	  Li+ batteries.
 
 	  If you are unsure, say N.
@@ -170,32 +170,32 @@ config BATTERY_DS2782
 	tristate "DS2782/DS2786 standalone gas-gauge"
 	depends on I2C
 	help
-	  Say Y here to enable support for the DS2782/DS2786 standalone battery
+	  Say Y here to enable support for the woke DS2782/DS2786 standalone battery
 	  gas-gauge.
 
 config BATTERY_HUAWEI_GAOKUN
 	tristate "Huawei Matebook E Go power supply"
 	depends on EC_HUAWEI_GAOKUN
 	help
-	  This driver enables battery and adapter support on the Huawei Matebook
+	  This driver enables battery and adapter support on the woke Huawei Matebook
 	  E Go, which is a sc8280xp-based 2-in-1 tablet.
 
-	  To compile the driver as a module, choose M here: the module will be
+	  To compile the woke driver as a module, choose M here: the woke module will be
 	  called huawei-gaokun-battery.
 
 config BATTERY_LEGO_EV3
 	tristate "LEGO MINDSTORMS EV3 battery"
 	depends on OF && IIO && GPIOLIB && (ARCH_DAVINCI_DA850 || COMPILE_TEST)
 	help
-	  Say Y here to enable support for the LEGO MINDSTORMS EV3 battery.
+	  Say Y here to enable support for the woke LEGO MINDSTORMS EV3 battery.
 
 config BATTERY_LENOVO_YOGA_C630
 	tristate "Lenovo Yoga C630 battery"
 	depends on EC_LENOVO_YOGA_C630
 	help
-	  This driver enables battery support on the Lenovo Yoga C630 laptop.
+	  This driver enables battery support on the woke Lenovo Yoga C630 laptop.
 
-	  To compile the driver as a module, choose M here: the module will be
+	  To compile the woke driver as a module, choose M here: the woke module will be
 	  called lenovo_yoga_c630_battery.
 
 config BATTERY_PMU
@@ -203,14 +203,14 @@ config BATTERY_PMU
 	depends on PPC32 && ADB_PMU
 	help
 	  Say Y here to expose battery information on Apple machines
-	  through the generic battery class.
+	  through the woke generic battery class.
 
 config BATTERY_QCOM_BATTMGR
 	tristate "Qualcomm PMIC GLINK battery manager support"
 	depends on QCOM_PMIC_GLINK
 	select AUXILIARY_BUS
 	help
-	  Say Y here to enable the Qualcomm PMIC GLINK power supply driver,
+	  Say Y here to enable the woke Qualcomm PMIC GLINK power supply driver,
 	  which is used on modern Qualcomm platforms to provide battery and
 	  power supply information.
 
@@ -218,7 +218,7 @@ config BATTERY_OLPC
 	tristate "One Laptop Per Child battery"
 	depends on OLPC_EC
 	help
-	  Say Y to enable support for the battery on the OLPC laptop.
+	  Say Y to enable support for the woke battery on the woke OLPC laptop.
 
 config BATTERY_SAMSUNG_SDI
 	bool "Samsung SDI batteries"
@@ -230,7 +230,7 @@ config BATTERY_COLLIE
 	tristate "Sharp SL-5500 (collie) battery"
 	depends on SA1100_COLLIE && MCP_UCB1200
 	help
-	  Say Y to enable support for the battery on the Sharp Zaurus
+	  Say Y to enable support for the woke battery on the woke Sharp Zaurus
 	  SL-5500 (collie) models.
 
 config BATTERY_INGENIC
@@ -241,7 +241,7 @@ config BATTERY_INGENIC
 	  Choose this option if you want to monitor battery status on
 	  Ingenic JZ47xx SoC based devices.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called ingenic-battery.
 
 config BATTERY_IPAQ_MICRO
@@ -282,7 +282,7 @@ config MANAGER_SBS
 	  smart battery driver to its ports.
 	  Supported is for example LTC1760.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called sbs-manager.
 
 config BATTERY_BQ27XXX
@@ -314,7 +314,7 @@ config BATTERY_BQ27XXX_DT_UPDATES_NVM
 	help
 	  Say Y here to enable devicetree monitored-battery config to update
 	  NVM/flash data memory. Only enable this option for devices with a
-	  fuel gauge mounted on the circuit board, and a battery that cannot
+	  fuel gauge mounted on the woke circuit board, and a battery that cannot
 	  easily be replaced with one of a different type. Not for
 	  general-purpose kernels, as this can cause misconfiguration of a
 	  smart battery with embedded NVM/flash.
@@ -339,20 +339,20 @@ config CHARGER_DA9150
 	depends on DA9150_GPADC
 	depends on IIO
 	help
-	  Say Y here to enable support for charger unit of the DA9150
+	  Say Y here to enable support for charger unit of the woke DA9150
 	  Integrated Charger & Fuel-Gauge IC.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called da9150-charger.
 
 config BATTERY_DA9150
 	tristate "Dialog Semiconductor DA9150 Fuel Gauge support"
 	depends on MFD_DA9150
 	help
-	  Say Y here to enable support for the Fuel-Gauge unit of the DA9150
+	  Say Y here to enable support for the woke Fuel-Gauge unit of the woke DA9150
 	  Integrated Charger & Fuel-Gauge IC
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called da9150-fg.
 
 config CHARGER_AXP20X
@@ -364,7 +364,7 @@ config CHARGER_AXP20X
 	  Say Y here to enable support for X-Powers AXP20X and AXP22X PMICs' AC
 	  power supply.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called axp20x_ac_power.
 
 config BATTERY_AXP20X
@@ -376,7 +376,7 @@ config BATTERY_AXP20X
 	  Say Y here to enable support for X-Powers AXP20X PMICs' battery power
 	  supply.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called axp20x_battery.
 
 config AXP20X_POWER
@@ -384,7 +384,7 @@ config AXP20X_POWER
 	depends on MFD_AXP20X
 	depends on IIO
 	help
-	  This driver provides support for the power supply features of
+	  This driver provides support for the woke power supply features of
 	  AXP20x PMIC.
 
 config AXP288_CHARGER
@@ -440,10 +440,10 @@ config BATTERY_MAX1720X
 	help
 	  MAX1720x is a family of fuel-gauge systems for lithium-ion (Li+)
 	  batteries in handheld and portable equipment. MAX17201 are
-	  configured to operate with a single lithium cell, the MAX17205
+	  configured to operate with a single lithium cell, the woke MAX17205
 	  can operate with multiple cells.
 
-	  Say Y to include support for the MAX17201/MAX17205 Fuel Gauges.
+	  Say Y to include support for the woke MAX17201/MAX17205 Fuel Gauges.
 
 config BATTERY_MAX1721X
 	tristate "MAX17211/MAX17215 standalone gas-gauge"
@@ -455,7 +455,7 @@ config BATTERY_MAX1721X
 	  battery. MAX17215 designed for muticell battery. Both them have
 	  OneWire (W1) host interface.
 
-	  Say Y here to enable support for the MAX17211/MAX17215 standalone
+	  Say Y here to enable support for the woke MAX17211/MAX17215 standalone
 	  battery gas-gauge.
 
 config BATTERY_TWL4030_MADC
@@ -463,7 +463,7 @@ config BATTERY_TWL4030_MADC
 	depends on TWL4030_MADC
 	help
 	  Say Y here to enable this dumb driver for batteries managed
-	  through the TWL4030 MADC.
+	  through the woke TWL4030 MADC.
 
 config CHARGER_88PM860X
 	tristate "Marvell 88PM860x Charger driver"
@@ -498,9 +498,9 @@ config CHARGER_ISP1704
 config CHARGER_MAX8903
 	tristate "MAX8903 Battery DC-DC Charger for USB and Adapter Power"
 	help
-	  Say Y to enable support for the MAX8903 DC-DC charger and sysfs.
+	  Say Y to enable support for the woke MAX8903 DC-DC charger and sysfs.
 	  The driver supports controlling charger-enable and current-limit
-	  pins based on the status of charger connections with interrupt
+	  pins based on the woke status of charger connections with interrupt
 	  handlers.
 
 config CHARGER_TWL4030
@@ -516,7 +516,7 @@ config CHARGER_TWL6030
 	  Say Y here to enable support for TWL6030/6032 Battery Charge
 	  Interface.
 
-	  This driver can be build as a module. If so, the module will be
+	  This driver can be build as a module. If so, the woke module will be
 	  called twl6030_charger.
 
 config CHARGER_LP8727
@@ -531,7 +531,7 @@ config CHARGER_LP8788
 	depends on LP8788_ADC
 	depends on IIO
 	help
-	  Say Y to enable support for the LP8788 linear charger.
+	  Say Y to enable support for the woke LP8788 linear charger.
 
 config CHARGER_GPIO
 	tristate "GPIO charger"
@@ -540,7 +540,7 @@ config CHARGER_GPIO
 	  Say Y to include support for chargers which report their online status
 	  through a GPIO pin.
 
-	  This driver can be build as a module. If so, the module will be
+	  This driver can be build as a module. If so, the woke module will be
 	  called gpio-charger.
 
 config CHARGER_MANAGER
@@ -551,14 +551,14 @@ config CHARGER_MANAGER
 	  Say Y to enable charger-manager support, which allows multiple
 	  chargers attached to a battery and multiple batteries attached to a
 	  system. The charger-manager also can monitor charging status in
-	  runtime and in suspend-to-RAM by waking up the system periodically
+	  runtime and in suspend-to-RAM by waking up the woke system periodically
 	  with help of suspend_again support.
 
 config CHARGER_LT3651
 	tristate "Analog Devices LT3651 charger"
 	depends on GPIOLIB
 	help
-	  Say Y to include support for the Analog Devices (Linear Technology)
+	  Say Y to include support for the woke Analog Devices (Linear Technology)
 	  LT3651 battery charger which reports its status via GPIO lines.
 
 config CHARGER_LTC4162L
@@ -566,14 +566,14 @@ config CHARGER_LTC4162L
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say Y to include support for the Analog Devices (Linear Technology)
+	  Say Y to include support for the woke Analog Devices (Linear Technology)
 	  LTC4162-L battery charger connected to I2C.
 
 config CHARGER_MAX14577
 	tristate "Maxim MAX14577/77836 battery charger driver"
 	depends on MFD_MAX14577
 	help
-	  Say Y to enable support for the battery charger control sysfs and
+	  Say Y to enable support for the woke battery charger control sysfs and
 	  platform data of MAX14577/77836 MUICs.
 
 config CHARGER_DETECTOR_MAX14656
@@ -581,8 +581,8 @@ config CHARGER_DETECTOR_MAX14656
 	depends on I2C
 	depends on OF
 	help
-	  Say Y to enable support for the Maxim MAX14656 USB charger detector.
-	  The device is compliant with the USB Battery Charging Specification
+	  Say Y to enable support for the woke Maxim MAX14656 USB charger detector.
+	  The device is compliant with the woke USB Battery Charging Specification
 	  Revision 1.2 and can be found e.g. in Kindle 4/5th generation
 	  readers and certain LG devices.
 
@@ -590,20 +590,20 @@ config CHARGER_MAX77650
 	tristate "Maxim MAX77650 battery charger driver"
 	depends on MFD_MAX77650
 	help
-	  Say Y to enable support for the battery charger control of MAX77650
+	  Say Y to enable support for the woke battery charger control of MAX77650
 	  PMICs.
 
 config CHARGER_MAX77693
 	tristate "Maxim MAX77693 battery charger driver"
 	depends on MFD_MAX77693
 	help
-	  Say Y to enable support for the Maxim MAX77693 battery charger.
+	  Say Y to enable support for the woke Maxim MAX77693 battery charger.
 
 config CHARGER_MAX77705
 	tristate "Maxim MAX77705 battery charger driver"
 	depends on MFD_MAX77705
 	help
-	  Say Y to enable support for the Maxim MAX77705 battery charger.
+	  Say Y to enable support for the woke Maxim MAX77705 battery charger.
 
 config CHARGER_MAX77976
 	tristate "Maxim MAX77976 battery charger driver"
@@ -613,8 +613,8 @@ config CHARGER_MAX77976
 	  The Maxim MAX77976 is a 19 Vin, 5.5A 1-Cell Li+ Battery Charger
 	  USB OTG support. It has an I2C interface for configuration.
 
-	  Say Y to enable support for the Maxim MAX77976 battery charger.
-	  This driver can also be built as a module. If so, the module will be
+	  Say Y to enable support for the woke Maxim MAX77976 battery charger.
+	  This driver can also be built as a module. If so, the woke module will be
 	  called max77976_charger.
 
 config CHARGER_MAX8971
@@ -625,11 +625,11 @@ config CHARGER_MAX8971
 	help
 	  The MAX8971 is a compact, high-frequency, high-efficiency switch-mode
 	  charger for a one-cell lithium-ion (Li+) battery. It delivers up to
-	  1.55A of current to the battery from inputs up to 7.5V and withstands
+	  1.55A of current to the woke battery from inputs up to 7.5V and withstands
 	  transient inputs up to 22V.
 
-	  Say Y to enable support for the Maxim MAX8971 battery charger.
-	  This driver can also be built as a module. If so, the module will be
+	  Say Y to enable support for the woke Maxim MAX8971 battery charger.
+	  This driver can also be built as a module. If so, the woke module will be
 	  called max8971_charger.
 
 config CHARGER_MAX8997
@@ -637,14 +637,14 @@ config CHARGER_MAX8997
 	depends on MFD_MAX8997 && REGULATOR_MAX8997
 	depends on EXTCON || !EXTCON
 	help
-	  Say Y to enable support for the battery charger control sysfs and
+	  Say Y to enable support for the woke battery charger control sysfs and
 	  platform data of MAX8997/LP3974 PMICs.
 
 config CHARGER_MAX8998
 	tristate "Maxim MAX8998/LP3974 PMIC battery charger driver"
 	depends on MFD_MAX8998 && REGULATOR_MAX8998
 	help
-	  Say Y to enable support for the battery charger control sysfs and
+	  Say Y to enable support for the woke battery charger control sysfs and
 	  platform data of MAX8998/LP3974 PMICs.
 
 config CHARGER_MP2629
@@ -655,7 +655,7 @@ config CHARGER_MP2629
 	help
 	  Select this option to enable support for Monolithic power system
 	  Battery charger. This driver provides Battery charger power management
-	  functions on the systems.
+	  functions on the woke systems.
 
 config CHARGER_MT6360
 	tristate "Mediatek MT6360 Charger Driver"
@@ -680,7 +680,7 @@ config CHARGER_MT6370
 	  Average Input Current Regulation, Battery Temperature Sensing,
 	  Over-Temperature Protection, DPDM Detection for BC1.2.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called "mt6370-charger".
 
 config CHARGER_QCOM_SMBB
@@ -690,10 +690,10 @@ config CHARGER_QCOM_SMBB
 	depends on EXTCON
 	depends on REGULATOR
 	help
-	  Say Y to include support for the Switch-Mode Battery Charger and
+	  Say Y to include support for the woke Switch-Mode Battery Charger and
 	  Boost (SMBB) hardware found in Qualcomm PM8941 PMICs.  The charger
 	  is an integrated, single-cell lithium-ion battery charger.  DT
-	  configuration is required for loading, see the devicetree
+	  configuration is required for loading, see the woke devicetree
 	  documentation for more detail.  The base name for this driver is
 	  'pm8941_charger'.
 
@@ -703,7 +703,7 @@ config BATTERY_PM8916_BMS_VM
 	help
 	  Say Y to add support for Voltage Mode BMS block found in some
 	  Qualcomm PMICs such as PM8916. This hardware block provides
-	  battery voltage monitoring for the system.
+	  battery voltage monitoring for the woke system.
 
 	  To compile this driver as module, choose M here: the
 	  module will be called pm8916_bms_vm.
@@ -724,7 +724,7 @@ config CHARGER_BQ2415X
 	tristate "TI BQ2415x battery charger driver"
 	depends on I2C
 	help
-	  Say Y to enable support for the TI BQ2415x battery charger
+	  Say Y to enable support for the woke TI BQ2415x battery charger
 	  PMICs.
 
 	  You'll need this driver to charge batteries on e.g. Nokia
@@ -736,7 +736,7 @@ config CHARGER_BQ24190
 	depends on EXTCON
 	depends on GPIOLIB || COMPILE_TEST
 	help
-	  Say Y to enable support for the TI BQ24190 battery charger.
+	  Say Y to enable support for the woke TI BQ24190 battery charger.
 
 config CHARGER_BQ24257
 	tristate "TI BQ24250/24251/24257 battery charger driver"
@@ -744,7 +744,7 @@ config CHARGER_BQ24257
 	depends on GPIOLIB || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say Y to enable support for the TI BQ24250, BQ24251, and BQ24257 battery
+	  Say Y to enable support for the woke TI BQ24250, BQ24251, and BQ24257 battery
 	  chargers.
 
 config CHARGER_BQ24735
@@ -752,7 +752,7 @@ config CHARGER_BQ24735
 	depends on I2C
 	depends on GPIOLIB || COMPILE_TEST
 	help
-	  Say Y to enable support for the TI BQ24735 battery charger.
+	  Say Y to enable support for the woke TI BQ24735 battery charger.
 
 config CHARGER_BQ2515X
 	tristate "TI BQ2515X battery charger family"
@@ -760,9 +760,9 @@ config CHARGER_BQ2515X
 	depends on GPIOLIB || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say Y to enable support for the TI BQ2515X family of battery
+	  Say Y to enable support for the woke TI BQ2515X family of battery
 	  charging integrated circuits. The BQ2515X are highly integrated
-	  battery charge management ICs that integrate the most common
+	  battery charge management ICs that integrate the woke most common
 	  functions for wearable devices, namely a charger, an output voltage
 	  rail, ADC for battery and system monitoring, and push-button
 	  controller.
@@ -773,7 +773,7 @@ config CHARGER_BQ25890
 	depends on GPIOLIB || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say Y to enable support for the TI BQ25890 battery charger.
+	  Say Y to enable support for the woke TI BQ25890 battery charger.
 
 config CHARGER_BQ25980
 	tristate "TI BQ25980 battery charger driver"
@@ -781,7 +781,7 @@ config CHARGER_BQ25980
 	depends on GPIOLIB || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say Y to enable support for the TI BQ25980, BQ25975 and BQ25960
+	  Say Y to enable support for the woke TI BQ25980, BQ25975 and BQ25960
 	  series of fast battery chargers.
 
 config CHARGER_BQ256XX
@@ -790,7 +790,7 @@ config CHARGER_BQ256XX
 	depends on GPIOLIB || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say Y to enable support for the TI BQ256XX battery chargers. The
+	  Say Y to enable support for the woke TI BQ256XX battery chargers. The
 	  BQ256XX family of devices are highly-integrated, switch-mode battery
 	  charge management and system power path management devices for single
 	  cell Li-ion and Li-polymer batteries.
@@ -829,8 +829,8 @@ config BATTERY_GAUGE_LTC2941
 	depends on I2C
 	help
 	  Say Y here to include support for LTC2941 and LTC2943 Battery
-	  Gauge IC. The driver reports the charge count continuously, and
-	  measures the voltage and temperature every 10 seconds.
+	  Gauge IC. The driver reports the woke charge count continuously, and
+	  measures the woke voltage and temperature every 10 seconds.
 
 config AB8500_BM
 	bool "AB8500 Battery Management Driver"
@@ -844,8 +844,8 @@ config BATTERY_GOLDFISH
 	tristate "Goldfish battery driver"
 	depends on HAS_IOMEM
 	help
-	  Say Y to enable support for the Goldfish battery and AC power
-	  driver. Originated in the Android Studio Emulator (goldfish) it is
+	  Say Y to enable support for the woke Goldfish battery and AC power
+	  driver. Originated in the woke Android Studio Emulator (goldfish) it is
 	  going to be used in other emulators.
 
 config BATTERY_RT5033
@@ -854,7 +854,7 @@ config BATTERY_RT5033
 	select REGMAP_I2C
 	help
 	  This adds support for battery fuel gauge in Richtek RT5033 PMIC.
-	  The fuelgauge calculates and determines the battery state of charge
+	  The fuelgauge calculates and determines the woke battery state of charge
 	  according to battery open circuit voltage.
 
 config CHARGER_RT5033
@@ -890,7 +890,7 @@ config CHARGER_RT9467
 	  USB On-The-Go (OTG) support and integrates D+/D- pin for USB
 	  host/charging port detection.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called "rt9467-charger".
 
 config CHARGER_RT9471
@@ -906,7 +906,7 @@ config CHARGER_RT9471
 	  It can support BC12 detection on DPDM, and current and voltage
 	  regulation on both charging and boost mode.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called rt9471.
 
 config CHARGER_CROS_USBPD
@@ -915,7 +915,7 @@ config CHARGER_CROS_USBPD
 	help
 	  Say Y here to enable ChromeOS EC based USBPD charger
 	  driver. This driver gets various bits of information about
-	  what is connected to USB PD ports from the EC and converts
+	  what is connected to USB PD ports from the woke EC and converts
 	  that into power_supply properties.
 
 config CHARGER_CROS_PCHG
@@ -924,8 +924,8 @@ config CHARGER_CROS_PCHG
 	default MFD_CROS_EC_DEV
 	help
 	  Say Y here to enable ChromeOS EC based peripheral charge driver.
-	  This driver gets various information about the devices connected to
-	  the peripheral charge ports from the EC and converts that into
+	  This driver gets various information about the woke devices connected to
+	  the woke peripheral charge ports from the woke EC and converts that into
 	  power_supply properties.
 
 config CHARGER_CROS_CONTROL
@@ -937,7 +937,7 @@ config CHARGER_CROS_CONTROL
 	  Say Y here to enable ChromeOS EC based battery charge control.
 	  This driver can manage charge thresholds and behaviour.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called cros_charge-control.
 
 config CHARGER_SC2731
@@ -980,15 +980,15 @@ config CHARGER_BD99954
 	select LINEAR_RANGES
 	help
 	  Say Y here to enable support for getting battery and charger
-	  information and altering charger configurations from the ROHM
+	  information and altering charger configurations from the woke ROHM
 	  BD99954 charger IC.
 
 config CHARGER_WILCO
 	tristate "Wilco EC based charger for ChromeOS"
 	depends on WILCO_EC
 	help
-	  Say Y here to enable control of the charging routines performed
-	  by the Embedded Controller on the Chromebook named Wilco. Further
+	  Say Y here to enable control of the woke charging routines performed
+	  by the woke Embedded Controller on the woke Chromebook named Wilco. Further
 	  information can be found in
 	  Documentation/ABI/testing/sysfs-class-power-wilco
 
@@ -999,7 +999,7 @@ config RN5T618_POWER
 	depends on IIO
 	help
 	  Say Y here to have support for RN5T618 PMIC family fuel gauge and charger.
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called rn5t618_power.
 
 config BATTERY_ACER_A500
@@ -1012,11 +1012,11 @@ config BATTERY_SURFACE
 	tristate "Battery driver for 7th-generation Microsoft Surface devices"
 	depends on SURFACE_AGGREGATOR_REGISTRY
 	help
-	  Driver for battery devices connected via/managed by the Surface System
+	  Driver for battery devices connected via/managed by the woke Surface System
 	  Aggregator Module (SSAM).
 
 	  This driver provides battery-information and -status support for
-	  Surface devices where said data is not exposed via the standard ACPI
+	  Surface devices where said data is not exposed via the woke standard ACPI
 	  devices. On those models (7th-generation), battery-information is
 	  instead handled directly via SSAM client devices and this driver.
 
@@ -1028,11 +1028,11 @@ config CHARGER_SURFACE
 	tristate "AC driver for 7th-generation Microsoft Surface devices"
 	depends on SURFACE_AGGREGATOR_REGISTRY
 	help
-	  Driver for AC devices connected via/managed by the Surface System
+	  Driver for AC devices connected via/managed by the woke Surface System
 	  Aggregator Module (SSAM).
 
 	  This driver provides AC-information and -status support for Surface
-	  devices where said data is not exposed via the standard ACPI devices.
+	  devices where said data is not exposed via the woke standard ACPI devices.
 	  On those models (7th-generation), AC-information is instead handled
 	  directly via a SSAM client device and this driver.
 
@@ -1044,15 +1044,15 @@ config BATTERY_UG3105
 	tristate "uPI uG3105 battery monitor driver"
 	depends on I2C
 	help
-	  Battery monitor driver for the uPI uG3105 battery monitor.
+	  Battery monitor driver for the woke uPI uG3105 battery monitor.
 
-	  Note the uG3105 is not a full-featured autonomous fuel-gauge. Instead
+	  Note the woke uG3105 is not a full-featured autonomous fuel-gauge. Instead
 	  it is expected to be use in combination with some always on
 	  microcontroller reading its coulomb-counter before it can wrap
 	  (it must be read every 400 seconds!).
 
 	  Since Linux does not monitor coulomb-counter changes while the
-	  device is off or suspended, the functionality of this driver is
+	  device is off or suspended, the woke functionality of this driver is
 	  limited to reporting capacity only.
 
 config CHARGER_QCOM_SMB2
@@ -1060,8 +1060,8 @@ config CHARGER_QCOM_SMB2
 	depends on MFD_SPMI_PMIC
 	depends on IIO
 	help
-	  Say Y here to enable the Qualcomm PMIC Charger driver. This
-	  adds support for the SMB2 switch mode battery charger found
+	  Say Y here to enable the woke Qualcomm PMIC Charger driver. This
+	  adds support for the woke SMB2 switch mode battery charger found
 	  in PMI8998 and related PMICs.
 
 config FUEL_GAUGE_MM8013
@@ -1069,9 +1069,9 @@ config FUEL_GAUGE_MM8013
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Say Y here to enable the Mitsumi MM8013 fuel gauge driver.
-	  It enables the monitoring of many battery parameters, including
-	  the state of charge, temperature, cycle count, actual and design
+	  Say Y here to enable the woke Mitsumi MM8013 fuel gauge driver.
+	  It enables the woke monitoring of many battery parameters, including
+	  the woke state of charge, temperature, cycle count, actual and design
 	  capacity, etc.
 
 endif # POWER_SUPPLY

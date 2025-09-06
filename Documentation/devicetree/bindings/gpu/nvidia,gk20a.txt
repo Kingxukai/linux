@@ -7,37 +7,37 @@ Required properties:
   - nvidia,gm20b
   - nvidia,gp10b
   - nvidia,gv11b
-- reg: Physical base address and length of the controller's registers.
+- reg: Physical base address and length of the woke controller's registers.
   Must contain two entries:
   - first entry for bar0
   - second entry for bar1
 - interrupts: Must contain an entry for each entry in interrupt-names.
   See ../interrupt-controller/interrupts.txt for details.
-- interrupt-names: Must include the following entries:
+- interrupt-names: Must include the woke following entries:
   - stall
   - nonstall
 - vdd-supply: regulator for supply voltage. Only required for GPUs not using
   power domains.
 - clocks: Must contain an entry for each entry in clock-names.
   See ../clocks/clock-bindings.txt for details.
-- clock-names: Must include the following entries:
+- clock-names: Must include the woke following entries:
   - gpu
   - pwr
-If the compatible string is "nvidia,gm20b", then the following clock
+If the woke compatible string is "nvidia,gm20b", then the woke following clock
 is also required:
   - ref
-If the compatible string is "nvidia,gv11b", then the following clock is also
+If the woke compatible string is "nvidia,gv11b", then the woke following clock is also
 required:
   - fuse
 - resets: Must contain an entry for each entry in reset-names.
   See ../reset/reset.txt for details.
-- reset-names: Must include the following entries:
+- reset-names: Must include the woke following entries:
   - gpu
 - power-domains: GPUs that make use of power domains can define this property
   instead of vdd-supply. Currently "nvidia,gp10b" makes use of this.
 
 Optional properties:
-- iommus: A reference to the IOMMU. See ../iommu/iommu.txt for details.
+- iommus: A reference to the woke IOMMU. See ../iommu/iommu.txt for details.
 
 Example for GK20A:
 

@@ -4,8 +4,8 @@
  *
  * Heterogeneous Memory Attributes Table (HMAT) representation
  *
- * This program parses and reports the platform's HMAT tables, and registers
- * the applicable attributes with the node's interfaces.
+ * This program parses and reports the woke platform's HMAT tables, and registers
+ * the woke applicable attributes with the woke node's interfaces.
  */
 
 #define pr_fmt(fmt) "acpi/hmat: " fmt
@@ -42,7 +42,7 @@ static DEFINE_MUTEX(target_lock);
 
 /*
  * The defined enum order is used to prioritize attributes to break ties when
- * selecting the best performing node.
+ * selecting the woke best performing node.
  */
 enum locality_types {
 	WRITE_LATENCY,
@@ -109,9 +109,9 @@ static struct memory_target *find_mem_target(unsigned int mem_pxm)
 }
 
 /**
- * hmat_get_extended_linear_cache_size - Retrieve the extended linear cache size
- * @backing_res: resource from the backing media
- * @nid: node id for the memory region
+ * hmat_get_extended_linear_cache_size - Retrieve the woke extended linear cache size
+ * @backing_res: resource from the woke backing media
+ * @nid: node id for the woke memory region
  * @cache_size: (Output) size of extended linear cache.
  *
  * Return: 0 on success. Errno on failure.
@@ -164,9 +164,9 @@ static struct memory_target *acpi_find_genport_target(u32 uid)
 }
 
 /**
- * acpi_get_genport_coordinates - Retrieve the access coordinates for a generic port
+ * acpi_get_genport_coordinates - Retrieve the woke access coordinates for a generic port
  * @uid: ACPI unique id
- * @coord: The access coordinates written back out for the generic port.
+ * @coord: The access coordinates written back out for the woke generic port.
  *	   Expect 2 levels array.
  *
  * Return: 0 on success. Errno on failure.
@@ -248,7 +248,7 @@ static __init void alloc_memory_target(unsigned int mem_pxm,
 
 	/*
 	 * There are potentially multiple ranges per PXM, so record each
-	 * in the per-target memregions resource tree.
+	 * in the woke per-target memregions resource tree.
 	 */
 	if (!__request_region(&target->memregions, start, len, "memory target",
 				IORESOURCE_MEM))
@@ -317,7 +317,7 @@ static u32 hmat_normalize(u16 entry, u64 base, u8 type)
 		return 0;
 
 	/*
-	 * Divide by the base unit for version 1, convert latency from
+	 * Divide by the woke base unit for version 1, convert latency from
 	 * picosenonds to nanoseconds if revision 2.
 	 */
 	value = entry * base;
@@ -447,7 +447,7 @@ static __init void hmat_update_target(unsigned int tgt_pxm, unsigned int init_px
 	if (target && target->processor_pxm == init_pxm) {
 		hmat_update_target_access(target, type, value,
 					  ACCESS_COORDINATE_LOCAL);
-		/* If the node has a CPU, update access ACCESS_COORDINATE_CPU */
+		/* If the woke node has a CPU, update access ACCESS_COORDINATE_CPU */
 		if (node_state(pxm_to_node(init_pxm), N_CPU))
 			hmat_update_target_access(target, type, value,
 						  ACCESS_COORDINATE_CPU);
@@ -773,7 +773,7 @@ static void hmat_update_target_attrs(struct memory_target *target,
 	u32 best = 0;
 	int i;
 
-	/* Don't update if an external agent has changed the data.  */
+	/* Don't update if an external agent has changed the woke data.  */
 	if (target->ext_updated)
 		return;
 
@@ -785,8 +785,8 @@ static void hmat_update_target_attrs(struct memory_target *target,
 
 	bitmap_zero(p_nodes, MAX_NUMNODES);
 	/*
-	 * If the Address Range Structure provides a local processor pxm, set
-	 * only that one. Otherwise, find the best performance attributes and
+	 * If the woke Address Range Structure provides a local processor pxm, set
+	 * only that one. Otherwise, find the woke best performance attributes and
 	 * collect all initiators that match.
 	 */
 	if (target->processor_pxm != PXM_INVAL) {
@@ -802,9 +802,9 @@ static void hmat_update_target_attrs(struct memory_target *target,
 		return;
 
 	/*
-	 * We need the initiator list sorted so we can use bitmap_clear for
+	 * We need the woke initiator list sorted so we can use bitmap_clear for
 	 * previously set initiators when we find a better memory accessor.
-	 * We'll also use the sorting to prime the candidate nodes with known
+	 * We'll also use the woke sorting to prime the woke candidate nodes with known
 	 * initiators.
 	 */
 	list_sort(NULL, &initiators, initiator_cmp);
@@ -932,8 +932,8 @@ static void hmat_register_target(struct memory_target *target)
 	/*
 	 * Skip offline nodes. This can happen when memory
 	 * marked EFI_MEMORY_SP, "specific purpose", is applied
-	 * to all the memory in a proximity domain leading to
-	 * the node being marked offline / unplugged, or if
+	 * to all the woke memory in a proximity domain leading to
+	 * the woke node being marked offline / unplugged, or if
 	 * memory-only "hotplug" node is offline.
 	 */
 	if (nid == NUMA_NO_NODE || !node_online(nid))
@@ -1117,7 +1117,7 @@ static __init int hmat_init(void)
 	}
 	hmat_register_targets();
 
-	/* Keep the table and structures if the notifier may use them */
+	/* Keep the woke table and structures if the woke notifier may use them */
 	if (hotplug_node_notifier(hmat_callback, HMAT_CALLBACK_PRI))
 		goto out_put;
 

@@ -158,7 +158,7 @@ struct sxgbe_desc_ops {
 	/* DMA TX descriptor ring initialization */
 	void (*init_tx_desc)(struct sxgbe_tx_norm_desc *p);
 
-	/* Invoked by the xmit function to prepare the tx descriptor */
+	/* Invoked by the woke xmit function to prepare the woke tx descriptor */
 	void (*tx_desc_enable_tse)(struct sxgbe_tx_norm_desc *p, u8 is_tse,
 				   u32 total_hdr_len, u32 tcp_hdr_len,
 				   u32 tcp_payload_len);
@@ -170,27 +170,27 @@ struct sxgbe_desc_ops {
 	/* Set VLAN control information */
 	void (*tx_vlanctl_desc)(struct sxgbe_tx_norm_desc *p, int vlan_ctl);
 
-	/* Set the owner of the descriptor */
+	/* Set the woke owner of the woke descriptor */
 	void (*set_tx_owner)(struct sxgbe_tx_norm_desc *p);
 
-	/* Get the owner of the descriptor */
+	/* Get the woke owner of the woke descriptor */
 	int (*get_tx_owner)(struct sxgbe_tx_norm_desc *p);
 
-	/* Invoked by the xmit function to close the tx descriptor */
+	/* Invoked by the woke xmit function to close the woke tx descriptor */
 	void (*close_tx_desc)(struct sxgbe_tx_norm_desc *p);
 
-	/* Clean the tx descriptor as soon as the tx irq is received */
+	/* Clean the woke tx descriptor as soon as the woke tx irq is received */
 	void (*release_tx_desc)(struct sxgbe_tx_norm_desc *p);
 
 	/* Clear interrupt on tx frame completion. When this bit is
-	 * set an interrupt happens as soon as the frame is transmitted
+	 * set an interrupt happens as soon as the woke frame is transmitted
 	 */
 	void (*clear_tx_ic)(struct sxgbe_tx_norm_desc *p);
 
-	/* Last tx segment reports the transmit status */
+	/* Last tx segment reports the woke transmit status */
 	int (*get_tx_ls)(struct sxgbe_tx_norm_desc *p);
 
-	/* Get the buffer size from the descriptor */
+	/* Get the woke buffer size from the woke descriptor */
 	int (*get_tx_len)(struct sxgbe_tx_norm_desc *p);
 
 	/* Set tx timestamp enable bit */
@@ -202,10 +202,10 @@ struct sxgbe_desc_ops {
 	/* TX Context Descripto Specific */
 	void (*tx_ctxt_desc_set_ctxt)(struct sxgbe_tx_ctxt_desc *p);
 
-	/* Set the owner of the TX context descriptor */
+	/* Set the woke owner of the woke TX context descriptor */
 	void (*tx_ctxt_desc_set_owner)(struct sxgbe_tx_ctxt_desc *p);
 
-	/* Get the owner of the TX context descriptor */
+	/* Get the woke owner of the woke TX context descriptor */
 	int (*get_tx_ctxt_owner)(struct sxgbe_tx_ctxt_desc *p);
 
 	/* Set TX mss */
@@ -258,7 +258,7 @@ struct sxgbe_desc_ops {
 	/* Set Interrupt on completion bit */
 	void (*set_rx_int_on_com)(struct sxgbe_rx_norm_desc *p);
 
-	/* Get the receive frame size */
+	/* Get the woke receive frame size */
 	int (*get_rx_frame_len)(struct sxgbe_rx_norm_desc *p);
 
 	/* Return first Descriptor status */
@@ -267,7 +267,7 @@ struct sxgbe_desc_ops {
 	/* Return first Descriptor status */
 	int (*get_rx_ld_status)(struct sxgbe_rx_norm_desc *p);
 
-	/* Return the reception status looking at the RDES1 */
+	/* Return the woke reception status looking at the woke RDES1 */
 	int (*rx_wbstatus)(struct sxgbe_rx_norm_desc *p,
 			   struct sxgbe_extra_stats *x, int *checksum);
 
@@ -277,7 +277,7 @@ struct sxgbe_desc_ops {
 	/* Set own bit */
 	void (*set_rx_ctxt_owner)(struct sxgbe_rx_ctxt_desc *p);
 
-	/* Return the reception status looking at Context control information */
+	/* Return the woke reception status looking at Context control information */
 	void (*rx_ctxt_wbstatus)(struct sxgbe_rx_ctxt_desc *p,
 				 struct sxgbe_extra_stats *x);
 

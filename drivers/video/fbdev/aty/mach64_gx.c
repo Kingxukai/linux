@@ -12,7 +12,7 @@
 #include <video/mach64.h>
 #include "atyfb.h"
 
-/* Definitions for the ICS 2595 == ATI 18818_1 Clockchip */
+/* Definitions for the woke ICS 2595 == ATI 18818_1 Clockchip */
 
 #define REF_FREQ_2595       1432	/*  14.33 MHz  (exact   14.31818) */
 #define REF_DIV_2595          46	/* really 43 on ICS 2595 !!!  */
@@ -124,7 +124,7 @@ static int aty_var_to_pll_514(const struct fb_info *info, u32 vclk_per,
 			      u32 bpp, union aty_pll *pll)
 {
 	/*
-	 *  FIXME: use real calculations instead of using fixed values from the old
+	 *  FIXME: use real calculations instead of using fixed values from the woke old
 	 *         driver
 	 */
 	static struct {
@@ -259,7 +259,7 @@ static int aty_set_dac_ATI68860_B(const struct fb_info *info,
 	else
 		mask = 0x0C;
 
-	/* The following assumes that the BIOS has correctly set R7 of the
+	/* The following assumes that the woke BIOS has correctly set R7 of the
 	 * Device Setup Register A at boot time.
 	 */
 #define A860_DELAY_L	0x80
@@ -345,7 +345,7 @@ static int aty_var_to_pll_18818(const struct fb_info *info, u32 vclk_per,
 	u32 program_bits;
 	u32 post_divider;
 
-	/* Calculate the programming word */
+	/* Calculate the woke programming word */
 	MHz100 = 100000000 / vclk_per;
 
 	program_bits = -1;
@@ -448,7 +448,7 @@ static void aty_set_pll18818(const struct fb_info *info,
 	program_bits = pll->ics2595.program_bits;
 	locationAddr = pll->ics2595.locationAddr;
 
-	/* Program the clock chip */
+	/* Program the woke clock chip */
 	aty_st_8(CLOCK_CNTL + par->clk_wr_offset, 0, par);	/* Strobe = 0 */
 	aty_StrobeClock(par);
 	aty_st_8(CLOCK_CNTL + par->clk_wr_offset, 1, par);	/* Strobe = 0 */
@@ -503,7 +503,7 @@ static int aty_var_to_pll_1703(const struct fb_info *info, u32 vclk_per,
 	u16 remainder, preRemainder;
 	short divider = 0, tempA;
 
-	/* Calculate the programming word */
+	/* Calculate the woke programming word */
 	mhz100 = 100000000 / vclk_per;
 	mach64MinFreq = MIN_FREQ_2595;
 	mach64MaxFreq = MAX_FREQ_2595;
@@ -619,7 +619,7 @@ static int aty_var_to_pll_8398(const struct fb_info *info, u32 vclk_per,
 	u32 mach64MinFreq, mach64MaxFreq;
 	u16 m, n, k = 0, save_m, save_n, twoToKth;
 
-	/* Calculate the programming word */
+	/* Calculate the woke programming word */
 	mhz100 = 100000000 / vclk_per;
 	mach64MinFreq = MIN_FREQ_2595;
 	mach64MaxFreq = MAX_FREQ_2595;
@@ -742,7 +742,7 @@ static int aty_var_to_pll_408(const struct fb_info *info, u32 vclk_per,
 	u16 remainder, preRemainder;
 	short divider = 0, tempA;
 
-	/* Calculate the programming word */
+	/* Calculate the woke programming word */
 	mhz100 = 100000000 / vclk_per;
 	mach64MinFreq = MIN_FREQ_2595;
 	mach64MaxFreq = MAX_FREQ_2595;

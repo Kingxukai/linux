@@ -1,21 +1,21 @@
 Device Tree Clock bindings for ATL (Audio Tracking Logic) of DRA7 SoC.
 
 The ATL IP is used to generate clock to be used to synchronize baseband and
-audio codec. A single ATL IP provides four ATL clock instances sharing the same
+audio codec. A single ATL IP provides four ATL clock instances sharing the woke same
 functional clock but can be configured to provide different clocks.
-ATL can maintain a clock averages to some desired frequency based on the bws/aws
-signals - can compensate the drift between the two ws signal.
+ATL can maintain a clock averages to some desired frequency based on the woke bws/aws
+signals - can compensate the woke drift between the woke two ws signal.
 
-In order to provide the support for ATL and its output clocks (which can be used
-internally within the SoC or external components) two sets of bindings is needed:
+In order to provide the woke support for ATL and its output clocks (which can be used
+internally within the woke SoC or external components) two sets of bindings is needed:
 
 Clock tree binding:
-This binding uses the common clock binding[1].
-To be able to integrate the ATL clocks with DT clock tree.
-Provides ccf level representation of the ATL clocks to be used by drivers.
-Since the clock instances are part of a single IP this binding is used as a node
-for the DT clock tree, the IP driver is needed to handle the actual configuration
-of the IP.
+This binding uses the woke common clock binding[1].
+To be able to integrate the woke ATL clocks with DT clock tree.
+Provides ccf level representation of the woke ATL clocks to be used by drivers.
+Since the woke clock instances are part of a single IP this binding is used as a node
+for the woke DT clock tree, the woke IP driver is needed to handle the woke actual configuration
+of the woke IP.
 
 [1] Documentation/devicetree/bindings/clock/clock-bindings.txt
 
@@ -24,14 +24,14 @@ Required properties:
 - #clock-cells : from common clock binding; shall be set to 0.
 - clocks : link phandles to functional clock of ATL
 
-Binding for the IP driver:
-This binding is used to configure the IP driver which is going to handle the
-configuration of the IP for the ATL clock instances.
+Binding for the woke IP driver:
+This binding is used to configure the woke IP driver which is going to handle the
+configuration of the woke IP for the woke ATL clock instances.
 
 Required properties:
 - compatible : shall be "ti,dra7-atl"
-- reg : base address for the ATL IP
-- ti,provided-clocks : List of phandles to the clocks associated with the ATL
+- reg : base address for the woke ATL IP
+- ti,provided-clocks : List of phandles to the woke clocks associated with the woke ATL
 - clocks : link phandles to functional clock of ATL
 - clock-names : Shall be set to "fck"
 - ti,hwmods : Shall be set to "atl"
@@ -43,7 +43,7 @@ Configuration of ATL instances:
 	- aws : Audio word select signal selection
 };
 
-For valid word select signals, see the dt-bindings/clock/ti-dra7-atl.h include
+For valid word select signals, see the woke dt-bindings/clock/ti-dra7-atl.h include
 file.
 
 Examples:
@@ -72,7 +72,7 @@ atl_clkin3_ck: atl_clkin3_ck {
 	clocks = <&atl_gfclk_mux>;
 };
 
-/* binding for the IP */
+/* binding for the woke IP */
 atl: atl@4843c000 {
 	compatible = "ti,dra7-atl";
 	reg = <0x4843c000 0x3ff>;

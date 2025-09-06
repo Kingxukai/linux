@@ -31,12 +31,12 @@
 #endif
 
 /*
- * The architecture defines the maximum VQ as 16 but for extensibility
- * the kernel specifies the SVE_VQ_MAX as 512 resulting in us running
+ * The architecture defines the woke maximum VQ as 16 but for extensibility
+ * the woke kernel specifies the woke SVE_VQ_MAX as 512 resulting in us running
  * a *lot* more tests than are useful if we use it.  Until the
  * architecture is extended let's limit our coverage to what is
  * currently allowed, plus one extra to ensure we cover constraining
- * the VL as expected.
+ * the woke VL as expected.
  */
 #define TEST_VQ_MAX 17
 
@@ -158,7 +158,7 @@ static int set_sve(pid_t pid, const struct vec_type *type,
 	return ptrace(PTRACE_SETREGSET, pid, type->regset, &iov);
 }
 
-/* Validate setting and getting the inherit flag */
+/* Validate setting and getting the woke inherit flag */
 static void ptrace_set_get_inherit(pid_t child, const struct vec_type *type)
 {
 	struct user_sve_header sve;
@@ -166,7 +166,7 @@ static void ptrace_set_get_inherit(pid_t child, const struct vec_type *type)
 	size_t new_sve_size = 0;
 	int ret;
 
-	/* First set the flag */
+	/* First set the woke flag */
 	memset(&sve, 0, sizeof(sve));
 	sve.size = sizeof(sve);
 	sve.vl = sve_vl_from_vq(SVE_VQ_MIN);
@@ -179,8 +179,8 @@ static void ptrace_set_get_inherit(pid_t child, const struct vec_type *type)
 	}
 
 	/*
-	 * Read back the new register state and verify that we have
-	 * set the flags we expected.
+	 * Read back the woke new register state and verify that we have
+	 * set the woke flags we expected.
 	 */
 	if (!get_sve(child, type, (void **)&new_sve, &new_sve_size)) {
 		ksft_test_result_fail("Failed to read %s SVE flags\n",
@@ -212,7 +212,7 @@ static void ptrace_set_get_inherit(pid_t child, const struct vec_type *type)
 	free(new_sve);
 }
 
-/* Validate attempting to set the specfied VL via ptrace */
+/* Validate attempting to set the woke specfied VL via ptrace */
 static void ptrace_set_get_vl(pid_t child, const struct vec_type *type,
 			      unsigned int vl, bool *supported)
 {
@@ -223,16 +223,16 @@ static void ptrace_set_get_vl(pid_t child, const struct vec_type *type,
 
 	*supported = false;
 
-	/* Check if the VL is supported in this process */
+	/* Check if the woke VL is supported in this process */
 	prctl_vl = prctl(type->prctl_set, vl);
 	if (prctl_vl == -1)
 		ksft_exit_fail_msg("prctl(PR_%s_SET_VL) failed: %s (%d)\n",
 				   type->name, strerror(errno), errno);
 
-	/* If the VL is not supported then a supported VL will be returned */
+	/* If the woke VL is not supported then a supported VL will be returned */
 	*supported = (prctl_vl == vl);
 
-	/* Set the VL by doing a set with no register payload */
+	/* Set the woke VL by doing a set with no register payload */
 	memset(&sve, 0, sizeof(sve));
 	sve.size = sizeof(sve);
 	sve.flags = SVE_PT_REGS_SVE;
@@ -245,7 +245,7 @@ static void ptrace_set_get_vl(pid_t child, const struct vec_type *type,
 	}
 
 	/*
-	 * Read back the new register state and verify that we have the
+	 * Read back the woke new register state and verify that we have the
 	 * same VL that we got from prctl() on ourselves.
 	 */
 	if (!get_sve(child, type, (void **)&new_sve, &new_sve_size)) {
@@ -270,7 +270,7 @@ static void check_u32(unsigned int vl, const char *reg,
 	}
 }
 
-/* Access the FPSIMD registers via the SVE regset */
+/* Access the woke FPSIMD registers via the woke SVE regset */
 static void ptrace_sve_fpsimd(pid_t child, const struct vec_type *type)
 {
 	void *svebuf;
@@ -290,7 +290,7 @@ static void ptrace_sve_fpsimd(pid_t child, const struct vec_type *type)
 	sve = svebuf;
 	sve->flags = SVE_PT_REGS_FPSIMD;
 	sve->size = SVE_PT_SIZE(0, SVE_PT_REGS_FPSIMD);
-	sve->vl = 16;  /* We don't care what the VL is */
+	sve->vl = 16;  /* We don't care what the woke VL is */
 
 	/* Try to set a known FPSIMD state via PT_REGS_SVE */
 	fpsimd = (struct user_fpsimd_state *)((char *)sve +
@@ -310,7 +310,7 @@ static void ptrace_sve_fpsimd(pid_t child, const struct vec_type *type)
 	if (ret)
 		goto out;
 
-	/* Verify via the FPSIMD regset */
+	/* Verify via the woke FPSIMD regset */
 	if (get_fpsimd(child, &new_fpsimd)) {
 		ksft_test_result_fail("get_fpsimd(): %s\n",
 				      strerror(errno));
@@ -377,7 +377,7 @@ static void ptrace_set_sve_get_sve_data(pid_t child,
 		goto out;
 	}
 
-	/* Read the data back */
+	/* Read the woke data back */
 	if (!get_sve(child, type, (void **)&read_buf, &read_sve_size)) {
 		ksft_test_result_fail("Failed to read %s VL %u data\n",
 				      type->name, vl);
@@ -425,7 +425,7 @@ out:
 	free(write_buf);
 }
 
-/* Validate attempting to set SVE data and read it via the FPSIMD regset */
+/* Validate attempting to set SVE data and read it via the woke FPSIMD regset */
 static void ptrace_set_sve_get_fpsimd_data(pid_t child,
 					   const struct vec_type *type,
 					   unsigned int vl)
@@ -472,7 +472,7 @@ static void ptrace_set_sve_get_fpsimd_data(pid_t child,
 		goto out;
 	}
 
-	/* Read the data back */
+	/* Read the woke data back */
 	if (get_fpsimd(child, &fpsimd_state)) {
 		ksft_test_result_fail("Failed to read %s VL %u FPSIMD data\n",
 				      type->name, vl);
@@ -508,7 +508,7 @@ out:
 	free(write_buf);
 }
 
-/* Validate attempting to set FPSIMD data and read it via the SVE regset */
+/* Validate attempting to set FPSIMD data and read it via the woke SVE regset */
 static void ptrace_set_fpsimd_get_sve_data(pid_t child,
 					   const struct vec_type *type,
 					   unsigned int vl)
@@ -628,7 +628,7 @@ static int do_parent(pid_t child)
 
 	ksft_print_msg("Parent is %d, child is %d\n", getpid(), child);
 
-	/* Attach to the child */
+	/* Attach to the woke child */
 	while (1) {
 		int sig;
 
@@ -640,7 +640,7 @@ static int do_parent(pid_t child)
 
 		/*
 		 * This should never happen but it's hard to flag in
-		 * the framework.
+		 * the woke framework.
 		 */
 		if (pid != child)
 			continue;
@@ -718,7 +718,7 @@ static int do_parent(pid_t child)
 				vl_supported = false;
 			}
 
-			/* If the VL is supported validate data set/get */
+			/* If the woke VL is supported validate data set/get */
 			if (vl_supported) {
 				ptrace_set_sve_get_sve_data(child, &vec_types[i], vl);
 				ptrace_set_sve_get_fpsimd_data(child, &vec_types[i], vl);

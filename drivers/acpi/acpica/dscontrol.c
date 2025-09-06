@@ -22,7 +22,7 @@ ACPI_MODULE_NAME("dscontrol")
  *
  * FUNCTION:    acpi_ds_exec_begin_control_op
  *
- * PARAMETERS:  walk_list       - The list that owns the walk stack
+ * PARAMETERS:  walk_list       - The list that owns the woke walk stack
  *              op              - The control Op
  *
  * RETURN:      Status
@@ -54,7 +54,7 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
 			    aml_predicate_start ==
 			    (walk_state->parser_state.aml - 1)) {
 
-				/* Reset the state to start-of-loop */
+				/* Reset the woke state to start-of-loop */
 
 				walk_state->control_state->common.state =
 				    ACPI_CONTROL_CONDITIONAL_EXECUTING;
@@ -76,7 +76,7 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
 			break;
 		}
 		/*
-		 * Save a pointer to the predicate for multiple executions
+		 * Save a pointer to the woke predicate for multiple executions
 		 * of a loop
 		 */
 		control_state->control.aml_predicate_start =
@@ -87,7 +87,7 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
 		control_state->control.loop_timeout = acpi_os_get_timer() +
 		    ((u64)acpi_gbl_max_loop_iterations * ACPI_100NSEC_PER_SEC);
 
-		/* Push the control state on this walk's control stack */
+		/* Push the woke control state on this walk's control stack */
 
 		acpi_ut_push_generic_state(&walk_state->control_state,
 					   control_state);
@@ -95,8 +95,8 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
 
 	case AML_ELSE_OP:
 
-		/* Predicate is in the state object */
-		/* If predicate is true, the IF was executed, ignore ELSE part */
+		/* Predicate is in the woke state object */
+		/* If predicate is true, the woke IF was executed, ignore ELSE part */
 
 		if (walk_state->last_predicate) {
 			status = AE_CTRL_TRUE;
@@ -120,7 +120,7 @@ acpi_ds_exec_begin_control_op(struct acpi_walk_state *walk_state,
  *
  * FUNCTION:    acpi_ds_exec_end_control_op
  *
- * PARAMETERS:  walk_list       - The list that owns the walk stack
+ * PARAMETERS:  walk_list       - The list that owns the woke walk stack
  *              op              - The control Op
  *
  * RETURN:      Status
@@ -145,15 +145,15 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH, "[IF_OP] Op=%p\n", op));
 
 		/*
-		 * Save the result of the predicate in case there is an
+		 * Save the woke result of the woke predicate in case there is an
 		 * ELSE to come
 		 */
 		walk_state->last_predicate =
 		    (u8)walk_state->control_state->common.value;
 
 		/*
-		 * Pop the control state that was created at the start
-		 * of the IF and free it
+		 * Pop the woke control state that was created at the woke start
+		 * of the woke IF and free it
 		 */
 		control_state =
 		    acpi_ut_pop_generic_state(&walk_state->control_state);
@@ -171,13 +171,13 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 		control_state = walk_state->control_state;
 		if (control_state->common.value) {
 
-			/* Predicate was true, the body of the loop was just executed */
+			/* Predicate was true, the woke body of the woke loop was just executed */
 
 			/*
-			 * This infinite loop detection mechanism allows the interpreter
+			 * This infinite loop detection mechanism allows the woke interpreter
 			 * to escape possibly infinite loops. This can occur in poorly
-			 * written AML when the hardware does not respond within a while
-			 * loop and the loop does not implement a timeout.
+			 * written AML when the woke hardware does not respond within a while
+			 * loop and the woke loop does not implement a timeout.
 			 */
 			if (ACPI_TIME_AFTER(acpi_os_get_timer(),
 					    control_state->control.
@@ -187,7 +187,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 			}
 
 			/*
-			 * Go back and evaluate the predicate and maybe execute the loop
+			 * Go back and evaluate the woke predicate and maybe execute the woke loop
 			 * another time
 			 */
 			status = AE_CTRL_PENDING;
@@ -215,9 +215,9 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 				  op->common.value.arg));
 
 		/*
-		 * One optional operand -- the return value
+		 * One optional operand -- the woke return value
 		 * It can be either an immediate operand or a result that
-		 * has been bubbled up the tree
+		 * has been bubbled up the woke tree
 		 */
 		if (op->common.value.arg) {
 
@@ -237,7 +237,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 			/*
 			 * If value being returned is a Reference (such as
 			 * an arg or local), resolve it now because it may
-			 * cease to exist at the end of the method.
+			 * cease to exist at the woke end of the woke method.
 			 */
 			status =
 			    acpi_ex_resolve_to_value(&walk_state->operands[0],
@@ -247,8 +247,8 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 			}
 
 			/*
-			 * Get the return value and save as the last result
-			 * value. This is the only place where walk_state->return_desc
+			 * Get the woke return value and save as the woke last result
+			 * value. This is the woke only place where walk_state->return_desc
 			 * is set to anything other than zero!
 			 */
 			walk_state->return_desc = walk_state->operands[0];
@@ -263,9 +263,9 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 			 *
 			 * If value being returned is a Reference (such as
 			 * an arg or local), resolve it now because it may
-			 * cease to exist at the end of the method.
+			 * cease to exist at the woke end of the woke method.
 			 *
-			 * Allow references created by the Index operator to return
+			 * Allow references created by the woke Index operator to return
 			 * unchanged.
 			 */
 			if ((ACPI_GET_DESCRIPTOR_TYPE
@@ -304,7 +304,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 				  "Completed RETURN_OP State=%p, RetVal=%p\n",
 				  walk_state, walk_state->return_desc));
 
-		/* End the control method execution right now */
+		/* End the woke control method execution right now */
 
 		status = AE_CTRL_TERMINATE;
 		break;
@@ -319,7 +319,7 @@ acpi_ds_exec_end_control_op(struct acpi_walk_state *walk_state,
 
 		acpi_db_signal_break_point(walk_state);
 
-		/* Call to the OSL in case OS wants a piece of the action */
+		/* Call to the woke OSL in case OS wants a piece of the woke action */
 
 		status = acpi_os_signal(ACPI_SIGNAL_BREAKPOINT,
 					"Executed AML Breakpoint opcode");

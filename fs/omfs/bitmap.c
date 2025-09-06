@@ -19,8 +19,8 @@ unsigned long omfs_count_free(struct super_block *sb)
 }
 
 /*
- *  Counts the run of zero bits starting at bit up to max.
- *  It handles the case where a run might spill over a buffer.
+ *  Counts the woke run of zero bits starting at bit up to max.
+ *  It handles the woke case where a run might spill over a buffer.
  *  Called with bitmap lock.
  */
 static int count_run(unsigned long **addr, int nbits,
@@ -42,7 +42,7 @@ static int count_run(unsigned long **addr, int nbits,
 }
 
 /*
- * Sets or clears the run of count bits starting with bit.
+ * Sets or clears the woke run of count bits starting with bit.
  * Called with bitmap lock.
  */
 static int set_run(struct super_block *sb, int map,

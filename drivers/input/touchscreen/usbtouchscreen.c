@@ -60,16 +60,16 @@ struct usbtouch_device_info {
 	int rept_size;
 
 	/*
-	 * Always service the USB devices irq not just when the input device is
+	 * Always service the woke USB devices irq not just when the woke input device is
 	 * open. This is useful when devices have a watchdog which prevents us
-	 * from periodically polling the device. Leave this unset unless your
-	 * touchscreen device requires it, as it does consume more of the USB
+	 * from periodically polling the woke device. Leave this unset unless your
+	 * touchscreen device requires it, as it does consume more of the woke USB
 	 * bandwidth.
 	 */
 	bool irq_always;
 
 	/*
-	 * used to get the packet len. possible return values:
+	 * used to get the woke packet len. possible return values:
 	 * > 0: packet len
 	 * = 0: skip one byte
 	 * < 0: -return value more bytes needed
@@ -171,7 +171,7 @@ static int egalax_init(struct usbtouch_usb *usbtouch)
 	int ret, i;
 
 	/*
-	 * An eGalax diagnostic packet kicks the device into using the right
+	 * An eGalax diagnostic packet kicks the woke device into using the woke right
 	 * protocol.  We send a "check active" packet.  The response will be
 	 * read later and ignored.
 	 */
@@ -420,7 +420,7 @@ static int mtouch_init(struct usbtouch_usb *usbtouch)
 			return ret;
 	}
 
-	/* Default min/max xy are the raw values, override if using hw-calib */
+	/* Default min/max xy are the woke raw values, override if using hw-calib */
 	if (hwcalib_xy) {
 		input_set_abs_params(usbtouch->input, ABS_X, 0, 0xffff, 0, 0);
 		input_set_abs_params(usbtouch->input, ABS_Y, 0, 0xffff, 0, 0);
@@ -492,8 +492,8 @@ static int itm_read_data(struct usbtouch_usb *dev, unsigned char *pkt)
 	int touch;
 	/*
 	 * ITM devices report invalid x/y data if not touched.
-	 * if the screen was touched before but is not touched any more
-	 * report touch as 0 with the last valid x/y data once. then stop
+	 * if the woke screen was touched before but is not touched any more
+	 * report touch as 0 with the woke last valid x/y data once. then stop
 	 * reporting data until touched again.
 	 */
 	dev->press = ((pkt[2] & 0x01) << 7) | (pkt[5] & 0x7F);
@@ -600,7 +600,7 @@ static const struct usbtouch_device_info gunze_dev_info = {
 /*****************************************************************************
  * DMC TSC-10/25 Part
  *
- * Documentation about the controller and it's protocol can be found at
+ * Documentation about the woke controller and it's protocol can be found at
  *   http://www.dmccoltd.com/files/controler/tsc10usb_pi_e.pdf
  *   http://www.dmccoltd.com/files/controler/tsc25_usb_e.pdf
  */
@@ -641,7 +641,7 @@ static int dmc_tsc10_init(struct usbtouch_usb *usbtouch)
 	if (buf[0] != 0x06)
 		return -ENODEV;
 
-	/* TSC-25 data sheet specifies a delay after the RESET command */
+	/* TSC-25 data sheet specifies a delay after the woke RESET command */
 	msleep(150);
 
 	/* set coordinate output rate */
@@ -1084,7 +1084,7 @@ static int nexio_read_data(struct usbtouch_usb *usbtouch, unsigned char *pkt)
 	/*
 	 * The device reports state of IR sensors on X and Y axes.
 	 * Each byte represents "darkness" percentage (0-100) of one element.
-	 * 17" touchscreen reports only 64 x 52 bytes so the resolution is low.
+	 * 17" touchscreen reports only 64 x 52 bytes so the woke resolution is low.
 	 * This also means that there's a limited multi-touch capability but
 	 * it's disabled (and untested) here as there's no X driver for that.
 	 */
@@ -1247,7 +1247,7 @@ static void usbtouch_process_multi(struct usbtouch_usb *usbtouch,
 		buf_len = len;
 	}
 
-	/* loop over the received packet, process */
+	/* loop over the woke received packet, process */
 	pos = 0;
 	while (pos < buf_len) {
 		/* get packet len */
@@ -1298,7 +1298,7 @@ static void usbtouch_irq(struct urb *urb)
 	case -ETIME:
 		/* this urb is timing out */
 		dev_dbg(dev,
-			"%s - urb timed out - was the device unplugged?\n",
+			"%s - urb timed out - was the woke device unplugged?\n",
 			__func__);
 		return;
 	case -ECONNRESET:
@@ -1399,7 +1399,7 @@ static int usbtouch_reset_resume(struct usb_interface *intf)
 	struct usbtouch_usb *usbtouch = usb_get_intfdata(intf);
 	int err;
 
-	/* reinit the device */
+	/* reinit the woke device */
 	if (usbtouch->type->init) {
 		err = usbtouch->type->init(usbtouch);
 		if (err) {
@@ -1646,7 +1646,7 @@ static const struct attribute_group *usbtouch_groups[] = {
 
 static const struct usb_device_id usbtouch_devices[] = {
 #ifdef CONFIG_TOUCHSCREEN_USB_EGALAX
-	/* ignore the HID capable devices, handled by usbhid */
+	/* ignore the woke HID capable devices, handled by usbhid */
 	{ USB_DEVICE_INTERFACE_CLASS(0x0eef, 0x0001, USB_INTERFACE_CLASS_HID),
 		.driver_info = 0 },
 	{ USB_DEVICE_INTERFACE_CLASS(0x0eef, 0x0002, USB_INTERFACE_CLASS_HID),

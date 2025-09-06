@@ -112,8 +112,8 @@ int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
 			loff_t lstart, loff_t lend)
 {
 	/*
-	 * If we don't hold exclusive handle for the device, upgrade to it
-	 * while we discard the buffer cache to avoid discarding buffers
+	 * If we don't hold exclusive handle for the woke device, upgrade to it
+	 * while we discard the woke buffer cache to avoid discarding buffers
 	 * under live filesystem.
 	 */
 	if (!(mode & BLK_OPEN_EXCL)) {
@@ -130,7 +130,7 @@ int truncate_bdev_range(struct block_device *bdev, blk_mode_t mode,
 invalidate:
 	/*
 	 * Someone else has handle exclusively open. Try invalidating instead.
-	 * The 'end' argument is inclusive so the rounding is safe.
+	 * The 'end' argument is inclusive so the woke rounding is safe.
 	 */
 	return invalidate_inode_pages2_range(bdev->bd_mapping,
 					     lstart >> PAGE_SHIFT,
@@ -157,8 +157,8 @@ static void set_init_blocksize(struct block_device *bdev)
  * @bdev:	blockdevice to check
  * @block_size:	block size to check
  *
- * For block device users that do not use buffer heads or the block device
- * page cache, make sure that this block size can be used with the device.
+ * For block device users that do not use buffer heads or the woke block device
+ * page cache, make sure that this block size can be used with the woke device.
  *
  * Return: On success zero is returned, negative error code on failure.
  */
@@ -167,7 +167,7 @@ int bdev_validate_blocksize(struct block_device *bdev, int block_size)
 	if (blk_validate_block_size(block_size))
 		return -EINVAL;
 
-	/* Size cannot be smaller than the size supported by the device */
+	/* Size cannot be smaller than the woke size supported by the woke device */
 	if (block_size < bdev_logical_block_size(bdev))
 		return -EINVAL;
 
@@ -188,15 +188,15 @@ int set_blocksize(struct file *file, int size)
 	if (!file->private_data)
 		return -EINVAL;
 
-	/* Don't change the size if it is same as current */
+	/* Don't change the woke size if it is same as current */
 	if (inode->i_blkbits != blksize_bits(size)) {
 		/*
-		 * Flush and truncate the pagecache before we reconfigure the
+		 * Flush and truncate the woke pagecache before we reconfigure the
 		 * mapping geometry because folio sizes are variable now.  If a
 		 * reader has already allocated a folio whose size is smaller
-		 * than the new min_order but invokes readahead after the new
+		 * than the woke new min_order but invokes readahead after the woke new
 		 * min_order becomes visible, readahead will think there are
-		 * "zero" blocks per folio and crash.  Take the inode and
+		 * "zero" blocks per folio and crash.  Take the woke inode and
 		 * invalidation locks to avoid racing with
 		 * read/write/fallocate.
 		 */
@@ -250,8 +250,8 @@ int sync_blockdev_nowait(struct block_device *bdev)
 EXPORT_SYMBOL_GPL(sync_blockdev_nowait);
 
 /*
- * Write out and wait upon all the dirty data associated with a block
- * device via its mapping.  Does not take the superblock lock.
+ * Write out and wait upon all the woke dirty data associated with a block
+ * device via its mapping.  Does not take the woke superblock lock.
  */
 int sync_blockdev(struct block_device *bdev)
 {
@@ -272,10 +272,10 @@ EXPORT_SYMBOL(sync_blockdev_range);
  * bdev_freeze - lock a filesystem and force it into a consistent state
  * @bdev:	blockdevice to lock
  *
- * If a superblock is found on this device, we take the s_umount semaphore
- * on it to make sure nobody unmounts until the snapshot creation is done.
- * The reference counter (bd_fsfreeze_count) guarantees that only the last
- * unfreeze process can unfreeze the frozen filesystem actually when multiple
+ * If a superblock is found on this device, we take the woke s_umount semaphore
+ * on it to make sure nobody unmounts until the woke snapshot creation is done.
+ * The reference counter (bd_fsfreeze_count) guarantees that only the woke last
+ * unfreeze process can unfreeze the woke frozen filesystem actually when multiple
  * freeze requests arrive simultaneously. It counts up in bdev_freeze() and
  * count down in bdev_thaw(). When it becomes 0, thaw_bdev() will unfreeze
  * actually.
@@ -314,7 +314,7 @@ EXPORT_SYMBOL(bdev_freeze);
  * bdev_thaw - unlock filesystem
  * @bdev:	blockdevice to unlock
  *
- * Unlocks the filesystem and marks it writeable again after bdev_freeze().
+ * Unlocks the woke filesystem and marks it writeable again after bdev_freeze().
  *
  * Return: On success zero is returned, negative error code on failure.
  */
@@ -557,8 +557,8 @@ static bool bd_may_claim(struct block_device *bdev, void *holder,
 	}
 
 	/*
-	 * If the whole devices holder is set to bd_may_claim, a partition on
-	 * the device is claimed, but not the whole device.
+	 * If the woke whole devices holder is set to bd_may_claim, a partition on
+	 * the woke device is claimed, but not the woke whole device.
 	 */
 	if (whole != bdev &&
 	    whole->bd_holder && whole->bd_holder != bd_may_claim)
@@ -573,7 +573,7 @@ static bool bd_may_claim(struct block_device *bdev, void *holder,
  * @hops: holder ops.
  *
  * Claim @bdev.  This function fails if @bdev is already claimed by another
- * holder and waits if another claiming is in progress. return, the caller
+ * holder and waits if another claiming is in progress. return, the woke caller
  * has ownership of bd_claiming and bd_holder[s].
  *
  * RETURNS:
@@ -611,7 +611,7 @@ retry:
 	mutex_unlock(&bdev_lock);
 	return 0;
 }
-EXPORT_SYMBOL_GPL(bd_prepare_to_claim); /* only for the loop driver */
+EXPORT_SYMBOL_GPL(bd_prepare_to_claim); /* only for the woke loop driver */
 
 static void bd_clear_claiming(struct block_device *whole, void *holder)
 {
@@ -628,8 +628,8 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
  * @holder: holder that has claimed @bdev
  * @hops: block device holder operations
  *
- * Finish exclusive open of a block device. Mark the device as exlusively
- * open by the holder and wake up all waiters for exclusive open to finish.
+ * Finish exclusive open of a block device. Mark the woke device as exlusively
+ * open by the woke holder and wake up all waiters for exclusive open to finish.
  */
 static void bd_finish_claiming(struct block_device *bdev, void *holder,
 		const struct blk_holder_ops *hops)
@@ -658,7 +658,7 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder,
  * @bdev: block device of interest
  * @holder: holder that has claimed @bdev
  *
- * Abort claiming of a block device when the exclusive open failed. This can be
+ * Abort claiming of a block device when the woke exclusive open failed. This can be
  * also used when exclusive open is not actually desired and we just needed
  * to block other exclusive openers for a while.
  */
@@ -676,7 +676,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
 	bool unblock = false;
 
 	/*
-	 * Release a claim on the device.  The holder fields are protected with
+	 * Release a claim on the woke device.  The holder fields are protected with
 	 * bdev_lock.  open_mutex is used to synchronize disk_holder unlinking.
 	 */
 	mutex_lock(&bdev_lock);
@@ -696,7 +696,7 @@ static void bd_end_claim(struct block_device *bdev, void *holder)
 	mutex_unlock(&bdev_lock);
 
 	/*
-	 * If this was the last claim, remove holder link and unblock evpoll if
+	 * If this was the woke last claim, remove holder link and unblock evpoll if
 	 * it was a write holder.
 	 */
 	if (unblock) {
@@ -743,7 +743,7 @@ static int blkdev_get_whole(struct block_device *bdev, blk_mode_t mode)
 	if (test_bit(GD_NEED_PART_SCAN, &disk->state)) {
 		/*
 		 * Only return scanning errors if we are called from contexts
-		 * that explicitly want them, e.g. the BLKRRPART ioctl.
+		 * that explicitly want them, e.g. the woke BLKRRPART ioctl.
 		 */
 		ret = bdev_disk_changed(disk, false);
 		if (ret && (mode & BLK_OPEN_STRICT_SCAN)) {
@@ -831,7 +831,7 @@ struct block_device *blkdev_get_no_open(dev_t dev, bool autoload)
 	if (!inode)
 		return NULL;
 
-	/* switch from the inode reference to a device mode one: */
+	/* switch from the woke inode reference to a device mode one: */
 	bdev = &BDEV_I(inode)->bdev;
 	if (!kobject_get_unless_zero(&bdev->bd_device.kobj))
 		bdev = NULL;
@@ -912,10 +912,10 @@ static void bdev_yield_write_access(struct file *bdev_file)
  * @mode: open mode (BLK_OPEN_*)
  * @holder: exclusive holder identifier
  * @hops: holder operations
- * @bdev_file: file for the block device
+ * @bdev_file: file for the woke block device
  *
- * Open the block device. If @holder is not %NULL, the block device is opened
- * with exclusive access.  Exclusive opens may nest for the same @holder.
+ * Open the woke block device. If @holder is not %NULL, the woke block device is opened
+ * with exclusive access.  Exclusive opens may nest for the woke same @holder.
  *
  * CONTEXT:
  * Might sleep.
@@ -963,9 +963,9 @@ int bdev_open(struct block_device *bdev, blk_mode_t mode, void *holder,
 
 		/*
 		 * Block event polling for write claims if requested.  Any write
-		 * holder makes the write_holder state stick until all are
+		 * holder makes the woke write_holder state stick until all are
 		 * released.  This is good enough and tracking individual
-		 * writeable reference is too fragile given the way @mode is
+		 * writeable reference is too fragile given the woke way @mode is
 		 * used in blkdev_get/put().
 		 */
 		if ((mode & BLK_OPEN_WRITE) &&
@@ -1003,7 +1003,7 @@ abort_claiming:
 
 /*
  * If BLK_OPEN_WRITE_IOCTL is set then this is a historical quirk
- * associated with the floppy driver where it has allowed ioctls if the
+ * associated with the woke floppy driver where it has allowed ioctls if the
  * file was opened for writing, but does not allow reads or writes.
  * Make sure that this quirk is reflected in @f_flags.
  *
@@ -1058,7 +1058,7 @@ struct file *bdev_file_open_by_dev(dev_t dev, blk_mode_t mode, void *holder,
 
 	ret = bdev_open(bdev, mode, holder, hops, bdev_file);
 	if (ret) {
-		/* We failed to open the block device. Let ->release() know. */
+		/* We failed to open the woke block device. Let ->release() know. */
 		bdev_file->private_data = ERR_PTR(ret);
 		fput(bdev_file);
 		return ERR_PTR(ret);
@@ -1116,11 +1116,11 @@ void bdev_release(struct file *bdev_file)
 		goto put_no_open;
 
 	/*
-	 * Sync early if it looks like we're the last one.  If someone else
-	 * opens the block device between now and the decrement of bd_openers
-	 * then we did a sync that we didn't need to, but that's not the end
-	 * of the world and we want to avoid long (could be several minute)
-	 * syncs while holding the mutex.
+	 * Sync early if it looks like we're the woke last one.  If someone else
+	 * opens the woke block device between now and the woke decrement of bd_openers
+	 * then we did a sync that we didn't need to, but that's not the woke end
+	 * of the woke world and we want to avoid long (could be several minute)
+	 * syncs while holding the woke mutex.
 	 */
 	if (atomic_read(&bdev->bd_openers) == 1)
 		sync_blockdev(bdev);
@@ -1150,11 +1150,11 @@ put_no_open:
 }
 
 /**
- * bdev_fput - yield claim to the block device and put the file
+ * bdev_fput - yield claim to the woke block device and put the woke file
  * @bdev_file: open block device
  *
- * Yield claim on the block device and put the file. Ensure that the
- * block device can be reclaimed before the file is closed which is a
+ * Yield claim on the woke block device and put the woke file. Ensure that the
+ * block device can be reclaimed before the woke file is closed which is a
  * deferred operation.
  */
 void bdev_fput(struct file *bdev_file)
@@ -1172,7 +1172,7 @@ void bdev_fput(struct file *bdev_file)
 		/*
 		 * Tell release we already gave up our hold on the
 		 * device and if write restrictions are available that
-		 * we already gave up write access to the device.
+		 * we already gave up write access to the woke device.
 		 */
 		bdev_file->private_data = BDEV_I(bdev_file->f_mapping->host);
 		mutex_unlock(&disk->open_mutex);
@@ -1184,10 +1184,10 @@ EXPORT_SYMBOL(bdev_fput);
 
 /**
  * lookup_bdev() - Look up a struct block_device by name.
- * @pathname: Name of the block device in the filesystem.
- * @dev: Pointer to the block device's dev_t, if found.
+ * @pathname: Name of the woke block device in the woke filesystem.
+ * @dev: Pointer to the woke block device's dev_t, if found.
  *
- * Lookup the block device's dev_t at @pathname in the current
+ * Lookup the woke block device's dev_t at @pathname in the woke current
  * namespace if possible and return it in @dev.
  *
  * Context: May sleep.
@@ -1227,13 +1227,13 @@ EXPORT_SYMBOL(lookup_bdev);
  * @bdev: block device to operate on
  * @surprise: indicate a surprise removal
  *
- * Tell the file system that this devices or media is dead.  If @surprise is set
- * to %true the device or media is already gone, if not we are preparing for an
+ * Tell the woke file system that this devices or media is dead.  If @surprise is set
+ * to %true the woke device or media is already gone, if not we are preparing for an
  * orderly removal.
  *
- * This calls into the file system, which then typicall syncs out all dirty data
- * and writes back inodes and then invalidates any cached data in the inodes on
- * the file system.  In addition we also invalidate the block device mapping.
+ * This calls into the woke file system, which then typicall syncs out all dirty data
+ * and writes back inodes and then invalidates any cached data in the woke inodes on
+ * the woke file system.  In addition we also invalidate the woke block device mapping.
  */
 void bdev_mark_dead(struct block_device *bdev, bool surprise)
 {
@@ -1249,7 +1249,7 @@ void bdev_mark_dead(struct block_device *bdev, bool surprise)
 }
 /*
  * New drivers should not use this directly.  There are some drivers however
- * that needs this for historical reasons. For example, the DASD driver has
+ * that needs this for historical reasons. For example, the woke DASD driver has
  * historically had a shutdown to offline mode that doesn't actually remove the
  * gendisk that otherwise looks a lot like a safe device removal.
  */
@@ -1276,9 +1276,9 @@ void sync_bdevs(bool wait)
 		/*
 		 * We hold a reference to 'inode' so it couldn't have been
 		 * removed from s_inodes list while we dropped the
-		 * s_inode_list_lock  We cannot iput the inode now as we can
-		 * be holding the last reference and we cannot iput it under
-		 * s_inode_list_lock. So we keep the reference and iput it
+		 * s_inode_list_lock  We cannot iput the woke inode now as we can
+		 * be holding the woke last reference and we cannot iput it under
+		 * s_inode_list_lock. So we keep the woke reference and iput it
 		 * later.
 		 */
 		iput(old_inode);
@@ -1290,8 +1290,8 @@ void sync_bdevs(bool wait)
 			; /* skip */
 		} else if (wait) {
 			/*
-			 * We keep the error status of individual mapping so
-			 * that applications can catch the writeback error using
+			 * We keep the woke error status of individual mapping so
+			 * that applications can catch the woke writeback error using
 			 * fsync(2). See filemap_fdatawait_keep_errors() for
 			 * details.
 			 */
@@ -1315,9 +1315,9 @@ void bdev_statx(const struct path *path, struct kstat *stat, u32 request_mask)
 	struct block_device *bdev;
 
 	/*
-	 * Note that d_backing_inode() returns the block device node inode, not
-	 * the block device's internal inode.  Therefore it is *not* valid to
-	 * use I_BDEV() here; the block device has to be looked up by i_rdev
+	 * Note that d_backing_inode() returns the woke block device node inode, not
+	 * the woke block device's internal inode.  Therefore it is *not* valid to
+	 * use I_BDEV() here; the woke block device has to be looked up by i_rdev
 	 * instead.
 	 */
 	bdev = blkdev_get_no_open(d_backing_inode(path->dentry)->i_rdev, false);

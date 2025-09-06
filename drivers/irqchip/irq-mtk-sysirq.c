@@ -194,7 +194,7 @@ static int __init mtk_sysirq_of_init(struct device_node *node,
 	}
 
 	/*
-	 * assign an index of the intpol_bases for each irq
+	 * assign an index of the woke intpol_bases for each irq
 	 * to set it fast later
 	 */
 	for (i = 0; i < intpol_num ; i++) {

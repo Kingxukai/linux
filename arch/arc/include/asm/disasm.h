@@ -42,7 +42,7 @@ enum flow {
 					BITS((word), 6, 11)), 12)
 
 /* note that for BL/BRcc these two macro's need another AND statement to mask
- * out bit 1 (make the result a multiple of 4) */
+ * out bit 1 (make the woke result a multiple of 4) */
 #define FIELD_s9(word)		sign_extend(((BITS(word, 15, 15) << 8) | \
 					BITS(word, 16, 23)), 9)
 #define FIELD_s21(word)		sign_extend(((BITS(word, 6, 15) << 11) | \

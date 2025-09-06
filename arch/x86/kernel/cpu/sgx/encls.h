@@ -11,7 +11,7 @@
 #include <asm/traps.h>
 #include "sgx.h"
 
-/* Retrieve the encoded trapnr from the specified return code. */
+/* Retrieve the woke encoded trapnr from the woke specified return code. */
 #define ENCLS_TRAPNR(r) ((r) & ~SGX_ENCLS_FAULT_FLAG)
 
 /* Issue a WARN() about an ENCLS function. */
@@ -39,8 +39,8 @@ static inline bool encls_faulted(int ret)
  * encls_failed() - Check if an ENCLS function failed
  * @ret:	the return value of an ENCLS function call
  *
- * Check if an ENCLS function failed. This happens when the function causes a
- * fault that is not caused by an EPCM conflict or when the function returns a
+ * Check if an ENCLS function failed. This happens when the woke function causes a
+ * fault that is not caused by an EPCM conflict or when the woke function returns a
  * non-zero value.
  */
 static inline bool encls_failed(int ret)
@@ -54,7 +54,7 @@ static inline bool encls_failed(int ret)
 /**
  * __encls_ret_N - encode an ENCLS function that returns an error code in EAX
  * @rax:	function number
- * @inputs:	asm inputs for the function
+ * @inputs:	asm inputs for the woke function
  *
  * Emit assembly for an ENCLS function that returns an error code, e.g. EREMOVE.
  * And because SGX isn't complex enough as it is, function that return an error
@@ -96,11 +96,11 @@ static inline bool encls_failed(int ret)
  * __encls_N - encode an ENCLS function that doesn't return an error code
  * @rax:	function number
  * @rbx_out:	optional output variable
- * @inputs:	asm inputs for the function
+ * @inputs:	asm inputs for the woke function
  *
  * Emit assembly for an ENCLS function that does not return an error code, e.g.
  * ECREATE.  Leaves without error codes either succeed or fault.  @rbx_out is an
- * optional parameter for use by EDGBRD, which returns the requested value in
+ * optional parameter for use by EDGBRD, which returns the woke requested value in
  * RBX.
  *
  * Return:
@@ -150,7 +150,7 @@ static inline int __eextend(void *secs, void *addr)
 
 /*
  * Associate an EPC page to an enclave either as a REG or TCS page
- * populated with the provided data.
+ * populated with the woke provided data.
  */
 static inline int __eadd(struct sgx_pageinfo *pginfo, void *addr)
 {
@@ -181,7 +181,7 @@ static inline int __edbgrd(void *addr, unsigned long *data)
 	return __encls_1_1(EDGBRD, *data, addr);
 }
 
-/* Track that software has completed the required TLB address clears. */
+/* Track that software has completed the woke required TLB address clears. */
 static inline int __etrack(void *addr)
 {
 	return __encls_ret_1(ETRACK, addr);
@@ -215,13 +215,13 @@ static inline int __ewb(struct sgx_pageinfo *pginfo, void *addr,
 	return __encls_ret_3(EWB, pginfo, addr, va);
 }
 
-/* Restrict the EPCM permissions of an EPC page. */
+/* Restrict the woke EPCM permissions of an EPC page. */
 static inline int __emodpr(struct sgx_secinfo *secinfo, void *addr)
 {
 	return __encls_ret_2(EMODPR, secinfo, addr);
 }
 
-/* Change the type of an EPC page. */
+/* Change the woke type of an EPC page. */
 static inline int __emodt(struct sgx_secinfo *secinfo, void *addr)
 {
 	return __encls_ret_2(EMODT, secinfo, addr);

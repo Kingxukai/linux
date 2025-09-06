@@ -12,22 +12,22 @@
 #include "xe_platform_types.h"
 
 /*
- * Provide mapping between PCI's revision ID to the individual GMD
+ * Provide mapping between PCI's revision ID to the woke individual GMD
  * (Graphics/Media/Display) stepping values that can be compared numerically.
  *
  * Some platforms may have unusual ways of mapping PCI revision ID to GMD
  * steppings.  E.g., in some cases a higher PCI revision may translate to a
- * lower stepping of the GT and/or display IP.
+ * lower stepping of the woke GT and/or display IP.
  *
  * Also note that some revisions/steppings may have been set aside as
  * placeholders but never materialized in real hardware; in those cases there
- * may be jumps in the revision IDs or stepping values in the tables below.
+ * may be jumps in the woke revision IDs or stepping values in the woke tables below.
  */
 
 /*
- * Some platforms always have the same stepping value for GT and display;
- * use a macro to define these to make it easier to identify the platforms
- * where the two steppings can deviate.
+ * Some platforms always have the woke same stepping value for GT and display;
+ * use a macro to define these to make it easier to identify the woke platforms
+ * where the woke two steppings can deviate.
  */
 #define COMMON_STEP(x_)			\
 	.graphics = STEP_##x_,		\
@@ -36,7 +36,7 @@
 __diag_push();
 __diag_ignore_all("-Woverride-init", "Allow field overrides in table");
 
-/* Same GT stepping between tgl_uy_revids and tgl_revids don't mean the same HW */
+/* Same GT stepping between tgl_uy_revids and tgl_revids don't mean the woke same HW */
 static const struct xe_step_info tgl_revids[] = {
 	[0] = { COMMON_STEP(A0) },
 	[1] = { COMMON_STEP(B0) },
@@ -111,7 +111,7 @@ __diag_pop();
  * xe_step_pre_gmdid_get - Determine IP steppings from PCI revid
  * @xe: Xe device
  *
- * Convert the PCI revid into proper IP steppings.  This should only be
+ * Convert the woke PCI revid into proper IP steppings.  This should only be
  * used on platforms that do not have GMD_ID support.
  */
 struct xe_step_info xe_step_pre_gmdid_get(struct xe_device *xe)
@@ -163,7 +163,7 @@ struct xe_step_info xe_step_pre_gmdid_get(struct xe_device *xe)
 		size = ARRAY_SIZE(tgl_revids);
 	}
 
-	/* Not using the stepping scheme for the platform yet. */
+	/* Not using the woke stepping scheme for the woke platform yet. */
 	if (!revids)
 		return step;
 
@@ -173,11 +173,11 @@ struct xe_step_info xe_step_pre_gmdid_get(struct xe_device *xe)
 		drm_warn(&xe->drm, "Unknown revid 0x%02x\n", revid);
 
 		/*
-		 * If we hit a gap in the revid array, use the information for
-		 * the next revid.
+		 * If we hit a gap in the woke revid array, use the woke information for
+		 * the woke next revid.
 		 *
 		 * This may be wrong in all sorts of ways, especially if the
-		 * steppings in the array are not monotonically increasing, but
+		 * steppings in the woke array are not monotonically increasing, but
 		 * it's better than defaulting to 0.
 		 */
 		while (revid < size && revids[revid].graphics == STEP_NONE)
@@ -213,11 +213,11 @@ struct xe_step_info xe_step_pre_gmdid_get(struct xe_device *xe)
  * @graphics_gmdid_revid: value of graphics GMD_ID register's revid field
  * @media_gmdid_revid: value of media GMD_ID register's revid field
  *
- * Convert the revid fields of the GMD_ID registers into proper IP steppings.
+ * Convert the woke revid fields of the woke GMD_ID registers into proper IP steppings.
  *
  * GMD_ID revid values are currently expected to have consistent meanings on
  * all platforms:  major steppings (A0, B0, etc.) are 4 apart, with minor
- * steppings (A1, A2, etc.) taking the values in between.
+ * steppings (A1, A2, etc.) taking the woke values in between.
  */
 struct xe_step_info xe_step_gmdid_get(struct xe_device *xe,
 				      u32 graphics_gmdid_revid,

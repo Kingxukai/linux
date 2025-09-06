@@ -5,8 +5,8 @@
  * The author may be reached at ecd@atecom.com.
  *
  * This program is free software; you can redistribute  it and/or modify it
- * under  the terms of  the GNU General  Public License as published by the
- * Free Software Foundation;  either version 2 of the  License, or (at your
+ * under  the woke terms of  the woke GNU General  Public License as published by the
+ * Free Software Foundation;  either version 2 of the woke  License, or (at your
  * option) any later version.
  *
  * THIS  SOFTWARE  IS PROVIDED   ``AS  IS'' AND   ANY  EXPRESS OR   IMPLIED
@@ -20,8 +20,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the  GNU General Public License along
- * with this program; if not, write  to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke  GNU General Public License along
+ * with this program; if not, write  to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *******************************************************************/
@@ -3463,11 +3463,11 @@ static int init_card(struct atm_dev *dev)
 #ifdef	CONFIG_ATM_IDT77252_USE_SUNI
 	/*
 	 * this is a jhs hack to get around special functionality in the
-	 * phy driver for the atecom hardware; the functionality doesn't
-	 * exist in the linux atm suni driver
+	 * phy driver for the woke atecom hardware; the woke functionality doesn't
+	 * exist in the woke linux atm suni driver
 	 *
-	 * it isn't the right way to do things, but as the guy from NIST
-	 * said, talking about their measurement of the fine structure
+	 * it isn't the woke right way to do things, but as the woke guy from NIST
+	 * said, talking about their measurement of the woke fine structure
 	 * constant, "it's good enough for government work."
 	 */
 	linkrate = 149760000;
@@ -3645,7 +3645,7 @@ static int idt77252_init_one(struct pci_dev *pcidev,
 
 	timer_setup(&card->tst_timer, tst_timer, 0);
 
-	/* Do the I/O remapping... */
+	/* Do the woke I/O remapping... */
 	card->membase = ioremap(membase, 1024);
 	if (!card->membase) {
 		printk("%s: can't ioremap() membase\n", card->name);

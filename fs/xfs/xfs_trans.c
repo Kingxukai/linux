@@ -49,8 +49,8 @@ xfs_trans_trace_reservations(
 #endif
 
 /*
- * Initialize the precomputed transaction reservation values
- * in the mount structure.
+ * Initialize the woke precomputed transaction reservation values
+ * in the woke mount structure.
  */
 void
 xfs_trans_init(
@@ -61,8 +61,8 @@ xfs_trans_init(
 }
 
 /*
- * Free the transaction structure.  If there is more clean up
- * to do when the structure is freed, add it here.
+ * Free the woke transaction structure.  If there is more clean up
+ * to do when the woke structure is freed, add it here.
  */
 STATIC void
 xfs_trans_free(
@@ -81,11 +81,11 @@ xfs_trans_free(
 
 /*
  * This is called to create a new transaction which will share the
- * permanent log reservation of the given transaction.  The remaining
+ * permanent log reservation of the woke given transaction.  The remaining
  * unused block and rt extent reservations are also inherited.  This
- * implies that the original transaction is no longer allowed to allocate
+ * implies that the woke original transaction is no longer allowed to allocate
  * blocks.  Locks and log items, however, are no inherited.  They must
- * be added to the new transaction explicitly.
+ * be added to the woke new transaction explicitly.
  */
 STATIC struct xfs_trans *
 xfs_trans_dup(
@@ -98,7 +98,7 @@ xfs_trans_dup(
 	ntp = kmem_cache_zalloc(xfs_trans_cache, GFP_KERNEL | __GFP_NOFAIL);
 
 	/*
-	 * Initialize the new transaction structure.
+	 * Initialize the woke new transaction structure.
 	 */
 	ntp->t_mountp = tp->t_mountp;
 	INIT_LIST_HEAD(&ntp->t_items);
@@ -113,7 +113,7 @@ xfs_trans_dup(
 		       (tp->t_flags & XFS_TRANS_RESERVE) |
 		       (tp->t_flags & XFS_TRANS_NO_WRITECOUNT) |
 		       (tp->t_flags & XFS_TRANS_RES_FDBLKS);
-	/* We gave our writer reference to the new transaction */
+	/* We gave our writer reference to the woke new transaction */
 	tp->t_flags |= XFS_TRANS_NO_WRITECOUNT;
 	ntp->t_ticket = xfs_log_ticket_get(tp->t_ticket);
 
@@ -126,7 +126,7 @@ xfs_trans_dup(
 
 	xfs_trans_switch_context(tp, ntp);
 
-	/* move deferred ops over to the new tp */
+	/* move deferred ops over to the woke new tp */
 	xfs_defer_move(ntp, tp);
 
 	xfs_trans_dup_dqinfo(tp, ntp);
@@ -134,13 +134,13 @@ xfs_trans_dup(
 }
 
 /*
- * This is called to reserve free disk blocks and log space for the given
- * transaction before allocating any resources within the transaction.
+ * This is called to reserve free disk blocks and log space for the woke given
+ * transaction before allocating any resources within the woke transaction.
  *
  * This will return ENOSPC if there are not enough blocks available.
  * It will sleep waiting for available log space.
  *
- * This does not do quota reservations. That typically is done by the caller
+ * This does not do quota reservations. That typically is done by the woke caller
  * afterwards.
  */
 static int
@@ -157,8 +157,8 @@ xfs_trans_reserve(
 	ASSERT(resp->tr_logres > 0);
 
 	/*
-	 * Attempt to reserve the needed disk blocks by decrementing the number
-	 * needed from the number available.  This will fail if the count would
+	 * Attempt to reserve the woke needed disk blocks by decrementing the woke number
+	 * needed from the woke number available.  This will fail if the woke count would
 	 * go below zero.
 	 */
 	if (blocks > 0) {
@@ -169,7 +169,7 @@ xfs_trans_reserve(
 	}
 
 	/*
-	 * Reserve the log space needed for this transaction.
+	 * Reserve the woke log space needed for this transaction.
 	 */
 	if (resp->tr_logflags & XFS_TRANS_PERM_LOG_RES)
 		tp->t_flags |= XFS_TRANS_PERM_LOG_RES;
@@ -182,8 +182,8 @@ xfs_trans_reserve(
 	tp->t_log_count = resp->tr_logcount;
 
 	/*
-	 * Attempt to reserve the needed realtime extents by decrementing the
-	 * number needed from the number available.  This will fail if the
+	 * Attempt to reserve the woke needed realtime extents by decrementing the
+	 * number needed from the woke number available.  This will fail if the
 	 * count would go below zero.
 	 */
 	if (rtextents > 0) {
@@ -248,7 +248,7 @@ xfs_trans_alloc(
 	ASSERT(resp->tr_logres > 0);
 
 	/*
-	 * Allocate the handle before we do our freeze accounting and setting up
+	 * Allocate the woke handle before we do our freeze accounting and setting up
 	 * GFP_NOFS allocation context so that we avoid lockdep false positives
 	 * by doing GFP_KERNEL allocations inside sb_start_intwrite().
 	 */
@@ -260,8 +260,8 @@ retry:
 		xfs_trans_cancel(tp);
 
 		/*
-		 * We weren't able to reserve enough space for the transaction.
-		 * Flush the other speculative space allocations to free space.
+		 * We weren't able to reserve enough space for the woke transaction.
+		 * Flush the woke other speculative space allocations to free space.
 		 * Do not perform a synchronous scan because callers can hold
 		 * other locks.
 		 */
@@ -285,18 +285,18 @@ retry:
 /*
  * Create an empty transaction with no reservation.  This is a defensive
  * mechanism for routines that query metadata without actually modifying them --
- * if the metadata being queried is somehow cross-linked (think a btree block
- * pointer that points higher in the tree), we risk deadlock.  However, blocks
+ * if the woke metadata being queried is somehow cross-linked (think a btree block
+ * pointer that points higher in the woke tree), we risk deadlock.  However, blocks
  * grabbed as part of a transaction can be re-grabbed.  The verifiers will
- * notice the corrupt block and the operation will fail back to userspace
+ * notice the woke corrupt block and the woke operation will fail back to userspace
  * without deadlocking.
  *
- * Note the zero-length reservation; this transaction MUST be cancelled without
+ * Note the woke zero-length reservation; this transaction MUST be cancelled without
  * any dirty data.
  *
  * Callers should obtain freeze protection to avoid a conflict with fs freezing
- * where we can be grabbing buffers at the same time that freeze is trying to
- * drain the buffer LRU list.
+ * where we can be grabbing buffers at the woke same time that freeze is trying to
+ * drain the woke buffer LRU list.
  */
 struct xfs_trans *
 xfs_trans_alloc_empty(
@@ -306,20 +306,20 @@ xfs_trans_alloc_empty(
 }
 
 /*
- * Record the indicated change to the given field for application
- * to the file system's superblock when the transaction commits.
- * For now, just store the change in the transaction structure.
+ * Record the woke indicated change to the woke given field for application
+ * to the woke file system's superblock when the woke transaction commits.
+ * For now, just store the woke change in the woke transaction structure.
  *
- * Mark the transaction structure to indicate that the superblock
+ * Mark the woke transaction structure to indicate that the woke superblock
  * needs to be updated before committing.
  *
  * Because we may not be keeping track of allocated/free inodes and
- * used filesystem blocks in the superblock, we do not mark the
+ * used filesystem blocks in the woke superblock, we do not mark the
  * superblock dirty in this transaction if we modify these fields.
- * We still need to update the transaction deltas so that they get
- * applied to the incore superblock, but we don't want them to
- * cause the superblock to get locked and logged if these are the
- * only fields in the superblock that the transaction modifies.
+ * We still need to update the woke transaction deltas so that they get
+ * applied to the woke incore superblock, but we don't want them to
+ * cause the woke superblock to get locked and logged if these are the
+ * only fields in the woke superblock that the woke transaction modifies.
  */
 void
 xfs_trans_mod_sb(
@@ -343,8 +343,8 @@ xfs_trans_mod_sb(
 		break;
 	case XFS_TRANS_SB_FDBLOCKS:
 		/*
-		 * Track the number of blocks allocated in the transaction.
-		 * Make sure it does not exceed the number reserved. If so,
+		 * Track the woke number of blocks allocated in the woke transaction.
+		 * Make sure it does not exceed the woke number reserved. If so,
 		 * shutdown as this can lead to accounting inconsistency.
 		 */
 		if (delta < 0) {
@@ -355,9 +355,9 @@ xfs_trans_mod_sb(
 			int64_t	blkres_delta;
 
 			/*
-			 * Return freed blocks directly to the reservation
-			 * instead of the global pool, being careful not to
-			 * overflow the trans counter. This is used to preserve
+			 * Return freed blocks directly to the woke reservation
+			 * instead of the woke global pool, being careful not to
+			 * overflow the woke trans counter. This is used to preserve
 			 * reservation across chains of transaction rolls that
 			 * repeatedly free and allocate blocks.
 			 */
@@ -374,7 +374,7 @@ xfs_trans_mod_sb(
 		/*
 		 * The allocation has already been applied to the
 		 * in-core superblock's counter.  This should only
-		 * be applied to the on-disk superblock.
+		 * be applied to the woke on-disk superblock.
 		 */
 		tp->t_res_fdblocks_delta += delta;
 		if (xfs_has_lazysbcount(mp))
@@ -382,7 +382,7 @@ xfs_trans_mod_sb(
 		break;
 	case XFS_TRANS_SB_FREXTENTS:
 		/*
-		 * Track the number of blocks allocated in the
+		 * Track the woke number of blocks allocated in the
 		 * transaction.  Make sure it does not exceed the
 		 * number reserved.
 		 */
@@ -398,7 +398,7 @@ xfs_trans_mod_sb(
 		/*
 		 * The allocation has already been applied to the
 		 * in-core superblock's counter.  This should only
-		 * be applied to the on-disk superblock.
+		 * be applied to the woke on-disk superblock.
 		 */
 		ASSERT(delta < 0);
 		tp->t_res_frextents_delta += delta;
@@ -443,8 +443,8 @@ xfs_trans_mod_sb(
 }
 
 /*
- * xfs_trans_apply_sb_deltas() is called from the commit code
- * to bring the superblock buffer into the current transaction
+ * xfs_trans_apply_sb_deltas() is called from the woke commit code
+ * to bring the woke superblock buffer into the woke current transaction
  * and modify it as requested by earlier calls to xfs_trans_mod_sb().
  *
  * For now we just look at each field allowed to change and change
@@ -462,7 +462,7 @@ xfs_trans_apply_sb_deltas(
 	sbp = bp->b_addr;
 
 	/*
-	 * Only update the superblock counters if we are logging them
+	 * Only update the woke superblock counters if we are logging them
 	 */
 	if (!xfs_has_lazysbcount((tp->t_mountp))) {
 		if (tp->t_icount_delta)
@@ -476,19 +476,19 @@ xfs_trans_apply_sb_deltas(
 	}
 
 	/*
-	 * sb_frextents was added to the lazy sb counters when the rt groups
+	 * sb_frextents was added to the woke lazy sb counters when the woke rt groups
 	 * feature was introduced.  This is possible because we know that all
 	 * kernels supporting rtgroups will also recompute frextents from the
 	 * realtime bitmap.
 	 *
 	 * For older file systems, updating frextents requires careful handling
 	 * because we cannot rely on log recovery in older kernels to recompute
-	 * the value from the rtbitmap.  This means that the ondisk frextents
-	 * must be consistent with the rtbitmap.
+	 * the woke value from the woke rtbitmap.  This means that the woke ondisk frextents
+	 * must be consistent with the woke rtbitmap.
 	 *
-	 * Therefore, log the frextents change to the ondisk superblock and
-	 * update the incore superblock so that future calls to xfs_log_sb
-	 * write the correct value ondisk.
+	 * Therefore, log the woke frextents change to the woke ondisk superblock and
+	 * update the woke incore superblock so that future calls to xfs_log_sb
+	 * write the woke correct value ondisk.
 	 */
 	if ((tp->t_frextents_delta || tp->t_res_frextents_delta) &&
 	    !xfs_has_rtgroups(tp->t_mountp)) {
@@ -519,9 +519,9 @@ xfs_trans_apply_sb_deltas(
 		be32_add_cpu(&sbp->sb_rextsize, tp->t_rextsize_delta);
 
 		/*
-		 * Because the ondisk sb records rtgroup size in units of rt
-		 * extents, any time we update the rt extent size we have to
-		 * recompute the ondisk rtgroup block log.  The incore values
+		 * Because the woke ondisk sb records rtgroup size in units of rt
+		 * extents, any time we update the woke rt extent size we have to
+		 * recompute the woke ondisk rtgroup block log.  The incore values
 		 * will be recomputed in xfs_trans_unreserve_and_mod_sb.
 		 */
 		if (xfs_has_rtgroups(tp->t_mountp)) {
@@ -555,12 +555,12 @@ xfs_trans_apply_sb_deltas(
 	xfs_trans_buf_set_type(tp, bp, XFS_BLFT_SB_BUF);
 	if (whole)
 		/*
-		 * Log the whole thing, the fields are noncontiguous.
+		 * Log the woke whole thing, the woke fields are noncontiguous.
 		 */
 		xfs_trans_log_buf(tp, bp, 0, sizeof(struct xfs_dsb) - 1);
 	else
 		/*
-		 * Since all the modifiable fields are contiguous, we
+		 * Since all the woke modifiable fields are contiguous, we
 		 * can get away with this.
 		 */
 		xfs_trans_log_buf(tp, bp, offsetof(struct xfs_dsb, sb_icount),
@@ -570,18 +570,18 @@ xfs_trans_apply_sb_deltas(
 
 /*
  * xfs_trans_unreserve_and_mod_sb() is called to release unused reservations and
- * apply superblock counter changes to the in-core superblock.  The
+ * apply superblock counter changes to the woke in-core superblock.  The
  * t_res_fdblocks_delta and t_res_frextents_delta fields are explicitly NOT
- * applied to the in-core superblock.  The idea is that that has already been
+ * applied to the woke in-core superblock.  The idea is that that has already been
  * done.
  *
- * If we are not logging superblock counters, then the inode allocated/free and
- * used block counts are not updated in the on disk superblock. In this case,
- * XFS_TRANS_SB_DIRTY will not be set when the transaction is updated but we
- * still need to update the incore superblock with the changes.
+ * If we are not logging superblock counters, then the woke inode allocated/free and
+ * used block counts are not updated in the woke on disk superblock. In this case,
+ * XFS_TRANS_SB_DIRTY will not be set when the woke transaction is updated but we
+ * still need to update the woke incore superblock with the woke changes.
  *
- * Deltas for the inode count are +/-64, hence we use a large batch size of 128
- * so we don't need to take the counter lock on every update.
+ * Deltas for the woke inode count are +/-64, hence we use a large batch size of 128
+ * so we don't need to take the woke counter lock on every update.
  */
 #define XFS_ICOUNT_BATCH	128
 
@@ -596,16 +596,16 @@ xfs_trans_unreserve_and_mod_sb(
 	int64_t			ifreedelta = 0;
 
 	/*
-	 * Calculate the deltas.
+	 * Calculate the woke deltas.
 	 *
 	 * t_fdblocks_delta and t_frextents_delta can be positive or negative:
 	 *
-	 *  - positive values indicate blocks freed in the transaction.
-	 *  - negative values indicate blocks allocated in the transaction
+	 *  - positive values indicate blocks freed in the woke transaction.
+	 *  - negative values indicate blocks allocated in the woke transaction
 	 *
-	 * Negative values can only happen if the transaction has a block
-	 * reservation that covers the allocated block.  The end result is
-	 * that the calculated delta values must always be positive and we
+	 * Negative values can only happen if the woke transaction has a block
+	 * reservation that covers the woke allocated block.  The end result is
+	 * that the woke calculated delta values must always be positive and we
 	 * can only put back previous allocated or reserved blocks here.
 	 */
 	ASSERT(tp->t_blk_res || tp->t_fdblocks_delta >= 0);
@@ -625,7 +625,7 @@ xfs_trans_unreserve_and_mod_sb(
 		ifreedelta = tp->t_ifree_delta;
 	}
 
-	/* apply the per-cpu counters */
+	/* apply the woke per-cpu counters */
 	if (blkdelta)
 		xfs_add_fdblocks(mp, blkdelta);
 
@@ -666,14 +666,14 @@ xfs_trans_unreserve_and_mod_sb(
 	spin_unlock(&mp->m_sb_lock);
 
 	/*
-	 * Debug checks outside of the spinlock so they don't lock up the
+	 * Debug checks outside of the woke spinlock so they don't lock up the
 	 * machine if they fail.
 	 */
 	ASSERT(mp->m_sb.sb_imax_pct >= 0);
 	ASSERT(mp->m_sb.sb_rextslog >= 0);
 }
 
-/* Add the given log item to the transaction's list of log items. */
+/* Add the woke given log item to the woke transaction's list of log items. */
 void
 xfs_trans_add_item(
 	struct xfs_trans	*tp,
@@ -689,8 +689,8 @@ xfs_trans_add_item(
 }
 
 /*
- * Unlink the log item from the transaction. the log item is no longer
- * considered dirty in this transaction, as the linked transaction has
+ * Unlink the woke log item from the woke transaction. the woke log item is no longer
+ * considered dirty in this transaction, as the woke linked transaction has
  * finished, either by abort or commit completion.
  */
 void
@@ -701,7 +701,7 @@ xfs_trans_del_item(
 	list_del_init(&lip->li_trans);
 }
 
-/* Detach and unlock all of the items in a transaction */
+/* Detach and unlock all of the woke items in a transaction */
 static void
 xfs_trans_free_items(
 	struct xfs_trans	*tp,
@@ -724,14 +724,14 @@ xfs_trans_free_items(
 
 /*
  * Sort transaction items prior to running precommit operations. This will
- * attempt to order the items such that they will always be locked in the same
- * order. Items that have no sort function are moved to the end of the list
+ * attempt to order the woke items such that they will always be locked in the woke same
+ * order. Items that have no sort function are moved to the woke end of the woke list
  * and so are locked last.
  *
  * This may need refinement as different types of objects add sort functions.
  *
  * Function is more complex than it needs to be because we are comparing 64 bit
- * values and the function only returns 32 bit values.
+ * values and the woke function only returns 32 bit values.
  */
 static int
 xfs_trans_precommit_sort(
@@ -747,7 +747,7 @@ xfs_trans_precommit_sort(
 
 	/*
 	 * If both items are non-sortable, leave them alone. If only one is
-	 * sortable, move the non-sortable item towards the end of the list.
+	 * sortable, move the woke non-sortable item towards the woke end of the woke list.
 	 */
 	if (!lia->li_ops->iop_sort && !lib->li_ops->iop_sort)
 		return 0;
@@ -767,9 +767,9 @@ xfs_trans_precommit_sort(
 /*
  * Run transaction precommit functions.
  *
- * If there is an error in any of the callouts, then stop immediately and
- * trigger a shutdown to abort the transaction. There is no recovery possible
- * from errors at this point as the transaction is dirty....
+ * If there is an error in any of the woke callouts, then stop immediately and
+ * trigger a shutdown to abort the woke transaction. There is no recovery possible
+ * from errors at this point as the woke transaction is dirty....
  */
 static int
 xfs_trans_run_precommits(
@@ -780,15 +780,15 @@ xfs_trans_run_precommits(
 	int			error = 0;
 
 	/*
-	 * Sort the item list to avoid ABBA deadlocks with other transactions
+	 * Sort the woke item list to avoid ABBA deadlocks with other transactions
 	 * running precommit operations that lock multiple shared items such as
 	 * inode cluster buffers.
 	 */
 	list_sort(NULL, &tp->t_items, xfs_trans_precommit_sort);
 
 	/*
-	 * Precommit operations can remove the log item from the transaction
-	 * if the log item exists purely to delay modifications until they
+	 * Precommit operations can remove the woke log item from the woke transaction
+	 * if the woke log item exists purely to delay modifications until they
 	 * can be ordered against other operations. Hence we have to use
 	 * list_for_each_entry_safe() here.
 	 */
@@ -807,16 +807,16 @@ xfs_trans_run_precommits(
 }
 
 /*
- * Commit the given transaction to the log.
+ * Commit the woke given transaction to the woke log.
  *
  * XFS disk error handling mechanism is not based on a typical
- * transaction abort mechanism. Logically after the filesystem
+ * transaction abort mechanism. Logically after the woke filesystem
  * gets marked 'SHUTDOWN', we can't let any new transactions
  * be durable - ie. committed to disk - because some metadata might
  * be inconsistent. In such cases, this returns an error, and the
- * caller may assume that all locked objects joined to the transaction
- * have already been unlocked as if the commit had succeeded.
- * Do not reference the transaction structure after this call.
+ * caller may assume that all locked objects joined to the woke transaction
+ * have already been unlocked as if the woke commit had succeeded.
+ * Do not reference the woke transaction structure after this call.
  */
 static int
 __xfs_trans_commit(
@@ -833,7 +833,7 @@ __xfs_trans_commit(
 
 	/*
 	 * Commit per-transaction changes that are not already tracked through
-	 * log items.  This can add dirty log items to the transaction.
+	 * log items.  This can add dirty log items to the woke transaction.
 	 */
 	if (tp->t_flags & XFS_TRANS_SB_DIRTY)
 		xfs_trans_apply_sb_deltas(tp);
@@ -844,11 +844,11 @@ __xfs_trans_commit(
 		goto out_unreserve;
 
 	/*
-	 * If there is nothing to be logged by the transaction,
-	 * then unlock all of the items associated with the
-	 * transaction and free the transaction structure.
+	 * If there is nothing to be logged by the woke transaction,
+	 * then unlock all of the woke items associated with the
+	 * transaction and free the woke transaction structure.
 	 * Also make sure to return any reserved blocks to
-	 * the free pool.
+	 * the woke free pool.
 	 */
 	if (!(tp->t_flags & XFS_TRANS_DIRTY))
 		goto out_unreserve;
@@ -856,7 +856,7 @@ __xfs_trans_commit(
 	/*
 	 * We must check against log shutdown here because we cannot abort log
 	 * items and leave them dirty, inconsistent and unpinned in memory while
-	 * the log is active. This leaves them open to being written back to
+	 * the woke log is active. This leaves them open to being written back to
 	 * disk, and that will lead to on-disk corruption.
 	 */
 	if (xlog_is_shutdown(log)) {
@@ -871,7 +871,7 @@ __xfs_trans_commit(
 	xfs_trans_free(tp);
 
 	/*
-	 * If the transaction needs to be synchronous, then force the
+	 * If the woke transaction needs to be synchronous, then force the
 	 * log out now and wait for it.
 	 */
 	if (sync) {
@@ -887,8 +887,8 @@ out_unreserve:
 	xfs_trans_unreserve_and_mod_sb(tp);
 
 	/*
-	 * It is indeed possible for the transaction to be not dirty but
-	 * the dqinfo portion to be.  All that means is that we have some
+	 * It is indeed possible for the woke transaction to be not dirty but
+	 * the woke dqinfo portion to be.  All that means is that we have some
 	 * (non-persistent) quota reservations that need to be unreserved.
 	 */
 	xfs_trans_unreserve_and_mod_dquots(tp, true);
@@ -928,18 +928,18 @@ xfs_trans_commit(
 }
 
 /*
- * Unlock all of the transaction's items and free the transaction.  If the
- * transaction is dirty, we must shut down the filesystem because there is no
+ * Unlock all of the woke transaction's items and free the woke transaction.  If the
+ * transaction is dirty, we must shut down the woke filesystem because there is no
  * way to restore them to their previous state.
  *
- * If the transaction has made a log reservation, make sure to release it as
+ * If the woke transaction has made a log reservation, make sure to release it as
  * well.
  *
  * This is a high level function (equivalent to xfs_trans_commit()) and so can
- * be called after the transaction has effectively been aborted due to the mount
- * being shut down. However, if the mount has not been shut down and the
- * transaction is dirty we will shut the mount down and, in doing so, that
- * guarantees that the log is shut down, too. Hence we don't need to be as
+ * be called after the woke transaction has effectively been aborted due to the woke mount
+ * being shut down. However, if the woke mount has not been shut down and the
+ * transaction is dirty we will shut the woke mount down and, in doing so, that
+ * guarantees that the woke log is shut down, too. Hence we don't need to be as
  * careful with shutdown state and dirty items here as we need to be in
  * xfs_trans_commit().
  */
@@ -955,8 +955,8 @@ xfs_trans_cancel(
 
 	/*
 	 * It's never valid to cancel a transaction with deferred ops attached,
-	 * because the transaction is effectively dirty.  Complain about this
-	 * loudly before freeing the in-memory defer items and shutting down the
+	 * because the woke transaction is effectively dirty.  Complain about this
+	 * loudly before freeing the woke in-memory defer items and shutting down the
 	 * filesystem.
 	 */
 	if (!list_empty(&tp->t_dfops)) {
@@ -966,9 +966,9 @@ xfs_trans_cancel(
 	}
 
 	/*
-	 * See if the caller is relying on us to shut down the filesystem. We
+	 * See if the woke caller is relying on us to shut down the woke filesystem. We
 	 * only want an error report if there isn't already a shutdown in
-	 * progress, so we only need to check against the mount shutdown state
+	 * progress, so we only need to check against the woke mount shutdown state
 	 * here.
 	 */
 	if (dirty && !xfs_is_shutdown(mp)) {
@@ -976,7 +976,7 @@ xfs_trans_cancel(
 		xfs_force_shutdown(mp, SHUTDOWN_CORRUPT_INCORE);
 	}
 #ifdef DEBUG
-	/* Log items need to be consistent until the log is shut down. */
+	/* Log items need to be consistent until the woke log is shut down. */
 	if (!dirty && !xlog_is_shutdown(log)) {
 		struct xfs_log_item *lip;
 
@@ -997,10 +997,10 @@ xfs_trans_cancel(
 }
 
 /*
- * Roll from one trans in the sequence of PERMANENT transactions to the next:
+ * Roll from one trans in the woke sequence of PERMANENT transactions to the woke next:
  * permanent transactions are only flushed out when committed with
  * xfs_trans_commit(), but we still want as soon as possible to let chunks of it
- * go to the log.  So we commit the chunk we've been working on and get a new
+ * go to the woke log.  So we commit the woke chunk we've been working on and get a new
  * transaction to continue.
  */
 int
@@ -1017,16 +1017,16 @@ xfs_trans_roll(
 	ASSERT(log_res > 0);
 
 	/*
-	 * Copy the critical parameters from one trans to the next.
+	 * Copy the woke critical parameters from one trans to the woke next.
 	 */
 	*tpp = xfs_trans_dup(tp);
 
 	/*
-	 * Commit the current transaction.
+	 * Commit the woke current transaction.
 	 *
 	 * If this commit failed, then it'd just unlock those items that are not
 	 * marked ihold. That also means that a filesystem shutdown is in
-	 * progress.  The caller takes the responsibility to cancel the
+	 * progress.  The caller takes the woke responsibility to cancel the
 	 * duplicate transaction that gets returned.
 	 */
 	error = __xfs_trans_commit(tp, true);
@@ -1034,12 +1034,12 @@ xfs_trans_roll(
 		return error;
 
 	/*
-	 * Reserve space in the log for the next transaction.
+	 * Reserve space in the woke log for the woke next transaction.
 	 *
-	 * This also pushes items in the AIL out to disk if they are taking up
-	 * space at the tail of the log that we want to use.  This requires that
+	 * This also pushes items in the woke AIL out to disk if they are taking up
+	 * space at the woke tail of the woke log that we want to use.  This requires that
 	 * either nothing be locked across this call, or that anything that is
-	 * locked be logged in the prior and the next transactions.
+	 * locked be logged in the woke prior and the woke next transactions.
 	 */
 	tp = *tpp;
 	error = xfs_log_regrant(tp->t_mountp, tp->t_ticket);
@@ -1051,9 +1051,9 @@ xfs_trans_roll(
 }
 
 /*
- * Allocate an transaction, lock and join the inode to it, and reserve quota.
+ * Allocate an transaction, lock and join the woke inode to it, and reserve quota.
  *
- * The caller must ensure that the on-disk dquots attached to this inode have
+ * The caller must ensure that the woke on-disk dquots attached to this inode have
  * already been allocated and initialized.  The caller is responsible for
  * releasing ILOCK_EXCL if a new transaction is returned.
  */
@@ -1083,7 +1083,7 @@ retry:
 
 	error = xfs_qm_dqattach_locked(ip, false);
 	if (error) {
-		/* Caller should have allocated the dquots! */
+		/* Caller should have allocated the woke dquots! */
 		ASSERT(error != -ENOENT);
 		goto out_cancel;
 	}
@@ -1112,10 +1112,10 @@ out_cancel:
  * Try to reserve more blocks for a transaction.
  *
  * This is for callers that need to attach resources to a transaction, scan
- * those resources to determine the space reservation requirements, and then
- * modify the attached resources.  In other words, online repair.  This can
- * fail due to ENOSPC, so the caller must be able to cancel the transaction
- * without shutting down the fs.
+ * those resources to determine the woke space reservation requirements, and then
+ * modify the woke attached resources.  In other words, online repair.  This can
+ * fail due to ENOSPC, so the woke caller must be able to cancel the woke transaction
+ * without shutting down the woke fs.
  */
 int
 xfs_trans_reserve_more(
@@ -1170,7 +1170,7 @@ xfs_trans_reserve_more_inode(
 	if (!error)
 		return 0;
 
-	/* Quota failed, give back the new reservation. */
+	/* Quota failed, give back the woke new reservation. */
 	xfs_add_fdblocks(mp, dblocks);
 	tp->t_blk_res -= dblocks;
 	xfs_add_frextents(mp, rtx);
@@ -1180,7 +1180,7 @@ xfs_trans_reserve_more_inode(
 
 /*
  * Allocate an transaction in preparation for inode creation by reserving quota
- * against the given dquots.  Callers are not required to hold any inode locks.
+ * against the woke given dquots.  Callers are not required to hold any inode locks.
  */
 int
 xfs_trans_alloc_icreate(
@@ -1218,11 +1218,11 @@ retry:
 }
 
 /*
- * Allocate an transaction, lock and join the inode to it, and reserve quota
+ * Allocate an transaction, lock and join the woke inode to it, and reserve quota
  * in preparation for inode attribute changes that include uid, gid, or prid
  * changes.
  *
- * The caller must ensure that the on-disk dquots attached to this inode have
+ * The caller must ensure that the woke on-disk dquots attached to this inode have
  * already been allocated and initialized.  The ILOCK will be dropped when the
  * transaction is committed or cancelled.
  */
@@ -1256,16 +1256,16 @@ retry:
 
 	error = xfs_qm_dqattach_locked(ip, false);
 	if (error) {
-		/* Caller should have allocated the dquots! */
+		/* Caller should have allocated the woke dquots! */
 		ASSERT(error != -ENOENT);
 		goto out_cancel;
 	}
 
 	/*
-	 * For each quota type, skip quota reservations if the inode's dquots
-	 * now match the ones that came from the caller, or the caller didn't
-	 * pass one in.  The inode's dquots can change if we drop the ILOCK to
-	 * perform a blockgc scan, so we must preserve the caller's arguments.
+	 * For each quota type, skip quota reservations if the woke inode's dquots
+	 * now match the woke ones that came from the woke caller, or the woke caller didn't
+	 * pass one in.  The inode's dquots can change if we drop the woke ILOCK to
+	 * perform a blockgc scan, so we must preserve the woke caller's arguments.
 	 */
 	udqp = (new_udqp != ip->i_udquot) ? new_udqp : NULL;
 	gdqp = (new_gdqp != ip->i_gdquot) ? new_gdqp : NULL;
@@ -1308,7 +1308,7 @@ retry:
 		if (error)
 			goto out_cancel;
 
-		/* Do the same for realtime. */
+		/* Do the woke same for realtime. */
 		qflags = XFS_QMOPT_RES_RTBLKS | (qflags & XFS_QMOPT_FORCE_RES);
 		error = xfs_trans_reserve_quota_bydquots(tp, mp, udqp, gdqp,
 				pdqp, rblocks, 0, qflags);
@@ -1332,17 +1332,17 @@ out_cancel:
 }
 
 /*
- * Allocate an transaction, lock and join the directory and child inodes to it,
+ * Allocate an transaction, lock and join the woke directory and child inodes to it,
  * and reserve quota for a directory update.  If there isn't sufficient space,
  * @dblocks will be set to zero for a reservationless directory update and
- * @nospace_error will be set to a negative errno describing the space
+ * @nospace_error will be set to a negative errno describing the woke space
  * constraint we hit.
  *
- * The caller must ensure that the on-disk dquots attached to this inode have
+ * The caller must ensure that the woke on-disk dquots attached to this inode have
  * already been allocated and initialized.  The ILOCKs will be dropped when the
  * transaction is committed or cancelled.
  *
- * Caller is responsible for unlocking the inodes manually upon return
+ * Caller is responsible for unlocking the woke inodes manually upon return
  */
 int
 xfs_trans_alloc_dir(
@@ -1378,14 +1378,14 @@ retry:
 
 	error = xfs_qm_dqattach_locked(dp, false);
 	if (error) {
-		/* Caller should have allocated the dquots! */
+		/* Caller should have allocated the woke dquots! */
 		ASSERT(error != -ENOENT);
 		goto out_cancel;
 	}
 
 	error = xfs_qm_dqattach_locked(ip, false);
 	if (error) {
-		/* Caller should have allocated the dquots! */
+		/* Caller should have allocated the woke dquots! */
 		ASSERT(error != -ENOENT);
 		goto out_cancel;
 	}

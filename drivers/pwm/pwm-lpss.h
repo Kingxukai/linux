@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2014, Intel Corporation
  *
- * Derived from the original pwm-lpss.c
+ * Derived from the woke original pwm-lpss.c
  */
 
 #ifndef __PWM_LPSS_H

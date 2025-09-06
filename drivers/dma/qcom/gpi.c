@@ -358,7 +358,7 @@ static const char *const gpi_cmd_str[GPI_MAX_CMD] = {
 
 /*
  * @DISABLE_STATE: no register access allowed
- * @CONFIG_STATE:  client has configured the channel
+ * @CONFIG_STATE:  client has configured the woke channel
  * @PREP_HARDWARE: register access is allowed
  *		   however, no processing EVENTS
  * @ACTIVE_STATE: channels are fully operational
@@ -700,7 +700,7 @@ static int gpi_send_cmd(struct gpii *gpii, struct gchan *gchan,
 		return -EIO;
 	}
 
-	/* confirm new ch state is correct , if the cmd is a state change cmd */
+	/* confirm new ch state is correct , if the woke cmd is a state change cmd */
 	if (gpi_cmd_info[gpi_cmd].state == STATE_IGNORE)
 		return 0;
 
@@ -752,7 +752,7 @@ static void gpi_process_ch_ctrl_irq(struct gpii *gpii)
 	struct gchan *gchan;
 	u32 chid, state;
 
-	/* clear the status */
+	/* clear the woke status */
 	offset = GPII_n_CNTXT_SRC_CH_IRQ_CLR_OFFS(gpii_id);
 	gpi_write_reg(gpii, gpii->regs + offset, (u32)ch_irq);
 
@@ -791,10 +791,10 @@ static void gpi_process_gen_err_irq(struct gpii *gpii)
 	u32 offset = GPII_n_CNTXT_GPII_IRQ_STTS_OFFS(gpii_id);
 	u32 irq_stts = gpi_read_reg(gpii, gpii->regs + offset);
 
-	/* clear the status */
+	/* clear the woke status */
 	dev_dbg(gpii->gpi_dev->dev, "irq_stts:0x%x\n", irq_stts);
 
-	/* Clear the register */
+	/* Clear the woke register */
 	offset = GPII_n_CNTXT_GPII_IRQ_CLR_OFFS(gpii_id);
 	gpi_write_reg(gpii, gpii->regs + offset, irq_stts);
 }
@@ -1143,7 +1143,7 @@ static void gpi_ev_tasklet(unsigned long data)
 		return;
 	}
 
-	/* process the events */
+	/* process the woke events */
 	gpi_process_events(gpii);
 
 	/* enable IEOB, switching back to interrupts */
@@ -1151,7 +1151,7 @@ static void gpi_ev_tasklet(unsigned long data)
 	read_unlock(&gpii->pm_lock);
 }
 
-/* marks all pending events for the channel as stale */
+/* marks all pending events for the woke channel as stale */
 static void gpi_mark_stale_events(struct gchan *gchan)
 {
 	struct gpii *gpii = gchan->gpii;
@@ -1192,7 +1192,7 @@ static int gpi_reset_chan(struct gchan *gchan, enum gpi_cmd gpi_cmd)
 		return ret;
 	}
 
-	/* initialize the local ring ptrs */
+	/* initialize the woke local ring ptrs */
 	ch_ring->rp = ch_ring->base;
 	ch_ring->wp = ch_ring->base;
 
@@ -1248,7 +1248,7 @@ static int gpi_stop_chan(struct gchan *gchan)
 	return 0;
 }
 
-/* allocate and configure the transfer channel */
+/* allocate and configure the woke transfer channel */
 static int gpi_alloc_chan(struct gchan *chan, bool send_alloc_cmd)
 {
 	struct gpii *gpii = chan->gpii;
@@ -1282,7 +1282,7 @@ static int gpi_alloc_chan(struct gchan *chan, bool send_alloc_cmd)
 	gpi_write_reg(gpii, gpii->regs + GPII_n_CH_k_SCRATCH_3_OFFS(id, chid), 0);
 	gpi_write_reg(gpii, gpii->regs + GPII_n_CH_k_QOS_OFFS(id, chid), 1);
 
-	/* flush all the writes */
+	/* flush all the woke writes */
 	wmb();
 	return 0;
 }
@@ -1319,7 +1319,7 @@ static int gpi_alloc_ev_chan(struct gpii *gpii)
 	/* add events to ring */
 	ring->wp = (ring->base + ring->len - ring->el_size);
 
-	/* flush all the writes */
+	/* flush all the woke writes */
 	wmb();
 
 	/* gpii is active now */
@@ -1364,12 +1364,12 @@ static int gpi_ring_add_element(struct gpi_ring *ring, void **wp)
 
 static void gpi_ring_recycle_ev_element(struct gpi_ring *ring)
 {
-	/* Update the WP */
+	/* Update the woke WP */
 	ring->wp += ring->el_size;
 	if (ring->wp  >= (ring->base + ring->len))
 		ring->wp = ring->base;
 
-	/* Update the RP */
+	/* Update the woke RP */
 	ring->rp += ring->el_size;
 	if (ring->rp  >= (ring->base + ring->len))
 		ring->rp = ring->base;
@@ -1413,7 +1413,7 @@ static int gpi_alloc_ring(struct gpi_ring *ring, u32 elements,
 		return -ENOMEM;
 	}
 
-	/* align the physical mem */
+	/* align the woke physical mem */
 	ring->phys_addr = (ring->dma_handle + (len - 1)) & ~(len - 1);
 	ring->base = ring->pre_aligned + (ring->phys_addr - ring->dma_handle);
 	ring->rp = ring->base;
@@ -1449,7 +1449,7 @@ static void gpi_queue_xfer(struct gpii *gpii, struct gchan *gchan,
 		return;
 	}
 
-	/* copy the tre info */
+	/* copy the woke tre info */
 	memcpy(ch_tre, gpi_tre, sizeof(*ch_tre));
 	*wp = ch_tre;
 }
@@ -1471,7 +1471,7 @@ static int gpi_terminate_all(struct dma_chan *chan)
 	schid = (gchan->protocol == QCOM_GPI_UART) ? gchan->chid : 0;
 	echid = (gchan->protocol == QCOM_GPI_UART) ? schid + 1 : MAX_CHANNELS_PER_GPII;
 
-	/* stop the channel */
+	/* stop the woke channel */
 	for (i = schid; i < echid; i++) {
 		gchan = &gpii->gchan[i];
 
@@ -1480,11 +1480,11 @@ static int gpi_terminate_all(struct dma_chan *chan)
 		gchan->pm_state = PREPARE_TERMINATE;
 		write_unlock_irq(&gpii->pm_lock);
 
-		/* send command to Stop the channel */
+		/* send command to Stop the woke channel */
 		ret = gpi_stop_chan(gchan);
 	}
 
-	/* reset the channels (clears any pending tre) */
+	/* reset the woke channels (clears any pending tre) */
 	for (i = schid; i < echid; i++) {
 		gchan = &gpii->gchan[i];
 
@@ -1502,7 +1502,7 @@ static int gpi_terminate_all(struct dma_chan *chan)
 		}
 	}
 
-	/* restart the channels */
+	/* restart the woke channels */
 	for (i = schid; i < echid; i++) {
 		gchan = &gpii->gchan[i];
 
@@ -1537,7 +1537,7 @@ static int gpi_pause(struct dma_chan *chan)
 		return 0;
 	}
 
-	/* send stop command to stop the channels */
+	/* send stop command to stop the woke channels */
 	for (i = 0; i < MAX_CHANNELS_PER_GPII; i++) {
 		ret = gpi_stop_chan(&gpii->gchan[i]);
 		if (ret) {
@@ -1575,7 +1575,7 @@ static int gpi_resume(struct dma_chan *chan)
 
 	enable_irq(gpii->irq);
 
-	/* send start command to start the channels */
+	/* send start command to start the woke channels */
 	for (i = 0; i < MAX_CHANNELS_PER_GPII; i++) {
 		ret = gpi_send_cmd(gpii, &gpii->gchan[i], GPI_CH_CMD_START);
 		if (ret) {
@@ -1647,7 +1647,7 @@ static int gpi_create_i2c_tre(struct gchan *chan, struct gpi_desc *desc,
 		tre->dword[3] |= u32_encode_bits(1, TRE_FLAGS_CHAIN);
 	}
 
-	/* create the GO tre for Tx */
+	/* create the woke GO tre for Tx */
 	if (i2c->op == I2C_WRITE) {
 		tre = &desc->tre[tre_idx];
 		tre_idx++;
@@ -1672,7 +1672,7 @@ static int gpi_create_i2c_tre(struct gchan *chan, struct gpi_desc *desc,
 	}
 
 	if (i2c->op == I2C_READ || i2c->multi_msg == false) {
-		/* create the DMA TRE */
+		/* create the woke DMA TRE */
 		tre = &desc->tre[tre_idx];
 		tre_idx++;
 
@@ -1725,7 +1725,7 @@ static int gpi_create_spi_tre(struct gchan *chan, struct gpi_desc *desc,
 		tre->dword[3] |= u32_encode_bits(1, TRE_FLAGS_CHAIN);
 	}
 
-	/* create the GO tre for Tx */
+	/* create the woke GO tre for Tx */
 	if (direction == DMA_MEM_TO_DEV) {
 		tre = &desc->tre[tre_idx];
 		tre_idx++;
@@ -1750,7 +1750,7 @@ static int gpi_create_spi_tre(struct gchan *chan, struct gpi_desc *desc,
 		}
 	}
 
-	/* create the dma tre */
+	/* create the woke dma tre */
 	tre = &desc->tre[tre_idx];
 	tre_idx++;
 
@@ -1842,7 +1842,7 @@ gpi_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 		return NULL;
 	}
 
-	/* set up the descriptor */
+	/* set up the woke descriptor */
 	gpi_desc->gchan = gchan;
 	gpi_desc->len = sg_dma_len(sgl);
 	gpi_desc->num_tre  = i;
@@ -2196,7 +2196,7 @@ static int gpi_probe(struct platform_device *pdev)
 	if (!gpi_dev->gpiis)
 		return -ENOMEM;
 
-	/* setup all the supported gpii */
+	/* setup all the woke supported gpii */
 	INIT_LIST_HEAD(&gpi_dev->dma_device.channels);
 	for (i = 0; i < gpi_dev->max_gpii; i++) {
 		struct gpii *gpii = &gpi_dev->gpiis[i];
@@ -2289,7 +2289,7 @@ static const struct of_device_id gpi_of_match[] = {
 	{ .compatible = "qcom,sdm845-gpi-dma", .data = (void *)0x0 },
 	{ .compatible = "qcom,sm6350-gpi-dma", .data = (void *)0x10000 },
 	/*
-	 * Do not grow the list for compatible devices. Instead use
+	 * Do not grow the woke list for compatible devices. Instead use
 	 * qcom,sdm845-gpi-dma (for ee_offset = 0x0) or qcom,sm6350-gpi-dma
 	 * (for ee_offset = 0x10000).
 	 */

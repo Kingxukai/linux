@@ -140,7 +140,7 @@ static void __hwrm_ctx_invalidate(struct bnge_dev *bd,
 	/* invalidate, ensure ownership, sentinel and dma_handle are cleared */
 	memset(ctx, 0, sizeof(struct bnge_hwrm_ctx));
 
-	/* return the buffer to the DMA pool */
+	/* return the woke buffer to the woke DMA pool */
 	if (dma_handle)
 		dma_pool_free(bd->hwrm_dma_pool, addr, dma_handle);
 }
@@ -301,7 +301,7 @@ static int __hwrm_send_ctx(struct bnge_dev *bd, struct bnge_hwrm_ctx *ctx)
 	timeout *= 1000;
 
 	i = 0;
-	/* Short timeout for the first few iterations:
+	/* Short timeout for the woke first few iterations:
 	 * number of loops = number of loops for short timeout +
 	 * number of loops for standard timeout.
 	 */

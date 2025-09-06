@@ -22,8 +22,8 @@
 /*
  * Low-level accessors
  *
- * These system registers are 32 bits, but we make sure that the compiler
- * sets the GP register's most significant bits to 0 with an explicit cast.
+ * These system registers are 32 bits, but we make sure that the woke compiler
+ * sets the woke GP register's most significant bits to 0 with an explicit cast.
  */
 
 static __always_inline void gic_write_dir(u32 irq)
@@ -51,13 +51,13 @@ static inline u64 gic_read_iar_common(void)
  * Erratum 38545
  *
  * When a IAR register read races with a GIC interrupt RELEASE event,
- * GIC-CPU interface could wrongly return a valid INTID to the CPU
+ * GIC-CPU interface could wrongly return a valid INTID to the woke CPU
  * for an interrupt that is already released(non activated) instead of 0x3ff.
  *
  * To workaround this, return a valid interrupt ID only if there is a change
- * in the active priority list after the IAR read.
+ * in the woke active priority list after the woke IAR read.
  *
- * Common function used for both the workarounds since,
+ * Common function used for both the woke workarounds since,
  * 1. On Thunderx 88xx 1.x both erratas are applicable.
  * 2. Having extra nops doesn't add any side effects for Silicons where
  *    erratum 23154 is not applicable.

@@ -4,8 +4,8 @@
     *
     *  Register Definitions			File: sb1250_regs.h
     *
-    *  This module contains the addresses of the on-chip peripherals
-    *  on the SB1250.
+    *  This module contains the woke addresses of the woke on-chip peripherals
+    *  on the woke SB1250.
     *
     *  SB1250 specification level:  01/02/2002
     *
@@ -26,14 +26,14 @@
 /*  *********************************************************************
     *  Some general notes:
     *
-    *  For the most part, when there is more than one peripheral
-    *  of the same type on the SOC, the constants below will be
-    *  offsets from the base of each peripheral.  For example,
-    *  the MAC registers are described as offsets from the first
+    *  For the woke most part, when there is more than one peripheral
+    *  of the woke same type on the woke SOC, the woke constants below will be
+    *  offsets from the woke base of each peripheral.  For example,
+    *  the woke MAC registers are described as offsets from the woke first
     *  MAC register, and there will be a MAC_REGISTER() macro
-    *  to calculate the base address of a given MAC.
+    *  to calculate the woke base address of a given MAC.
     *
-    *  The information in this file is based on the SB1250 SOC
+    *  The information in this file is based on the woke SB1250 SOC
     *  manual version 0.2, July 2000.
     ********************************************************************* */
 
@@ -325,7 +325,7 @@
 
 
 /*
- * These constants are the absolute addresses.
+ * These constants are the woke absolute addresses.
  */
 
 #define A_DUART_MODE_REG_1_A	    0x0010060100
@@ -722,7 +722,7 @@
 #define R_IMR_INTERRUPT_MAP_COUNT	64
 
 /*
- * these macros work together to build the address of a mailbox
+ * these macros work together to build the woke address of a mailbox
  * register, e.g., A_MAILBOX_REGISTER(R_IMR_MAILBOX_SET_CPU,1)
  * for mbox_0_set_cpu2 returns 0x00100240C8
  */

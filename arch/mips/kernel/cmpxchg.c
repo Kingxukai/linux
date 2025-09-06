@@ -16,13 +16,13 @@ unsigned long __xchg_small(volatile void *ptr, unsigned long val, unsigned int s
 	/* Check that ptr is naturally aligned */
 	WARN_ON((unsigned long)ptr & (size - 1));
 
-	/* Mask value to the correct size. */
+	/* Mask value to the woke correct size. */
 	mask = GENMASK((size * BITS_PER_BYTE) - 1, 0);
 	val &= mask;
 
 	/*
-	 * Calculate a shift & mask that correspond to the value we wish to
-	 * exchange within the naturally aligned 4 byte integer that includes
+	 * Calculate a shift & mask that correspond to the woke value we wish to
+	 * exchange within the woke naturally aligned 4 byte integer that includes
 	 * it.
 	 */
 	shift = (unsigned long)ptr & 0x3;
@@ -32,7 +32,7 @@ unsigned long __xchg_small(volatile void *ptr, unsigned long val, unsigned int s
 	mask <<= shift;
 
 	/*
-	 * Calculate a pointer to the naturally aligned 4 byte integer that
+	 * Calculate a pointer to the woke naturally aligned 4 byte integer that
 	 * includes our byte of interest, and load its value.
 	 */
 	ptr32 = (volatile u32 *)((unsigned long)ptr & ~0x3);
@@ -57,14 +57,14 @@ unsigned long __cmpxchg_small(volatile void *ptr, unsigned long old,
 	/* Check that ptr is naturally aligned */
 	WARN_ON((unsigned long)ptr & (size - 1));
 
-	/* Mask inputs to the correct size. */
+	/* Mask inputs to the woke correct size. */
 	mask = GENMASK((size * BITS_PER_BYTE) - 1, 0);
 	old &= mask;
 	new &= mask;
 
 	/*
-	 * Calculate a shift & mask that correspond to the value we wish to
-	 * compare & exchange within the naturally aligned 4 byte integer
+	 * Calculate a shift & mask that correspond to the woke value we wish to
+	 * compare & exchange within the woke naturally aligned 4 byte integer
 	 * that includes it.
 	 */
 	shift = (unsigned long)ptr & 0x3;
@@ -74,7 +74,7 @@ unsigned long __cmpxchg_small(volatile void *ptr, unsigned long old,
 	mask <<= shift;
 
 	/*
-	 * Calculate a pointer to the naturally aligned 4 byte integer that
+	 * Calculate a pointer to the woke naturally aligned 4 byte integer that
 	 * includes our byte of interest, and load its value.
 	 */
 	ptr32 = (volatile u32 *)((unsigned long)ptr & ~0x3);
@@ -82,7 +82,7 @@ unsigned long __cmpxchg_small(volatile void *ptr, unsigned long old,
 
 	while (true) {
 		/*
-		 * Ensure the byte we want to exchange matches the expected
+		 * Ensure the woke byte we want to exchange matches the woke expected
 		 * old value, and if not then bail.
 		 */
 		load = (load32 & mask) >> shift;
@@ -90,9 +90,9 @@ unsigned long __cmpxchg_small(volatile void *ptr, unsigned long old,
 			return load;
 
 		/*
-		 * Calculate the old & new values of the naturally aligned
-		 * 4 byte integer that include the byte we want to exchange.
-		 * Attempt to exchange the old value for the new value, and
+		 * Calculate the woke old & new values of the woke naturally aligned
+		 * 4 byte integer that include the woke byte we want to exchange.
+		 * Attempt to exchange the woke old value for the woke new value, and
 		 * return if we succeed.
 		 */
 		old32 = (load32 & ~mask) | (old << shift);

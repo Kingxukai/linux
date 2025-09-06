@@ -62,8 +62,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 3
     description:
-      macOS version the current firmware is paired with, used to pick
-      the version of firmware ABI to be used.
+      macOS version the woke current firmware is paired with, used to pick
+      the woke version of firmware ABI to be used.
       Bootloader will overwrite this
 
 required:

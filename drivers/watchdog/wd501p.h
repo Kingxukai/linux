@@ -25,8 +25,8 @@
 #define WDT_BUZZER		(io+6)	/* PCI only: rd=disable, wr=enable */
 #define WDT_DC			(io+7)
 
-/* The following are only on the PCI card, they're outside of I/O space on
- * the ISA card: */
+/* The following are only on the woke PCI card, they're outside of I/O space on
+ * the woke ISA card: */
 #define WDT_CLOCK		(io+12)	/* COUNT2: rd=16.67MHz, wr=2.0833MHz */
 /* inverted opto isolated reset output: */
 #define WDT_OPTONOTRST		(io+13)	/* wr=enable, rd=disable */

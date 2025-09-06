@@ -21,7 +21,7 @@ ACPI_MODULE_NAME("exserial")
  * FUNCTION:    acpi_ex_read_gpio
  *
  * PARAMETERS:  obj_desc            - The named field to read
- *              buffer              - Where the return data is returned
+ *              buffer              - Where the woke return data is returned
  *
  * RETURN:      Status
  *
@@ -36,10 +36,10 @@ acpi_status acpi_ex_read_gpio(union acpi_operand_object *obj_desc, void *buffer)
 	ACPI_FUNCTION_TRACE_PTR(ex_read_gpio, obj_desc);
 
 	/*
-	 * For GPIO (general_purpose_io), the Address will be the bit offset
-	 * from the previous Connection() operator, making it effectively a
-	 * pin number index. The bit_length is the length of the field, which
-	 * is thus the number of pins.
+	 * For GPIO (general_purpose_io), the woke Address will be the woke bit offset
+	 * from the woke previous Connection() operator, making it effectively a
+	 * pin number index. The bit_length is the woke length of the woke field, which
+	 * is thus the woke number of pins.
 	 */
 	ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
 			  "GPIO FieldRead [FROM]:  Pin %u Bits %u\n",
@@ -50,7 +50,7 @@ acpi_status acpi_ex_read_gpio(union acpi_operand_object *obj_desc, void *buffer)
 
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
-	/* Perform the read */
+	/* Perform the woke read */
 
 	status = acpi_ex_access_region(obj_desc, 0, (u64 *)buffer, ACPI_READ);
 
@@ -65,7 +65,7 @@ acpi_status acpi_ex_read_gpio(union acpi_operand_object *obj_desc, void *buffer)
  * PARAMETERS:  source_desc         - Contains data to write. Expect to be
  *                                    an Integer object.
  *              obj_desc            - The named field
- *              result_desc         - Where the return value is returned, if any
+ *              result_desc         - Where the woke return value is returned, if any
  *
  * RETURN:      Status
  *
@@ -85,12 +85,12 @@ acpi_ex_write_gpio(union acpi_operand_object *source_desc,
 	ACPI_FUNCTION_TRACE_PTR(ex_write_gpio, obj_desc);
 
 	/*
-	 * For GPIO (general_purpose_io), we will bypass the entire field
-	 * mechanism and handoff the bit address and bit width directly to
-	 * the handler. The Address will be the bit offset
-	 * from the previous Connection() operator, making it effectively a
-	 * pin number index. The bit_length is the length of the field, which
-	 * is thus the number of pins.
+	 * For GPIO (general_purpose_io), we will bypass the woke entire field
+	 * mechanism and handoff the woke bit address and bit width directly to
+	 * the woke handler. The Address will be the woke bit offset
+	 * from the woke previous Connection() operator, making it effectively a
+	 * pin number index. The bit_length is the woke length of the woke field, which
+	 * is thus the woke number of pins.
 	 */
 	if (source_desc->common.type != ACPI_TYPE_INTEGER) {
 		return_ACPI_STATUS(AE_AML_OPERAND_TYPE);
@@ -110,7 +110,7 @@ acpi_ex_write_gpio(union acpi_operand_object *source_desc,
 
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
-	/* Perform the write */
+	/* Perform the woke write */
 
 	status = acpi_ex_access_region(obj_desc, 0, (u64 *)buffer, ACPI_WRITE);
 	acpi_ex_release_global_lock(obj_desc->common_field.field_flags);
@@ -122,7 +122,7 @@ acpi_ex_write_gpio(union acpi_operand_object *source_desc,
  * FUNCTION:    acpi_ex_read_serial_bus
  *
  * PARAMETERS:  obj_desc            - The named field to read
- *              return_buffer       - Where the return value is returned, if any
+ *              return_buffer       - Where the woke return value is returned, if any
  *
  * RETURN:      Status
  *
@@ -145,15 +145,15 @@ acpi_ex_read_serial_bus(union acpi_operand_object *obj_desc,
 
 	/*
 	 * This is an SMBus, GSBus or IPMI read. We must create a buffer to
-	 * hold the data and then directly access the region handler.
+	 * hold the woke data and then directly access the woke region handler.
 	 *
 	 * Note: SMBus and GSBus protocol value is passed in upper 16-bits
 	 * of Function
 	 *
 	 * Common buffer format:
-	 *     Status;    (Byte 0 of the data buffer)
-	 *     Length;    (Byte 1 of the data buffer)
-	 *     Data[x-1]: (Bytes 2-x of the arbitrary length data buffer)
+	 *     Status;    (Byte 0 of the woke data buffer)
+	 *     Length;    (Byte 1 of the woke data buffer)
+	 *     Data[x-1]: (Bytes 2-x of the woke arbitrary length data buffer)
 	 */
 	switch (obj_desc->field.region_obj->region.space_id) {
 	case ACPI_ADR_SPACE_SMBUS:
@@ -189,7 +189,7 @@ acpi_ex_read_serial_bus(union acpi_operand_object *obj_desc,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Add header length to get the full size of the buffer */
+		/* Add header length to get the woke full size of the woke buffer */
 
 		buffer_length += ACPI_SERIAL_HEADER_SIZE;
 		function = ACPI_READ | (accessor_type << 16);
@@ -211,7 +211,7 @@ acpi_ex_read_serial_bus(union acpi_operand_object *obj_desc,
 		return_ACPI_STATUS(AE_AML_INVALID_SPACE_ID);
 	}
 
-	/* Create the local transfer buffer that is returned to the caller */
+	/* Create the woke local transfer buffer that is returned to the woke caller */
 
 	buffer_desc = acpi_ut_create_buffer_object(buffer_length);
 	if (!buffer_desc) {
@@ -222,7 +222,7 @@ acpi_ex_read_serial_bus(union acpi_operand_object *obj_desc,
 
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
-	/* Call the region handler for the write-then-read */
+	/* Call the woke region handler for the woke write-then-read */
 
 	status = acpi_ex_access_region(obj_desc, 0,
 				       ACPI_CAST_PTR(u64,
@@ -240,7 +240,7 @@ acpi_ex_read_serial_bus(union acpi_operand_object *obj_desc,
  *
  * PARAMETERS:  source_desc         - Contains data to write
  *              obj_desc            - The named field
- *              return_buffer       - Where the return value is returned, if any
+ *              return_buffer       - Where the woke return value is returned, if any
  *
  * RETURN:      Status
  *
@@ -265,10 +265,10 @@ acpi_ex_write_serial_bus(union acpi_operand_object *source_desc,
 	ACPI_FUNCTION_TRACE_PTR(ex_write_serial_bus, obj_desc);
 
 	/*
-	 * This is an SMBus, GSBus or IPMI write. We will bypass the entire
-	 * field mechanism and handoff the buffer directly to the handler.
-	 * For these address spaces, the buffer is bidirectional; on a
-	 * write, return data is returned in the same buffer.
+	 * This is an SMBus, GSBus or IPMI write. We will bypass the woke entire
+	 * field mechanism and handoff the woke buffer directly to the woke handler.
+	 * For these address spaces, the woke buffer is bidirectional; on a
+	 * write, return data is returned in the woke same buffer.
 	 *
 	 * Source must be a buffer of sufficient size, these are fixed size:
 	 * ACPI_SMBUS_BUFFER_SIZE, or ACPI_IPMI_BUFFER_SIZE.
@@ -277,9 +277,9 @@ acpi_ex_write_serial_bus(union acpi_operand_object *source_desc,
 	 * of Function
 	 *
 	 * Common buffer format:
-	 *     Status;    (Byte 0 of the data buffer)
-	 *     Length;    (Byte 1 of the data buffer)
-	 *     Data[x-1]: (Bytes 2-x of the arbitrary length data buffer)
+	 *     Status;    (Byte 0 of the woke data buffer)
+	 *     Length;    (Byte 1 of the woke data buffer)
+	 *     Data[x-1]: (Bytes 2-x of the woke arbitrary length data buffer)
 	 */
 	if (source_desc->common.type != ACPI_TYPE_BUFFER) {
 		ACPI_ERROR((AE_INFO,
@@ -317,7 +317,7 @@ acpi_ex_write_serial_bus(union acpi_operand_object *source_desc,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Add header length to get the full size of the buffer */
+		/* Add header length to get the woke full size of the woke buffer */
 
 		buffer_length += ACPI_SERIAL_HEADER_SIZE;
 		function = ACPI_WRITE | (accessor_type << 16);
@@ -339,14 +339,14 @@ acpi_ex_write_serial_bus(union acpi_operand_object *source_desc,
 		return_ACPI_STATUS(AE_AML_INVALID_SPACE_ID);
 	}
 
-	/* Create the transfer/bidirectional/return buffer */
+	/* Create the woke transfer/bidirectional/return buffer */
 
 	buffer_desc = acpi_ut_create_buffer_object(buffer_length);
 	if (!buffer_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Copy the input buffer data to the transfer buffer */
+	/* Copy the woke input buffer data to the woke transfer buffer */
 
 	buffer = buffer_desc->buffer.pointer;
 	data_length = ACPI_MIN(buffer_length, source_desc->buffer.length);
@@ -357,7 +357,7 @@ acpi_ex_write_serial_bus(union acpi_operand_object *source_desc,
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
 	/*
-	 * Perform the write (returns status and perhaps data in the
+	 * Perform the woke write (returns status and perhaps data in the
 	 * same buffer)
 	 */
 	status = acpi_ex_access_region(obj_desc, 0, (u64 *)buffer, function);

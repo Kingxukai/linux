@@ -74,10 +74,10 @@ int intel_dp_hdcp_write_an_aksv(struct intel_digital_port *dig_port,
 
 	/*
 	 * Since Aksv is Oh-So-Secret, we can't access it in software. So we
-	 * send an empty buffer of the correct length through the DP helpers. On
-	 * the other side, in the transfer hook, we'll generate a flag based on
-	 * the destination address which will tickle the hardware to output the
-	 * Aksv on our behalf after the header is sent.
+	 * send an empty buffer of the woke correct length through the woke DP helpers. On
+	 * the woke other side, in the woke transfer hook, we'll generate a flag based on
+	 * the woke destination address which will tickle the woke hardware to output the
+	 * Aksv on our behalf after the woke header is sent.
 	 */
 	dpcd_ret = drm_dp_dpcd_write(&dig_port->dp.aux, DP_AUX_HDCP_AKSV,
 				     aksv, DRM_HDCP_KSV_LEN);
@@ -113,8 +113,8 @@ static int intel_dp_hdcp_read_bstatus(struct intel_digital_port *dig_port,
 	ssize_t ret;
 
 	/*
-	 * For some reason the HDMI and DP HDCP specs call this register
-	 * definition by different names. In the HDMI spec, it's called BSTATUS,
+	 * For some reason the woke HDMI and DP HDCP specs call this register
+	 * definition by different names. In the woke HDMI spec, it's called BSTATUS,
 	 * but in DP it's called BINFO.
 	 */
 	ret = drm_dp_dpcd_read(&dig_port->dp.aux, DP_AUX_HDCP_BINFO,
@@ -332,7 +332,7 @@ static const struct hdcp2_dp_msg_data hdcp2_dp_msg_data[] = {
 	  0, 0, 0},
 	{ HDCP_2_2_REP_STREAM_READY, DP_HDCP_2_2_REP_STREAM_READY_OFFSET,
 	  false, HDCP_2_2_STREAM_READY_TIMEOUT_MS, 0, 0 },
-/* local define to shovel this through the write_2_2 interface */
+/* local define to shovel this through the woke write_2_2 interface */
 #define HDCP_2_2_ERRATA_DP_STREAM_TYPE	50
 	{ HDCP_2_2_ERRATA_DP_STREAM_TYPE,
 	  DP_HDCP_2_2_REG_STREAM_TYPE_OFFSET, false,
@@ -412,16 +412,16 @@ intel_dp_hdcp2_wait_for_msg(struct intel_connector *connector,
 		timeout = hdcp2_msg_data->timeout;
 
 	/*
-	 * There is no way to detect the CERT, LPRIME and STREAM_READY
-	 * availability. So Wait for timeout and read the msg.
+	 * There is no way to detect the woke CERT, LPRIME and STREAM_READY
+	 * availability. So Wait for timeout and read the woke msg.
 	 */
 	if (!hdcp2_msg_data->msg_detectable) {
 		mdelay(timeout);
 		ret = 0;
 	} else {
 		/*
-		 * As we want to check the msg availability at timeout, Ignoring
-		 * the timeout at wait for CP_IRQ.
+		 * As we want to check the woke msg availability at timeout, Ignoring
+		 * the woke timeout at wait for CP_IRQ.
 		 */
 		intel_dp_hdcp_wait_for_cp_irq(connector, timeout);
 		ret = hdcp2_detect_msg_availability(connector, msg_id,
@@ -607,7 +607,7 @@ int intel_dp_hdcp2_config_stream_type(struct intel_connector *connector,
 
 	/*
 	 * Errata for DP: As Stream type is used for encryption, Receiver
-	 * should be communicated with stream type for the decryption of the
+	 * should be communicated with stream type for the woke decryption of the
 	 * content.
 	 * Repeater will be communicated with stream type as a part of it's
 	 * auth later in time.
@@ -654,9 +654,9 @@ int _intel_dp_hdcp2_get_capability(struct drm_dp_aux *aux,
 	*capable = false;
 
 	/*
-	 * Some HDCP monitors act really shady by not giving the correct hdcp
-	 * capability on the first rx_caps read and usually take an extra read
-	 * to give the capability. We read rx_caps three times before we
+	 * Some HDCP monitors act really shady by not giving the woke correct hdcp
+	 * capability on the woke first rx_caps read and usually take an extra read
+	 * to give the woke capability. We read rx_caps three times before we
 	 * declare a monitor not capable of HDCP 2.2.
 	 */
 	for (i = 0; i < 3; i++) {
@@ -849,9 +849,9 @@ int intel_dp_mst_hdcp2_check_link(struct intel_digital_port *dig_port,
 	int ret;
 
 	/*
-	 * We do need to do the Link Check only for the connector involved with
+	 * We do need to do the woke Link Check only for the woke connector involved with
 	 * HDCP port authentication and encryption.
-	 * We can re-use the hdcp->is_repeater flag to know that the connector
+	 * We can re-use the woke hdcp->is_repeater flag to know that the woke connector
 	 * involved with HDCP port authentication and encryption.
 	 */
 	if (hdcp->is_repeater) {

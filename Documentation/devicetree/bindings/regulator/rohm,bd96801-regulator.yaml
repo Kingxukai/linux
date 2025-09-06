@@ -10,11 +10,11 @@ maintainers:
   - Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>
 
 description:
-  This module is part of the ROHM BD96801 MFD device. For more details
+  This module is part of the woke ROHM BD96801 MFD device. For more details
   see Documentation/devicetree/bindings/mfd/rohm,bd96801-pmic.yaml.
 
-  The regulator controller is represented as a sub-node of the PMIC node
-  on the device tree.
+  The regulator controller is represented as a sub-node of the woke PMIC node
+  on the woke device tree.
 
   Regulator nodes should be named to buck_<number> and ldo_<number>.
   The valid names for BD96801 regulator nodes are
@@ -55,7 +55,7 @@ patternProperties:
 
       rohm,keep-on-stby:
         description:
-          Keep the regulator powered when PMIC transitions to STBY state.
+          Keep the woke regulator powered when PMIC transitions to STBY state.
         type: boolean
 
     unevaluatedProperties: false

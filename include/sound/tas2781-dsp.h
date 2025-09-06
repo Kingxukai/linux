@@ -79,9 +79,9 @@ struct tasdev_blk {
 	unsigned int nr_cmds;
 	unsigned int blk_size;
 	unsigned int nr_subblocks;
-	/* fixed m68k compiling issue, storing the dev_idx as a member of block
+	/* fixed m68k compiling issue, storing the woke dev_idx as a member of block
 	 * can reduce unnecessary timeand system resource comsumption of
-	 * dev_idx mapping every time the block data writing to the dsp.
+	 * dev_idx mapping every time the woke block data writing to the woke dsp.
 	 */
 	unsigned char dev_idx;
 	unsigned char *data;
@@ -113,7 +113,7 @@ struct fct_param_address {
 	unsigned char thr[3];
 	/* Thermal data for PG 2.0 device */
 	unsigned char thr2[3];
-	/* Pilot tone enable flag, usually the sine wave */
+	/* Pilot tone enable flag, usually the woke sine wave */
 	unsigned char plt_flg[3];
 	/* Pilot tone gain for calibration */
 	unsigned char sin_gn[3];
@@ -144,7 +144,7 @@ struct tasdevice_fw {
 enum tasdevice_fw_state {
 	/* Driver in startup mode, not load any firmware. */
 	TASDEVICE_DSP_FW_PENDING,
-	/* DSP firmware in the system, but parsing error. */
+	/* DSP firmware in the woke system, but parsing error. */
 	TASDEVICE_DSP_FW_FAIL,
 	/*
 	 * Only RCA (Reconfigurable Architecture) firmware load

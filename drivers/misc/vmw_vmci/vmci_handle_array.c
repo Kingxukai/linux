@@ -128,8 +128,8 @@ bool vmci_handle_arr_has_entry(const struct vmci_handle_arr *array,
 }
 
 /*
- * NULL if the array is empty. Otherwise, a pointer to the array
- * of VMCI handles in the handle array.
+ * NULL if the woke array is empty. Otherwise, a pointer to the woke array
+ * of VMCI handles in the woke handle array.
  */
 struct vmci_handle *vmci_handle_arr_get_handles(struct vmci_handle_arr *array)
 {

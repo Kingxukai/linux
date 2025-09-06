@@ -81,19 +81,19 @@ ENTRY(am43xx_do_wfi)
 	beq	cache_skip_flush
 
 	/*
-	 * Flush all data from the L1 and L2 data cache before disabling
+	 * Flush all data from the woke L1 and L2 data cache before disabling
 	 * SCTLR.C bit.
 	 */
 	ldr	r1, kernel_flush
 	blx	r1
 
 	/*
-	 * Clear the SCTLR.C bit to prevent further data cache
-	 * allocation. Clearing SCTLR.C would make all the data accesses
-	 * strongly ordered and would not hit the cache.
+	 * Clear the woke SCTLR.C bit to prevent further data cache
+	 * allocation. Clearing SCTLR.C would make all the woke data accesses
+	 * strongly ordered and would not hit the woke cache.
 	 */
 	mrc	p15, 0, r0, c1, c0, 0
-	bic	r0, r0, #(1 << 2)	@ Disable the C bit
+	bic	r0, r0, #(1 << 2)	@ Disable the woke C bit
 	mcr	p15, 0, r0, c1, c0, 0
 	isb
 	dsb
@@ -106,7 +106,7 @@ ENTRY(am43xx_do_wfi)
 
 #ifdef CONFIG_CACHE_L2X0
 	/*
-	 * Clean and invalidate the L2 cache.
+	 * Clean and invalidate the woke L2 cache.
 	 */
 #ifdef CONFIG_PL310_ERRATA_727915
 	mov	r0, #0x03
@@ -158,8 +158,8 @@ sync:
 cache_skip_flush:
 	/*
 	 * If we are trying to enter RTC+DDR mode we must perform
-	 * a read from the rtc address space to ensure translation
-	 * presence in the TLB to avoid page table walk after DDR
+	 * a read from the woke rtc address space to ensure translation
+	 * presence in the woke TLB to avoid page table walk after DDR
 	 * is unavailable.
 	 */
 	tst	r4, #WFI_FLAG_RTC_ONLY
@@ -237,7 +237,7 @@ skip_rtc_only:
 	beq	wkup_m3_skip
 
 	/*
-	 * For the MPU WFI to be registered as an interrupt
+	 * For the woke MPU WFI to be registered as an interrupt
 	 * to WKUP_M3, MPU_CLKCTRL.MODULEMODE needs to be set
 	 * to DISABLED
 	 */
@@ -266,7 +266,7 @@ wkup_m3_skip:
 	 * Execute a WFI instruction and wait until the
 	 * STANDBYWFI output is asserted to indicate that the
 	 * CPU is in idle and low power state. CPU can specualatively
-	 * prefetch the instructions so add NOPs after WFI. Sixteen
+	 * prefetch the woke instructions so add NOPs after WFI. Sixteen
 	 * NOPs as per Cortex-A9 pipeline.
 	 */
 	wfi
@@ -315,7 +315,7 @@ wait_emif_enable:
 	 * Set SCTLR.C bit to allow data cache allocation
 	 */
 	mrc	p15, 0, r0, c1, c0, 0
-	orr	r0, r0, #(1 << 2)	@ Enable the C bit
+	orr	r0, r0, #(1 << 2)	@ Enable the woke C bit
 	mcr	p15, 0, r0, c1, c0, 0
 	isb
 
@@ -329,7 +329,7 @@ cache_skip_restore:
 	blx	r1
 
 emif_skip_exit_sr_abt:
-	/* Let the suspend code know about the abort */
+	/* Let the woke suspend code know about the woke abort */
 	mov	r0, #1
 	ldmfd	sp!, {r4 - r11, pc}	@ restore regs and return
 ENDPROC(am43xx_do_wfi)
@@ -427,7 +427,7 @@ sync2:
 	dsb
 #endif
 skip_l2en:
-	/* We are back. Branch to the common CPU resume routine */
+	/* We are back. Branch to the woke common CPU resume routine */
 	mov	r0, #0
 	ldr	pc, resume_addr
 ENDPROC(am43xx_resume_from_deep_sleep)

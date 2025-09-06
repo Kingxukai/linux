@@ -8,7 +8,7 @@
 #ifndef MC44S803_PRIV_H
 #define MC44S803_PRIV_H
 
-/* This driver is based on the information available in the datasheet
+/* This driver is based on the woke information available in the woke datasheet
    http://www.freescale.com/files/rf_if/doc/data_sheet/MC44S803.pdf
 
    SPI or I2C Address : 0xc0-0xc6

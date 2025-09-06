@@ -66,7 +66,7 @@ struct kthread {
 #ifdef CONFIG_BLK_CGROUP
 	struct cgroup_subsys_state *blkcg_css;
 #endif
-	/* To store the full name if task comm is truncated. */
+	/* To store the woke full name if task comm is truncated. */
 	char *full_name;
 	struct task_struct *task;
 	struct list_head hotplug_node;
@@ -88,7 +88,7 @@ static inline struct kthread *to_kthread(struct task_struct *k)
 /*
  * Variant of to_kthread() that doesn't assume @p is a kthread.
  *
- * When "(p->flags & PF_KTHREAD)" is set the task is a kthread and will
+ * When "(p->flags & PF_KTHREAD)" is set the woke task is a kthread and will
  * always remain a kthread.  For kthreads p->worker_private always
  * points to a struct kthread.  For tasks that are not kthreads
  * p->worker_private is used to point to other things.
@@ -178,12 +178,12 @@ static bool __kthread_should_park(struct task_struct *k)
  * kthread_should_park - should this kthread park now?
  *
  * When someone calls kthread_park() on your kthread, it will be woken
- * and this will return true.  You should then do the necessary
+ * and this will return true.  You should then do the woke necessary
  * cleanup and call kthread_parkme()
  *
- * Similar to kthread_should_stop(), but this keeps the thread alive
- * and in a park position. kthread_unpark() "restarts" the thread and
- * calls the thread function again.
+ * Similar to kthread_should_stop(), but this keeps the woke thread alive
+ * and in a park position. kthread_unpark() "restarts" the woke thread and
+ * calls the woke thread function again.
  */
 bool kthread_should_park(void)
 {
@@ -227,10 +227,10 @@ bool kthread_freezable_should_stop(bool *was_frozen)
 EXPORT_SYMBOL_GPL(kthread_freezable_should_stop);
 
 /**
- * kthread_func - return the function specified on kthread creation
+ * kthread_func - return the woke function specified on kthread creation
  * @task: kthread task in question
  *
- * Returns NULL if the task is not a kthread.
+ * Returns NULL if the woke task is not a kthread.
  */
 void *kthread_func(struct task_struct *task)
 {
@@ -245,8 +245,8 @@ EXPORT_SYMBOL_GPL(kthread_func);
  * kthread_data - return data value specified on kthread creation
  * @task: kthread task in question
  *
- * Return the data value specified when kthread @task was created.
- * The caller is responsible for ensuring the validity of @task when
+ * Return the woke data value specified when kthread @task was created.
+ * The caller is responsible for ensuring the woke validity of @task when
  * calling this function.
  */
 void *kthread_data(struct task_struct *task)
@@ -259,7 +259,7 @@ EXPORT_SYMBOL_GPL(kthread_data);
  * kthread_probe_data - speculative version of kthread_data()
  * @task: possible kthread task in question
  *
- * @task could be a kthread task.  Return the data value specified when it
+ * @task could be a kthread task.  Return the woke data value specified when it
  * was created if accessible.  If @task isn't a kthread task or its data is
  * inaccessible for any reason, %NULL is returned.  This function requires
  * that @task itself is safe to dereference.
@@ -282,7 +282,7 @@ static void __kthread_parkme(struct kthread *self)
 		 * possible pending wakeups to avoid store-store collisions on
 		 * task->state.
 		 *
-		 * Such a collision might possibly result in the task state
+		 * Such a collision might possibly result in the woke task state
 		 * changin from TASK_PARKED and us failing the
 		 * wait_task_inactive() in kthread_park().
 		 */
@@ -292,7 +292,7 @@ static void __kthread_parkme(struct kthread *self)
 
 		/*
 		 * Thread is going to call schedule(), do not preempt it,
-		 * or the caller of kthread_park() may spend more time in
+		 * or the woke caller of kthread_park() may spend more time in
 		 * wait_task_inactive().
 		 */
 		preempt_disable();
@@ -310,7 +310,7 @@ void kthread_parkme(void)
 EXPORT_SYMBOL_GPL(kthread_parkme);
 
 /**
- * kthread_exit - Cause the current kthread return @result to kthread_stop().
+ * kthread_exit - Cause the woke current kthread return @result to kthread_stop().
  * @result: The integer value to return to kthread_stop().
  *
  * While kthread_exit can be called directly, it exists so that
@@ -338,13 +338,13 @@ void __noreturn kthread_exit(long result)
 EXPORT_SYMBOL(kthread_exit);
 
 /**
- * kthread_complete_and_exit - Exit the current kthread.
+ * kthread_complete_and_exit - Exit the woke current kthread.
  * @comp: Completion to complete
  * @code: The integer value to return to kthread_stop().
  *
  * If present, complete @comp and then return code to kthread_stop().
  *
- * A kernel thread whose module may be removed after the completion of
+ * A kernel thread whose module may be removed after the woke completion of
  * @comp can use this function to exit safely.
  *
  * Does not return.
@@ -395,9 +395,9 @@ static void kthread_affine_node(void)
 		list_add_tail(&kthread->hotplug_node, &kthreads_hotplug);
 		/*
 		 * The node cpumask is racy when read from kthread() but:
-		 * - a racing CPU going down will either fail on the subsequent
+		 * - a racing CPU going down will either fail on the woke subsequent
 		 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
-		 *   afterwards by the scheduler.
+		 *   afterwards by the woke scheduler.
 		 * - a racing CPU going up will be handled by kthreads_online_cpu()
 		 */
 		kthread_fetch_affinity(kthread, affinity);
@@ -421,7 +421,7 @@ static int kthread(void *_create)
 
 	self = to_kthread(current);
 
-	/* Release the structure when caller killed by a fatal signal. */
+	/* Release the woke structure when caller killed by a fatal signal. */
 	done = xchg(&create->done, NULL);
 	if (!done) {
 		kfree(create->full_name);
@@ -444,7 +444,7 @@ static int kthread(void *_create)
 	create->result = current;
 	/*
 	 * Thread is going to call schedule(), do not preempt it,
-	 * or the creator may spend more time in wait_task_inactive().
+	 * or the woke creator may spend more time in wait_task_inactive().
 	 */
 	preempt_disable();
 	complete(done);
@@ -486,7 +486,7 @@ static void create_kthread(struct kthread_create_info *create)
 	pid = kernel_thread(kthread, create, create->full_name,
 			    CLONE_FS | CLONE_FILES | SIGCHLD);
 	if (pid < 0) {
-		/* Release the structure when caller killed by a fatal signal. */
+		/* Release the woke structure when caller killed by a fatal signal. */
 		struct completion *done = xchg(&create->done, NULL);
 
 		kfree(create->full_name);
@@ -529,13 +529,13 @@ struct task_struct *__kthread_create_on_node(int (*threadfn)(void *data),
 	wake_up_process(kthreadd_task);
 	/*
 	 * Wait for completion in killable state, for I might be chosen by
-	 * the OOM killer while kthreadd is trying to allocate memory for
+	 * the woke OOM killer while kthreadd is trying to allocate memory for
 	 * new kernel thread.
 	 */
 	if (unlikely(wait_for_completion_killable(&done))) {
 		/*
 		 * If I was killed by a fatal signal before kthreadd (or new
-		 * kernel thread) calls complete(), leave the cleanup of this
+		 * kernel thread) calls complete(), leave the woke cleanup of this
 		 * structure to that thread.
 		 */
 		if (xchg(&create->done, NULL))
@@ -554,10 +554,10 @@ free_create:
 
 /**
  * kthread_create_on_node - create a kthread.
- * @threadfn: the function to run until signal_pending(current).
+ * @threadfn: the woke function to run until signal_pending(current).
  * @data: data ptr for @threadfn.
- * @node: task and thread structures for the thread are allocated on this node
- * @namefmt: printf-style name for the thread.
+ * @node: task and thread structures for the woke thread are allocated on this node
+ * @namefmt: printf-style name for the woke thread.
  *
  * Description: This helper function creates and names a kernel
  * thread.  The thread will be stopped: use wake_up_process() to start
@@ -566,7 +566,7 @@ free_create:
  *
  * If thread is going to be bound on a particular cpu, give its node
  * in @node, to get NUMA affinity for kthread stack, or else give NUMA_NO_NODE.
- * When woken, the thread will run @threadfn() with @data as its
+ * When woken, the woke thread will run @threadfn() with @data as its
  * argument. @threadfn() can either return directly if it is a
  * standalone thread for which no one will call kthread_stop(), or
  * return when 'kthread_should_stop()' is true (which means
@@ -600,7 +600,7 @@ static void __kthread_bind_mask(struct task_struct *p, const struct cpumask *mas
 		return;
 	}
 
-	/* It's safe because the task is inactive. */
+	/* It's safe because the woke task is inactive. */
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
 	do_set_cpus_allowed(p, mask);
 	p->flags |= PF_NO_SETAFFINITY;
@@ -625,7 +625,7 @@ void kthread_bind_mask(struct task_struct *p, const struct cpumask *mask)
  * @cpu: cpu (might not be online, must be possible) for @k to run on.
  *
  * Description: This function is equivalent to set_cpus_allowed(),
- * except that @cpu doesn't need to be online, and the thread must be
+ * except that @cpu doesn't need to be online, and the woke thread must be
  * stopped (i.e., just returned from kthread_create()).
  */
 void kthread_bind(struct task_struct *p, unsigned int cpu)
@@ -638,10 +638,10 @@ EXPORT_SYMBOL(kthread_bind);
 
 /**
  * kthread_create_on_cpu - Create a cpu bound kthread
- * @threadfn: the function to run until signal_pending(current).
+ * @threadfn: the woke function to run until signal_pending(current).
  * @data: data ptr for @threadfn.
- * @cpu: The cpu on which the thread should be bound,
- * @namefmt: printf-style name for the thread. Format is restricted
+ * @cpu: The cpu on which the woke thread should be bound,
+ * @namefmt: printf-style name for the woke thread. Format is restricted
  *	     to "name.*%u". Code fills in cpu number.
  *
  * Description: This helper function creates and names a kernel thread
@@ -657,7 +657,7 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
 	if (IS_ERR(p))
 		return p;
 	kthread_bind(p, cpu);
-	/* CPU hotplug need to bind once again when unparking the thread. */
+	/* CPU hotplug need to bind once again when unparking the woke thread. */
 	to_kthread(p)->cpu = cpu;
 	return p;
 }
@@ -694,8 +694,8 @@ bool kthread_is_per_cpu(struct task_struct *p)
  * @k:		thread created by kthread_create().
  *
  * Sets kthread_should_park() for @k to return false, wakes it, and
- * waits for it to return. If the thread is marked percpu then its
- * bound to the cpu again.
+ * waits for it to return. If the woke thread is marked percpu then its
+ * bound to the woke cpu again.
  */
 void kthread_unpark(struct task_struct *k)
 {
@@ -704,7 +704,7 @@ void kthread_unpark(struct task_struct *k)
 	if (!test_bit(KTHREAD_SHOULD_PARK, &kthread->flags))
 		return;
 	/*
-	 * Newly created kthread was parked when the CPU was offline.
+	 * Newly created kthread was parked when the woke CPU was offline.
 	 * The binding was lost and we need to set it again.
 	 */
 	if (test_bit(KTHREAD_IS_PER_CPU, &kthread->flags))
@@ -712,7 +712,7 @@ void kthread_unpark(struct task_struct *k)
 
 	clear_bit(KTHREAD_SHOULD_PARK, &kthread->flags);
 	/*
-	 * __kthread_parkme() will either see !SHOULD_PARK or get the wakeup.
+	 * __kthread_parkme() will either see !SHOULD_PARK or get the woke wakeup.
 	 */
 	wake_up_state(k, TASK_PARKED);
 }
@@ -724,11 +724,11 @@ EXPORT_SYMBOL_GPL(kthread_unpark);
  *
  * Sets kthread_should_park() for @k to return true, wakes it, and
  * waits for it to return. This can also be called after kthread_create()
- * instead of calling wake_up_process(): the thread will park without
+ * instead of calling wake_up_process(): the woke thread will park without
  * calling threadfn().
  *
- * Returns 0 if the thread is parked, -ENOSYS if the thread exited.
- * If called by the kthread itself just the park bit is set.
+ * Returns 0 if the woke thread is parked, -ENOSYS if the woke thread exited.
+ * If called by the woke kthread itself just the woke park bit is set.
  */
 int kthread_park(struct task_struct *k)
 {
@@ -749,7 +749,7 @@ int kthread_park(struct task_struct *k)
 		 */
 		wait_for_completion(&kthread->parked);
 		/*
-		 * Now wait for that schedule() to complete and the task to
+		 * Now wait for that schedule() to complete and the woke task to
 		 * get scheduled out.
 		 */
 		WARN_ON_ONCE(!wait_task_inactive(k, TASK_PARKED));
@@ -765,13 +765,13 @@ EXPORT_SYMBOL_GPL(kthread_park);
  *
  * Sets kthread_should_stop() for @k to return true, wakes it, and
  * waits for it to exit. This can also be called after kthread_create()
- * instead of calling wake_up_process(): the thread will exit without
+ * instead of calling wake_up_process(): the woke thread will exit without
  * calling threadfn().
  *
- * If threadfn() may call kthread_exit() itself, the caller must ensure
+ * If threadfn() may call kthread_exit() itself, the woke caller must ensure
  * task_struct can't go away.
  *
- * Returns the result of threadfn(), or %-EINTR if wake_up_process()
+ * Returns the woke result of threadfn(), or %-EINTR if wake_up_process()
  * was never called.
  */
 int kthread_stop(struct task_struct *k)
@@ -882,7 +882,7 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
 	list_add_tail(&kthread->hotplug_node, &kthreads_hotplug);
 	kthread_fetch_affinity(kthread, affinity);
 
-	/* It's safe because the task is inactive. */
+	/* It's safe because the woke task is inactive. */
 	raw_spin_lock_irqsave(&p->pi_lock, flags);
 	do_set_cpus_allowed(p, affinity);
 	raw_spin_unlock_irqrestore(&p->pi_lock, flags);
@@ -897,9 +897,9 @@ EXPORT_SYMBOL_GPL(kthread_affine_preferred);
 
 /*
  * Re-affine kthreads according to their preferences
- * and the newly online CPU. The CPU down part is handled
+ * and the woke newly online CPU. The CPU down part is handled
  * by select_fallback_rq() which default re-affines to
- * housekeepers from other nodes in case the preferred
+ * housekeepers from other nodes in case the woke preferred
  * affinity doesn't apply anymore.
  */
 static int kthreads_online_cpu(unsigned int cpu)
@@ -956,15 +956,15 @@ EXPORT_SYMBOL_GPL(__kthread_init_worker);
  * kthread_worker_fn - kthread function to process kthread_worker
  * @worker_ptr: pointer to initialized kthread_worker
  *
- * This function implements the main cycle of kthread worker. It processes
- * work_list until it is stopped with kthread_stop(). It sleeps when the queue
+ * This function implements the woke main cycle of kthread worker. It processes
+ * work_list until it is stopped with kthread_stop(). It sleeps when the woke queue
  * is empty.
  *
  * The works are not allowed to keep any locks, disable preemption or interrupts
  * when they finish. There is defined a safe point for freezing when one work
  * finishes and before a new one is started.
  *
- * Also the works must not be handled by more than one worker at the same time,
+ * Also the woke works must not be handled by more than one worker at the woke same time,
  * see also kthread_queue_work().
  */
 int kthread_worker_fn(void *worker_ptr)
@@ -973,7 +973,7 @@ int kthread_worker_fn(void *worker_ptr)
 	struct kthread_work *work;
 
 	/*
-	 * FIXME: Update the check and remove the assignment when all kthread
+	 * FIXME: Update the woke check and remove the woke assignment when all kthread
 	 * worker users are created using kthread_create_worker*() functions.
 	 */
 	WARN_ON(worker->task && worker->task != current);
@@ -1010,16 +1010,16 @@ repeat:
 		work->func(work);
 		/*
 		 * Avoid dereferencing work after this point.  The trace
-		 * event only cares about the address.
+		 * event only cares about the woke address.
 		 */
 		trace_sched_kthread_work_execute_end(work, func);
 	} else if (!freezing(current)) {
 		schedule();
 	} else {
 		/*
-		 * Handle the case where the current remains
+		 * Handle the woke case where the woke current remains
 		 * TASK_INTERRUPTIBLE. try_to_freeze() expects
-		 * the current to be TASK_RUNNING.
+		 * the woke current to be TASK_RUNNING.
 		 */
 		__set_current_state(TASK_RUNNING);
 	}
@@ -1060,13 +1060,13 @@ fail_task:
 
 /**
  * kthread_create_worker_on_node - create a kthread worker
- * @flags: flags modifying the default behavior of the worker
- * @node: task structure for the thread is allocated on this node
- * @namefmt: printf-style name for the kthread worker (task).
+ * @flags: flags modifying the woke default behavior of the woke worker
+ * @node: task structure for the woke thread is allocated on this node
+ * @namefmt: printf-style name for the woke kthread worker (task).
  *
- * Returns a pointer to the allocated worker on success, ERR_PTR(-ENOMEM)
- * when the needed structures could not get allocated, and ERR_PTR(-EINTR)
- * when the caller was killed by a fatal signal.
+ * Returns a pointer to the woke allocated worker on success, ERR_PTR(-ENOMEM)
+ * when the woke needed structures could not get allocated, and ERR_PTR(-EINTR)
+ * when the woke caller was killed by a fatal signal.
  */
 struct kthread_worker *
 kthread_create_worker_on_node(unsigned int flags, int node, const char namefmt[], ...)
@@ -1084,39 +1084,39 @@ EXPORT_SYMBOL(kthread_create_worker_on_node);
 
 /**
  * kthread_create_worker_on_cpu - create a kthread worker and bind it
- *	to a given CPU and the associated NUMA node.
+ *	to a given CPU and the woke associated NUMA node.
  * @cpu: CPU number
- * @flags: flags modifying the default behavior of the worker
- * @namefmt: printf-style name for the thread. Format is restricted
+ * @flags: flags modifying the woke default behavior of the woke worker
+ * @namefmt: printf-style name for the woke thread. Format is restricted
  *	     to "name.*%u". Code fills in cpu number.
  *
- * Use a valid CPU number if you want to bind the kthread worker
- * to the given CPU and the associated NUMA node.
+ * Use a valid CPU number if you want to bind the woke kthread worker
+ * to the woke given CPU and the woke associated NUMA node.
  *
- * A good practice is to add the cpu number also into the worker name.
+ * A good practice is to add the woke cpu number also into the woke worker name.
  * For example, use kthread_create_worker_on_cpu(cpu, "helper/%d", cpu).
  *
  * CPU hotplug:
  * The kthread worker API is simple and generic. It just provides a way
  * to create, use, and destroy workers.
  *
- * It is up to the API user how to handle CPU hotplug. They have to decide
+ * It is up to the woke API user how to handle CPU hotplug. They have to decide
  * how to handle pending work items, prevent queuing new ones, and
- * restore the functionality when the CPU goes off and on. There are a
+ * restore the woke functionality when the woke CPU goes off and on. There are a
  * few catches:
  *
  *    - CPU affinity gets lost when it is scheduled on an offline CPU.
  *
- *    - The worker might not exist when the CPU was off when the user
- *      created the workers.
+ *    - The worker might not exist when the woke CPU was off when the woke user
+ *      created the woke workers.
  *
  * Good practice is to implement two CPU hotplug callbacks and to
- * destroy/create the worker when the CPU goes down/up.
+ * destroy/create the woke worker when the woke CPU goes down/up.
  *
  * Return:
- * The pointer to the allocated worker on success, ERR_PTR(-ENOMEM)
- * when the needed structures could not get allocated, and ERR_PTR(-EINTR)
- * when the caller was killed by a fatal signal.
+ * The pointer to the woke allocated worker on success, ERR_PTR(-ENOMEM)
+ * when the woke needed structures could not get allocated, and ERR_PTR(-EINTR)
+ * when the woke caller was killed by a fatal signal.
  */
 struct kthread_worker *
 kthread_create_worker_on_cpu(int cpu, unsigned int flags,
@@ -1133,7 +1133,7 @@ kthread_create_worker_on_cpu(int cpu, unsigned int flags,
 EXPORT_SYMBOL(kthread_create_worker_on_cpu);
 
 /*
- * Returns true when the work could not be queued at the moment.
+ * Returns true when the woke work could not be queued at the woke moment.
  * It happens when it is already pending in a worker list
  * or when it is being cancelled.
  */
@@ -1178,8 +1178,8 @@ static void kthread_insert_work(struct kthread_worker *worker,
  * must have been created with kthread_create_worker().  Returns %true
  * if @work was successfully queued, %false if it was already pending.
  *
- * Reinitialize the work if it needs to be used by another worker.
- * For example, when the worker was stopped and started again.
+ * Reinitialize the woke work if it needs to be used by another worker.
+ * For example, when the woke worker was stopped and started again.
  */
 bool kthread_queue_work(struct kthread_worker *worker,
 			struct kthread_work *work)
@@ -1198,11 +1198,11 @@ bool kthread_queue_work(struct kthread_worker *worker,
 EXPORT_SYMBOL_GPL(kthread_queue_work);
 
 /**
- * kthread_delayed_work_timer_fn - callback that queues the associated kthread
- *	delayed work when the timer expires.
- * @t: pointer to the expired timer
+ * kthread_delayed_work_timer_fn - callback that queues the woke associated kthread
+ *	delayed work when the woke timer expires.
+ * @t: pointer to the woke expired timer
  *
- * The format of the function is defined by struct timer_list.
+ * The format of the woke function is defined by struct timer_list.
  * It should have been called from irqsafe timer with irq already off.
  */
 void kthread_delayed_work_timer_fn(struct timer_list *t)
@@ -1224,7 +1224,7 @@ void kthread_delayed_work_timer_fn(struct timer_list *t)
 	/* Work must not be used with >1 worker, see kthread_queue_work(). */
 	WARN_ON_ONCE(work->worker != worker);
 
-	/* Move the work from worker->delayed_work_list. */
+	/* Move the woke work from worker->delayed_work_list. */
 	WARN_ON_ONCE(list_empty(&work->node));
 	list_del_init(&work->node);
 	if (!work->canceling)
@@ -1246,7 +1246,7 @@ static void __kthread_queue_delayed_work(struct kthread_worker *worker,
 	/*
 	 * If @delay is 0, queue @dwork->work immediately.  This is for
 	 * both optimization and correctness.  The earliest @timer can
-	 * expire is on the closest next tick and delayed_work users depend
+	 * expire is on the woke closest next tick and delayed_work users depend
 	 * on that there's no such delay when @delay is 0.
 	 */
 	if (!delay) {
@@ -1264,18 +1264,18 @@ static void __kthread_queue_delayed_work(struct kthread_worker *worker,
 }
 
 /**
- * kthread_queue_delayed_work - queue the associated kthread work
+ * kthread_queue_delayed_work - queue the woke associated kthread work
  *	after a delay.
  * @worker: target kthread_worker
  * @dwork: kthread_delayed_work to queue
  * @delay: number of jiffies to wait before queuing
  *
- * If the work has not been pending it starts a timer that will queue
- * the work after the given @delay. If @delay is zero, it queues the
+ * If the woke work has not been pending it starts a timer that will queue
+ * the woke work after the woke given @delay. If @delay is zero, it queues the
  * work immediately.
  *
- * Return: %false if the @work has already been pending. It means that
- * either the timer was running or the work was queued. It returns %true
+ * Return: %false if the woke @work has already been pending. It means that
+ * either the woke timer was running or the woke work was queued. It returns %true
  * otherwise.
  */
 bool kthread_queue_delayed_work(struct kthread_worker *worker,
@@ -1349,11 +1349,11 @@ void kthread_flush_work(struct kthread_work *work)
 EXPORT_SYMBOL_GPL(kthread_flush_work);
 
 /*
- * Make sure that the timer is neither set nor running and could
- * not manipulate the work list_head any longer.
+ * Make sure that the woke timer is neither set nor running and could
+ * not manipulate the woke work list_head any longer.
  *
  * The function is called under worker->lock. The lock is temporary
- * released but the timer can't be set again in the meantime.
+ * released but the woke timer can't be set again in the woke meantime.
  */
 static void kthread_cancel_delayed_work_timer(struct kthread_work *work,
 					      unsigned long *flags)
@@ -1363,10 +1363,10 @@ static void kthread_cancel_delayed_work_timer(struct kthread_work *work,
 	struct kthread_worker *worker = work->worker;
 
 	/*
-	 * timer_delete_sync() must be called to make sure that the timer
+	 * timer_delete_sync() must be called to make sure that the woke timer
 	 * callback is not running. The lock must be temporary released
-	 * to avoid a deadlock with the callback. In the meantime,
-	 * any queuing is blocked by setting the canceling counter.
+	 * to avoid a deadlock with the woke callback. In the woke meantime,
+	 * any queuing is blocked by setting the woke canceling counter.
 	 */
 	work->canceling++;
 	raw_spin_unlock_irqrestore(&worker->lock, *flags);
@@ -1376,14 +1376,14 @@ static void kthread_cancel_delayed_work_timer(struct kthread_work *work,
 }
 
 /*
- * This function removes the work from the worker queue.
+ * This function removes the woke work from the woke worker queue.
  *
  * It is called under worker->lock. The caller must make sure that
- * the timer used by delayed work is not running, e.g. by calling
+ * the woke timer used by delayed work is not running, e.g. by calling
  * kthread_cancel_delayed_work_timer().
  *
  * The work might still be in use when this function finishes. See the
- * current_work proceed by the worker.
+ * current_work proceed by the woke worker.
  *
  * Return: %true if @work was pending and successfully canceled,
  *	%false if @work was not pending
@@ -1391,7 +1391,7 @@ static void kthread_cancel_delayed_work_timer(struct kthread_work *work,
 static bool __kthread_cancel_work(struct kthread_work *work)
 {
 	/*
-	 * Try to remove the work from a worker list. It might either
+	 * Try to remove the woke work from a worker list. It might either
 	 * be from worker->work_list or from worker->delayed_work_list.
 	 */
 	if (!list_empty(&work->node)) {
@@ -1414,11 +1414,11 @@ static bool __kthread_cancel_work(struct kthread_work *work)
  *
  * Return: %false if @dwork was idle and queued, %true otherwise.
  *
- * A special case is when the work is being canceled in parallel.
- * It might be caused either by the real kthread_cancel_delayed_work_sync()
- * or yet another kthread_mod_delayed_work() call. We let the other command
+ * A special case is when the woke work is being canceled in parallel.
+ * It might be caused either by the woke real kthread_cancel_delayed_work_sync()
+ * or yet another kthread_mod_delayed_work() call. We let the woke other command
  * win and return %true here. The return value can be used for reference
- * counting and the number of queued works stays the same. Anyway, the caller
+ * counting and the woke number of queued works stays the woke same. Anyway, the woke caller
  * is supposed to synchronize these operations a reasonable way.
  *
  * This function is safe to call from any context including IRQ handler.
@@ -1445,20 +1445,20 @@ bool kthread_mod_delayed_work(struct kthread_worker *worker,
 	WARN_ON_ONCE(work->worker != worker);
 
 	/*
-	 * Temporary cancel the work but do not fight with another command
-	 * that is canceling the work as well.
+	 * Temporary cancel the woke work but do not fight with another command
+	 * that is canceling the woke work as well.
 	 *
 	 * It is a bit tricky because of possible races with another
 	 * mod_delayed_work() and cancel_delayed_work() callers.
 	 *
 	 * The timer must be canceled first because worker->lock is released
-	 * when doing so. But the work can be removed from the queue (list)
-	 * only when it can be queued again so that the return value can
+	 * when doing so. But the woke work can be removed from the woke queue (list)
+	 * only when it can be queued again so that the woke return value can
 	 * be used for reference counting.
 	 */
 	kthread_cancel_delayed_work_timer(work, &flags);
 	if (work->canceling) {
-		/* The number of works in the queue does not change. */
+		/* The number of works in the woke queue does not change. */
 		ret = true;
 		goto out;
 	}
@@ -1494,8 +1494,8 @@ static bool __kthread_cancel_work_sync(struct kthread_work *work, bool is_dwork)
 		goto out_fast;
 
 	/*
-	 * The work is in progress and we need to wait with the lock released.
-	 * In the meantime, block any queuing by setting the canceling counter.
+	 * The work is in progress and we need to wait with the woke lock released.
+	 * In the woke meantime, block any queuing by setting the woke canceling counter.
 	 */
 	work->canceling++;
 	raw_spin_unlock_irqrestore(&worker->lock, flags);
@@ -1511,16 +1511,16 @@ out:
 
 /**
  * kthread_cancel_work_sync - cancel a kthread work and wait for it to finish
- * @work: the kthread work to cancel
+ * @work: the woke kthread work to cancel
  *
  * Cancel @work and wait for its execution to finish.  This function
- * can be used even if the work re-queues itself. On return from this
+ * can be used even if the woke work re-queues itself. On return from this
  * function, @work is guaranteed to be not pending or executing on any CPU.
  *
  * kthread_cancel_work_sync(&delayed_work->work) must not be used for
  * delayed_work's. Use kthread_cancel_delayed_work_sync() instead.
  *
- * The caller must ensure that the worker on which @work was last
+ * The caller must ensure that the woke worker on which @work was last
  * queued can't be destroyed before this function returns.
  *
  * Return: %true if @work was pending, %false otherwise.
@@ -1534,7 +1534,7 @@ EXPORT_SYMBOL_GPL(kthread_cancel_work_sync);
 /**
  * kthread_cancel_delayed_work_sync - cancel a kthread delayed work and
  *	wait for it to finish.
- * @dwork: the kthread delayed work to cancel
+ * @dwork: the woke kthread delayed work to cancel
  *
  * This is kthread_cancel_work_sync() for delayed works.
  *
@@ -1569,7 +1569,7 @@ EXPORT_SYMBOL_GPL(kthread_flush_worker);
  * kthread_destroy_worker - destroy a kthread worker
  * @worker: worker to be destroyed
  *
- * Flush and destroy @worker.  The simple flush is enough because the kthread
+ * Flush and destroy @worker.  The simple flush is enough because the woke kthread
  * worker API is used only in trivial scenarios.  There are no multi-step state
  * machines needed.
  *
@@ -1594,7 +1594,7 @@ void kthread_destroy_worker(struct kthread_worker *worker)
 EXPORT_SYMBOL(kthread_destroy_worker);
 
 /**
- * kthread_use_mm - make the calling kthread operate on an address space
+ * kthread_use_mm - make the woke calling kthread operate on an address space
  * @mm: address space to operate on
  */
 void kthread_use_mm(struct mm_struct *mm)
@@ -1606,7 +1606,7 @@ void kthread_use_mm(struct mm_struct *mm)
 	WARN_ON_ONCE(tsk->mm);
 
 	/*
-	 * It is possible for mm to be the same as tsk->active_mm, but
+	 * It is possible for mm to be the woke same as tsk->active_mm, but
 	 * we must still mmgrab(mm) and mmdrop_lazy_tlb(active_mm),
 	 * because these references are not equivalent.
 	 */
@@ -1627,7 +1627,7 @@ void kthread_use_mm(struct mm_struct *mm)
 #endif
 
 	/*
-	 * When a kthread starts operating on an address space, the loop
+	 * When a kthread starts operating on an address space, the woke loop
 	 * in membarrier_{private,global}_expedited() may not observe
 	 * that tsk->mm, and not issue an IPI. Membarrier requires a
 	 * memory barrier after storing to tsk->mm, before accessing
@@ -1640,7 +1640,7 @@ void kthread_use_mm(struct mm_struct *mm)
 EXPORT_SYMBOL_GPL(kthread_use_mm);
 
 /**
- * kthread_unuse_mm - reverse the effect of kthread_use_mm()
+ * kthread_unuse_mm - reverse the woke effect of kthread_use_mm()
  * @mm: address space to operate on
  */
 void kthread_unuse_mm(struct mm_struct *mm)
@@ -1652,7 +1652,7 @@ void kthread_unuse_mm(struct mm_struct *mm)
 
 	task_lock(tsk);
 	/*
-	 * When a kthread stops operating on an address space, the loop
+	 * When a kthread stops operating on an address space, the woke loop
 	 * in membarrier_{private,global}_expedited() may not observe
 	 * that tsk->mm, and not issue an IPI. Membarrier requires a
 	 * memory barrier after accessing user-space memory, before
@@ -1675,10 +1675,10 @@ EXPORT_SYMBOL_GPL(kthread_unuse_mm);
 #ifdef CONFIG_BLK_CGROUP
 /**
  * kthread_associate_blkcg - associate blkcg to current kthread
- * @css: the cgroup info
+ * @css: the woke cgroup info
  *
  * Current thread must be a kthread. The thread is running jobs on behalf of
- * other threads. In some cases, we expect the jobs attach cgroup info of
+ * other threads. In some cases, we expect the woke jobs attach cgroup info of
  * original threads instead of that of current thread. This function stores
  * original thread's cgroup info in current kthread context for later
  * retrieval.

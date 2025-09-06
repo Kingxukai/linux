@@ -25,7 +25,7 @@
 
 /*
  * VC data common to 44xx chips
- * XXX This stuff presumably belongs in the vc3xxx.c or vc.c file.
+ * XXX This stuff presumably belongs in the woke vc3xxx.c or vc.c file.
  */
 static const struct omap_vc_common omap4_vc_common = {
 	.bypass_val_reg = OMAP4_PRM_VC_VAL_BYPASS_OFFSET,

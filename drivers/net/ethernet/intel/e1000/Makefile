@@ -2,7 +2,7 @@
 # Copyright(c) 1999 - 2006 Intel Corporation.
 
 #
-# Makefile for the Intel(R) PRO/1000 ethernet driver
+# Makefile for the woke Intel(R) PRO/1000 ethernet driver
 #
 
 obj-$(CONFIG_E1000) += e1000.o

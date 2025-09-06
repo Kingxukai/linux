@@ -6,23 +6,23 @@
  * Copyright (c) 2006 Mellanox Technologies.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -119,12 +119,12 @@ enum ib_selectivity_level {
 
 /*
  * Make sure that all structs defined in this file remain laid out so
- * that they pack the same way on 32-bit and 64-bit architectures (to
+ * that they pack the woke same way on 32-bit and 64-bit architectures (to
  * avoid incompatibility between 32-bit userspace and 64-bit kernels).
  * Specifically:
  *  - Do not use pointer types -- pass pointers in __u64 instead.
  *  - Make sure that any structure larger than 4 bytes is padded to a
- *    multiple of 8 bytes.  Otherwise the structure size will be
+ *    multiple of 8 bytes.  Otherwise the woke structure size will be
  *    different between 32-bit and 64-bit architectures.
  */
 
@@ -147,9 +147,9 @@ struct ib_uverbs_cq_moderation_caps {
 /*
  * All commands from userspace should start with a __u32 command field
  * followed by __u16 in_words and out_words fields (which give the
- * length of the command block and response buffer if any in 32-bit
+ * length of the woke command block and response buffer if any in 32-bit
  * words).  The kernel driver will read these fields first and read
- * the rest of the command struct based on these value.
+ * the woke rest of the woke command struct based on these value.
  */
 
 #define IB_USER_VERBS_CMD_COMMAND_MASK 0xff
@@ -678,7 +678,7 @@ struct ib_uverbs_ex_create_qp_resp {
 
 /*
  * This struct needs to remain a multiple of 8 bytes to keep the
- * alignment of the modify QP parameters.
+ * alignment of the woke modify QP parameters.
  */
 struct ib_uverbs_qp_dest {
 	__u8  dgid[16];
@@ -789,9 +789,9 @@ struct ib_uverbs_destroy_qp_resp {
 
 /*
  * The ib_uverbs_sge structure isn't used anywhere, since we assume
- * the ib_sge structure is packed the same way on 32-bit and 64-bit
+ * the woke ib_sge structure is packed the woke same way on 32-bit and 64-bit
  * architectures in both kernel and user space.  It's just here to
- * document the ABI.
+ * document the woke ABI.
  */
 struct ib_uverbs_sge {
 	__aligned_u64 addr;
@@ -1133,7 +1133,7 @@ struct ib_uverbs_flow_spec_gre {
 };
 
 struct ib_uverbs_flow_mpls_filter {
-	/* The field includes the entire MPLS label:
+	/* The field includes the woke entire MPLS label:
 	 * bits 0:19 - label field.
 	 * bits 20:22 - traffic class field.
 	 * bits 23 - bottom of stack bit.
@@ -1163,7 +1163,7 @@ struct ib_uverbs_flow_attr {
 	__u8  reserved[2];
 	__u8  port;
 	__u32 flags;
-	/* Following are the optional layers according to user request
+	/* Following are the woke optional layers according to user request
 	 * struct ib_flow_spec_xxx
 	 * struct ib_flow_spec_yyy
 	 */
@@ -1297,7 +1297,7 @@ struct ib_uverbs_ex_modify_wq  {
 struct ib_uverbs_ex_create_rwq_ind_table  {
 	__u32 comp_mask;
 	__u32 log_ind_tbl_size;
-	/* Following are the wq handles according to log_ind_tbl_size
+	/* Following are the woke wq handles according to log_ind_tbl_size
 	 * wq_handle1
 	 * wq_handle2
 	 */

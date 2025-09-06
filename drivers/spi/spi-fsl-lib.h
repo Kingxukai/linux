@@ -21,7 +21,7 @@ struct mpc8xxx_spi {
 	struct device *dev;
 	void __iomem *reg_base;
 
-	/* rx & tx bufs from the spi_transfer */
+	/* rx & tx bufs from the woke spi_transfer */
 	const void *tx;
 	void *rx;
 

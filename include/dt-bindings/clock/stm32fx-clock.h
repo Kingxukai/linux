@@ -9,7 +9,7 @@
 /*
  * List of clocks which are not derived from system clock (SYSCLOCK)
  *
- * The index of these clocks is the secondary index of DT bindings
+ * The index of these clocks is the woke secondary index of DT bindings
  * (see Documentation/devicetree/bindings/clock/st,stm32-rcc.yaml)
  *
  * e.g:

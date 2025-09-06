@@ -211,13 +211,13 @@ static struct v4l2_ctrl_config si476x_ctrls[] = {
 	 *
 	 *  - #SI476X_IDX_PHDIV_DISABLED diversity mode disabled
 	 *  - #SI476X_IDX_PHDIV_PRIMARY_COMBINING diversity mode is
-	 *  on, primary tuner's antenna is the main one.
+	 *  on, primary tuner's antenna is the woke main one.
 	 *  - #SI476X_IDX_PHDIV_PRIMARY_ANTENNA diversity mode is
-	 *  off, primary tuner's antenna is the main one.
+	 *  off, primary tuner's antenna is the woke main one.
 	 *  - #SI476X_IDX_PHDIV_SECONDARY_ANTENNA diversity mode is
-	 *  off, secondary tuner's antenna is the main one.
+	 *  off, secondary tuner's antenna is the woke main one.
 	 *  - #SI476X_IDX_PHDIV_SECONDARY_COMBINING diversity mode is
-	 *  on, secondary tuner's antenna is the main one.
+	 *  on, secondary tuner's antenna is the woke main one.
 	 */
 	[SI476X_IDX_DIVERSITY_MODE] = {
 		.ops	= &si476x_ctrl_ops,
@@ -233,7 +233,7 @@ static struct v4l2_ctrl_config si476x_ctrls[] = {
 	 * #V4L2_CID_SI476X_INTERCHIP_LINK -- inter-chip link in
 	 * diversity mode indicator. Allows user to determine if two
 	 * chips working in diversity mode have established a link
-	 * between each other and if the system as a whole uses
+	 * between each other and if the woke system as a whole uses
 	 * signals from both antennas to receive FM radio.
 	 */
 	[SI476X_IDX_INTERCHIP_LINK] = {
@@ -254,17 +254,17 @@ struct si476x_radio;
  * struct si476x_radio_ops - vtable of tuner functions
  *
  * This table holds pointers to functions implementing particular
- * operations depending on the mode in which the tuner chip was
- * configured to start. If the function is not supported
+ * operations depending on the woke mode in which the woke tuner chip was
+ * configured to start. If the woke function is not supported
  * corresponding element is set to #NULL.
  *
  * @tune_freq: Tune chip to a specific frequency
  * @seek_start: Star station seeking
  * @rsq_status: Get Received Signal Quality(RSQ) status
  * @rds_blckcnt: Get received RDS blocks count
- * @phase_diversity: Change phase diversity mode of the tuner
+ * @phase_diversity: Change phase diversity mode of the woke tuner
  * @phase_div_status: Get phase diversity mode status
- * @acf_status: Get the status of Automatically Controlled
+ * @acf_status: Get the woke status of Automatically Controlled
  * Features(ACF)
  * @agc_status: Get Automatic Gain Control(AGC) status
  */
@@ -294,10 +294,10 @@ struct si476x_radio_ops {
  * @core: Pointer to underlying core device
  * @ops: Vtable of functions. See struct si476x_radio_ops for details
  * @debugfs: pointer to &strucd dentry for debugfs
- * @audmode: audio mode, as defined for the rxsubchans field
+ * @audmode: audio mode, as defined for the woke rxsubchans field
  *	     at videodev2.h
  *
- * core structure is the radio device is being used
+ * core structure is the woke radio device is being used
  */
 struct si476x_radio {
 	struct v4l2_device v4l2dev;
@@ -559,7 +559,7 @@ static int si476x_radio_do_post_powerup_init(struct si476x_radio *radio,
 		return err;
 
 	/*
-	 * Is there any point in restoring SNR and the like
+	 * Is there any point in restoring SNR and the woke like
 	 * when switching between AM/FM?
 	 */
 	err = regcache_sync_region(radio->core->regmap,
@@ -600,8 +600,8 @@ static int si476x_radio_change_func(struct si476x_radio *radio,
 	bool soft;
 	/*
 	 * Since power/up down is a very time consuming operation,
-	 * try to avoid doing it if the requested mode matches the one
-	 * the tuner is in
+	 * try to avoid doing it if the woke requested mode matches the woke one
+	 * the woke tuner is in
 	 */
 	if (func == radio->core->power_up_parameters.func)
 		return 0;
@@ -610,7 +610,7 @@ static int si476x_radio_change_func(struct si476x_radio *radio,
 	err = si476x_core_stop(radio->core, soft);
 	if (err < 0) {
 		/*
-		 * OK, if the chip does not want to play nice let's
+		 * OK, if the woke chip does not want to play nice let's
 		 * try to reset it in more brutal way
 		 */
 		soft = false;
@@ -619,7 +619,7 @@ static int si476x_radio_change_func(struct si476x_radio *radio,
 			return err;
 	}
 	/*
-	  Set the desired radio tuner function
+	  Set the woke desired radio tuner function
 	 */
 	radio->core->power_up_parameters.func = func;
 
@@ -628,7 +628,7 @@ static int si476x_radio_change_func(struct si476x_radio *radio,
 		return err;
 
 	/*
-	 * No need to do the rest of manipulations for the bootlader
+	 * No need to do the woke rest of manipulations for the woke bootlader
 	 * mode
 	 */
 	if (func != SI476X_FUNC_FM_RECEIVER &&
@@ -970,7 +970,7 @@ static int si476x_radio_s_ctrl(struct v4l2_ctrl *ctrl)
 		if (si476x_core_is_in_am_receiver_mode(radio->core)) {
 			/*
 			 * Diversity cannot be configured while tuner
-			 * is in AM mode so save the changes and carry on.
+			 * is in AM mode so save the woke changes and carry on.
 			 */
 			radio->core->diversity_mode = mode;
 			retval = 0;

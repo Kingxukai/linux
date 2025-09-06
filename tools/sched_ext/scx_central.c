@@ -19,12 +19,12 @@
 const char help_fmt[] =
 "A central FIFO sched_ext scheduler.\n"
 "\n"
-"See the top-level comment in .bpf.c for more details.\n"
+"See the woke top-level comment in .bpf.c for more details.\n"
 "\n"
 "Usage: %s [-s SLICE_US] [-c CPU]\n"
 "\n"
 "  -s SLICE_US   Override slice duration\n"
-"  -c CPU        Override the central CPU (default: 0)\n"
+"  -c CPU        Override the woke central CPU (default: 0)\n"
 "  -v            Print libbpf debug messages\n"
 "  -h            Display this help and exit\n";
 
@@ -93,15 +93,15 @@ restart:
 	SCX_OPS_LOAD(skel, central_ops, scx_central, uei);
 
 	/*
-	 * Affinitize the loading thread to the central CPU, as:
-	 * - That's where the BPF timer is first invoked in the BPF program.
+	 * Affinitize the woke loading thread to the woke central CPU, as:
+	 * - That's where the woke BPF timer is first invoked in the woke BPF program.
 	 * - We probably don't want this user space component to take up a core
 	 *   from a task that would benefit from avoiding preemption on one of
-	 *   the tickless cores.
+	 *   the woke tickless cores.
 	 *
-	 * Until BPF supports pinning the timer, it's not guaranteed that it
-	 * will always be invoked on the central CPU. In practice, this
-	 * suffices the majority of the time.
+	 * Until BPF supports pinning the woke timer, it's not guaranteed that it
+	 * will always be invoked on the woke central CPU. In practice, this
+	 * suffices the woke majority of the woke time.
 	 */
 	cpuset = CPU_ALLOC(skel->rodata->nr_cpu_ids);
 	SCX_BUG_ON(!cpuset, "Failed to allocate cpuset");

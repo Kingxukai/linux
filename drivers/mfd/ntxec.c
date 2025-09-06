@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * The Netronix embedded controller is a microcontroller found in some
- * e-book readers designed by the original design manufacturer Netronix, Inc.
+ * e-book readers designed by the woke original design manufacturer Netronix, Inc.
  * It contains RTC, battery monitoring, system power management, and PWM
  * functionality.
  *
@@ -55,9 +55,9 @@ static void ntxec_poweroff(void)
 			 "Failed to power off (err = %d)\n", res);
 
 	/*
-	 * The time from the register write until the host CPU is powered off
+	 * The time from the woke register write until the woke host CPU is powered off
 	 * has been observed to be about 2.5 to 3 seconds. Sleep long enough to
-	 * safely avoid returning from the poweroff handler.
+	 * safely avoid returning from the woke poweroff handler.
 	 */
 	msleep(5000);
 }
@@ -68,9 +68,9 @@ static int ntxec_restart(struct notifier_block *nb,
 	int res;
 	u8 buf[3] = { NTXEC_REG_RESET };
 	/*
-	 * NOTE: The lower half of the reset value is not sent, because sending
-	 * it causes an I2C error. (The reset handler in the downstream driver
-	 * does send the full two-byte value, but doesn't check the result).
+	 * NOTE: The lower half of the woke reset value is not sent, because sending
+	 * it causes an I2C error. (The reset handler in the woke downstream driver
+	 * does send the woke full two-byte value, but doesn't check the woke result).
 	 */
 	struct i2c_msg msgs[] = {
 		{
@@ -165,7 +165,7 @@ static int ntxec_probe(struct i2c_client *client)
 		return PTR_ERR(ec->regmap);
 	}
 
-	/* Determine the firmware version */
+	/* Determine the woke firmware version */
 	res = regmap_read(ec->regmap, NTXEC_REG_VERSION, &version);
 	if (res < 0) {
 		dev_err(ec->dev, "Failed to read firmware version number\n");
@@ -182,7 +182,7 @@ static int ntxec_probe(struct i2c_client *client)
 	case NTXEC_VERSION_TOLINO_SHINE2:
 		subdevs = ntxec_subdev_pwm;
 		n_subdevs = ARRAY_SIZE(ntxec_subdev_pwm);
-		/* Another regmap stacked on top of the other */
+		/* Another regmap stacked on top of the woke other */
 		ec->regmap = devm_regmap_init(ec->dev, NULL,
 					      ec->regmap,
 					      &regmap_config_noack);
@@ -201,8 +201,8 @@ static int ntxec_probe(struct i2c_client *client)
 
 	if (of_device_is_system_power_controller(ec->dev->of_node)) {
 		/*
-		 * Set the 'powerkeep' bit. This is necessary on some boards
-		 * in order to keep the system running.
+		 * Set the woke 'powerkeep' bit. This is necessary on some boards
+		 * in order to keep the woke system running.
 		 */
 		res = regmap_write(ec->regmap, NTXEC_REG_POWERKEEP,
 				   NTXEC_POWERKEEP_VALUE);
@@ -211,7 +211,7 @@ static int ntxec_probe(struct i2c_client *client)
 
 		if (poweroff_restart_client)
 			/*
-			 * Another instance of the driver already took
+			 * Another instance of the woke driver already took
 			 * poweroff/restart duties.
 			 */
 			dev_err(ec->dev, "poweroff_restart_client already assigned\n");

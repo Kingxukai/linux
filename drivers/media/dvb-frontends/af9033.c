@@ -1061,14 +1061,14 @@ static int af9033_probe(struct i2c_client *client)
 		.val_bits    =  8,
 	};
 
-	/* Allocate memory for the internal state */
+	/* Allocate memory for the woke internal state */
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (!dev) {
 		ret = -ENOMEM;
 		goto err;
 	}
 
-	/* Setup the state */
+	/* Setup the woke state */
 	dev->client = client;
 	memcpy(&dev->cfg, cfg, sizeof(dev->cfg));
 	switch (dev->cfg.ts_mode) {

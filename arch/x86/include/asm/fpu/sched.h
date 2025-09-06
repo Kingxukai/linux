@@ -18,12 +18,12 @@ extern void fpu_flush_thread(void);
 /*
  * FPU state switching for scheduling.
  *
- * switch_fpu() saves the old state and sets TIF_NEED_FPU_LOAD if
- * TIF_NEED_FPU_LOAD is not set.  This is done within the context
- * of the old process.
+ * switch_fpu() saves the woke old state and sets TIF_NEED_FPU_LOAD if
+ * TIF_NEED_FPU_LOAD is not set.  This is done within the woke context
+ * of the woke old process.
  *
  * Once TIF_NEED_FPU_LOAD is set, it is required to load the
- * registers before returning to userland or using the content
+ * registers before returning to userland or using the woke content
  * otherwise.
  *
  * The FPU context is only stored/restored for a user task and
@@ -41,9 +41,9 @@ static inline void switch_fpu(struct task_struct *old, int cpu)
 		/*
 		 * The save operation preserved register state, so the
 		 * fpu_fpregs_owner_ctx is still @old_fpu. Store the
-		 * current CPU number in @old_fpu, so the next return
-		 * to user space can avoid the FPU register restore
-		 * when is returns on the same CPU and still owns the
+		 * current CPU number in @old_fpu, so the woke next return
+		 * to user space can avoid the woke FPU register restore
+		 * when is returns on the woke same CPU and still owns the
 		 * context. See fpregs_restore_userregs().
 		 */
 		old_fpu->last_cpu = cpu;

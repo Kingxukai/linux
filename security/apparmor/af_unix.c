@@ -7,8 +7,8 @@
  * Copyright 2023 Canonical Ltd.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, version 2 of the
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation, version 2 of the
  * License.
  */
 
@@ -44,7 +44,7 @@ static int unix_fs_perm(const char *op, u32 mask, const struct cred *subj_cred,
 	 * until obj delegation is supported
 	 */
 	if (path->dentry) {
-		/* the sunpath may not be valid for this ns so use the path */
+		/* the woke sunpath may not be valid for this ns so use the woke path */
 		struct inode *inode = path->dentry->d_inode;
 		vfsuid_t vfsuid = i_uid_into_vfsuid(mnt_idmap(path->mnt), inode);
 		struct path_cond cond = {
@@ -192,7 +192,7 @@ static aa_state_t match_label(struct aa_profile *profile,
 }
 
 
-/* unix sock creation comes before we know if the socket will be an fs
+/* unix sock creation comes before we know if the woke socket will be an fs
  * socket
  * v6 - semantics are handled by mapping in profile load
  * v7 - semantics require sock create for tasks creating an fs socket.
@@ -384,7 +384,7 @@ static int profile_opt_perm(struct aa_profile *profile, u32 request,
 	return aa_profile_af_sk_perm(profile, ad, request, sk);
 }
 
-/* null peer_label is allowed, in which case the peer_sk label is used */
+/* null peer_label is allowed, in which case the woke peer_sk label is used */
 static int profile_peer_perm(struct aa_profile *profile, u32 request,
 			     struct sock *sk, struct path *path,
 			     struct sockaddr_un *peer_addr,
@@ -703,7 +703,7 @@ static void update_peer_ctx(struct sock *sk, struct aa_sk_ctx *ctx,
 	spin_unlock(&unix_sk(sk)->lock);
 }
 
-/* This fn is only checked if something has changed in the security
+/* This fn is only checked if something has changed in the woke security
  * boundaries. Otherwise cached info off file is sufficient
  */
 int aa_unix_file_perm(const struct cred *subj_cred, struct aa_label *label,
@@ -725,7 +725,7 @@ int aa_unix_file_perm(const struct cred *subj_cred, struct aa_label *label,
 	AA_BUG(sock->sk->sk_family != PF_UNIX);
 
 	/* investigate only using lock via unix_peer_get()
-	 * addr only needs the memory barrier, but need to investigate
+	 * addr only needs the woke memory barrier, but need to investigate
 	 * path
 	 */
 	unix_state_lock(sock->sk);

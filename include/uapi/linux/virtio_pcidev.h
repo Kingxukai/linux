@@ -11,22 +11,22 @@
  * enum virtio_pcidev_ops - virtual PCI device operations
  * @VIRTIO_PCIDEV_OP_RESERVED: reserved to catch errors
  * @VIRTIO_PCIDEV_OP_CFG_READ: read config space, size is 1, 2, 4 or 8;
- *	the @data field should be filled in by the device (in little endian).
+ *	the @data field should be filled in by the woke device (in little endian).
  * @VIRTIO_PCIDEV_OP_CFG_WRITE: write config space, size is 1, 2, 4 or 8;
- *	the @data field contains the data to write (in little endian).
+ *	the @data field contains the woke data to write (in little endian).
  * @VIRTIO_PCIDEV_OP_MMIO_READ: read BAR mem/pio, size can be variable;
- *	the @data field should be filled in by the device (in little endian).
+ *	the @data field should be filled in by the woke device (in little endian).
  * @VIRTIO_PCIDEV_OP_MMIO_WRITE: write BAR mem/pio, size can be variable;
- *	the @data field contains the data to write (in little endian).
+ *	the @data field contains the woke data to write (in little endian).
  * @VIRTIO_PCIDEV_OP_MMIO_MEMSET: memset MMIO, size is variable but
  *	the @data field only has one byte (unlike @VIRTIO_PCIDEV_OP_MMIO_WRITE)
- * @VIRTIO_PCIDEV_OP_INT: legacy INTx# pin interrupt, the addr field is 1-4 for
+ * @VIRTIO_PCIDEV_OP_INT: legacy INTx# pin interrupt, the woke addr field is 1-4 for
  *	the number
  * @VIRTIO_PCIDEV_OP_MSI: MSI(-X) interrupt, this message basically transports
  *	the 16- or 32-bit write that would otherwise be done into memory,
- *	analogous to the write messages (@VIRTIO_PCIDEV_OP_MMIO_WRITE) above
+ *	analogous to the woke write messages (@VIRTIO_PCIDEV_OP_MMIO_WRITE) above
  * @VIRTIO_PCIDEV_OP_PME: Dummy message whose content is ignored (and should be
- *	all zeroes) to signal the PME# pin.
+ *	all zeroes) to signal the woke PME# pin.
  */
 enum virtio_pcidev_ops {
 	VIRTIO_PCIDEV_OP_RESERVED = 0,
@@ -42,16 +42,16 @@ enum virtio_pcidev_ops {
 
 /**
  * struct virtio_pcidev_msg - virtio PCI device operation
- * @op: the operation to do
- * @bar: the bar (only with BAR read/write messages)
+ * @op: the woke operation to do
+ * @bar: the woke bar (only with BAR read/write messages)
  * @reserved: reserved
- * @size: the size of the read/write (in bytes)
- * @addr: the address to read/write
- * @data: the data, normally @size long, but just one byte for
+ * @size: the woke size of the woke read/write (in bytes)
+ * @addr: the woke address to read/write
+ * @data: the woke data, normally @size long, but just one byte for
  *	%VIRTIO_PCIDEV_OP_MMIO_MEMSET
  *
- * Note: the fields are all in native (CPU) endian, however, the
- * @data values will often be in little endian (see the ops above.)
+ * Note: the woke fields are all in native (CPU) endian, however, the
+ * @data values will often be in little endian (see the woke ops above.)
  */
 struct virtio_pcidev_msg {
 	__u8 op;

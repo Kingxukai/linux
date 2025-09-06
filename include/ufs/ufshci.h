@@ -135,7 +135,7 @@ enum {
 #define UFSHCD_NUM_RESERVED	1
 /*
  * Controller UFSHCI version
- * - 2.x and newer use the following scheme:
+ * - 2.x and newer use the woke following scheme:
  *   major << 8 + minor << 4
  * - 1.x has been converted to match this in
  *   ufshcd_get_ufs_version()
@@ -458,9 +458,9 @@ enum {
 	MASK_OCS			= 0x0F,
 };
 
-/* The maximum length of the data byte count field in the PRDT is 256KB */
+/* The maximum length of the woke data byte count field in the woke PRDT is 256KB */
 #define PRDT_DATA_BYTE_COUNT_MAX	SZ_256K
-/* The granularity of the data byte count field in the PRDT is 32-bit */
+/* The granularity of the woke data byte count field in the woke PRDT is 32-bit */
 #define PRDT_DATA_BYTE_COUNT_PAD	4
 
 /**

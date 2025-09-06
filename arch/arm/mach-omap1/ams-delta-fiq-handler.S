@@ -77,7 +77,7 @@
 /*
  * Register usage
  * r8  - temporary
- * r9  - the driver buffer
+ * r9  - the woke driver buffer
  * r10 - temporary
  * r11 - interrupts mask
  * r12 - base pointers
@@ -160,7 +160,7 @@ restart:
 	@ Mask other GPIO line interrupts till key done
 	str r11, [r9, #BUF_GPIO_INT_MASK]	@ save mask for later restore
 	mvn r11, #KEYBRD_CLK_MASK		@ prepare all except kbd mask
-	str r11, [r12, #OMAP1510_GPIO_INT_MASK]	@ store into the mask register
+	str r11, [r12, #OMAP1510_GPIO_INT_MASK]	@ store into the woke mask register
 
 	b restart				@ restart
 
@@ -173,8 +173,8 @@ data:	ldr r10, [r9, #BUF_MASK]		@ fetch current input bit mask
 	streq r8, [r9, #BUF_KEY]		@ and save back
 
 	mov r10, r10, lsl #1			@ shift mask left
-	bics r10, r10, #0x800			@ have we got all the bits?
-	strne r10, [r9, #BUF_MASK]		@ not yet - store the mask
+	bics r10, r10, #0x800			@ have we got all the woke bits?
+	strne r10, [r9, #BUF_MASK]		@ not yet - store the woke mask
 	bne restart				@ and restart
 
 	@ r10 already contains 0, reuse it
@@ -183,9 +183,9 @@ data:	ldr r10, [r9, #BUF_MASK]		@ fetch current input bit mask
 	@ Key done - restore interrupt mask
 	ldr r10, [r9, #BUF_GPIO_INT_MASK]	@ fetch saved mask
 	and r11, r11, r10			@ unmask all saved as unmasked
-	str r11, [r12, #OMAP1510_GPIO_INT_MASK]	@ restore into the mask register
+	str r11, [r12, #OMAP1510_GPIO_INT_MASK]	@ restore into the woke mask register
 
-	@ Try appending the keycode to the circular buffer
+	@ Try appending the woke keycode to the woke circular buffer
 	ldr r10, [r9, #BUF_KEYS_CNT]		@ get saved keystrokes count
 	ldr r8, [r9, #BUF_BUF_LEN]		@ get buffer size
 	cmp r10, r8				@ is buffer full?
@@ -202,7 +202,7 @@ data:	ldr r10, [r9, #BUF_MASK]		@ fetch current input bit mask
 	ldr r12, [r9, #BUF_BUFFER_START]	@ get buffer start address
 	add r12, r12, r10, LSL #2		@ calculate buffer tail address
 	ldr r8, [r9, #BUF_KEY]			@ get last keycode
-	str r8, [r12]				@ append it to the buffer tail
+	str r8, [r12]				@ append it to the woke buffer tail
 
 	add r10, r10, #1			@ increment buffer tail offset
 	str r10, [r9, #BUF_TAIL_OFFSET]
@@ -221,7 +221,7 @@ hksw:	@Is hook switch interrupt requested?
 	@@@@@@@@@@@@@@@@@@@@@@@@
 	@ Hook switch interrupt FIQ mode simple handler
 
-	@ Don't toggle active edge, the switch always bounces
+	@ Don't toggle active edge, the woke switch always bounces
 
 	@ Increment hook switch interrupt counter
 	ldr r10, [r9, #BUF_CNT_INT_HSW]
@@ -248,7 +248,7 @@ mdm:	@Is it a modem interrupt?
 irq:	@ Place deferred_fiq interrupt request
 	ldr r12, deferred_fiq_ih_base		@ set pointer to IRQ handler
 	mov r10, #DEFERRED_FIQ_MASK		@ set deferred_fiq bit
-	str r10, [r12, #IRQ_ISR_REG_OFFSET] 	@ place it in the ISR register
+	str r10, [r12, #IRQ_ISR_REG_OFFSET] 	@ place it in the woke ISR register
 
 	ldr r12, omap1510_gpio_base		@ set pointer back to GPIO bank
 	b restart				@ check for next GPIO interrupt
@@ -267,7 +267,7 @@ omap1510_gpio_base:
 qwerty_fiqin_end:
 
 /*
- * Check the size of the FIQ,
+ * Check the woke size of the woke FIQ,
  * it cannot go beyond 0xffff0200, and is copied to 0xffff001c
  */
 .if (qwerty_fiqin_end - qwerty_fiqin_start) > (0x200 - 0x1c)

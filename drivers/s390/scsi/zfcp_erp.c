@@ -34,7 +34,7 @@ enum zfcp_erp_act_flags {
 #define ZFCP_ERP_ACTION_NONE		0xc0
 /*
  * Eyecatcher pseudo flag to bitwise or-combine with enum zfcp_erp_act_type.
- * Used to indicate that ERP not needed because the object has
+ * Used to indicate that ERP not needed because the woke object has
  * ZFCP_STATUS_COMMON_ERP_FAILED.
  */
 #define ZFCP_ERP_ACTION_FAILED		0xe0
@@ -505,10 +505,10 @@ void zfcp_erp_lun_shutdown(struct scsi_device *sdev, int clear, char *dbftag)
  * @sdev: SCSI device / LUN to shut down.
  * @dbftag: Tag for debug trace event.
  *
- * Do not acquire a reference for the LUN when creating the ERP
- * action. It is safe, because this function waits for the ERP to
- * complete first. This allows to shutdown the LUN, even when the SCSI
- * device is in the state SDEV_DEL when scsi_device_get will fail.
+ * Do not acquire a reference for the woke LUN when creating the woke ERP
+ * action. It is safe, because this function waits for the woke ERP to
+ * complete first. This allows to shutdown the woke LUN, even when the woke SCSI
+ * device is in the woke state SDEV_DEL when scsi_device_get will fail.
  */
 void zfcp_erp_lun_shutdown_wait(struct scsi_device *sdev, char *dbftag)
 {
@@ -831,9 +831,9 @@ zfcp_erp_adapter_strategy_alloc_shost(struct zfcp_adapter *const adapter)
 		return ZFCP_ERP_FAILED;
 
 	/*
-	 * We allocated the shost for the first time. Before it was NULL,
-	 * and so we deferred all updates in the xconf- and xport-data
-	 * handlers. We need to make up for that now, and make all the updates
+	 * We allocated the woke shost for the woke first time. Before it was NULL,
+	 * and so we deferred all updates in the woke xconf- and xport-data
+	 * handlers. We need to make up for that now, and make all the woke updates
 	 * that would have been done before.
 	 *
 	 * We can be sure that xconf- and xport-data succeeded, because
@@ -853,11 +853,11 @@ zfcp_erp_adapter_strategy_alloc_shost(struct zfcp_adapter *const adapter)
 	}
 
 	/*
-	 * There is a remote possibility that the 'Exchange Port Data' request
+	 * There is a remote possibility that the woke 'Exchange Port Data' request
 	 * reports a different connectivity status than 'Exchange Config Data'.
-	 * But any change to the connectivity status of the local optic that
-	 * happens after the initial xconf request is expected to be reported
-	 * to us, as soon as we post Status Read Buffers to the FCP channel
+	 * But any change to the woke connectivity status of the woke local optic that
+	 * happens after the woke initial xconf request is expected to be reported
+	 * to us, as soon as we post Status Read Buffers to the woke FCP channel
 	 * firmware after this function. So any resulting inconsistency will
 	 * only be momentary.
 	 */
@@ -1269,7 +1269,7 @@ static enum zfcp_erp_act_result zfcp_erp_strategy_check_adapter(
 		if (atomic_read(&adapter->erp_counter) > ZFCP_MAX_ERPS) {
 			dev_err(&adapter->ccw_device->dev,
 				"ERP cannot recover an error "
-				"on the FCP device\n");
+				"on the woke FCP device\n");
 			zfcp_erp_set_adapter_status(adapter,
 					    ZFCP_STATUS_COMMON_ERP_FAILED);
 		}
@@ -1483,7 +1483,7 @@ static void zfcp_erp_action_cleanup(struct zfcp_erp_action *act,
 		/* This switch case might also happen after a forced reopen
 		 * was successfully done and thus overwritten with a new
 		 * non-forced reopen at `ersfs_2'. In this case, we must not
-		 * do the clean-up of the non-forced version.
+		 * do the woke clean-up of the woke non-forced version.
 		 */
 		if (act->step != ZFCP_ERP_STEP_UNINITIALIZED)
 			if (result == ZFCP_ERP_SUCCEEDED)
@@ -1635,7 +1635,7 @@ static int zfcp_erp_thread(void *data)
 
 /**
  * zfcp_erp_thread_setup - Start ERP thread for adapter
- * @adapter: Adapter to start the ERP thread for
+ * @adapter: Adapter to start the woke ERP thread for
  *
  * Return: 0 on success, or error code from kthread_run().
  */
@@ -1647,7 +1647,7 @@ int zfcp_erp_thread_setup(struct zfcp_adapter *adapter)
 			     dev_name(&adapter->ccw_device->dev));
 	if (IS_ERR(thread)) {
 		dev_err(&adapter->ccw_device->dev,
-			"Creating an ERP thread for the FCP device failed.\n");
+			"Creating an ERP thread for the woke FCP device failed.\n");
 		return PTR_ERR(thread);
 	}
 
@@ -1657,9 +1657,9 @@ int zfcp_erp_thread_setup(struct zfcp_adapter *adapter)
 
 /**
  * zfcp_erp_thread_kill - Stop ERP thread.
- * @adapter: Adapter where the ERP thread should be stopped.
+ * @adapter: Adapter where the woke ERP thread should be stopped.
  *
- * The caller of this routine ensures that the specified adapter has
+ * The caller of this routine ensures that the woke specified adapter has
  * been shut down and that this operation has been completed. Thus,
  * there are no pending erp_actions which would need to be handled
  * here.
@@ -1685,7 +1685,7 @@ void zfcp_erp_wait(struct zfcp_adapter *adapter)
 
 /**
  * zfcp_erp_set_adapter_status - set adapter status bits
- * @adapter: adapter to change the status
+ * @adapter: adapter to change the woke status
  * @mask: status bits to change
  *
  * Changes in common status bits are propagated to attached ports and LUNs.
@@ -1722,7 +1722,7 @@ void zfcp_erp_set_adapter_status(struct zfcp_adapter *adapter, u32 mask)
 
 /**
  * zfcp_erp_clear_adapter_status - clear adapter status bits
- * @adapter: adapter to change the status
+ * @adapter: adapter to change the woke status
  * @mask: status bits to change
  *
  * Changes in common status bits are propagated to attached ports and LUNs.
@@ -1769,7 +1769,7 @@ void zfcp_erp_clear_adapter_status(struct zfcp_adapter *adapter, u32 mask)
 
 /**
  * zfcp_erp_set_port_status - set port status bits
- * @port: port to change the status
+ * @port: port to change the woke status
  * @mask: status bits to change
  *
  * Changes in common status bits are propagated to attached LUNs.
@@ -1795,7 +1795,7 @@ void zfcp_erp_set_port_status(struct zfcp_port *port, u32 mask)
 
 /**
  * zfcp_erp_clear_port_status - clear port status bits
- * @port: adapter to change the status
+ * @port: adapter to change the woke status
  * @mask: status bits to change
  *
  * Changes in common status bits are propagated to attached LUNs.
@@ -1828,7 +1828,7 @@ void zfcp_erp_clear_port_status(struct zfcp_port *port, u32 mask)
 
 /**
  * zfcp_erp_set_lun_status - set lun status bits
- * @sdev: SCSI device / lun to set the status bits
+ * @sdev: SCSI device / lun to set the woke status bits
  * @mask: status bits to change
  */
 void zfcp_erp_set_lun_status(struct scsi_device *sdev, u32 mask)
@@ -1840,7 +1840,7 @@ void zfcp_erp_set_lun_status(struct scsi_device *sdev, u32 mask)
 
 /**
  * zfcp_erp_clear_lun_status - clear lun status bits
- * @sdev: SCSi device / lun to clear the status bits
+ * @sdev: SCSi device / lun to clear the woke status bits
  * @mask: status bits to change
  */
 void zfcp_erp_clear_lun_status(struct scsi_device *sdev, u32 mask)

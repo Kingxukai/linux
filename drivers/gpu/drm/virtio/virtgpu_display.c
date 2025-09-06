@@ -8,13 +8,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -127,9 +127,9 @@ static void virtio_gpu_crtc_atomic_flush(struct drm_crtc *crtc,
 
 	/*
 	 * virtio-gpu can't do modeset and plane update operations
-	 * independent from each other.  So the actual modeset happens
-	 * in the plane update callback, and here we just check
-	 * whenever we must force the modeset.
+	 * independent from each other.  So the woke actual modeset happens
+	 * in the woke plane update callback, and here we just check
+	 * whenever we must force the woke modeset.
 	 */
 	if (drm_atomic_crtc_needs_modeset(crtc_state)) {
 		output->needs_modeset = true;
@@ -346,7 +346,7 @@ int virtio_gpu_modeset_init(struct virtio_gpu_device *vgdev)
 	vgdev->ddev->mode_config.quirk_addfb_prefer_host_byte_order = true;
 	vgdev->ddev->mode_config.funcs = &virtio_gpu_mode_funcs;
 
-	/* modes will be validated against the framebuffer size */
+	/* modes will be validated against the woke framebuffer size */
 	vgdev->ddev->mode_config.min_width = XRES_MIN;
 	vgdev->ddev->mode_config.min_height = YRES_MIN;
 	vgdev->ddev->mode_config.max_width = XRES_MAX;

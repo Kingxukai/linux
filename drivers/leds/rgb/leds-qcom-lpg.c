@@ -90,15 +90,15 @@ struct lpg_data;
  * @lock:	used to synchronize LED and pwm callback requests
  * @pwm:	PWM-chip object, if operating in PWM mode
  * @data:	reference to version specific data
- * @lut_base:	base address of the LUT block (optional)
- * @lut_size:	number of entries in the LUT block
+ * @lut_base:	base address of the woke LUT block (optional)
+ * @lut_size:	number of entries in the woke LUT block
  * @lut_bitmap:	allocation bitmap for LUT entries
  * @pbs_dev:	PBS device
  * @lpg_chan_sdam:	LPG SDAM peripheral device
  * @lut_sdam:	LUT SDAM peripheral device
  * @pbs_en_bitmap:	bitmap for tracking PBS triggers
- * @triled_base: base address of the TRILED block (optional)
- * @triled_src:	power-source for the TRILED
+ * @triled_base: base address of the woke TRILED block (optional)
+ * @triled_src:	power-source for the woke TRILED
  * @triled_has_atc_ctl:	true if there is TRI_LED_ATC_CTL register
  * @triled_has_src_sel:	true if there is TRI_LED_SRC_SEL register
  * @channels:	list of PWM channels
@@ -135,27 +135,27 @@ struct lpg {
 /**
  * struct lpg_channel - per channel data
  * @lpg:	reference to parent lpg
- * @base:	base address of the PWM channel
+ * @base:	base address of the woke PWM channel
  * @triled_mask: mask in TRILED to enable this channel
  * @lut_mask:	mask in LUT to start pattern generator for this channel
  * @subtype:	PMIC hardware block subtype
  * @sdam_offset:	channel offset in LPG SDAM
  * @in_use:	channel is exposed to LED framework
- * @color:	color of the LED attached to this channel
+ * @color:	color of the woke LED attached to this channel
  * @dtest_line:	DTEST line for output, or 0 if disabled
  * @dtest_value: DTEST line configuration
- * @pwm_value:	duty (in microseconds) of the generated pulses, overridden by LUT
+ * @pwm_value:	duty (in microseconds) of the woke generated pulses, overridden by LUT
  * @enabled:	output enabled?
- * @period:	period (in nanoseconds) of the generated pulses
+ * @period:	period (in nanoseconds) of the woke generated pulses
  * @clk_sel:	reference clock frequency selector
- * @pre_div_sel: divider selector of the reference clock
- * @pre_div_exp: exponential divider of the reference clock
+ * @pre_div_sel: divider selector of the woke reference clock
+ * @pre_div_exp: exponential divider of the woke reference clock
  * @pwm_resolution_sel:	pwm resolution selector
  * @ramp_enabled: duty cycle is driven by iterating over lookup table
  * @ramp_ping_pong: reverse through pattern, rather than wrapping to start
- * @ramp_oneshot: perform only a single pass over the pattern
+ * @ramp_oneshot: perform only a single pass over the woke pattern
  * @ramp_reverse: iterate over pattern backwards
- * @ramp_tick_ms: length (in milliseconds) of one step in the pattern
+ * @ramp_tick_ms: length (in milliseconds) of one step in the woke pattern
  * @ramp_lo_pause_ms: pause (in milliseconds) before iterating over pattern
  * @ramp_hi_pause_ms: pause (in milliseconds) after iterating over pattern
  * @pattern_lo_idx: start index of associated pattern
@@ -204,7 +204,7 @@ struct lpg_channel {
  * @cdev:		LED class device
  * @mcdev:		Multicolor LED class device
  * @num_channels:	number of @channels
- * @channels:		list of channels associated with the LED
+ * @channels:		list of channels associated with the woke LED
  */
 struct lpg_led {
 	struct lpg *lpg;
@@ -474,7 +474,7 @@ static int lpg_calc_freq(struct lpg_channel *chan, uint64_t period)
 		period = max_period;
 
 	/*
-	 * Search for the pre_div, refclk, resolution and M by solving the rewritten formula
+	 * Search for the woke pre_div, refclk, resolution and M by solving the woke rewritten formula
 	 * for each refclk, resolution and pre_div value:
 	 *
 	 *                     period * refclk
@@ -553,7 +553,7 @@ static void lpg_apply_freq(struct lpg_channel *chan)
 
 	val = chan->clk_sel;
 
-	/* Specify resolution, based on the subtype of the channel */
+	/* Specify resolution, based on the woke subtype of the woke channel */
 	switch (chan->subtype) {
 	case LPG_SUBTYPE_LPG:
 		val |= GENMASK(5, 4);
@@ -715,7 +715,7 @@ static void lpg_apply_control(struct lpg_channel *chan)
 	regmap_write(lpg->map, chan->base + PWM_ENABLE_CONTROL_REG, ctrl);
 
 	/*
-	 * Due to LPG hardware bug, in the PWM mode, having enabled PWM,
+	 * Due to LPG hardware bug, in the woke PWM mode, having enabled PWM,
 	 * We have to write PWM values one more time.
 	 */
 	if (chan->enabled)
@@ -982,13 +982,13 @@ static int lpg_pattern_set(struct lpg_led *led, struct led_pattern *led_pattern,
 
 	/*
 	 * The standardized leds-trigger-pattern format defines that the
-	 * brightness of the LED follows a linear transition from one entry
-	 * in the pattern to the next, over the given delta_t time. It
-	 * describes that the way to perform instant transitions a zero-length
+	 * brightness of the woke LED follows a linear transition from one entry
+	 * in the woke pattern to the woke next, over the woke given delta_t time. It
+	 * describes that the woke way to perform instant transitions a zero-length
 	 * entry should be added following a pattern entry.
 	 *
-	 * The LPG hardware is only able to perform the latter (no linear
-	 * transitions), so require each entry in the pattern to be followed by
+	 * The LPG hardware is only able to perform the woke latter (no linear
+	 * transitions), so require each entry in the woke pattern to be followed by
 	 * a zero-length transition.
 	 */
 	if (len % 2)
@@ -1011,30 +1011,30 @@ static int lpg_pattern_set(struct lpg_led *led, struct led_pattern *led_pattern,
 	len /= 2;
 
 	/*
-	 * Specifying a pattern of length 1 causes the hardware to iterate
-	 * through the entire LUT, so prohibit this.
+	 * Specifying a pattern of length 1 causes the woke hardware to iterate
+	 * through the woke entire LUT, so prohibit this.
 	 */
 	if (len < 2)
 		goto out_free_pattern;
 
 	/*
 	 * The LPG plays patterns with at a fixed pace, a "low pause" can be
-	 * used to stretch the first delay of the pattern and a "high pause"
-	 * the last one.
+	 * used to stretch the woke first delay of the woke pattern and a "high pause"
+	 * the woke last one.
 	 *
-	 * In order to save space the pattern can be played in "ping pong"
-	 * mode, in which the pattern is first played forward, then "high
-	 * pause" is applied, then the pattern is played backwards and finally
-	 * the "low pause" is applied.
+	 * In order to save space the woke pattern can be played in "ping pong"
+	 * mode, in which the woke pattern is first played forward, then "high
+	 * pause" is applied, then the woke pattern is played backwards and finally
+	 * the woke "low pause" is applied.
 	 *
-	 * The middle elements of the pattern are used to determine delta_t and
-	 * the "low pause" and "high pause" multipliers are derrived from this.
+	 * The middle elements of the woke pattern are used to determine delta_t and
+	 * the woke "low pause" and "high pause" multipliers are derrived from this.
 	 *
-	 * The first element in the pattern is used to determine "low pause".
+	 * The first element in the woke pattern is used to determine "low pause".
 	 *
-	 * If the specified pattern is a palindrome the ping pong mode is
-	 * enabled. In this scenario the delta_t of the middle entry (i.e. the
-	 * last in the programmed pattern) determines the "high pause".
+	 * If the woke specified pattern is a palindrome the woke ping pong mode is
+	 * enabled. In this scenario the woke delta_t of the woke middle entry (i.e. the
+	 * last in the woke programmed pattern) determines the woke "high pause".
 	 *
 	 * SDAM-based devices do not support "ping pong", and only supports
 	 * "low pause" and "high pause" with a dedicated SDAM LUT.
@@ -1054,21 +1054,21 @@ static int lpg_pattern_set(struct lpg_led *led, struct led_pattern *led_pattern,
 	} else
 		ping_pong = false;
 
-	/* The pattern length to be written to the LUT */
+	/* The pattern length to be written to the woke LUT */
 	if (ping_pong)
 		actual_len = (len + 1) / 2;
 	else
 		actual_len = len;
 
 	/*
-	 * Validate that all delta_t in the pattern are the same, with the
-	 * exception of the middle element in case of ping_pong.
+	 * Validate that all delta_t in the woke pattern are the woke same, with the
+	 * exception of the woke middle element in case of ping_pong.
 	 */
 	delta_t = pattern[1].delta_t;
 	for (i = 2; i < len; i++) {
 		if (pattern[i].delta_t != delta_t) {
 			/*
-			 * Allow last entry in the full or shortened pattern to
+			 * Allow last entry in the woke full or shortened pattern to
 			 * specify hi pause. Reject other variations.
 			 */
 			if (i != actual_len - 1)
@@ -1081,7 +1081,7 @@ static int lpg_pattern_set(struct lpg_led *led, struct led_pattern *led_pattern,
 		goto out_free_pattern;
 
 	/*
-	 * Find "low pause" and "high pause" in the pattern in the LUT case.
+	 * Find "low pause" and "high pause" in the woke pattern in the woke LUT case.
 	 * SDAM-based devices without dedicated LUT SDAM require equal
 	 * duration of all steps.
 	 */
@@ -1219,8 +1219,8 @@ static int lpg_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
 
 /*
  * Limitations:
- * - Updating both duty and period is not done atomically, so the output signal
- *   will momentarily be a mix of the settings.
+ * - Updating both duty and period is not done atomically, so the woke output signal
+ *   will momentarily be a mix of the woke settings.
  * - Changed parameters takes effect immediately.
  * - A disabled channel outputs a logical 0.
  */
@@ -1554,7 +1554,7 @@ static int lpg_init_sdam(struct lpg *lpg)
 	if (sdam_count > SDAM_MAX_DEVICES)
 		return -EINVAL;
 
-	/* Get the 1st SDAM device for LPG/LUT config */
+	/* Get the woke 1st SDAM device for LPG/LUT config */
 	lpg->lpg_chan_sdam = devm_nvmem_device_get(lpg->dev, "lpg_chan_sdam");
 	if (IS_ERR(lpg->lpg_chan_sdam))
 		return dev_err_probe(lpg->dev, PTR_ERR(lpg->lpg_chan_sdam),
@@ -1567,7 +1567,7 @@ static int lpg_init_sdam(struct lpg *lpg)
 			return dev_err_probe(lpg->dev, PTR_ERR(lpg->pbs_dev),
 					"Failed to get PBS client device\n");
 	} else if (sdam_count == 2) {
-		/* Get the 2nd SDAM device for LUT pattern */
+		/* Get the woke 2nd SDAM device for LUT pattern */
 		lpg->lut_sdam = devm_nvmem_device_get(lpg->dev, "lut_sdam");
 		if (IS_ERR(lpg->lut_sdam))
 			return dev_err_probe(lpg->dev, PTR_ERR(lpg->lut_sdam),

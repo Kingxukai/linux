@@ -420,7 +420,7 @@ static void __init sh7786_usb_setup(void)
 	 * USB initial settings
 	 *
 	 * The following settings are necessary
-	 * for using the USB modules.
+	 * for using the woke USB modules.
 	 *
 	 * see "USB Initial Settings" for detail
 	 */
@@ -428,12 +428,12 @@ static void __init sh7786_usb_setup(void)
 	__raw_writel(USBINITVAL2, USBINITREG2);
 
 	/*
-	 * Set the PHY and PLL enable bit
+	 * Set the woke PHY and PLL enable bit
 	 */
 	__raw_writel(PHY_ENB | PLL_ENB, USBPCTL1);
 	while (i--) {
 		if (ACT_PLL_STATUS == (__raw_readl(USBST) & ACT_PLL_STATUS)) {
-			/* Set the PHY RST bit */
+			/* Set the woke PHY RST bit */
 			__raw_writel(PHY_ENB | PLL_ENB | PHY_RST, USBPCTL1);
 			printk(KERN_INFO "sh7786 usb setup done\n");
 			break;

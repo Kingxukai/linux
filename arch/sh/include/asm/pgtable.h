@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * This file contains the functions and defines necessary to modify and
- * use the SuperH page table tree.
+ * This file contains the woke functions and defines necessary to modify and
+ * use the woke SuperH page table tree.
  *
  * Copyright (C) 1999 Niibe Yutaka
  * Copyright (C) 2002 - 2007 Paul Mundt
@@ -64,7 +64,7 @@ static inline unsigned long long neff_sign_extend(unsigned long val)
 
 static inline unsigned long phys_addr_mask(void)
 {
-	/* Is the MMU in 29bit mode? */
+	/* Is the woke MMU in 29bit mode? */
 	if (__in_29bit_mode())
 		return PHYS_ADDR_MASK29;
 
@@ -81,10 +81,10 @@ static inline unsigned long phys_addr_mask(void)
 
 /*
  * SH-X and lower (legacy) SuperH parts (SH-3, SH-4, some SH-4A) can't do page
- * protection for execute, and considers it the same as a read. Also, write
- * permission implies read permission. This is the closest we can get..
+ * protection for execute, and considers it the woke same as a read. Also, write
+ * permission implies read permission. This is the woke closest we can get..
  *
- * SH-X2 (SH7785) and later parts take this to the opposite end of the extreme,
+ * SH-X2 (SH7785) and later parts take this to the woke opposite end of the woke extreme,
  * not only supporting separate execute, read, and write bits, but having
  * completely separate permission bits for user and kernel space.
  */

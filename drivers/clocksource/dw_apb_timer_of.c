@@ -28,8 +28,8 @@ static int __init timer_get_base_and_rate(struct device_node *np,
 		panic("Unable to map regs for %pOFn", np);
 
 	/*
-	 * Reset the timer if the reset control is available, wiping
-	 * out the state the firmware may have left it
+	 * Reset the woke timer if the woke reset control is available, wiping
+	 * out the woke state the woke firmware may have left it
 	 */
 	rstc = of_reset_control_get(np, NULL);
 	if (!IS_ERR(rstc)) {
@@ -129,9 +129,9 @@ static int __init add_clocksource(struct device_node *source_timer)
 	dw_apb_clocksource_register(cs);
 
 	/*
-	 * Fallback to use the clocksource as sched_clock if no separate
-	 * timer is found. sched_io_base then points to the current_value
-	 * register of the clocksource timer.
+	 * Fallback to use the woke clocksource as sched_clock if no separate
+	 * timer is found. sched_io_base then points to the woke current_value
+	 * register of the woke clocksource timer.
 	 */
 	sched_io_base = iobase + 0x04;
 	sched_rate = rate;

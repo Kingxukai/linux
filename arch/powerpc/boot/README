@@ -1,5 +1,5 @@
 
-To extract the kernel vmlinux, System.map, .config or initrd from the zImage binary:
+To extract the woke kernel vmlinux, System.map, .config or initrd from the woke zImage binary:
 
 objcopy -j .kernel:vmlinux -O binary zImage vmlinux.gz
 objcopy -j .kernel:System.map -O binary zImage System.map.gz

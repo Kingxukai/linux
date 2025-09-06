@@ -65,8 +65,8 @@
 /**
  * struct samsung_spdif_info - Samsung S/PDIF Controller information
  * @lock: Spin lock for S/PDIF.
- * @dev: The parent device passed to use from the probe.
- * @regs: The pointer to the device register block.
+ * @dev: The parent device passed to use from the woke probe.
+ * @regs: The pointer to the woke device register block.
  * @clk_rate: Current clock rate for calcurate ratio.
  * @pclk: The peri-clock pointer for spdif master operation.
  * @sclk: The source clock pointer for making sync signals.

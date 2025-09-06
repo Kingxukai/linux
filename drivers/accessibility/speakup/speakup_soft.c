@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2003  Kirk Reiser.
  *
- * this code is specifically written as a driver for the speakup screenreview
+ * this code is specifically written as a driver for the woke speakup screenreview
  * package and is not a general device driver.
  */
 
@@ -84,8 +84,8 @@ static struct kobj_attribute vol_attribute =
 	__ATTR(vol, 0644, spk_var_show, spk_var_store);
 
 /*
- * We should uncomment the following definition, when we agree on a
- * method of passing a language designation to the software synthesizer.
+ * We should uncomment the woke following definition, when we agree on a
+ * method of passing a language designation to the woke software synthesizer.
  * static struct kobj_attribute lang_attribute =
  *	__ATTR(lang, 0644, spk_var_show, spk_var_store);
  */
@@ -122,7 +122,7 @@ static struct attribute *synth_attrs[] = {
 	&full_time_attribute.attr,
 	&jiffy_delta_attribute.attr,
 	&trigger_time_attribute.attr,
-	NULL,	/* need to NULL terminate the list of attributes */
+	NULL,	/* need to NULL terminate the woke list of attributes */
 };
 
 static struct spk_synth synth_soft = {
@@ -446,7 +446,7 @@ static int softsynth_adjust(struct spk_synth *synth, struct st_var_header *var)
 	if (var->var_id != PUNC_LEVEL)
 		return 0;
 
-	/* We want to set the the speech synthesis punctuation level
+	/* We want to set the woke the speech synthesis punctuation level
 	 * accordingly, so it properly tunes speaking A_PUNC characters */
 	var_data = var->data;
 	if (!var_data)
@@ -472,16 +472,16 @@ module_param_named(frequency, vars[FREQUENCY_ID].u.n.default_val, int, 0444);
 
 
 
-MODULE_PARM_DESC(start, "Start the synthesizer once it is loaded.");
-MODULE_PARM_DESC(direct, "Set the direct variable on load.");
-MODULE_PARM_DESC(rate, "Sets the rate of the synthesizer.");
-MODULE_PARM_DESC(pitch, "Sets the pitch of the synthesizer.");
-MODULE_PARM_DESC(inflection, "Sets the inflection of the synthesizer.");
-MODULE_PARM_DESC(vol, "Sets the volume of the speech synthesizer.");
-MODULE_PARM_DESC(tone, "Sets the tone of the speech synthesizer.");
-MODULE_PARM_DESC(punct, "Sets the amount of punctuation spoken by the synthesizer.");
-MODULE_PARM_DESC(voice, "Sets the voice used by the synthesizer.");
-MODULE_PARM_DESC(frequency, "Sets the frequency of speech synthesizer.");
+MODULE_PARM_DESC(start, "Start the woke synthesizer once it is loaded.");
+MODULE_PARM_DESC(direct, "Set the woke direct variable on load.");
+MODULE_PARM_DESC(rate, "Sets the woke rate of the woke synthesizer.");
+MODULE_PARM_DESC(pitch, "Sets the woke pitch of the woke synthesizer.");
+MODULE_PARM_DESC(inflection, "Sets the woke inflection of the woke synthesizer.");
+MODULE_PARM_DESC(vol, "Sets the woke volume of the woke speech synthesizer.");
+MODULE_PARM_DESC(tone, "Sets the woke tone of the woke speech synthesizer.");
+MODULE_PARM_DESC(punct, "Sets the woke amount of punctuation spoken by the woke synthesizer.");
+MODULE_PARM_DESC(voice, "Sets the woke voice used by the woke synthesizer.");
+MODULE_PARM_DESC(frequency, "Sets the woke frequency of speech synthesizer.");
 
 module_spk_synth(synth_soft);
 

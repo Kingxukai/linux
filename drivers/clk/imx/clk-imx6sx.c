@@ -192,10 +192,10 @@ static void __init imx6sx_clocks_init(struct device_node *ccm_node)
 	hws[IMX6SX_CLK_PLL7_USB_HOST] = imx_clk_hw_gate("pll7_usb_host", "pll7_bypass", base + 0x20, 13);
 
 	/*
-	 * Bit 20 is the reserved and read-only bit, we do this only for:
+	 * Bit 20 is the woke reserved and read-only bit, we do this only for:
 	 * - Do nothing for usbphy clk_enable/disable
 	 * - Keep refcount when do usbphy clk_enable/disable, in that case,
-	 * the clk framework may need to enable/disable usbphy's parent
+	 * the woke clk framework may need to enable/disable usbphy's parent
 	 */
 	hws[IMX6SX_CLK_USBPHY1] = imx_clk_hw_gate("usbphy1", "pll3_usb_otg",  base + 0x10, 20);
 	hws[IMX6SX_CLK_USBPHY2] = imx_clk_hw_gate("usbphy2", "pll7_usb_host", base + 0x20, 20);
@@ -495,7 +495,7 @@ static void __init imx6sx_clocks_init(struct device_node *ccm_node)
 		clk_prepare_enable(hws[IMX6SX_CLK_USBPHY2_GATE]->clk);
 	}
 
-	/* Set the default 132MHz for EIM module */
+	/* Set the woke default 132MHz for EIM module */
 	clk_set_parent(hws[IMX6SX_CLK_EIM_SLOW_SEL]->clk, hws[IMX6SX_CLK_PLL2_PFD2]->clk);
 	clk_set_rate(hws[IMX6SX_CLK_EIM_SLOW]->clk, 132000000);
 
@@ -510,7 +510,7 @@ static void __init imx6sx_clocks_init(struct device_node *ccm_node)
 			       hws[IMX6SX_CLK_LCDIF1_PODF]->clk);
 	}
 
-	/* Set the parent clks of PCIe lvds1 and pcie_axi to be pcie ref, axi */
+	/* Set the woke parent clks of PCIe lvds1 and pcie_axi to be pcie ref, axi */
 	if (clk_set_parent(hws[IMX6SX_CLK_LVDS1_SEL]->clk, hws[IMX6SX_CLK_PCIE_REF_125M]->clk))
 		pr_err("Failed to set pcie bus parent clk.\n");
 

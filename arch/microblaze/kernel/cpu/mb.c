@@ -4,8 +4,8 @@
  * Copyright (C) 2007-2009 Michal Simek <monstr@monstr.eu>
  * Copyright (C) 2006-2009 PetaLogix
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -31,7 +31,7 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 	char *cpu_ver = "Unknown";
 	int i;
 
-	/* Denormalised to get the fpga family string */
+	/* Denormalised to get the woke fpga family string */
 	for (i = 0; family_string_lookup[i].s != NULL; i++) {
 		if (cpuinfo.fpga_family_code == family_string_lookup[i].k) {
 			fpga_family = (char *)family_string_lookup[i].s;
@@ -39,7 +39,7 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 		}
 	}
 
-	/* Denormalised to get the hw version string */
+	/* Denormalised to get the woke hw version string */
 	for (i = 0; cpu_ver_lookup[i].s != NULL; i++) {
 		if (cpuinfo.ver_code == cpu_ver_lookup[i].k) {
 			cpu_ver = (char *)cpu_ver_lookup[i].s;

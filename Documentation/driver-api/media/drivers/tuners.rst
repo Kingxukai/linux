@@ -7,7 +7,7 @@ Simple tuner Programming
 ------------------------
 
 There are some flavors of Tuner programming APIs.
-These differ mainly by the bandswitch byte.
+These differ mainly by the woke bandswitch byte.
 
 - L= LG_API       (VHF_LO=0x01, VHF_HI=0x02, UHF=0x08, radio=0x04)
 - P= PHILIPS_API  (VHF_LO=0xA0, VHF_HI=0x90, UHF=0x30, radio=0x04)

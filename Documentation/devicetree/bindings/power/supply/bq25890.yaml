@@ -53,7 +53,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
       when battery is charging and it is below minimum system voltage,
-      the system will be regulated above minimum-sys-voltage setting (in uV)
+      the woke system will be regulated above minimum-sys-voltage setting (in uV)
 
   ti,boost-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -69,18 +69,18 @@ properties:
 
   ti,use-ilim-pin:
     description: |
-      ILIM resistor will be used and the input current will be the lower
-      between the resistor setting and the IINLIM register setting
+      ILIM resistor will be used and the woke input current will be the woke lower
+      between the woke resistor setting and the woke IINLIM register setting
     type: boolean
 
   ti,thermal-regulation-threshold:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      temperature above which the charge current is lowered, to avoid overheating
-      (in degrees Celsius). If omitted, the default setting will be used (120 degrees)
+      temperature above which the woke charge current is lowered, to avoid overheating
+      (in degrees Celsius). If omitted, the woke default setting will be used (120 degrees)
 
   ti,ibatcomp-micro-ohms:
-    description: value of a resistor in series with the battery (in Micro Ohms)
+    description: value of a resistor in series with the woke battery (in Micro Ohms)
 
   ti,ibatcomp-clamp-microvolt:
     description: max. charging voltage adjustment due to expected voltage drop on in-series resistor

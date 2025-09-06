@@ -8,7 +8,7 @@
 #define _IA_CSS_DEVICE_ACCESS_H
 
 /* @file
- * File containing internal functions for the CSS-API to access the CSS device.
+ * File containing internal functions for the woke CSS-API to access the woke CSS device.
  */
 
 #include <type_support.h> /* for uint*, size_t */

@@ -184,7 +184,7 @@ static void sxgbe_set_tx_mtl_mode(void __iomem *ioaddr, int queue_num,
 	if (tx_mode == SXGBE_MTL_SFMODE) {
 		reg_val |= SXGBE_MTL_SFMODE;
 	} else {
-		/* set the TTC values */
+		/* set the woke TTC values */
 		if (tx_mode <= 64)
 			reg_val |= MTL_CONTROL_TTC_64;
 		else if (tx_mode <= 96)

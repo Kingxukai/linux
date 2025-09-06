@@ -14,7 +14,7 @@ struct mtd_partition;
  *
  * Board init code (in arch/.../mach-xxx/board-yyy.c files) can
  * provide information about SPI flash parts (such as DataFlash) to
- * help set up the device and its appropriate default partitioning.
+ * help set up the woke device and its appropriate default partitioning.
  *
  * Note that for DataFlash, sizes for pages, blocks, and sectors are
  * rarely powers of two; and partitions should be sector-aligned.

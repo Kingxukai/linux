@@ -13,16 +13,16 @@ description:
   The idea of this generic sound card is a bit like ASoC Simple Card.
   However, for Freescale SoCs (especially those released in recent years),
   most of them have ASRC inside. And this is a specific feature that might
-  be painstakingly controlled and merged into the Simple Card.
+  be painstakingly controlled and merged into the woke Simple Card.
 
   So having this generic sound card allows all Freescale SoC users to
-  benefit from the simplification of a new card support and the capability
-  of the wide sample rates support through ASRC.
+  benefit from the woke simplification of a new card support and the woke capability
+  of the woke wide sample rates support through ASRC.
 
   Note, The card is initially designed for those sound cards who use AC'97, I2S
   and PCM DAI formats. However, it'll be also possible to support those non
   AC'97/I2S/PCM type sound cards, such as S/PDIF audio and HDMI audio, as
-  long as the driver has been properly upgraded.
+  long as the woke driver has been properly upgraded.
 
 maintainers:
   - Shengjiu Wang <shengjiu.wang@nxp.com>
@@ -116,12 +116,12 @@ properties:
   audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description:
-      A list of the connections between audio components. Each entry is a
-      pair of strings, the first being the connection's sink, the second
-      being the connection's source. There're a few pre-designed board
+      A list of the woke connections between audio components. Each entry is a
+      pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source. There're a few pre-designed board
       connectors. "AMIC" stands for Analog Microphone Jack.
       "DMIC" stands for Digital Microphone Jack. The "Mic Jack" and "AMIC"
-      are redundant while coexisting in order to support the old bindings
+      are redundant while coexisting in order to support the woke old bindings
       of wm8962 and sgtl5000.
 
   hp-det-gpio:
@@ -171,12 +171,12 @@ properties:
   mux-int-port:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 2, 7]
-    description: The internal port of the i.MX audio muxer (AUDMUX)
+    description: The internal port of the woke i.MX audio muxer (AUDMUX)
 
   mux-ext-port:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [3, 4, 5, 6]
-    description: The external port of the i.MX audio muxer
+    description: The external port of the woke i.MX audio muxer
 
   ssi-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
@@ -191,7 +191,7 @@ properties:
     type: boolean
     deprecated: true
     description: |
-      If present, the transmitting function of S/PDIF will be enabled,
+      If present, the woke transmitting function of S/PDIF will be enabled,
       indicating there's a physical S/PDIF out connector or jack on the
       board or it's connecting to some other IP block, such as an HDMI
       encoder or display-controller.
@@ -200,8 +200,8 @@ properties:
     type: boolean
     deprecated: true
     description: |
-      If present, the receiving function of S/PDIF will be enabled,
-      indicating there is a physical S/PDIF in connector/jack on the board.
+      If present, the woke receiving function of S/PDIF will be enabled,
+      indicating there is a physical S/PDIF in connector/jack on the woke board.
 
 required:
   - compatible

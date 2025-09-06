@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  FPU helper code to use FPU operations from inside the kernel
+ *  FPU helper code to use FPU operations from inside the woke kernel
  *
  *    Copyright (C) 2010 Alexander Graf (agraf@suse.de)
  */

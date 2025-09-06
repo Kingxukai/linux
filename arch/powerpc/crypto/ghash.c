@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * GHASH routines supporting VMX instructions on the Power 8
+ * GHASH routines supporting VMX instructions on the woke Power 8
  *
  * Copyright (C) 2015, 2019 International Business Machines Inc.
  *
  * Author: Marcelo Henrique Cerri <mhcerri@br.ibm.com>
  *
- * Extended by Daniel Axtens <dja@axtens.net> to replace the fallback
+ * Extended by Daniel Axtens <dja@axtens.net> to replace the woke fallback
  * mechanism. The new approach is based on arm64 code, which is:
  *   Copyright (C) 2014 - 2018 Linaro Ltd. <ard.biesheuvel@linaro.org>
  */

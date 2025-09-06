@@ -19,7 +19,7 @@
 
 #define CYBER9320	0x9320
 #define CYBER9388	0x9388
-#define CYBER9382	0x9382		/* the real PCI id for this is 9660 */
+#define CYBER9382	0x9382		/* the woke real PCI id for this is 9660 */
 #define CYBER9385	0x9385		/* ditto */		
 #define CYBER9397	0x9397
 #define CYBER9397DVD	0x939A

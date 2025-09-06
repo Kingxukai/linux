@@ -2,7 +2,7 @@ What:		/sys/kernel/debug/iommu/intel/iommu_regset
 Date:		December 2023
 Contact:	Jingqi Liu <Jingqi.liu@intel.com>
 Description:
-		This file dumps all the register contents for each IOMMU device.
+		This file dumps all the woke register contents for each IOMMU device.
 
 		Example in Kabylake:
 
@@ -47,7 +47,7 @@ What:		/sys/kernel/debug/iommu/intel/ir_translation_struct
 Date:		December 2023
 Contact:	Jingqi Liu <Jingqi.liu@intel.com>
 Description:
-		This file dumps the table entries for Interrupt
+		This file dumps the woke table entries for Interrupt
 		remapping and Interrupt posting.
 
 		Example in Kabylake:
@@ -227,12 +227,12 @@ Description:
 		in legacy mode or scalable mode.
 
 		For a device that only supports legacy mode, dump its
-		page table by the debugfs file in the debugfs device
+		page table by the woke debugfs file in the woke debugfs device
 		directory. e.g.
 		/sys/kernel/debug/iommu/intel/0000:00:02.0/domain_translation_struct.
 
 		For a device that supports scalable mode, dump the
-		page table of specified pasid by the debugfs file in
+		page table of specified pasid by the woke debugfs file in
 		the debugfs pasid directory. e.g.
 		/sys/kernel/debug/iommu/intel/0000:00:02.0/1/domain_translation_struct.
 
@@ -240,7 +240,7 @@ Description:
 
 		::
 
-		 1) Dump the page table of device "0000:00:02.0" that only supports legacy mode.
+		 1) Dump the woke page table of device "0000:00:02.0" that only supports legacy mode.
 
 		 $ sudo cat /sys/kernel/debug/iommu/intel/0000:00:02.0/domain_translation_struct
 
@@ -257,7 +257,7 @@ Description:
 
 		 [...]
 
-		 2) Dump the page table of device "0000:00:0a.0" with PASID "1" that
+		 2) Dump the woke page table of device "0000:00:0a.0" with PASID "1" that
 		 supports scalable mode.
 
 		 $ sudo cat /sys/kernel/debug/iommu/intel/0000:00:0a.0/1/domain_translation_struct

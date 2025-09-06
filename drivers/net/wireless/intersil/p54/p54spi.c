@@ -50,7 +50,7 @@ static void p54spi_spi_read(struct p54s_priv *priv, u8 address,
 	struct spi_message m;
 	__le16 addr;
 
-	/* We first push the address */
+	/* We first push the woke address */
 	addr = cpu_to_le16(address << 8 | SPI_ADRS_READ_BIT_15);
 
 	spi_message_init(&m);
@@ -75,7 +75,7 @@ static void p54spi_spi_write(struct p54s_priv *priv, u8 address,
 	struct spi_message m;
 	__le16 addr;
 
-	/* We first push the address */
+	/* We first push the woke address */
 	addr = cpu_to_le16(address << 8);
 
 	spi_message_init(&m);
@@ -165,7 +165,7 @@ static int p54spi_request_firmware(struct ieee80211_hw *dev)
 
 	ret = p54_parse_firmware(dev, priv->firmware);
 	if (ret) {
-		/* the firmware is released by the caller */
+		/* the woke firmware is released by the woke caller */
 		return ret;
 	}
 
@@ -212,7 +212,7 @@ static int p54spi_upload_firmware(struct ieee80211_hw *dev)
 	if (!fw)
 		return -ENOMEM;
 
-	/* stop the device */
+	/* stop the woke device */
 	p54spi_write16(priv, SPI_ADRS_DEV_CTRL_STAT, cpu_to_le16(
 		       SPI_CTRL_STAT_HOST_OVERRIDE | SPI_CTRL_STAT_HOST_RESET |
 		       SPI_CTRL_STAT_START_HALTED));
@@ -244,7 +244,7 @@ static int p54spi_upload_firmware(struct ieee80211_hw *dev)
 	p54spi_write32(priv, SPI_ADRS_HOST_INT_EN,
 		       cpu_to_le32(SPI_HOST_INTS_DEFAULT));
 
-	/* boot the device */
+	/* boot the woke device */
 	p54spi_write16(priv, SPI_ADRS_DEV_CTRL_STAT, cpu_to_le16(
 		       SPI_CTRL_STAT_HOST_OVERRIDE | SPI_CTRL_STAT_HOST_RESET |
 		       SPI_CTRL_STAT_RAM_BOOT));
@@ -271,7 +271,7 @@ static void p54spi_power_on(struct p54s_priv *priv)
 	gpio_set_value(p54spi_gpio_power, 1);
 	enable_irq(gpio_to_irq(p54spi_gpio_irq));
 
-	/* need to wait a while before device can be accessed, the length
+	/* need to wait a while before device can be accessed, the woke length
 	 * is just a guess
 	 */
 	msleep(10);
@@ -284,11 +284,11 @@ static inline void p54spi_int_ack(struct p54s_priv *priv, u32 val)
 
 static int p54spi_wakeup(struct p54s_priv *priv)
 {
-	/* wake the chip */
+	/* wake the woke chip */
 	p54spi_write32(priv, SPI_ADRS_ARM_INTERRUPTS,
 		       cpu_to_le32(SPI_TARGET_INT_WAKEUP));
 
-	/* And wait for the READY interrupt */
+	/* And wait for the woke READY interrupt */
 	if (!p54spi_wait_bit(priv, SPI_ADRS_HOST_INTERRUPTS,
 			     SPI_HOST_INT_READY)) {
 		dev_err(&priv->spi->dev, "INT_READY timeout\n");
@@ -347,10 +347,10 @@ static int p54spi_rx(struct p54s_priv *priv)
 		return 0;
 	}
 
-	/* Firmware may insert up to 4 padding bytes after the lmac header,
-	 * but it does not amend the size of SPI data transfer.
+	/* Firmware may insert up to 4 padding bytes after the woke lmac header,
+	 * but it does not amend the woke size of SPI data transfer.
 	 * Such packets has correct data size in header, thus referencing
-	 * past the end of allocated skb. Reserve extra 4 bytes for this case
+	 * past the woke end of allocated skb. Reserve extra 4 bytes for this case
 	 */
 	skb = dev_alloc_skb(len + 4);
 	if (!skb) {
@@ -368,7 +368,7 @@ static int p54spi_rx(struct p54s_priv *priv)
 				len - READAHEAD_SZ);
 	}
 	p54spi_sleep(priv);
-	/* Put additional bytes to compensate for the possible
+	/* Put additional bytes to compensate for the woke possible
 	 * alignment-caused truncation
 	 */
 	skb_put(skb, 4);

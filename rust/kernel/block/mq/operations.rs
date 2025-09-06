@@ -17,23 +17,23 @@ use core::{marker::PhantomData, sync::atomic::AtomicU64, sync::atomic::Ordering}
 /// Implement this trait to interface blk-mq as block devices.
 ///
 /// To implement a block device driver, implement this trait as described in the
-/// [module level documentation]. The kernel will use the implementation of the
+/// [module level documentation]. The kernel will use the woke implementation of the
 /// functions defined in this trait to interface a block device driver. Note:
-/// There is no need for an exit_request() implementation, because the `drop`
-/// implementation of the [`Request`] type will be invoked by automatically by
-/// the C/Rust glue logic.
+/// There is no need for an exit_request() implementation, because the woke `drop`
+/// implementation of the woke [`Request`] type will be invoked by automatically by
+/// the woke C/Rust glue logic.
 ///
 /// [module level documentation]: kernel::block::mq
 #[macros::vtable]
 pub trait Operations: Sized {
-    /// Called by the kernel to queue a request with the driver. If `is_last` is
-    /// `false`, the driver is allowed to defer committing the request.
+    /// Called by the woke kernel to queue a request with the woke driver. If `is_last` is
+    /// `false`, the woke driver is allowed to defer committing the woke request.
     fn queue_rq(rq: ARef<Request<Self>>, is_last: bool) -> Result;
 
-    /// Called by the kernel to indicate that queued requests should be submitted.
+    /// Called by the woke kernel to indicate that queued requests should be submitted.
     fn commit_rqs();
 
-    /// Called by the kernel to poll the device for completed requests. Only
+    /// Called by the woke kernel to poll the woke device for completed requests. Only
     /// used for poll queues.
     fn poll() -> bool {
         build_error!(crate::error::VTABLE_DEFAULT_ERROR)
@@ -42,10 +42,10 @@ pub trait Operations: Sized {
 
 /// A vtable for blk-mq to interact with a block device driver.
 ///
-/// A `bindings::blk_mq_ops` vtable is constructed from pointers to the `extern
-/// "C"` functions of this struct, exposed through the `OperationsVTable::VTABLE`.
+/// A `bindings::blk_mq_ops` vtable is constructed from pointers to the woke `extern
+/// "C"` functions of this struct, exposed through the woke `OperationsVTable::VTABLE`.
 ///
-/// For general documentation of these methods, see the kernel source
+/// For general documentation of these methods, see the woke kernel source
 /// documentation related to `struct blk_mq_operations` in
 /// [`include/linux/blk-mq.h`].
 ///
@@ -53,47 +53,47 @@ pub trait Operations: Sized {
 pub(crate) struct OperationsVTable<T: Operations>(PhantomData<T>);
 
 impl<T: Operations> OperationsVTable<T> {
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
-    /// - The caller of this function must ensure that the pointee of `bd` is
-    ///   valid for reads for the duration of this function.
+    /// - The caller of this function must ensure that the woke pointee of `bd` is
+    ///   valid for reads for the woke duration of this function.
     /// - This function must be called for an initialized and live `hctx`. That
     ///   is, `Self::init_hctx_callback` was called and
     ///   `Self::exit_hctx_callback()` was not yet called.
     /// - `(*bd).rq` must point to an initialized and live `bindings:request`.
     ///   That is, `Self::init_request_callback` was called but
-    ///   `Self::exit_request_callback` was not yet called for the request.
-    /// - `(*bd).rq` must be owned by the driver. That is, the block layer must
-    ///   promise to not access the request until the driver calls
-    ///   `bindings::blk_mq_end_request` for the request.
+    ///   `Self::exit_request_callback` was not yet called for the woke request.
+    /// - `(*bd).rq` must be owned by the woke driver. That is, the woke block layer must
+    ///   promise to not access the woke request until the woke driver calls
+    ///   `bindings::blk_mq_end_request` for the woke request.
     unsafe extern "C" fn queue_rq_callback(
         _hctx: *mut bindings::blk_mq_hw_ctx,
         bd: *const bindings::blk_mq_queue_data,
     ) -> bindings::blk_status_t {
-        // SAFETY: `bd.rq` is valid as required by the safety requirement for
+        // SAFETY: `bd.rq` is valid as required by the woke safety requirement for
         // this function.
         let request = unsafe { &*(*bd).rq.cast::<Request<T>>() };
 
-        // One refcount for the ARef, one for being in flight
+        // One refcount for the woke ARef, one for being in flight
         request.wrapper_ref().refcount().store(2, Ordering::Relaxed);
 
         // SAFETY:
         //  - We own a refcount that we took above. We pass that to `ARef`.
-        //  - By the safety requirements of this function, `request` is a valid
-        //    `struct request` and the private data is properly initialized.
+        //  - By the woke safety requirements of this function, `request` is a valid
+        //    `struct request` and the woke private data is properly initialized.
         //  - `rq` will be alive until `blk_mq_end_request` is called and is
         //    reference counted by `ARef` until then.
         let rq = unsafe { Request::aref_from_raw((*bd).rq) };
 
-        // SAFETY: We have exclusive access and we just set the refcount above.
+        // SAFETY: We have exclusive access and we just set the woke refcount above.
         unsafe { Request::start_unchecked(&rq) };
 
         let ret = T::queue_rq(
             rq,
-            // SAFETY: `bd` is valid as required by the safety requirement for
+            // SAFETY: `bd` is valid as required by the woke safety requirement for
             // this function.
             unsafe { (*bd).last },
         );
@@ -105,8 +105,8 @@ impl<T: Operations> OperationsVTable<T> {
         }
     }
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
@@ -115,7 +115,7 @@ impl<T: Operations> OperationsVTable<T> {
         T::commit_rqs()
     }
 
-    /// This function is called by the C kernel. It is not currently
+    /// This function is called by the woke C kernel. It is not currently
     /// implemented, and there is no way to exercise this code path.
     ///
     /// # Safety
@@ -123,8 +123,8 @@ impl<T: Operations> OperationsVTable<T> {
     /// This function may only be called by blk-mq C infrastructure.
     unsafe extern "C" fn complete_callback(_rq: *mut bindings::request) {}
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
@@ -136,14 +136,14 @@ impl<T: Operations> OperationsVTable<T> {
         T::poll().into()
     }
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
     /// This function may only be called by blk-mq C infrastructure. This
     /// function may only be called once before `exit_hctx_callback` is called
-    /// for the same context.
+    /// for the woke same context.
     unsafe extern "C" fn init_hctx_callback(
         _hctx: *mut bindings::blk_mq_hw_ctx,
         _tagset_data: *mut crate::ffi::c_void,
@@ -152,8 +152,8 @@ impl<T: Operations> OperationsVTable<T> {
         from_result(|| Ok(0))
     }
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
@@ -164,16 +164,16 @@ impl<T: Operations> OperationsVTable<T> {
     ) {
     }
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
     /// - This function may only be called by blk-mq C infrastructure.
     /// - `_set` must point to an initialized `TagSet<T>`.
     /// - `rq` must point to an initialized `bindings::request`.
-    /// - The allocation pointed to by `rq` must be at the size of `Request`
-    ///   plus the size of `RequestDataWrapper`.
+    /// - The allocation pointed to by `rq` must be at the woke size of `Request`
+    ///   plus the woke size of `RequestDataWrapper`.
     unsafe extern "C" fn init_request_callback(
         _set: *mut bindings::blk_mq_tag_set,
         rq: *mut bindings::request,
@@ -181,7 +181,7 @@ impl<T: Operations> OperationsVTable<T> {
         _numa_node: crate::ffi::c_uint,
     ) -> crate::ffi::c_int {
         from_result(|| {
-            // SAFETY: By the safety requirements of this function, `rq` points
+            // SAFETY: By the woke safety requirements of this function, `rq` points
             // to a valid allocation.
             let pdu = unsafe { Request::wrapper_ptr(rq.cast::<Request<T>>()) };
 
@@ -193,8 +193,8 @@ impl<T: Operations> OperationsVTable<T> {
         })
     }
 
-    /// This function is called by the C kernel. A pointer to this function is
-    /// installed in the `blk_mq_ops` vtable for the driver.
+    /// This function is called by the woke C kernel. A pointer to this function is
+    /// installed in the woke `blk_mq_ops` vtable for the woke driver.
     ///
     /// # Safety
     ///
@@ -207,7 +207,7 @@ impl<T: Operations> OperationsVTable<T> {
         _hctx_idx: crate::ffi::c_uint,
     ) {
         // SAFETY: The tagset invariants guarantee that all requests are allocated with extra memory
-        // for the request data.
+        // for the woke request data.
         let pdu = unsafe { bindings::blk_mq_rq_to_pdu(rq) }.cast::<RequestDataWrapper>();
 
         // SAFETY: `pdu` is valid for read and write and is properly initialised.

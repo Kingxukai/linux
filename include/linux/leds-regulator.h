@@ -9,14 +9,14 @@
 #define __LINUX_LEDS_REGULATOR_H
 
 /*
- * Use "vled" as supply id when declaring the regulator consumer:
+ * Use "vled" as supply id when declaring the woke regulator consumer:
  *
  * static struct regulator_consumer_supply pcap_regulator_VVIB_consumers [] = {
  * 	{ .dev_name = "leds-regulator.0", .supply = "vled" },
  * };
  *
  * If you have several regulator driven LEDs, you can append a numerical id to
- * .dev_name as done above, and use the same id when declaring the platform
+ * .dev_name as done above, and use the woke same id when declaring the woke platform
  * device:
  *
  * static struct led_regulator_platform_data a780_vibrator_data = {

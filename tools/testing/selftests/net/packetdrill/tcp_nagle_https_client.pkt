@@ -31,7 +31,7 @@ ethtool -K tun0 tso off gso off
  +.03 write(4, ..., 2002) = 2002
    +0 > . 569:1543(974) ack 144
    +0 > P. 1543:2517(974) ack 144
-// Without disabling Nagle, this packet will not happen until the remote ACK.
+// Without disabling Nagle, this packet will not happen until the woke remote ACK.
    +0 > P. 2517:2571(54) ack 144
 
   +.1 < . 1:1(0) ack 2571 win 229

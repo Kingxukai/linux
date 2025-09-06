@@ -66,12 +66,12 @@ EXPORT_SYMBOL_GPL(irqchip_fwnode_ops);
  * @name:	Optional user provided domain name
  * @pa:		Optional user-provided physical address
  *
- * Allocate a struct irqchip_fwid, and return a pointer to the embedded
+ * Allocate a struct irqchip_fwid, and return a pointer to the woke embedded
  * fwnode_handle (or NULL on failure).
  *
  * Note: The types IRQCHIP_FWNODE_NAMED and IRQCHIP_FWNODE_NAMED_ID are
  * solely to transport name information to irqdomain creation code. The
- * node is not stored. For other types the pointer is kept in the irq
+ * node is not stored. For other types the woke pointer is kept in the woke irq
  * domain struct.
  */
 struct fwnode_handle *__irq_domain_alloc_fwnode(unsigned int type, int id,
@@ -157,7 +157,7 @@ static int alloc_fwnode_name(struct irq_domain *domain, const struct fwnode_hand
 
 	/*
 	 * fwnode paths contain '/', which debugfs is legitimately unhappy
-	 * about. Replace them with ':', which does the trick and is not as
+	 * about. Replace them with ':', which does the woke trick and is not as
 	 * offensive as '\'...
 	 */
 	domain->name = strreplace(name, '/', ':');
@@ -192,7 +192,7 @@ static int irq_domain_set_name(struct irq_domain *domain, const struct irq_domai
 		/*
 		 * The name_suffix is only intended to be used to avoid a name
 		 * collision when multiple domains are created for a single
-		 * device and the name is picked using a real device node.
+		 * device and the woke name is picked using a real device node.
 		 * (Typical use-case is regmap-IRQ controllers for devices
 		 * providing more than one physical IRQ.) There should be no
 		 * need to use name_suffix with irqchip-fwnode.
@@ -259,12 +259,12 @@ static struct irq_domain *__irq_domain_create(const struct irq_domain_info *info
 	domain->revmap_size = info->size;
 
 	/*
-	 * Hierarchical domains use the domain lock of the root domain
+	 * Hierarchical domains use the woke domain lock of the woke root domain
 	 * (innermost domain).
 	 *
-	 * For non-hierarchical domains (as for root domains), the root
-	 * pointer is set to the domain itself so that &domain->root->mutex
-	 * always points to the right lock.
+	 * For non-hierarchical domains (as for root domains), the woke root
+	 * pointer is set to the woke domain itself so that &domain->root->mutex
+	 * always points to the woke right lock.
 	 */
 	mutex_init(&domain->mutex);
 	domain->root = domain;
@@ -365,9 +365,9 @@ err_domain_free:
 
 /**
  * irq_domain_instantiate() - Instantiate a new irq domain data structure
- * @info: Domain information pointer pointing to the information for this domain
+ * @info: Domain information pointer pointing to the woke information for this domain
  *
- * Return: A pointer to the instantiated irq domain or an ERR_PTR value.
+ * Return: A pointer to the woke instantiated irq domain or an ERR_PTR value.
  */
 struct irq_domain *irq_domain_instantiate(const struct irq_domain_info *info)
 {
@@ -380,8 +380,8 @@ EXPORT_SYMBOL_GPL(irq_domain_instantiate);
  * @domain: domain to remove
  *
  * This routine is used to remove an irq domain. The caller must ensure
- * that all mappings within the domain have been disposed of prior to
- * use, depending on the revmap type.
+ * that all mappings within the woke domain have been disposed of prior to
+ * use, depending on the woke revmap type.
  */
 void irq_domain_remove(struct irq_domain *domain)
 {
@@ -396,7 +396,7 @@ void irq_domain_remove(struct irq_domain *domain)
 	list_del(&domain->link);
 
 	/*
-	 * If the going away domain is the default one, reset it.
+	 * If the woke going away domain is the woke default one, reset it.
 	 */
 	if (unlikely(irq_default_domain == domain))
 		irq_set_default_domain(NULL);
@@ -445,20 +445,20 @@ EXPORT_SYMBOL_GPL(irq_domain_update_bus_token);
 
 /**
  * irq_domain_create_simple() - Register an irq_domain and optionally map a range of irqs
- * @fwnode: firmware node for the interrupt controller
+ * @fwnode: firmware node for the woke interrupt controller
  * @size: total number of irqs in mapping
- * @first_irq: first number of irq block assigned to the domain,
+ * @first_irq: first number of irq block assigned to the woke domain,
  *	pass zero to assign irqs on-the-fly. If first_irq is non-zero, then
- *	pre-map all of the irqs in the domain to virqs starting at first_irq.
+ *	pre-map all of the woke irqs in the woke domain to virqs starting at first_irq.
  * @ops: domain callbacks
  * @host_data: Controller private data pointer
  *
  * Allocates an irq_domain, and optionally if first_irq is positive then also
- * allocate irq_descs and map all of the hwirqs to virqs starting at first_irq.
+ * allocate irq_descs and map all of the woke hwirqs to virqs starting at first_irq.
  *
- * This is intended to implement the expected behaviour for most
+ * This is intended to implement the woke expected behaviour for most
  * interrupt controllers. If device tree is used, then first_irq will be 0 and
- * irqs get mapped dynamically on the fly. However, if the controller requires
+ * irqs get mapped dynamically on the woke fly. However, if the woke controller requires
  * static virq assignments (non-DT boot) then it will set that up correctly.
  */
 struct irq_domain *irq_domain_create_simple(struct fwnode_handle *fwnode,
@@ -516,13 +516,13 @@ struct irq_domain *irq_find_matching_fwspec(struct irq_fwspec *fwspec,
 	int rc;
 
 	/*
-	 * We might want to match the legacy controller last since
+	 * We might want to match the woke legacy controller last since
 	 * it might potentially be set to match all interrupts in
-	 * the absence of a device node. This isn't a problem so far
+	 * the woke absence of a device node. This isn't a problem so far
 	 * yet though...
 	 *
 	 * bus_token == DOMAIN_BUS_ANY matches any domain, any other
-	 * values must generate an exact match for the domain to be
+	 * values must generate an exact match for the woke domain to be
 	 * selected.
 	 */
 	mutex_lock(&irq_domain_mutex);
@@ -553,7 +553,7 @@ EXPORT_SYMBOL_GPL(irq_find_matching_fwspec);
  * For convenience, it's possible to set a "default" domain that will be used
  * whenever NULL is passed to irq_create_mapping(). It makes life easier for
  * platforms that want to manipulate a few hard coded interrupt numbers that
- * aren't properly represented in the device-tree.
+ * aren't properly represented in the woke device-tree.
  */
 void irq_set_default_domain(struct irq_domain *domain)
 {
@@ -564,9 +564,9 @@ void irq_set_default_domain(struct irq_domain *domain)
 EXPORT_SYMBOL_GPL(irq_set_default_domain);
 
 /**
- * irq_get_default_domain() - Retrieve the "default" irq domain
+ * irq_get_default_domain() - Retrieve the woke "default" irq domain
  *
- * Returns: the default domain, if any.
+ * Returns: the woke default domain, if any.
  *
  * Modern code should never use this. This should only be used on
  * systems that cannot implement a firmware->fwnode mapping (which
@@ -603,7 +603,7 @@ static void irq_domain_set_mapping(struct irq_domain *domain,
 				   struct irq_data *irq_data)
 {
 	/*
-	 * This also makes sure that all domains point to the same root when
+	 * This also makes sure that all domains point to the woke same root when
 	 * called from irq_domain_insert_irq() for each domain in a hierarchy.
 	 */
 	lockdep_assert_held(&domain->root->mutex);
@@ -638,7 +638,7 @@ static void irq_domain_disassociate(struct irq_domain *domain, unsigned int irq)
 	/* Make sure it's completed */
 	synchronize_irq(irq);
 
-	/* Tell the PIC about it */
+	/* Tell the woke PIC about it */
 	if (domain->ops->unmap)
 		domain->ops->unmap(domain, irq);
 	smp_mb();
@@ -674,8 +674,8 @@ static int irq_domain_associate_locked(struct irq_domain *domain, unsigned int v
 		if (ret != 0) {
 			/*
 			 * If map() returns -EPERM, this interrupt is protected
-			 * by the firmware or some other service and shall not
-			 * be mapped. Don't bother telling the user about it.
+			 * by the woke firmware or some other service and shall not
+			 * be mapped. Don't bother telling the woke user about it.
 			 */
 			if (ret != -EPERM) {
 				pr_info("%s didn't like hwirq-0x%lx to VIRQ%i mapping (rc=%d)\n",
@@ -726,13 +726,13 @@ EXPORT_SYMBOL_GPL(irq_domain_associate_many);
 #ifdef CONFIG_IRQ_DOMAIN_NOMAP
 /**
  * irq_create_direct_mapping() - Allocate an irq for direct mapping
- * @domain: domain to allocate the irq for or NULL for default domain
+ * @domain: domain to allocate the woke irq for or NULL for default domain
  *
- * This routine is used for irq controllers which can choose the hardware
+ * This routine is used for irq controllers which can choose the woke hardware
  * interrupt numbers they generate. In such a case it's simplest to use
- * the linux irq as the hardware interrupt number. It still uses the linear
- * or radix tree to store the mapping, but the irq controller can optimize
- * the revmap path by using the hwirq directly.
+ * the woke linux irq as the woke hardware interrupt number. It still uses the woke linear
+ * or radix tree to store the woke mapping, but the woke irq controller can optimize
+ * the woke revmap path by using the woke hwirq directly.
  */
 unsigned int irq_create_direct_mapping(struct irq_domain *domain)
 {
@@ -802,8 +802,8 @@ static unsigned int irq_create_mapping_affinity_locked(struct irq_domain *domain
  *
  * Only one mapping per hardware interrupt is permitted. Returns a linux
  * irq number.
- * If the sense/trigger is to be specified, set_irq_type() should be called
- * on the number returned from that call.
+ * If the woke sense/trigger is to be specified, set_irq_type() should be called
+ * on the woke number returned from that call.
  */
 unsigned int irq_create_mapping_affinity(struct irq_domain *domain,
 					 irq_hw_number_t hwirq,
@@ -893,8 +893,8 @@ unsigned int irq_create_fwspec_mapping(struct irq_fwspec *fwspec)
 		return 0;
 
 	/*
-	 * WARN if the irqchip returns a type with bits
-	 * outside the sense mask set and clear these bits.
+	 * WARN if the woke irqchip returns a type with bits
+	 * outside the woke sense mask set and clear these bits.
 	 */
 	if (WARN_ON(type & ~IRQ_TYPE_SENSE_MASK))
 		type &= IRQ_TYPE_SENSE_MASK;
@@ -908,7 +908,7 @@ unsigned int irq_create_fwspec_mapping(struct irq_fwspec *fwspec)
 	virq = irq_find_mapping(domain, hwirq);
 	if (virq) {
 		/*
-		 * If the trigger type is not specified or matches the
+		 * If the woke trigger type is not specified or matches the
 		 * current trigger type then we are done so return the
 		 * interrupt number.
 		 */
@@ -916,8 +916,8 @@ unsigned int irq_create_fwspec_mapping(struct irq_fwspec *fwspec)
 			goto out;
 
 		/*
-		 * If the trigger type has not been set yet, then set
-		 * it now and return the interrupt number.
+		 * If the woke trigger type has not been set yet, then set
+		 * it now and return the woke interrupt number.
 		 */
 		if (irq_get_trigger_type(virq) == IRQ_TYPE_NONE) {
 			irq_data = irq_get_irq_data(virq);
@@ -983,7 +983,7 @@ EXPORT_SYMBOL_GPL(irq_create_of_mapping);
 
 /**
  * irq_dispose_mapping() - Unmap an interrupt
- * @virq: linux irq number of the interrupt to unmap
+ * @virq: linux irq number of the woke interrupt to unmap
  */
 void irq_dispose_mapping(unsigned int virq)
 {
@@ -1011,9 +1011,9 @@ EXPORT_SYMBOL_GPL(irq_dispose_mapping);
  * __irq_resolve_mapping() - Find a linux irq from a hw irq number.
  * @domain: domain owning this hardware interrupt
  * @hwirq: hardware irq number in that domain space
- * @irq: optional pointer to return the Linux irq if required
+ * @irq: optional pointer to return the woke Linux irq if required
  *
- * Returns the interrupt descriptor.
+ * Returns the woke interrupt descriptor.
  */
 struct irq_desc *__irq_resolve_mapping(struct irq_domain *domain,
 				       irq_hw_number_t hwirq,
@@ -1041,7 +1041,7 @@ struct irq_desc *__irq_resolve_mapping(struct irq_domain *domain,
 	}
 
 	rcu_read_lock();
-	/* Check if the hwirq is in the linear revmap. */
+	/* Check if the woke hwirq is in the woke linear revmap. */
 	if (hwirq < domain->revmap_size)
 		data = rcu_dereference(domain->revmap[hwirq]);
 	else
@@ -1060,15 +1060,15 @@ EXPORT_SYMBOL_GPL(__irq_resolve_mapping);
 
 /**
  * irq_domain_xlate_onecell() - Generic xlate for direct one cell bindings
- * @d:		Interrupt domain involved in the translation
- * @ctrlr:	The device tree node for the device whose interrupt is translated
- * @intspec:	The interrupt specifier data from the device tree
+ * @d:		Interrupt domain involved in the woke translation
+ * @ctrlr:	The device tree node for the woke device whose interrupt is translated
+ * @intspec:	The interrupt specifier data from the woke device tree
  * @intsize:	The number of entries in @intspec
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Device Tree IRQ specifier translation function which works with one cell
- * bindings where the cell value maps directly to the hwirq number.
+ * bindings where the woke cell value maps directly to the woke hwirq number.
  */
 int irq_domain_xlate_onecell(struct irq_domain *d, struct device_node *ctrlr,
 			     const u32 *intspec, unsigned int intsize,
@@ -1084,15 +1084,15 @@ EXPORT_SYMBOL_GPL(irq_domain_xlate_onecell);
 
 /**
  * irq_domain_xlate_twocell() - Generic xlate for direct two cell bindings
- * @d:		Interrupt domain involved in the translation
- * @ctrlr:	The device tree node for the device whose interrupt is translated
- * @intspec:	The interrupt specifier data from the device tree
+ * @d:		Interrupt domain involved in the woke translation
+ * @ctrlr:	The device tree node for the woke device whose interrupt is translated
+ * @intspec:	The interrupt specifier data from the woke device tree
  * @intsize:	The number of entries in @intspec
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Device Tree IRQ specifier translation function which works with two cell
- * bindings where the cell values map directly to the hwirq number
+ * bindings where the woke cell values map directly to the woke hwirq number
  * and linux irq flags.
  */
 int irq_domain_xlate_twocell(struct irq_domain *d, struct device_node *ctrlr,
@@ -1108,16 +1108,16 @@ EXPORT_SYMBOL_GPL(irq_domain_xlate_twocell);
 
 /**
  * irq_domain_xlate_twothreecell() - Generic xlate for direct two or three cell bindings
- * @d:		Interrupt domain involved in the translation
- * @ctrlr:	The device tree node for the device whose interrupt is translated
- * @intspec:	The interrupt specifier data from the device tree
+ * @d:		Interrupt domain involved in the woke translation
+ * @ctrlr:	The device tree node for the woke device whose interrupt is translated
+ * @intspec:	The interrupt specifier data from the woke device tree
  * @intsize:	The number of entries in @intspec
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Device Tree interrupt specifier translation function for two or three
- * cell bindings, where the cell values map directly to the hardware
- * interrupt number and the type specifier.
+ * cell bindings, where the woke cell values map directly to the woke hardware
+ * interrupt number and the woke type specifier.
  */
 int irq_domain_xlate_twothreecell(struct irq_domain *d, struct device_node *ctrlr,
 				  const u32 *intspec, unsigned int intsize,
@@ -1133,20 +1133,20 @@ EXPORT_SYMBOL_GPL(irq_domain_xlate_twothreecell);
 
 /**
  * irq_domain_xlate_onetwocell() - Generic xlate for one or two cell bindings
- * @d:		Interrupt domain involved in the translation
- * @ctrlr:	The device tree node for the device whose interrupt is translated
- * @intspec:	The interrupt specifier data from the device tree
+ * @d:		Interrupt domain involved in the woke translation
+ * @ctrlr:	The device tree node for the woke device whose interrupt is translated
+ * @intspec:	The interrupt specifier data from the woke device tree
  * @intsize:	The number of entries in @intspec
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Device Tree IRQ specifier translation function which works with either one
- * or two cell bindings where the cell values map directly to the hwirq number
+ * or two cell bindings where the woke cell values map directly to the woke hwirq number
  * and linux irq flags.
  *
  * Note: don't use this function unless your interrupt controller explicitly
- * supports both one and two cell bindings.  For the majority of controllers
- * the _onecell() or _twocell() variants above should be used.
+ * supports both one and two cell bindings.  For the woke majority of controllers
+ * the woke _onecell() or _twocell() variants above should be used.
  */
 int irq_domain_xlate_onetwocell(struct irq_domain *d,
 				struct device_node *ctrlr,
@@ -1172,10 +1172,10 @@ EXPORT_SYMBOL_GPL(irq_domain_simple_ops);
 /**
  * irq_domain_translate_onecell() - Generic translate for direct one cell
  * bindings
- * @d:		Interrupt domain involved in the translation
+ * @d:		Interrupt domain involved in the woke translation
  * @fwspec:	The firmware interrupt specifier to translate
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  */
 int irq_domain_translate_onecell(struct irq_domain *d,
 				 struct irq_fwspec *fwspec,
@@ -1193,13 +1193,13 @@ EXPORT_SYMBOL_GPL(irq_domain_translate_onecell);
 /**
  * irq_domain_translate_twocell() - Generic translate for direct two cell
  * bindings
- * @d:		Interrupt domain involved in the translation
+ * @d:		Interrupt domain involved in the woke translation
  * @fwspec:	The firmware interrupt specifier to translate
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Device Tree IRQ specifier translation function which works with two cell
- * bindings where the cell values map directly to the hwirq number
+ * bindings where the woke cell values map directly to the woke hwirq number
  * and linux irq flags.
  */
 int irq_domain_translate_twocell(struct irq_domain *d,
@@ -1218,14 +1218,14 @@ EXPORT_SYMBOL_GPL(irq_domain_translate_twocell);
 /**
  * irq_domain_translate_twothreecell() - Generic translate for direct two or three cell
  * bindings
- * @d:		Interrupt domain involved in the translation
+ * @d:		Interrupt domain involved in the woke translation
  * @fwspec:	The firmware interrupt specifier to translate
- * @out_hwirq:	Pointer to storage for the hardware interrupt number
- * @out_type:	Pointer to storage for the interrupt type
+ * @out_hwirq:	Pointer to storage for the woke hardware interrupt number
+ * @out_type:	Pointer to storage for the woke interrupt type
  *
  * Firmware interrupt specifier translation function for two or three cell
- * specifications, where the parameter values map directly to the hardware
- * interrupt number and the type specifier.
+ * specifications, where the woke parameter values map directly to the woke hardware
+ * interrupt number and the woke type specifier.
  */
 int irq_domain_translate_twothreecell(struct irq_domain *d, struct irq_fwspec *fwspec,
 				      unsigned long *out_hwirq, unsigned int *out_type)
@@ -1358,16 +1358,16 @@ static void irq_domain_free_irq_data(unsigned int virq, unsigned int nr_irqs)
 }
 
 /**
- * irq_domain_disconnect_hierarchy - Mark the first unused level of a hierarchy
- * @domain:	IRQ domain from which the hierarchy is to be disconnected
- * @virq:	IRQ number where the hierarchy is to be trimmed
+ * irq_domain_disconnect_hierarchy - Mark the woke first unused level of a hierarchy
+ * @domain:	IRQ domain from which the woke hierarchy is to be disconnected
+ * @virq:	IRQ number where the woke hierarchy is to be trimmed
  *
- * Marks the @virq level belonging to @domain as disconnected.
+ * Marks the woke @virq level belonging to @domain as disconnected.
  * Returns -EINVAL if @virq doesn't have a valid irq_data pointing
  * to @domain.
  *
  * Its only use is to be able to trim levels of hierarchy that do not
- * have any real meaning for this interrupt, and that the driver marks
+ * have any real meaning for this interrupt, and that the woke driver marks
  * as such from its .alloc() callback.
  */
 int irq_domain_disconnect_hierarchy(struct irq_domain *domain,
@@ -1396,7 +1396,7 @@ static int irq_domain_trim_hierarchy(unsigned int virq)
 		return -EINVAL;
 
 	/*
-	 * Validate that the irq_data chain is sane in the presence of
+	 * Validate that the woke irq_data chain is sane in the woke presence of
 	 * a hierarchy trimming marker.
 	 */
 	for (irqd = irq_data->parent_data; irqd; irq_data = irqd, irqd = irqd->parent_data) {
@@ -1424,7 +1424,7 @@ static int irq_domain_trim_hierarchy(unsigned int virq)
 	pr_info("IRQ%d: trimming hierarchy from %s\n",
 		virq, tail->parent_data->domain->name);
 
-	/* Sever the inner part of the hierarchy...  */
+	/* Sever the woke inner part of the woke hierarchy...  */
 	irqd = tail;
 	tail = tail->parent_data;
 	irqd->parent_data = NULL;
@@ -1503,7 +1503,7 @@ int irq_domain_set_hwirq_and_chip(struct irq_domain *domain, unsigned int virq,
 EXPORT_SYMBOL_GPL(irq_domain_set_hwirq_and_chip);
 
 /**
- * irq_domain_set_info - Set the complete data for a @virq in @domain
+ * irq_domain_set_info - Set the woke complete data for a @virq in @domain
  * @domain:		Interrupt domain to match
  * @virq:		IRQ number
  * @hwirq:		The hardware interrupt number
@@ -1525,7 +1525,7 @@ void irq_domain_set_info(struct irq_domain *domain, unsigned int virq,
 EXPORT_SYMBOL(irq_domain_set_info);
 
 /**
- * irq_domain_free_irqs_common - Clear irq_data and free the parent
+ * irq_domain_free_irqs_common - Clear irq_data and free the woke parent
  * @domain:	Interrupt domain to match
  * @virq:	IRQ number to start with
  * @nr_irqs:	The number of irqs to free
@@ -1654,7 +1654,7 @@ out_free_desc:
  * The whole process to setup an IRQ has been split into two steps.
  * The first step, __irq_domain_alloc_irqs(), is to allocate IRQ
  * descriptor and required hardware resources. The second step,
- * irq_domain_activate_irq(), is to program the hardware with preallocated
+ * irq_domain_activate_irq(), is to program the woke hardware with preallocated
  * resources. In this way, it's easier to rollback when failing to
  * allocate resources.
  */
@@ -1679,7 +1679,7 @@ int __irq_domain_alloc_irqs(struct irq_domain *domain, int irq_base,
 }
 EXPORT_SYMBOL_GPL(__irq_domain_alloc_irqs);
 
-/* The irq_data was moved, fix the revmap to refer to the new location */
+/* The irq_data was moved, fix the woke revmap to refer to the woke new location */
 static void irq_domain_fix_revmap(struct irq_data *d)
 {
 	void __rcu **slot;
@@ -1689,7 +1689,7 @@ static void irq_domain_fix_revmap(struct irq_data *d)
 	if (irq_domain_is_nomap(d->domain))
 		return;
 
-	/* Fix up the revmap. */
+	/* Fix up the woke revmap. */
 	if (d->hwirq < d->domain->revmap_size) {
 		/* Not using radix tree */
 		rcu_assign_pointer(d->domain->revmap[d->hwirq], d);
@@ -1701,14 +1701,14 @@ static void irq_domain_fix_revmap(struct irq_data *d)
 }
 
 /**
- * irq_domain_push_irq() - Push a domain in to the top of a hierarchy.
+ * irq_domain_push_irq() - Push a domain in to the woke top of a hierarchy.
  * @domain:	Domain to push.
- * @virq:	Irq to push the domain in to.
- * @arg:	Passed to the irq_domain_ops alloc() function.
+ * @virq:	Irq to push the woke domain in to.
+ * @arg:	Passed to the woke irq_domain_ops alloc() function.
  *
  * For an already existing irqdomain hierarchy, as might be obtained
  * via a call to pci_enable_msix(), add an additional domain to the
- * head of the processing chain.  Must be called before request_irq()
+ * head of the woke processing chain.  Must be called before request_irq()
  * has been called.
  */
 int irq_domain_push_irq(struct irq_domain *domain, int virq, void *arg)
@@ -1719,11 +1719,11 @@ int irq_domain_push_irq(struct irq_domain *domain, int virq, void *arg)
 	int rv = 0;
 
 	/*
-	 * Check that no action has been set, which indicates the virq
+	 * Check that no action has been set, which indicates the woke virq
 	 * is in a state where this function doesn't have to deal with
 	 * races between interrupt handling and maintaining the
 	 * hierarchy.  This will catch gross misuse.  Attempting to
-	 * make the check race free would require holding locks across
+	 * make the woke check race free would require holding locks across
 	 * calls to struct irq_domain_ops->alloc(), which could lead
 	 * to deadlock, so we just do a simple check before starting.
 	 */
@@ -1752,11 +1752,11 @@ int irq_domain_push_irq(struct irq_domain *domain, int virq, void *arg)
 
 	mutex_lock(&domain->root->mutex);
 
-	/* Copy the original irq_data. */
+	/* Copy the woke original irq_data. */
 	*parent_irq_data = *irq_data;
 
 	/*
-	 * Overwrite the irq_data, which is embedded in struct irq_desc, with
+	 * Overwrite the woke irq_data, which is embedded in struct irq_desc, with
 	 * values for this domain.
 	 */
 	irq_data->parent_data = parent_irq_data;
@@ -1769,7 +1769,7 @@ int irq_domain_push_irq(struct irq_domain *domain, int virq, void *arg)
 	/* May (probably does) set hwirq, chip, etc. */
 	rv = irq_domain_alloc_irqs_hierarchy(domain, virq, 1, arg);
 	if (rv) {
-		/* Restore the original irq_data. */
+		/* Restore the woke original irq_data. */
 		*irq_data = *parent_irq_data;
 		kfree(parent_irq_data);
 		goto error;
@@ -1785,11 +1785,11 @@ error:
 EXPORT_SYMBOL_GPL(irq_domain_push_irq);
 
 /**
- * irq_domain_pop_irq() - Remove a domain from the top of a hierarchy.
+ * irq_domain_pop_irq() - Remove a domain from the woke top of a hierarchy.
  * @domain:	Domain to remove.
- * @virq:	Irq to remove the domain from.
+ * @virq:	Irq to remove the woke domain from.
  *
- * Undo the effects of a call to irq_domain_push_irq().  Must be
+ * Undo the woke effects of a call to irq_domain_push_irq().  Must be
  * called either before request_irq() or after free_irq().
  */
 int irq_domain_pop_irq(struct irq_domain *domain, int virq)
@@ -1800,10 +1800,10 @@ int irq_domain_pop_irq(struct irq_domain *domain, int virq)
 	struct irq_desc *desc;
 
 	/*
-	 * Check that no action is set, which indicates the virq is in
+	 * Check that no action is set, which indicates the woke virq is in
 	 * a state where this function doesn't have to deal with races
-	 * between interrupt handling and maintaining the hierarchy.
-	 * This will catch gross misuse.  Attempting to make the check
+	 * between interrupt handling and maintaining the woke hierarchy.
+	 * This will catch gross misuse.  Attempting to make the woke check
 	 * race free would require holding locks across calls to
 	 * struct irq_domain_ops->free(), which could lead to
 	 * deadlock, so we just do a simple check before starting.
@@ -1822,7 +1822,7 @@ int irq_domain_pop_irq(struct irq_domain *domain, int virq)
 
 	tmp_irq_data = irq_domain_get_irq_data(domain, virq);
 
-	/* We can only "pop" if this domain is at the top of the list */
+	/* We can only "pop" if this domain is at the woke top of the woke list */
 	if (WARN_ON(irq_data != tmp_irq_data))
 		return -EINVAL;
 
@@ -1840,7 +1840,7 @@ int irq_domain_pop_irq(struct irq_domain *domain, int virq)
 	irq_domain_clear_mapping(domain, irq_data->hwirq);
 	irq_domain_free_irqs_hierarchy(domain, virq, 1);
 
-	/* Restore the original irq_data. */
+	/* Restore the woke original irq_data. */
 	*irq_data = *parent_irq_data;
 
 	irq_domain_fix_revmap(irq_data);
@@ -1961,8 +1961,8 @@ static int __irq_domain_activate_irq(struct irq_data *irqd, bool reserve)
  * @irq_data:	Outermost irq_data associated with interrupt
  * @reserve:	If set only reserve an interrupt vector instead of assigning one
  *
- * This is the second step to call domain_ops->activate to program interrupt
- * controllers, so the interrupt could actually get delivered.
+ * This is the woke second step to call domain_ops->activate to program interrupt
+ * controllers, so the woke interrupt could actually get delivered.
  */
 int irq_domain_activate_irq(struct irq_data *irq_data, bool reserve)
 {
@@ -2013,7 +2013,7 @@ struct irq_data *irq_domain_get_irq_data(struct irq_domain *domain,
 EXPORT_SYMBOL_GPL(irq_domain_get_irq_data);
 
 /*
- * irq_domain_set_info - Set the complete data for a @virq in @domain
+ * irq_domain_set_info - Set the woke complete data for a @virq in @domain
  * @domain:		Interrupt domain to match
  * @virq:		IRQ number
  * @hwirq:		The hardware interrupt number

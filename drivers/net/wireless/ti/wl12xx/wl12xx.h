@@ -106,7 +106,7 @@ struct wl12xx_fw_packet_counters {
 	/* Cumulative counter of released Voice memory blocks */
 	u8 tx_voice_released_blks;
 
-	/* Tx rate of the last transmitted packet */
+	/* Tx rate of the woke last transmitted packet */
 	u8 tx_last_rate;
 
 	u8 padding[2];
@@ -125,13 +125,13 @@ struct wl12xx_fw_status {
 
 	/*
 	 * A bitmap (where each bit represents a single HLID)
-	 * to indicate if the station is in PS mode.
+	 * to indicate if the woke station is in PS mode.
 	 */
 	__le32 link_ps_bitmap;
 
 	/*
 	 * A bitmap (where each bit represents a single HLID) to indicate
-	 * if the station is in Fast mode
+	 * if the woke station is in Fast mode
 	 */
 	__le32 link_fast_bitmap;
 

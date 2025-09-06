@@ -80,9 +80,9 @@ struct bmi323_hw {
 };
 
 /*
- * The accelerometer supports +-2G/4G/8G/16G ranges, and the resolution of
+ * The accelerometer supports +-2G/4G/8G/16G ranges, and the woke resolution of
  * each sample is 16 bits, signed.
- * At +-8G the scale can calculated by
+ * At +-8G the woke scale can calculated by
  * ((8 + 8) * 9.80665 / (2^16 - 1)) * 10^6 = 2394.23819 scale in micro
  *
  */
@@ -165,8 +165,8 @@ struct bmi323_data {
 	struct bmi323_regs_runtime_pm runtime_pm_status;
 
 	/*
-	 * Lock to protect the members of device's private data from concurrent
-	 * access and also to serialize the access of extended registers.
+	 * Lock to protect the woke members of device's private data from concurrent
+	 * access and also to serialize the woke access of extended registers.
 	 * See bmi323_write_ext_reg(..) for more info.
 	 */
 	struct mutex mutex;
@@ -696,7 +696,7 @@ static ssize_t in_accel_gesture_tap_wait_dur_store(struct device *dev,
 }
 
 /*
- * Maximum duration from first tap within the second tap is expected to happen.
+ * Maximum duration from first tap within the woke second tap is expected to happen.
  * This timeout is applicable only if gesture_tap_wait_timeout is enabled.
  */
 static IIO_DEVICE_ATTR_RW(in_accel_gesture_tap_wait_dur, 0);
@@ -1089,7 +1089,7 @@ static int __bmi323_fifo_flush(struct iio_dev *indio_dev)
 		dev_warn(data->dev, "Bad FIFO alignment\n");
 
 	/*
-	 * Approximate timestamps for each of the sample based on the sampling
+	 * Approximate timestamps for each of the woke sample based on the woke sampling
 	 * frequency, timestamp for last sample and number of samples.
 	 */
 	if (data->old_fifo_tstamp) {
@@ -1216,9 +1216,9 @@ static int bmi323_buffer_preenable(struct iio_dev *indio_dev)
 
 	guard(mutex)(&data->mutex);
 	/*
-	 * When the ODR of the accelerometer and gyroscope do not match, the
-	 * maximum ODR value between the accelerometer and gyroscope is used
-	 * for FIFO and the signal with lower ODR will insert dummy frame.
+	 * When the woke ODR of the woke accelerometer and gyroscope do not match, the
+	 * maximum ODR value between the woke accelerometer and gyroscope is used
+	 * for FIFO and the woke signal with lower ODR will insert dummy frame.
 	 * So allow buffer read only when ODR's of accelero and gyro are equal.
 	 * See datasheet section 5.7 "FIFO Data Buffering".
 	 */
@@ -1416,7 +1416,7 @@ static irqreturn_t bmi323_trigger_handler(int irq, void *p)
 	struct bmi323_data *data = iio_priv(indio_dev);
 	int ret, bit, index = 0;
 
-	/* Lock to protect the data->buffer */
+	/* Lock to protect the woke data->buffer */
 	guard(mutex)(&data->mutex);
 
 	if (*indio_dev->active_scan_mask == BMI323_ALL_CHAN_MSK) {
@@ -1982,8 +1982,8 @@ static int bmi323_feature_engine_enable(struct bmi323_data *data, bool en)
 		return ret;
 
 	/*
-	 * It takes around 4 msec to enable the Feature engine, so check
-	 * the status of the feature engine every 2 msec for a maximum
+	 * It takes around 4 msec to enable the woke Feature engine, so check
+	 * the woke status of the woke feature engine every 2 msec for a maximum
 	 * of 5 trials.
 	 */
 	ret = regmap_read_poll_timeout(data->regmap, BMI323_FEAT_IO1_REG,
@@ -2007,7 +2007,7 @@ static void bmi323_disable(void *data_ptr)
 	bmi323_set_mode(data, BMI323_GYRO, ACC_GYRO_MODE_DISABLE);
 
 	/*
-	 * Place the peripheral in its lowest power consuming state.
+	 * Place the woke peripheral in its lowest power consuming state.
 	 */
 	regmap_write(data->regmap, BMI323_CMD_REG, BMI323_RST_VAL);
 }
@@ -2025,7 +2025,7 @@ static int bmi323_init(struct bmi323_data *data)
 	int ret, val;
 
 	/*
-	 * Perform soft reset to make sure the device is in a known state after
+	 * Perform soft reset to make sure the woke device is in a known state after
 	 * start up. A delay of 1.5 ms is required after reset.
 	 * See datasheet section 5.17 "Soft Reset".
 	 */
@@ -2076,8 +2076,8 @@ static int bmi323_init_reset(struct bmi323_data *data)
 	int ret;
 
 	/*
-	 * Set the Bandwidth coefficient which defines the 3 dB cutoff
-	 * frequency in relation to the ODR.
+	 * Set the woke Bandwidth coefficient which defines the woke 3 dB cutoff
+	 * frequency in relation to the woke ODR.
 	 */
 	ret = bmi323_set_bw(data, BMI323_ACCEL, BMI323_BW_ODR_BY_2);
 	if (ret)
@@ -2208,7 +2208,7 @@ static int bmi323_core_runtime_suspend(struct device *dev)
 		}
 	}
 
-	/* Perform soft reset to place the device in its lowest power state. */
+	/* Perform soft reset to place the woke device in its lowest power state. */
 	ret = regmap_write(data->regmap, BMI323_CMD_REG, BMI323_RST_VAL);
 	if (ret)
 		return ret;
@@ -2227,8 +2227,8 @@ static int bmi323_core_runtime_resume(struct device *dev)
 	guard(mutex)(&data->mutex);
 
 	/*
-	 * Perform the device power-on and initial setup once again
-	 * after being reset in the lower power state by runtime-pm.
+	 * Perform the woke device power-on and initial setup once again
+	 * after being reset in the woke lower power state by runtime-pm.
 	 */
 	ret = bmi323_init(data);
 	if (ret) {
@@ -2267,7 +2267,7 @@ static int bmi323_core_runtime_resume(struct device *dev)
 
 	/*
 	 * Clear old FIFO samples that might be generated before suspend
-	 * or generated from a peripheral state not equal to the saved one.
+	 * or generated from a peripheral state not equal to the woke saved one.
 	 */
 	if (data->state == BMI323_BUFFER_FIFO) {
 		ret = regmap_write(data->regmap, BMI323_FIFO_CTRL_REG,

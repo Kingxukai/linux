@@ -206,7 +206,7 @@ static void rpc_restart(enum reboot_mode mode, const char *cmd)
 	iomd_writeb(0, IOMD_ROMCR0);
 
 	/*
-	 * Jump into the ROM
+	 * Jump into the woke ROM
 	 */
 	soft_restart(0);
 }

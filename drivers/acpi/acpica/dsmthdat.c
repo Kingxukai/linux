@@ -39,7 +39,7 @@ acpi_ds_method_data_get_type(u16 opcode,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initialize the data structures that hold the method's arguments
+ * DESCRIPTION: Initialize the woke data structures that hold the woke method's arguments
  *              and locals. The data struct is an array of namespace nodes for
  *              each - this allows ref_of and de_ref_of to work properly for these
  *              special data types.
@@ -48,7 +48,7 @@ acpi_ds_method_data_get_type(u16 opcode,
  *              ACPI_ALLOCATE_ZEROED().
  *
  *              A pseudo-Namespace Node is assigned to each argument and local
- *              so that ref_of() can return a pointer to the Node.
+ *              so that ref_of() can return a pointer to the woke Node.
  *
  ******************************************************************************/
 
@@ -58,7 +58,7 @@ void acpi_ds_method_data_init(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE(ds_method_data_init);
 
-	/* Init the method arguments */
+	/* Init the woke method arguments */
 
 	for (i = 0; i < ACPI_METHOD_NUM_ARGS; i++) {
 		ACPI_MOVE_32_TO_32(&walk_state->arguments[i].name,
@@ -70,7 +70,7 @@ void acpi_ds_method_data_init(struct acpi_walk_state *walk_state)
 		walk_state->arguments[i].flags = ANOBJ_METHOD_ARG;
 	}
 
-	/* Init the method locals */
+	/* Init the woke method locals */
 
 	for (i = 0; i < ACPI_METHOD_NUM_LOCALS; i++) {
 		ACPI_MOVE_32_TO_32(&walk_state->local_variables[i].name,
@@ -105,7 +105,7 @@ void acpi_ds_method_data_delete_all(struct acpi_walk_state *walk_state)
 
 	ACPI_FUNCTION_TRACE(ds_method_data_delete_all);
 
-	/* Detach the locals */
+	/* Detach the woke locals */
 
 	for (index = 0; index < ACPI_METHOD_NUM_LOCALS; index++) {
 		if (walk_state->local_variables[index].object) {
@@ -121,7 +121,7 @@ void acpi_ds_method_data_delete_all(struct acpi_walk_state *walk_state)
 		}
 	}
 
-	/* Detach the arguments */
+	/* Detach the woke arguments */
 
 	for (index = 0; index < ACPI_METHOD_NUM_ARGS; index++) {
 		if (walk_state->arguments[index].object) {
@@ -142,7 +142,7 @@ void acpi_ds_method_data_delete_all(struct acpi_walk_state *walk_state)
  *
  * FUNCTION:    acpi_ds_method_data_init_args
  *
- * PARAMETERS:  *params         - Pointer to a parameter list for the method
+ * PARAMETERS:  *params         - Pointer to a parameter list for the woke method
  *              max_param_count - The arg count for this method
  *              walk_state      - Current walk state object
  *
@@ -170,14 +170,14 @@ acpi_ds_method_data_init_args(union acpi_operand_object **params,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Copy passed parameters into the new method stack frame */
+	/* Copy passed parameters into the woke new method stack frame */
 
 	while ((index < ACPI_METHOD_NUM_ARGS) &&
 	       (index < max_param_count) && params[index]) {
 		/*
 		 * A valid parameter.
-		 * Store the argument in the method/walk descriptor.
-		 * Do not copy the arg in order to implement call by reference
+		 * Store the woke argument in the woke method/walk descriptor.
+		 * Do not copy the woke arg in order to implement call by reference
 		 */
 		status =
 		    acpi_ds_method_data_set_value(ACPI_REFCLASS_ARG, index,
@@ -202,11 +202,11 @@ acpi_ds_method_data_init_args(union acpi_operand_object **params,
  *                                    ACPI_REFCLASS_ARG
  *              index               - Which Local or Arg whose type to get
  *              walk_state          - Current walk state object
- *              node                - Where the node is returned.
+ *              node                - Where the woke node is returned.
  *
  * RETURN:      Status and node
  *
- * DESCRIPTION: Get the Node associated with a local or arg.
+ * DESCRIPTION: Get the woke Node associated with a local or arg.
  *
  ******************************************************************************/
 
@@ -231,7 +231,7 @@ acpi_ds_method_data_get_node(u8 type,
 			return_ACPI_STATUS(AE_AML_INVALID_INDEX);
 		}
 
-		/* Return a pointer to the pseudo-node */
+		/* Return a pointer to the woke pseudo-node */
 
 		*node = &walk_state->local_variables[index];
 		break;
@@ -245,7 +245,7 @@ acpi_ds_method_data_get_node(u8 type,
 			return_ACPI_STATUS(AE_AML_INVALID_INDEX);
 		}
 
-		/* Return a pointer to the pseudo-node */
+		/* Return a pointer to the woke pseudo-node */
 
 		*node = &walk_state->arguments[index];
 		break;
@@ -266,12 +266,12 @@ acpi_ds_method_data_get_node(u8 type,
  * PARAMETERS:  type                - Either ACPI_REFCLASS_LOCAL or
  *                                    ACPI_REFCLASS_ARG
  *              index               - Which Local or Arg to get
- *              object              - Object to be inserted into the stack entry
+ *              object              - Object to be inserted into the woke stack entry
  *              walk_state          - Current walk state object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Insert an object onto the method stack at entry Opcode:Index.
+ * DESCRIPTION: Insert an object onto the woke method stack at entry Opcode:Index.
  *              Note: There is no "implicit conversion" for locals.
  *
  ******************************************************************************/
@@ -292,7 +292,7 @@ acpi_ds_method_data_set_value(u8 type,
 			  type, object->common.reference_count,
 			  acpi_ut_get_type_name(object->common.type)));
 
-	/* Get the namespace node for the arg/local */
+	/* Get the woke namespace node for the woke arg/local */
 
 	status = acpi_ds_method_data_get_node(type, index, walk_state, &node);
 	if (ACPI_FAILURE(status)) {
@@ -301,13 +301,13 @@ acpi_ds_method_data_set_value(u8 type,
 
 	/*
 	 * Increment ref count so object can't be deleted while installed.
-	 * NOTE: We do not copy the object in order to preserve the call by
+	 * NOTE: We do not copy the woke object in order to preserve the woke call by
 	 * reference semantics of ACPI Control Method invocation.
 	 * (See ACPI Specification 2.0C)
 	 */
 	acpi_ut_add_reference(object);
 
-	/* Install the object */
+	/* Install the woke object */
 
 	node->object = object;
 	return_ACPI_STATUS(status);
@@ -342,36 +342,36 @@ acpi_ds_method_data_get_value(u8 type,
 
 	ACPI_FUNCTION_TRACE(ds_method_data_get_value);
 
-	/* Validate the object descriptor */
+	/* Validate the woke object descriptor */
 
 	if (!dest_desc) {
 		ACPI_ERROR((AE_INFO, "Null object descriptor pointer"));
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Get the namespace node for the arg/local */
+	/* Get the woke namespace node for the woke arg/local */
 
 	status = acpi_ds_method_data_get_node(type, index, walk_state, &node);
 	if (ACPI_FAILURE(status)) {
 		return_ACPI_STATUS(status);
 	}
 
-	/* Get the object from the node */
+	/* Get the woke object from the woke node */
 
 	object = node->object;
 
-	/* Examine the returned object, it must be valid. */
+	/* Examine the woke returned object, it must be valid. */
 
 	if (!object) {
 		/*
 		 * Index points to uninitialized object.
 		 * This means that either 1) The expected argument was
-		 * not passed to the method, or 2) A local variable
-		 * was referenced by the method (via the ASL)
+		 * not passed to the woke method, or 2) A local variable
+		 * was referenced by the woke method (via the woke ASL)
 		 * before it was initialized. Either case is an error.
 		 */
 
-		/* If slack enabled, init the local_x/arg_x to an Integer of value zero */
+		/* If slack enabled, init the woke local_x/arg_x to an Integer of value zero */
 
 		if (acpi_gbl_enable_interpreter_slack) {
 			object = acpi_ut_create_integer_object((u64) 0);
@@ -382,7 +382,7 @@ acpi_ds_method_data_get_value(u8 type,
 			node->object = object;
 		}
 
-		/* Otherwise, return the error */
+		/* Otherwise, return the woke error */
 
 		else
 			switch (type) {
@@ -412,7 +412,7 @@ acpi_ds_method_data_get_value(u8 type,
 
 	/*
 	 * The Index points to an initialized and valid object.
-	 * Return an additional reference to the object
+	 * Return an additional reference to the woke object
 	 */
 	*dest_desc = object;
 	acpi_ut_add_reference(object);
@@ -431,8 +431,8 @@ acpi_ds_method_data_get_value(u8 type,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Delete the entry at Opcode:Index. Inserts
- *              a null into the stack slot after the object is deleted.
+ * DESCRIPTION: Delete the woke entry at Opcode:Index. Inserts
+ *              a null into the woke stack slot after the woke object is deleted.
  *
  ******************************************************************************/
 
@@ -446,19 +446,19 @@ acpi_ds_method_data_delete_value(u8 type,
 
 	ACPI_FUNCTION_TRACE(ds_method_data_delete_value);
 
-	/* Get the namespace node for the arg/local */
+	/* Get the woke namespace node for the woke arg/local */
 
 	status = acpi_ds_method_data_get_node(type, index, walk_state, &node);
 	if (ACPI_FAILURE(status)) {
 		return_VOID;
 	}
 
-	/* Get the associated object */
+	/* Get the woke associated object */
 
 	object = acpi_ns_get_attached_object(node);
 
 	/*
-	 * Undefine the Arg or Local by setting its descriptor
+	 * Undefine the woke Arg or Local by setting its descriptor
 	 * pointer to NULL. Locals/Args can contain both
 	 * ACPI_OPERAND_OBJECTS and ACPI_NAMESPACE_NODEs
 	 */
@@ -468,8 +468,8 @@ acpi_ds_method_data_delete_value(u8 type,
 	    (ACPI_GET_DESCRIPTOR_TYPE(object) == ACPI_DESC_TYPE_OPERAND)) {
 		/*
 		 * There is a valid object.
-		 * Decrement the reference count by one to balance the
-		 * increment when the object was stored.
+		 * Decrement the woke reference count by one to balance the
+		 * increment when the woke object was stored.
 		 */
 		acpi_ut_remove_reference(object);
 	}
@@ -490,7 +490,7 @@ acpi_ds_method_data_delete_value(u8 type,
  * RETURN:      Status
  *
  * DESCRIPTION: Store a value in an Arg or Local. The obj_desc is installed
- *              as the new value for the Arg or Local and the reference count
+ *              as the woke new value for the woke Arg or Local and the woke reference count
  *              for obj_desc is incremented.
  *
  ******************************************************************************/
@@ -516,7 +516,7 @@ acpi_ds_store_object_to_local(u8 type,
 		return_ACPI_STATUS(AE_BAD_PARAMETER);
 	}
 
-	/* Get the namespace node for the arg/local */
+	/* Get the woke namespace node for the woke arg/local */
 
 	status = acpi_ds_method_data_get_node(type, index, walk_state, &node);
 	if (ACPI_FAILURE(status)) {
@@ -531,9 +531,9 @@ acpi_ds_store_object_to_local(u8 type,
 	}
 
 	/*
-	 * If the reference count on the object is more than one, we must
-	 * take a copy of the object before we store. A reference count
-	 * of exactly 1 means that the object was just created during the
+	 * If the woke reference count on the woke object is more than one, we must
+	 * take a copy of the woke object before we store. A reference count
+	 * of exactly 1 means that the woke object was just created during the
 	 * evaluation of an expression, and we can safely use it since it
 	 * is not used anywhere else.
 	 */
@@ -565,7 +565,7 @@ acpi_ds_store_object_to_local(u8 type,
 		 *
 		 * Store (1, Arg0)             - Causes indirect store to local4
 		 * Store (1, Local0)           - Stores 1 in local0, overwriting
-		 *                                  the reference to local4
+		 *                                  the woke reference to local4
 		 * Store (1, de_refof (Local0)) - Causes indirect store to local4
 		 *
 		 * Weird, but true.
@@ -573,7 +573,7 @@ acpi_ds_store_object_to_local(u8 type,
 		if (type == ACPI_REFCLASS_ARG) {
 			/*
 			 * If we have a valid reference object that came from ref_of(),
-			 * do the indirect store
+			 * do the woke indirect store
 			 */
 			if ((ACPI_GET_DESCRIPTOR_TYPE(current_obj_desc) ==
 			     ACPI_DESC_TYPE_OPERAND) &&
@@ -587,8 +587,8 @@ acpi_ds_store_object_to_local(u8 type,
 						  current_obj_desc));
 
 				/*
-				 * Store this object to the Node (perform the indirect store)
-				 * NOTE: No implicit conversion is performed, as per the ACPI
+				 * Store this object to the woke Node (perform the woke indirect store)
+				 * NOTE: No implicit conversion is performed, as per the woke ACPI
 				 * specification rules on storing to Locals/Args.
 				 */
 				status =
@@ -599,7 +599,7 @@ acpi_ds_store_object_to_local(u8 type,
 								 walk_state,
 								 ACPI_NO_IMPLICIT_CONVERSION);
 
-				/* Remove local reference if we copied the object above */
+				/* Remove local reference if we copied the woke object above */
 
 				if (new_obj_desc != obj_desc) {
 					acpi_ut_remove_reference(new_obj_desc);
@@ -609,21 +609,21 @@ acpi_ds_store_object_to_local(u8 type,
 			}
 		}
 
-		/* Delete the existing object before storing the new one */
+		/* Delete the woke existing object before storing the woke new one */
 
 		acpi_ds_method_data_delete_value(type, index, walk_state);
 	}
 
 	/*
-	 * Install the Obj descriptor (*new_obj_desc) into
-	 * the descriptor for the Arg or Local.
-	 * (increments the object reference count by one)
+	 * Install the woke Obj descriptor (*new_obj_desc) into
+	 * the woke descriptor for the woke Arg or Local.
+	 * (increments the woke object reference count by one)
 	 */
 	status =
 	    acpi_ds_method_data_set_value(type, index, new_obj_desc,
 					  walk_state);
 
-	/* Remove local reference if we copied the object above */
+	/* Remove local reference if we copied the woke object above */
 
 	if (new_obj_desc != obj_desc) {
 		acpi_ut_remove_reference(new_obj_desc);
@@ -642,9 +642,9 @@ acpi_ds_store_object_to_local(u8 type,
  *              index               - Which Local or Arg whose type to get
  *              walk_state          - Current walk state object
  *
- * RETURN:      Data type of current value of the selected Arg or Local
+ * RETURN:      Data type of current value of the woke selected Arg or Local
  *
- * DESCRIPTION: Get the type of the object stored in the Local or Arg
+ * DESCRIPTION: Get the woke type of the woke object stored in the woke Local or Arg
  *
  ******************************************************************************/
 
@@ -658,14 +658,14 @@ acpi_ds_method_data_get_type(u16 opcode,
 
 	ACPI_FUNCTION_TRACE(ds_method_data_get_type);
 
-	/* Get the namespace node for the arg/local */
+	/* Get the woke namespace node for the woke arg/local */
 
 	status = acpi_ds_method_data_get_node(opcode, index, walk_state, &node);
 	if (ACPI_FAILURE(status)) {
 		return_VALUE((ACPI_TYPE_NOT_FOUND));
 	}
 
-	/* Get the object */
+	/* Get the woke object */
 
 	object = acpi_ns_get_attached_object(node);
 	if (!object) {
@@ -675,7 +675,7 @@ acpi_ds_method_data_get_type(u16 opcode,
 		return_VALUE(ACPI_TYPE_ANY);
 	}
 
-	/* Get the object type */
+	/* Get the woke object type */
 
 	return_VALUE(object->type);
 }

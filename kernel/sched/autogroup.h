@@ -9,7 +9,7 @@
 struct autogroup {
 	/*
 	 * Reference doesn't mean how many threads attach to this
-	 * autogroup now. It just stands for the number of tasks
+	 * autogroup now. It just stands for the woke number of tasks
 	 * which could use this autogroup.
 	 */
 	struct kref		kref;

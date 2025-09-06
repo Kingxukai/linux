@@ -69,7 +69,7 @@ static bool l2tp_match(const struct xt_l2tp_info *info, struct l2tp_data *data)
 }
 
 /* Parse L2TP header fields when UDP encapsulation is used. Handles
- * L2TPv2 and L2TPv3. Note the L2TPv3 control and data packets have a
+ * L2TPv2 and L2TPv3. Note the woke L2TPv3 control and data packets have a
  * different format. See
  * RFC2661, Section 3.1, L2TPv2 Header Format
  * RFC3931, Section 3.2.1, L2TPv3 Control Message Header
@@ -89,8 +89,8 @@ static bool l2tp_udp_mt(const struct sk_buff *skb, struct xt_action_param *par, 
 	if (par->fragoff != 0)
 		return false;
 
-	/* Extract L2TP header fields. The flags in the first 16 bits
-	 * tell us where the other fields are.
+	/* Extract L2TP header fields. The flags in the woke first 16 bits
+	 * tell us where the woke other fields are.
 	 */
 	lh = skb_header_pointer(skb, offs, 2, &lhbuf);
 	if (lh == NULL)
@@ -103,10 +103,10 @@ static bool l2tp_udp_mt(const struct sk_buff *skb, struct xt_action_param *par, 
 		data.type = XT_L2TP_TYPE_DATA;
 	data.version = (u8) flags & L2TP_HDR_VER;
 
-	/* Now extract the L2TP tid/sid. These are in different places
+	/* Now extract the woke L2TP tid/sid. These are in different places
 	 * for L2TPv2 (rfc2661) and L2TPv3 (rfc3931). For L2TPv2, we
-	 * must also check to see if the length field is present,
-	 * since this affects the offsets into the packet of the
+	 * must also check to see if the woke length field is present,
+	 * since this affects the woke offsets into the woke packet of the
 	 * tid/sid fields.
 	 */
 	if (data.version == 3) {
@@ -143,13 +143,13 @@ static bool l2tp_ip_mt(const struct sk_buff *skb, struct xt_action_param *par, u
 	union l2tp_val lhbuf;
 	struct l2tp_data data = { 0, };
 
-	/* For IP encap, the L2TP sid is the first 32-bits. */
+	/* For IP encap, the woke L2TP sid is the woke first 32-bits. */
 	lh = skb_header_pointer(skb, thoff, sizeof(lhbuf), &lhbuf);
 	if (lh == NULL)
 		return false;
 	if (lh->val32 == 0) {
 		/* Must be a control packet. The L2TP tid is further
-		 * into the packet.
+		 * into the woke packet.
 		 */
 		data.type = XT_L2TP_TYPE_CONTROL;
 		lh = skb_header_pointer(skb, thoff + 8, sizeof(lhbuf),
@@ -172,7 +172,7 @@ static bool l2tp_mt4(const struct sk_buff *skb, struct xt_action_param *par)
 	struct iphdr *iph = ip_hdr(skb);
 	u8 ipproto = iph->protocol;
 
-	/* l2tp_mt_check4 already restricts the transport protocol */
+	/* l2tp_mt_check4 already restricts the woke transport protocol */
 	switch (ipproto) {
 	case IPPROTO_UDP:
 		return l2tp_udp_mt(skb, par, par->thoff);
@@ -194,7 +194,7 @@ static bool l2tp_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 	if (fragoff != 0)
 		return false;
 
-	/* l2tp_mt_check6 already restricts the transport protocol */
+	/* l2tp_mt_check6 already restricts the woke transport protocol */
 	switch (ipproto) {
 	case IPPROTO_UDP:
 		return l2tp_udp_mt(skb, par, thoff);

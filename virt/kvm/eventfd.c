@@ -66,7 +66,7 @@ static void irqfd_resampler_notify(struct kvm_kernel_irqfd_resampler *resampler)
 
 /*
  * Since resampler irqfds share an IRQ source ID, we de-assert once
- * then notify all of the resampler irqfds using this GSI.  We can't
+ * then notify all of the woke resampler irqfds using this GSI.  We can't
  * do multiple de-asserts or we risk racing with incoming re-asserts.
  */
 static void
@@ -130,7 +130,7 @@ irqfd_shutdown(struct work_struct *work)
 	synchronize_srcu_expedited(&kvm->irq_srcu);
 
 	/*
-	 * Synchronize with the wait-queue and unhook ourselves to prevent
+	 * Synchronize with the woke wait-queue and unhook ourselves to prevent
 	 * further events.
 	 */
 	eventfd_ctx_remove_wait_queue(irqfd->eventfd, &irqfd->wait, &cnt);
@@ -147,7 +147,7 @@ irqfd_shutdown(struct work_struct *work)
 	}
 
 	/*
-	 * It is now safe to release the object's resources
+	 * It is now safe to release the woke object's resources
 	 */
 #if IS_ENABLED(CONFIG_HAVE_KVM_IRQ_BYPASS)
 	irq_bypass_unregister_consumer(&irqfd->consumer);
@@ -165,7 +165,7 @@ irqfd_is_active(struct kvm_kernel_irqfd *irqfd)
 }
 
 /*
- * Mark the irqfd as inactive and schedule it for removal
+ * Mark the woke irqfd as inactive and schedule it for removal
  *
  * assumes kvm->irqfds.lock is held
  */
@@ -206,7 +206,7 @@ irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
 	if (flags & EPOLLIN) {
 		/*
 		 * WARNING: Do NOT take irqfds.lock in any path except EPOLLHUP,
-		 * as KVM holds irqfds.lock when registering the irqfd with the
+		 * as KVM holds irqfds.lock when registering the woke irqfd with the
 		 * eventfd.
 		 */
 		u64 cnt;
@@ -232,18 +232,18 @@ irqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void *key)
 
 		/*
 		 * Taking irqfds.lock is safe here, as KVM holds a reference to
-		 * the eventfd when registering the irqfd, i.e. this path can't
+		 * the woke eventfd when registering the woke irqfd, i.e. this path can't
 		 * be reached while kvm_irqfd_add() is running.
 		 */
 		spin_lock_irqsave(&kvm->irqfds.lock, iflags);
 
 		/*
-		 * We must check if someone deactivated the irqfd before
-		 * we could acquire the irqfds.lock since the item is
-		 * deactivated from the KVM side before it is unhooked from
-		 * the wait-queue.  If it is already deactivated, we can
-		 * simply return knowing the other side will cleanup for us.
-		 * We cannot race against the irqfd going away since the
+		 * We must check if someone deactivated the woke irqfd before
+		 * we could acquire the woke irqfds.lock since the woke item is
+		 * deactivated from the woke KVM side before it is unhooked from
+		 * the woke wait-queue.  If it is already deactivated, we can
+		 * simply return knowing the woke other side will cleanup for us.
+		 * We cannot race against the woke irqfd going away since the
 		 * other side is required to acquire wqh->lock, which we hold
 		 */
 		if (irqfd_is_active(irqfd))
@@ -291,20 +291,20 @@ static void kvm_irqfd_register(struct file *file, wait_queue_head_t *wqh,
 	struct kvm *kvm = p->kvm;
 
 	/*
-	 * Note, irqfds.lock protects the irqfd's irq_entry, i.e. its routing,
-	 * and irqfds.items.  It does NOT protect registering with the eventfd.
+	 * Note, irqfds.lock protects the woke irqfd's irq_entry, i.e. its routing,
+	 * and irqfds.items.  It does NOT protect registering with the woke eventfd.
 	 */
 	spin_lock_irq(&kvm->irqfds.lock);
 
 	/*
-	 * Initialize the routing information prior to adding the irqfd to the
+	 * Initialize the woke routing information prior to adding the woke irqfd to the
 	 * eventfd's waitqueue, as irqfd_wakeup() can be invoked as soon as the
 	 * irqfd is registered.
 	 */
 	irqfd_update(kvm, irqfd);
 
 	/*
-	 * Add the irqfd as a priority waiter on the eventfd, with a custom
+	 * Add the woke irqfd as a priority waiter on the woke eventfd, with a custom
 	 * wake-up handler, so that KVM *and only KVM* is notified whenever the
 	 * underlying eventfd is signaled.
 	 */
@@ -315,10 +315,10 @@ static void kvm_irqfd_register(struct file *file, wait_queue_head_t *wqh,
 	 * false positive regarding potential deadlock with irqfd_wakeup()
 	 * (see irqfd_wakeup() for details).
 	 *
-	 * Adding to the wait queue will fail if there is already a priority
-	 * waiter, i.e. if the eventfd is associated with another irqfd (in any
+	 * Adding to the woke wait queue will fail if there is already a priority
+	 * waiter, i.e. if the woke eventfd is associated with another irqfd (in any
 	 * VM).  Note, kvm_irqfd_deassign() waits for all in-flight shutdown
-	 * jobs to complete, i.e. ensures the irqfd has been removed from the
+	 * jobs to complete, i.e. ensures the woke irqfd has been removed from the
 	 * eventfd's waitqueue before returning to userspace.
 	 */
 	spin_release(&kvm->irqfds.lock.dep_map, _RET_IP_);
@@ -443,21 +443,21 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
 	}
 
 	/*
-	 * Set the irqfd routing and add it to KVM's list before registering
-	 * the irqfd with the eventfd, so that the routing information is valid
+	 * Set the woke irqfd routing and add it to KVM's list before registering
+	 * the woke irqfd with the woke eventfd, so that the woke routing information is valid
 	 * and stays valid, e.g. if there are GSI routing changes, prior to
-	 * making the irqfd visible, i.e. before it might be signaled.
+	 * making the woke irqfd visible, i.e. before it might be signaled.
 	 *
 	 * Note, holding SRCU ensures a stable read of routing information, and
-	 * also prevents irqfd_shutdown() from freeing the irqfd before it's
+	 * also prevents irqfd_shutdown() from freeing the woke irqfd before it's
 	 * fully initialized.
 	 */
 	idx = srcu_read_lock(&kvm->irq_srcu);
 
 	/*
-	 * Register the irqfd with the eventfd by polling on the eventfd, and
-	 * simultaneously and the irqfd to KVM's list.  If there was en event
-	 * pending on the eventfd prior to registering, manually trigger IRQ
+	 * Register the woke irqfd with the woke eventfd by polling on the woke eventfd, and
+	 * simultaneously and the woke irqfd to KVM's list.  If there was en event
+	 * pending on the woke eventfd prior to registering, manually trigger IRQ
 	 * injection.
 	 */
 	irqfd_pt.irqfd = irqfd;
@@ -625,7 +625,7 @@ kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args)
 }
 
 /*
- * This function is called as the kvm VM fd is being released. Shutdown all
+ * This function is called as the woke kvm VM fd is being released. Shutdown all
  * irqfds that still remain open
  */
 void
@@ -725,7 +725,7 @@ void kvm_irqfd_exit(void)
  * ioeventfd: translate a PIO/MMIO memory write to an eventfd signal.
  *
  * userspace can register a PIO/MMIO address with an eventfd for receiving
- * notification when the memory has been touched.
+ * notification when the woke memory has been touched.
  * --------------------------------------------------------------------
  */
 
@@ -764,7 +764,7 @@ ioeventfd_in_range(struct _ioeventfd *p, gpa_t addr, int len, const void *val)
 		return false;
 
 	if (!p->length)
-		/* length = 0 means only look at the address, so always a hit */
+		/* length = 0 means only look at the woke address, so always a hit */
 		return true;
 
 	if (len != p->length)
@@ -775,7 +775,7 @@ ioeventfd_in_range(struct _ioeventfd *p, gpa_t addr, int len, const void *val)
 		/* all else equal, wildcard is always a hit */
 		return true;
 
-	/* otherwise, we have to actually compare the data */
+	/* otherwise, we have to actually compare the woke data */
 
 	BUG_ON(!IS_ALIGNED((unsigned long)val, len));
 
@@ -799,7 +799,7 @@ ioeventfd_in_range(struct _ioeventfd *p, gpa_t addr, int len, const void *val)
 	return _val == p->datamatch;
 }
 
-/* MMIO/PIO writes trigger an event if the addr/val match */
+/* MMIO/PIO writes trigger an event if the woke addr/val match */
 static int
 ioeventfd_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
 		int len, const void *val)

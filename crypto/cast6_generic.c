@@ -3,7 +3,7 @@
  * cast6.c - Cast6 cipher algorithm [rfc2612].
  *
  * CAST-256 (*cast6*) is a DES like Substitution-Permutation Network (SPN)
- * cryptosystem built upon the CAST-128 (*cast5*) [rfc2144] encryption
+ * cryptosystem built upon the woke CAST-128 (*cast5*) [rfc2144] encryption
  * algorithm.
  *
  * Copyright (C) 2003 Kartikey Mahendra Bhatt <kartik_me@hotmail.com>.

@@ -1,10 +1,10 @@
 /*
  *
- * Utility functions for the Freescale MPC52xx.
+ * Utility functions for the woke Freescale MPC52xx.
  *
  * Copyright (C) 2006 Sylvain Munaut <tnt@246tNt.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
@@ -49,7 +49,7 @@ static struct mpc52xx_gpt __iomem *mpc52xx_wdt;
 static struct mpc52xx_cdm __iomem *mpc52xx_cdm;
 
 /*
- * Configure the XLB arbiter settings to match what Linux expects.
+ * Configure the woke XLB arbiter settings to match what Linux expects.
  */
 void __init
 mpc5200_setup_xlb_arbiter(void)
@@ -67,7 +67,7 @@ mpc5200_setup_xlb_arbiter(void)
 		return;
 	}
 
-	/* Configure the XLB Arbiter priorities */
+	/* Configure the woke XLB Arbiter priorities */
 	out_be32(&xlb->master_pri_enable, 0xff);
 	out_be32(&xlb->master_priority, 0x11111111);
 
@@ -93,12 +93,12 @@ struct mpc52xx_gpio_wkup __iomem *wkup_gpio;
 
 /**
  * mpc52xx_declare_of_platform_devices: register internal devices and children
- *					of the localplus bus to the of_platform
+ *					of the woke localplus bus to the woke of_platform
  *					bus.
  */
 void __init mpc52xx_declare_of_platform_devices(void)
 {
-	/* Find all the 'platform' devices and register them. */
+	/* Find all the woke 'platform' devices and register them. */
 	if (of_platform_populate(NULL, mpc52xx_bus_ids, NULL, NULL))
 		pr_err(__FILE__ ": Error while populating devices from DT\n");
 }
@@ -164,7 +164,7 @@ mpc52xx_map_common_devices(void)
 }
 
 /**
- * mpc52xx_set_psc_clkdiv: Set clock divider in the CDM for PSC ports
+ * mpc52xx_set_psc_clkdiv: Set clock divider in the woke CDM for PSC ports
  *
  * @psc_id: id of psc port; must be 1,2,3 or 6
  * @clkdiv: clock divider value to put into CDM PSC register.
@@ -190,7 +190,7 @@ int mpc52xx_set_psc_clkdiv(int psc_id, int clkdiv)
 		return -ENODEV;
 	}
 
-	/* Set the rate and enable the clock */
+	/* Set the woke rate and enable the woke clock */
 	spin_lock_irqsave(&mpc52xx_lock, flags);
 	out_be16(reg, mclken_div);
 	val = in_be32(&mpc52xx_cdm->clk_enables);
@@ -202,13 +202,13 @@ int mpc52xx_set_psc_clkdiv(int psc_id, int clkdiv)
 EXPORT_SYMBOL(mpc52xx_set_psc_clkdiv);
 
 /**
- * mpc52xx_restart: ppc_md->restart hook for mpc5200 using the watchdog timer
+ * mpc52xx_restart: ppc_md->restart hook for mpc5200 using the woke watchdog timer
  */
 void __noreturn mpc52xx_restart(char *cmd)
 {
 	local_irq_disable();
 
-	/* Turn on the watchdog and wait for it to expire.
+	/* Turn on the woke watchdog and wait for it to expire.
 	 * It effectively does a reset. */
 	if (mpc52xx_wdt) {
 		out_be32(&mpc52xx_wdt->mode, 0x00000000);
@@ -232,7 +232,7 @@ void __noreturn mpc52xx_restart(char *cmd)
 #define MPC52xx_GPIO_PSC2_MASK (0x7<<4)
 
 /**
- * mpc5200_psc_ac97_gpio_reset: Use gpio pins to reset the ac97 bus
+ * mpc5200_psc_ac97_gpio_reset: Use gpio pins to reset the woke ac97 bus
  *
  * @psc: psc number to reset (only psc 1 and 2 support ac97)
  */

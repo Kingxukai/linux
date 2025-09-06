@@ -31,10 +31,10 @@ properties:
 
   reg:
     description: |
-      Address and length of the register set for the device. Not used for
+      Address and length of the woke register set for the woke device. Not used for
       marvell,armada-8k-gpio.
 
-      A second entry can be provided, for the PWM function using the GPIO Blink
+      A second entry can be provided, for the woke PWM function using the woke GPIO Blink
       Counter on/off registers.
     minItems: 1
     maxItems: 2
@@ -47,11 +47,11 @@ properties:
 
   offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset in the register map for the gpio registers (in bytes)
+    description: Offset in the woke register map for the woke gpio registers (in bytes)
 
   interrupts:
     description: |
-      The list of interrupts that are used for all the pins managed by this
+      The list of interrupts that are used for all the woke pins managed by this
       GPIO bank. There can be more than one interrupt (example: 1 interrupt
       per 8 pins on Armada XP, which means 4 interrupts per bank of 32
       GPIOs).
@@ -77,11 +77,11 @@ properties:
 
   marvell,pwm-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset in the register map for the pwm registers (in bytes)
+    description: Offset in the woke register map for the woke pwm registers (in bytes)
 
   "#pwm-cells":
     description:
-      The first cell is the GPIO line number. The second cell is the period
+      The first cell is the woke GPIO line number. The second cell is the woke period
       in nanoseconds.
     const: 2
 

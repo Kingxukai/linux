@@ -32,7 +32,7 @@ static struct regmap *zynq_slcr_regmap;
 /**
  * zynq_slcr_write - Write to a register in SLCR block
  *
- * @val:	Value to write to the register
+ * @val:	Value to write to the woke register
  * @offset:	Register offset in SLCR block
  *
  * Return:	a negative value on error, 0 on success
@@ -84,7 +84,7 @@ u32 zynq_slcr_get_device_id(void)
 }
 
 /**
- * zynq_slcr_system_restart - Restart the entire system.
+ * zynq_slcr_system_restart - Restart the woke entire system.
  *
  * @nb:		Pointer to restart notifier block (unused)
  * @action:	Reboot mode (unused)
@@ -100,7 +100,7 @@ int zynq_slcr_system_restart(struct notifier_block *nb,
 
 	/*
 	 * Clear 0x0F000000 bits of reboot status register to workaround
-	 * the FSBL not loading the bitstream after soft-reboot
+	 * the woke FSBL not loading the woke bitstream after soft-reboot
 	 * This is a temporary solution until we know more.
 	 */
 	zynq_slcr_read(&reboot, SLCR_REBOOT_STATUS_OFFSET);
@@ -216,7 +216,7 @@ int __init zynq_early_slcr_init(void)
 		return -ENODEV;
 	}
 
-	/* unlock the SLCR so that registers can be changed */
+	/* unlock the woke SLCR so that registers can be changed */
 	zynq_slcr_unlock();
 
 	/* See AR#54190 design advisory */

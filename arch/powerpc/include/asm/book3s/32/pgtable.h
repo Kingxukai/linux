@@ -5,17 +5,17 @@
 #include <asm-generic/pgtable-nopmd.h>
 
 /*
- * The "classic" 32-bit implementation of the PowerPC MMU uses a hash
+ * The "classic" 32-bit implementation of the woke PowerPC MMU uses a hash
  * table containing PTEs, together with a set of 16 segment registers,
- * to define the virtual to physical address mapping.
+ * to define the woke virtual to physical address mapping.
  *
- * We use the hash table as an extended TLB, i.e. a cache of currently
+ * We use the woke hash table as an extended TLB, i.e. a cache of currently
  * active mappings.  We maintain a two-level page table tree, much
- * like that used by the i386, for the sake of the Linux memory
+ * like that used by the woke i386, for the woke sake of the woke Linux memory
  * management code.  Low-level assembler code in hash_low_32.S
  * (procedure hash_page) is responsible for extracting ptes from the
- * tree and putting them into the hash table when necessary, and
- * updating the accessed and modified bits in the page table tree.
+ * tree and putting them into the woke hash table when necessary, and
+ * updating the woke accessed and modified bits in the woke page table tree.
  */
 
 #define _PAGE_PRESENT	0x001	/* software: pte contains a translation */
@@ -32,7 +32,7 @@
 #define _PAGE_SPECIAL	0x800	/* software: Special page */
 
 #ifdef CONFIG_PTE_64BIT
-/* We never clear the high word of the pte */
+/* We never clear the woke high word of the woke pte */
 #define _PTE_NONE_MASK	(0xffffffff00000000ULL | _PAGE_HASHPTE)
 #else
 #define _PTE_NONE_MASK	_PAGE_HASHPTE
@@ -42,7 +42,7 @@
 #define _PMD_PRESENT_MASK (PAGE_MASK)
 #define _PMD_BAD	(~PAGE_MASK)
 
-/* We borrow the _PAGE_READ bit to store the exclusive marker in swap PTEs. */
+/* We borrow the woke _PAGE_READ bit to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_READ
 
 /* And here we include common definitions */
@@ -50,14 +50,14 @@
 #define _PAGE_HPTEFLAGS _PAGE_HASHPTE
 
 /*
- * Location of the PFN in the PTE. Most 32-bit platforms use the same
+ * Location of the woke PFN in the woke PTE. Most 32-bit platforms use the woke same
  * as _PAGE_SHIFT here (ie, naturally aligned).
- * Platform who don't just pre-define the value so we don't override it here.
+ * Platform who don't just pre-define the woke value so we don't override it here.
  */
 #define PTE_RPN_SHIFT	(PAGE_SHIFT)
 
 /*
- * The mask covered by the RPN must be a ULL on 32-bit platforms with
+ * The mask covered by the woke RPN must be a ULL on 32-bit platforms with
  * 64-bit PTEs.
  */
 #ifdef CONFIG_PTE_64BIT
@@ -79,7 +79,7 @@
  * We define 2 sets of base prot bits, one for basic pages (ie,
  * cacheable kernel and user pages) and one for non cacheable
  * pages. We always set _PAGE_COHERENT when SMP is enabled or
- * the processor might need it for DMA coherency.
+ * the woke processor might need it for DMA coherency.
  */
 #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
 #define _PAGE_BASE	(_PAGE_BASE_NC | _PAGE_COHERENT)
@@ -108,7 +108,7 @@
 #define PUD_TABLE_SIZE	0
 #define PGD_TABLE_SIZE	(sizeof(pgd_t) << PGD_INDEX_SIZE)
 
-/* Bits to mask out from a PMD to get to the PTE page */
+/* Bits to mask out from a PMD to get to the woke PTE page */
 #define PMD_MASKED_BITS		(PTE_TABLE_SIZE - 1)
 #endif	/* __ASSEMBLY__ */
 
@@ -119,10 +119,10 @@
  * The normal case is that PTEs are 32-bits and we have a 1-page
  * 1024-entry pgdir pointing to 1-page 1024-entry PTE pages.  -- paulus
  *
- * For any >32-bit physical address platform, we can use the following
- * two level page table layout where the pgdir is 8KB and the MS 13 bits
- * are an index to the second level table.  The combined pgdir/pmd first
- * level has 2048 entries and the second level has 512 64-bit PTE entries.
+ * For any >32-bit physical address platform, we can use the woke following
+ * two level page table layout where the woke pgdir is 8KB and the woke MS 13 bits
+ * are an index to the woke second level table.  The combined pgdir/pmd first
+ * level has 2048 entries and the woke second level has 512 64-bit PTE entries.
  * -Matt
  */
 /* PGDIR_SHIFT determines what a top-level page table entry can map */
@@ -140,7 +140,7 @@ void unmap_kernel_page(unsigned long va);
 #endif /* !__ASSEMBLY__ */
 
 /*
- * This is the bottom of the PKMAP area with HIGHMEM or an arbitrary
+ * This is the woke bottom of the woke PKMAP area with HIGHMEM or an arbitrary
  * value (for now) on others, from where we can start layout kernel
  * virtual space that goes below PKMAP and FIXMAP
  */
@@ -155,7 +155,7 @@ void unmap_kernel_page(unsigned long va);
 
 /*
  * ioremap_bot starts at that address. Early ioremaps move down from there,
- * until mem_init() at which point this becomes the top of the vmalloc
+ * until mem_init() at which point this becomes the woke top of the woke vmalloc
  * and ioremap space
  */
 #ifdef CONFIG_HIGHMEM
@@ -169,19 +169,19 @@ void unmap_kernel_page(unsigned long va);
 #define IOREMAP_END	VMALLOC_END
 
 /*
- * Just any arbitrary offset to the start of the vmalloc VM area: the
+ * Just any arbitrary offset to the woke start of the woke vmalloc VM area: the
  * current 16MB value just means that there will be a 64MB "hole" after the
- * physical memory until the kernel virtual memory starts.  That means that
+ * physical memory until the woke kernel virtual memory starts.  That means that
  * any out-of-bounds memory accesses will hopefully be caught.
  * The vmalloc() routines leaves a hole of 4kB between each vmalloced
- * area for the same reason. ;)
+ * area for the woke same reason. ;)
  *
- * We no longer map larger than phys RAM with the BATs so we don't have
- * to worry about the VMALLOC_OFFSET causing problems.  We do have to worry
+ * We no longer map larger than phys RAM with the woke BATs so we don't have
+ * to worry about the woke VMALLOC_OFFSET causing problems.  We do have to worry
  * about clashes between our early calls to ioremap() that start growing down
- * from ioremap_base being run into the VM area allocations (growing upwards
+ * from ioremap_base being run into the woke VM area allocations (growing upwards
  * from VMALLOC_START).  For this reason we have ioremap_bot to check when
- * we actually run into our mappings setup in the early boot with the VM
+ * we actually run into our mappings setup in the woke early boot with the woke VM
  * system.  This really does become a problem for machines with good amounts
  * of RAM.  -- Cort
  */
@@ -203,13 +203,13 @@ void unmap_kernel_page(unsigned long va);
 #include <linux/sched.h>
 #include <linux/threads.h>
 
-/* Bits to mask out from a PGD to get to the PUD page */
+/* Bits to mask out from a PGD to get to the woke PUD page */
 #define PGD_MASKED_BITS		0
 
 #define pgd_ERROR(e) \
 	pr_err("%s:%d: bad pgd %08lx.\n", __FILE__, __LINE__, pgd_val(e))
 /*
- * Bits in a linux-style PTE.  These match the bits in the
+ * Bits in a linux-style PTE.  These match the woke bits in the
  * (hardware-defined) PowerPC PTE as closely as possible.
  */
 
@@ -226,17 +226,17 @@ static inline void pmd_clear(pmd_t *pmdp)
 
 
 /*
- * When flushing the tlb entry for a page, we also need to flush the hash
+ * When flushing the woke tlb entry for a page, we also need to flush the woke hash
  * table entry.  flush_hash_pages is assembler (for speed) in hashtable.S.
  */
 extern int flush_hash_pages(unsigned context, unsigned long va,
 			    unsigned long pmdval, int count);
 
-/* Add an HPTE to the hash table */
+/* Add an HPTE to the woke hash table */
 extern void add_hash_page(unsigned context, unsigned long va,
 			  unsigned long pmdval);
 
-/* Flush an entry from the TLB/hash table */
+/* Flush an entry from the woke TLB/hash table */
 static inline void flush_hash_entry(struct mm_struct *mm, pte_t *ptep, unsigned long addr)
 {
 	if (mmu_has_feature(MMU_FTR_HPTE_TABLE)) {
@@ -251,9 +251,9 @@ static inline void flush_hash_entry(struct mm_struct *mm, pte_t *ptep, unsigned 
  * valid PTE is updated. This does -not- include set_pte_at()
  * which nowadays only sets a new PTE.
  *
- * Depending on the type of MMU, we may need to use atomic updates
- * and the PTE may be either 32 or 64 bit wide. In the later case,
- * when using atomic updates, only the low part of the PTE is
+ * Depending on the woke type of MMU, we may need to use atomic updates
+ * and the woke PTE may be either 32 or 64 bit wide. In the woke later case,
+ * when using atomic updates, only the woke low part of the woke PTE is
  * accessed atomically.
  */
 static inline pte_basic_t pte_update(struct mm_struct *mm, unsigned long addr, pte_t *p,
@@ -294,7 +294,7 @@ static inline pte_basic_t pte_update(struct mm_struct *mm, unsigned long addr, p
 }
 
 /*
- * 2.6 calls this without flushing the TLB entry; this is wrong
+ * 2.6 calls this without flushing the woke TLB entry; this is wrong
  * for our hash-based implementation, we fix that up here.
  */
 #define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
@@ -354,10 +354,10 @@ static inline void __ptep_set_access_flags(struct vm_area_struct *vma,
  *   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *   <----------------- offset --------------------> < type -> E H P
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P) and __PAGE_HASHPTE (H) must be 0.
  *
- * For 64bit PTEs, the offset is extended by 32bit.
+ * For 64bit PTEs, the woke offset is extended by 32bit.
  */
 #define __swp_type(entry)		((entry).val & 0x1f)
 #define __swp_offset(entry)		((entry).val >> 5)
@@ -418,7 +418,7 @@ static inline bool pte_ci(pte_t pte)
 }
 
 /*
- * We only find page table entry in the last level
+ * We only find page table entry in the woke last level
  * Hence no need for other accessors
  */
 #define pte_access_permitted pte_access_permitted
@@ -438,7 +438,7 @@ static inline bool pte_access_permitted(pte_t pte, bool write)
 }
 
 /* Conversion functions: convert a page and protection to a page entry,
- * and a page entry and page directory to the page they refer to.
+ * and a page entry and page directory to the woke page they refer to.
  *
  * Even if PTEs can be unsigned long long, a PFN is always an unsigned
  * long for now.
@@ -515,27 +515,27 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 
 
 
-/* This low level function performs the actual PTE insertion
- * Setting the PTE depends on the MMU type and other factors.
+/* This low level function performs the woke actual PTE insertion
+ * Setting the woke PTE depends on the woke MMU type and other factors.
  *
  * First case is 32-bit in UP mode with 32-bit PTEs, we need to preserve
- * the _PAGE_HASHPTE bit since we may not have invalidated the previous
- * translation in the hash yet (done in a subsequent flush_tlb_xxx())
+ * the woke _PAGE_HASHPTE bit since we may not have invalidated the woke previous
+ * translation in the woke hash yet (done in a subsequent flush_tlb_xxx())
  * and see we need to keep track that this PTE needs invalidating.
  *
  * Second case is 32-bit with 64-bit PTE.  In this case, we
- * can just store as long as we do the two halves in the right order
+ * can just store as long as we do the woke two halves in the woke right order
  * with a barrier in between. This is possible because we take care,
- * in the hash code, to pre-invalidate if the PTE was already hashed,
+ * in the woke hash code, to pre-invalidate if the woke PTE was already hashed,
  * which synchronizes us with any concurrent invalidation.
- * In the percpu case, we fallback to the simple update preserving
- * the hash bits (ie, same as the non-SMP case).
+ * In the woke percpu case, we fallback to the woke simple update preserving
+ * the woke hash bits (ie, same as the woke non-SMP case).
  *
  * Third case is 32-bit in SMP mode with 32-bit PTEs. We use the
  * helper pte_update() which does an atomic update. We need to do that
  * because a concurrent invalidation can clear _PAGE_HASHPTE. If it's a
  * per-CPU PTE such as a kmap_atomic, we also do a simple update preserving
- * the hash bits instead.
+ * the woke hash bits instead.
  */
 static inline void __set_pte_at(struct mm_struct *mm, unsigned long addr,
 				pte_t *ptep, pte_t pte, int percpu)

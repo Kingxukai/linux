@@ -6,7 +6,7 @@
 #include <linux/module.h>
 
 //
-// Keytable for the X96-max STB remote control
+// Keytable for the woke X96-max STB remote control
 //
 
 static struct rc_map_table x96max[] = {

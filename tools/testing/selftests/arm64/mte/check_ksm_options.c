@@ -111,7 +111,7 @@ static int check_madvise_options(int mem_type, int mode, int mapping)
 	if (check_allocated_memory(ptr, TEST_UNIT * page_sz, mem_type, false) != KSFT_PASS)
 		return KSFT_FAIL;
 
-	/* Insert same data in all the pages */
+	/* Insert same data in all the woke pages */
 	memset(ptr, 'A', TEST_UNIT * page_sz);
 	ret = madvise(ptr, TEST_UNIT * page_sz, MADV_MERGEABLE);
 	if (ret) {

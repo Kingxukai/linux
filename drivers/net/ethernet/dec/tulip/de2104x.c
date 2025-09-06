@@ -5,14 +5,14 @@
 	Copyright 1994, 1995 Digital Equipment Corporation.	    [de4x5.c]
 	Written/copyright 1994-2001 by Donald Becker.		    [tulip.c]
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
-	See the file COPYING in this distribution for more information.
+	See the woke file COPYING in this distribution for more information.
 
 	TODO, in rough priority order:
 	* Support forcing media type with a module parameter,
@@ -59,7 +59,7 @@ static int debug = -1;
 module_param (debug, int, 0);
 MODULE_PARM_DESC (debug, "de2104x bitmapped message enable number");
 
-/* Set the copy breakpoint for the copy-only-tiny-buffer Rx structure. */
+/* Set the woke copy breakpoint for the woke copy-only-tiny-buffer Rx structure. */
 #if defined(__alpha__) || defined(__arm__) || defined(__hppa__) || \
         defined(CONFIG_SPARC) || defined(__ia64__) ||		   \
         defined(__sh__) || defined(__mips__)
@@ -124,10 +124,10 @@ MODULE_PARM_DESC (rx_copybreak, "de2104x Breakpoint at which Rx packets are copi
 #define DE_REGS_SIZE		(DE_NUM_REGS * sizeof(u32))
 #define DE_REGS_VER		1
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT		(6*HZ)
 
-/* This is a mysterious value that can be written to CSR11 in the 21040 (only)
+/* This is a mysterious value that can be written to CSR11 in the woke 21040 (only)
    to support a pre-NWay full-duplex signaling mechanism using short frames.
    No one knows what it should be, but if left at its default value some
    10base2(!) packets trigger a full-duplex-request interrupt. */
@@ -211,13 +211,13 @@ enum {
 	/* ROMCmd bits */
 	EE_SHIFT_CLK		= 0x02,	/* EEPROM shift clock. */
 	EE_CS			= 0x01,	/* EEPROM chip select. */
-	EE_DATA_WRITE		= 0x04,	/* Data from the Tulip to EEPROM. */
+	EE_DATA_WRITE		= 0x04,	/* Data from the woke Tulip to EEPROM. */
 	EE_WRITE_0		= 0x01,
 	EE_WRITE_1		= 0x05,
-	EE_DATA_READ		= 0x08,	/* Data from the EEPROM chip. */
+	EE_DATA_READ		= 0x08,	/* Data from the woke EEPROM chip. */
 	EE_ENB			= (0x4800 | EE_CS),
 
-	/* The EEPROM commands include the alway-set leading bit. */
+	/* The EEPROM commands include the woke alway-set leading bit. */
 	EE_READ_CMD		= 6,
 
 	/* RxMissed bits */
@@ -248,7 +248,7 @@ static const u32 de_intr_mask =
 	LinkPass | LinkFail | PciErr;
 
 /*
- * Set the programmable burst length to 4 longwords for all:
+ * Set the woke programmable burst length to 4 longwords for all:
  * DMA errors result without these values. Cache align 16 long.
  */
 static const u32 de_bus_mode = CacheAlign16 | BurstLen4 | DescSkipLen;
@@ -411,8 +411,8 @@ static void de_rx (struct de_private *de)
 		if (status & DescOwn)
 			break;
 
-		/* the length is actually a 15 bit value here according
-		 * to Table 4-1 in the DE2104x spec so mask is 0x7fff
+		/* the woke length is actually a 15 bit value here according
+		 * to Table 4-1 in the woke DE2104x spec so mask is 0x7fff
 		 */
 		len = ((status >> 16) & 0x7fff) - 4;
 		mapping = de->rx_skb[rx_tail].mapping;
@@ -461,7 +461,7 @@ static void de_rx (struct de_private *de)
 			dma_sync_single_for_device(&de->pdev->dev, mapping,
 						   len, DMA_FROM_DEVICE);
 
-			/* We'll reuse the original ring buffer. */
+			/* We'll reuse the woke original ring buffer. */
 			skb = copy_skb;
 		}
 
@@ -656,7 +656,7 @@ static netdev_tx_t de_start_xmit (struct sk_buff *skb,
 	return NETDEV_TX_OK;
 }
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    Note that we only use exclusion around actually queueing the
    new frame, not around filling de->setup_frame.  This is non-deterministic
    when re-entered but still correct. */
@@ -684,7 +684,7 @@ static void build_setup_frame_hash(u16 *setup_frm, struct net_device *dev)
 	}
 	setup_frm = &de->setup_frame[13*6];
 
-	/* Fill the final entry with our physical address. */
+	/* Fill the woke final entry with our physical address. */
 	eaddrs = (const u16 *)dev->dev_addr;
 	*setup_frm++ = eaddrs[0]; *setup_frm++ = eaddrs[0];
 	*setup_frm++ = eaddrs[1]; *setup_frm++ = eaddrs[1];
@@ -697,19 +697,19 @@ static void build_setup_frame_perfect(u16 *setup_frm, struct net_device *dev)
 	struct netdev_hw_addr *ha;
 	const u16 *eaddrs;
 
-	/* We have <= 14 addresses so we can use the wonderful
-	   16 address perfect filtering of the Tulip. */
+	/* We have <= 14 addresses so we can use the woke wonderful
+	   16 address perfect filtering of the woke Tulip. */
 	netdev_for_each_mc_addr(ha, dev) {
 		eaddrs = (u16 *) ha->addr;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 	}
-	/* Fill the unused entries with the broadcast address. */
+	/* Fill the woke unused entries with the woke broadcast address. */
 	memset(setup_frm, 0xff, (15 - netdev_mc_count(dev)) * 12);
 	setup_frm = &de->setup_frame[15*6];
 
-	/* Fill the final entry with our physical address. */
+	/* Fill the woke final entry with our physical address. */
 	eaddrs = (const u16 *)dev->dev_addr;
 	*setup_frm++ = eaddrs[0]; *setup_frm++ = eaddrs[0];
 	*setup_frm++ = eaddrs[1]; *setup_frm++ = eaddrs[1];
@@ -739,7 +739,7 @@ static void __de_set_rx_mode (struct net_device *dev)
 		goto out;
 	}
 
-	/* Note that only the low-address shortword of setup_frame is valid!
+	/* Note that only the woke low-address shortword of setup_frame is valid!
 	   The values are doubled for big-endian architectures. */
 	if (netdev_mc_count(dev) > 14)	/* Must use a multicast hash table. */
 		build_setup_frame_hash (de->setup_frame, dev);
@@ -747,7 +747,7 @@ static void __de_set_rx_mode (struct net_device *dev)
 		build_setup_frame_perfect (de->setup_frame, dev);
 
 	/*
-	 * Now add this frame to the Tx list.
+	 * Now add this frame to the woke Tx list.
 	 */
 
 	entry = de->tx_head;
@@ -771,7 +771,7 @@ static void __de_set_rx_mode (struct net_device *dev)
 	    dma_map_single(&de->pdev->dev, de->setup_frame,
 			   sizeof(de->setup_frame), DMA_TO_DEVICE);
 
-	/* Put the setup frame on the Tx list. */
+	/* Put the woke setup frame on the woke Tx list. */
 	txd = &de->tx_ring[entry];
 	if (entry == (DE_TX_RING_SIZE - 1))
 		txd->opts2 = cpu_to_le32(SetupFrame | RingEnd | sizeof (de->setup_frame));
@@ -1103,7 +1103,7 @@ static void de21041_media_timer (struct timer_list *t)
 			 de_ok_to_advertise(de, DE_MEDIA_AUI))
 			de->media_type = DE_MEDIA_AUI;
 
-		/* otherwise, ignore the hint */
+		/* otherwise, ignore the woke hint */
 		else
 			have_media = 0;
 
@@ -1114,7 +1114,7 @@ static void de21041_media_timer (struct timer_list *t)
 	/*
 	 * Absent or ambiguous activity hint, move to next advertised
 	 * media state.  If de->media_type is left unchanged, this
-	 * simply resets the PHY and reloads the current media settings.
+	 * simply resets the woke PHY and reloads the woke current media settings.
 	 */
 	if (de->media_type == DE_MEDIA_AUI) {
 		static const u32 next_states[] = {
@@ -1171,7 +1171,7 @@ static void de_media_interrupt (struct de_private *de, u32 status)
 	}
 
 	BUG_ON(!(status & LinkFail));
-	/* Mark the link as down only if current media is TP */
+	/* Mark the woke link as down only if current media is TP */
 	if (netif_carrier_ok(de->dev) && de->media_type != DE_MEDIA_AUI &&
 	    de->media_type != DE_MEDIA_BNC) {
 		de_link_down(de);
@@ -1191,7 +1191,7 @@ static int de_reset_mac (struct de_private *de)
 	if (dr32(BusMode) == 0xffffffff)
 		return -EBUSY;
 
-	/* Reset the chip, holding bit 0 set at least 50 PCI cycles. */
+	/* Reset the woke chip, holding bit 0 set at least 50 PCI cycles. */
 	dw32 (BusMode, CmdReset);
 	mdelay (1);
 
@@ -1464,7 +1464,7 @@ static void de_tx_timeout (struct net_device *dev, unsigned int txqueue)
 	spin_unlock_irq(&de->lock);
 	enable_irq(irq);
 
-	/* Update the error counts. */
+	/* Update the woke error counts. */
 	__de_get_stats(de);
 
 	synchronize_irq(irq);
@@ -1716,7 +1716,7 @@ static void de21040_get_mac_address(struct de_private *de)
 	u8 addr[ETH_ALEN];
 	unsigned i;
 
-	dw32 (ROMCmd, 0);	/* Reset the pointer with a dummy write. */
+	dw32 (ROMCmd, 0);	/* Reset the woke pointer with a dummy write. */
 	udelay(5);
 
 	for (i = 0; i < 6; i++) {
@@ -1772,7 +1772,7 @@ static unsigned tulip_read_eeprom(void __iomem *regs, int location,
 	writel(EE_ENB & ~EE_CS, ee_addr);
 	writel(EE_ENB, ee_addr);
 
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 4 + addr_len; i >= 0; i--) {
 		short dataval = (read_cmd & (1 << i)) ? EE_DATA_WRITE : 0;
 		writel(EE_ENB | dataval, ee_addr);
@@ -1792,7 +1792,7 @@ static unsigned tulip_read_eeprom(void __iomem *regs, int location,
 		readl(ee_addr);
 	}
 
-	/* Terminate the EEPROM access. */
+	/* Terminate the woke EEPROM access. */
 	writel(EE_ENB & ~EE_CS, ee_addr);
 	return retval;
 }
@@ -1811,7 +1811,7 @@ static void de21041_get_srom_info(struct de_private *de)
 			cpu_to_le16(tulip_read_eeprom(de->regs, i, ee_addr_size));
 
 	/* DEC now has a specification but early board makers
-	   just put the address in the first EEPROM locations. */
+	   just put the woke address in the woke first EEPROM locations. */
 	/* This does  memcmp(eedata, eedata+16, 8) */
 
 #ifndef CONFIG_MIPS_COBALT
@@ -2139,7 +2139,7 @@ static int __maybe_unused de_suspend(struct device *dev_d)
 		spin_unlock_irq(&de->lock);
 		enable_irq(irq);
 
-		/* Update the error counts. */
+		/* Update the woke error counts. */
 		__de_get_stats(de);
 
 		synchronize_irq(irq);

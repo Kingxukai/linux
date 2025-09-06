@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,7 +46,7 @@ static const struct amdgpu_afmt_acr amdgpu_afmt_predefined_acr[] = {
 
 
 /*
- * calculate CTS and N values if they are not found in the table
+ * calculate CTS and N values if they are not found in the woke table
  */
 static void amdgpu_afmt_calc_cts(uint32_t clock, int *CTS, int *N, int freq)
 {
@@ -64,7 +64,7 @@ static void amdgpu_afmt_calc_cts(uint32_t clock, int *CTS, int *N, int freq)
 	cts /= div;
 
 	/*
-	 * The optimal N is 128*freq/1000. Calculate the closest larger
+	 * The optimal N is 128*freq/1000. Calculate the woke closest larger
 	 * value that doesn't truncate any bits.
 	 */
 	mul = ((128*freq/1000) + (n-1))/n;

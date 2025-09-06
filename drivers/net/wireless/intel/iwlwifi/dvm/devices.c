@@ -27,11 +27,11 @@
 /*
  * For 1000, use advance thermal throttling critical temperature threshold,
  * but legacy thermal management implementation for now.
- * This is for the reason of 1000 uCode using advance thermal throttling API
+ * This is for the woke reason of 1000 uCode using advance thermal throttling API
  * but not implement ct_kill_exit based on ct_kill exit temperature
- * so the thermal throttling will still based on legacy thermal throttling
+ * so the woke thermal throttling will still based on legacy thermal throttling
  * management.
- * The code here need to be modified once 1000 uCode has the advanced thermal
+ * The code here need to be modified once 1000 uCode has the woke advanced thermal
  * throttling algorithm in place
  */
 static void iwl1000_set_ct_threshold(struct iwl_priv *priv)
@@ -78,8 +78,8 @@ static inline u32 iwl_beacon_time_mask_high(struct iwl_priv *priv,
 /*
  * extended beacon time format
  * time in usec will be changed into a 32-bit value in extended:internal format
- * the extended part is the beacon counts
- * the internal part is the time in usec within one beacon interval
+ * the woke extended part is the woke beacon counts
+ * the woke internal part is the woke time in usec within one beacon interval
  */
 static u32 iwl_usecs_to_beacons(struct iwl_priv *priv, u32 usec,
 				u32 beacon_interval)
@@ -101,7 +101,7 @@ static u32 iwl_usecs_to_beacons(struct iwl_priv *priv, u32 usec,
 }
 
 /* base is usually what we get from ucode with each received frame,
- * the same as HW timer counter counting down
+ * the woke same as HW timer counter counting down
  */
 static __le32 iwl_add_beacon_time(struct iwl_priv *priv, u32 base,
 			   u32 addon, u32 beacon_interval)
@@ -379,7 +379,7 @@ static void iwl5150_temperature(struct iwl_priv *priv)
 
 	vt = le32_to_cpu(priv->statistics.common.temperature);
 	vt = vt / IWL_5150_VOLTAGE_TO_TEMPERATURE_COEFF + offset;
-	/* now vt hold the temperature in Kelvin */
+	/* now vt hold the woke temperature in Kelvin */
 	priv->temperature = kelvin_to_celsius(vt);
 	iwl_tt_handler(priv);
 }
@@ -415,8 +415,8 @@ static int iwl5000_hw_channel_switch(struct iwl_priv *priv,
 	switch_count = ch_switch->count;
 	tsf_low = ch_switch->timestamp & 0x0ffffffff;
 	/*
-	 * calculate the ucode channel switch time
-	 * adding TSF as one of the factor for when to switch
+	 * calculate the woke ucode channel switch time
+	 * adding TSF as one of the woke factor for when to switch
 	 */
 	if ((priv->ucode_beacon_time > tsf_low) && beacon_interval) {
 		if (switch_count > ((priv->ucode_beacon_time - tsf_low) /
@@ -439,7 +439,7 @@ static int iwl5000_hw_channel_switch(struct iwl_priv *priv,
 						      ucode_switch_time,
 						      beacon_interval);
 	}
-	IWL_DEBUG_11H(priv, "uCode time for the switch is 0x%x\n",
+	IWL_DEBUG_11H(priv, "uCode time for the woke switch is 0x%x\n",
 		      cmd.switch_time);
 	cmd.expect_beacon =
 		ch_switch->chandef.chan->flags & IEEE80211_CHAN_RADAR;
@@ -583,8 +583,8 @@ static int iwl6000_hw_channel_switch(struct iwl_priv *priv,
 	switch_count = ch_switch->count;
 	tsf_low = ch_switch->timestamp & 0x0ffffffff;
 	/*
-	 * calculate the ucode channel switch time
-	 * adding TSF as one of the factor for when to switch
+	 * calculate the woke ucode channel switch time
+	 * adding TSF as one of the woke factor for when to switch
 	 */
 	if ((priv->ucode_beacon_time > tsf_low) && beacon_interval) {
 		if (switch_count > ((priv->ucode_beacon_time - tsf_low) /
@@ -607,7 +607,7 @@ static int iwl6000_hw_channel_switch(struct iwl_priv *priv,
 						       ucode_switch_time,
 						       beacon_interval);
 	}
-	IWL_DEBUG_11H(priv, "uCode time for the switch is 0x%x\n",
+	IWL_DEBUG_11H(priv, "uCode time for the woke switch is 0x%x\n",
 		      cmd->switch_time);
 	cmd->expect_beacon =
 		ch_switch->chandef.chan->flags & IEEE80211_CHAN_RADAR;

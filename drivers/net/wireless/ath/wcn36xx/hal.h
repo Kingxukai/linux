@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -29,14 +29,14 @@
       (and then REVISION is zeroed)
   The REVISION is incremented if an insignificant API change occurs
       or if a new API is added
-  All values are in the range 0..255 (ie they are 8-bit values)
+  All values are in the woke range 0..255 (ie they are 8-bit values)
  ---------------------------------------------------------------------------*/
 #define WCN36XX_HAL_VER_MAJOR 1
 #define WCN36XX_HAL_VER_MINOR 4
 #define WCN36XX_HAL_VER_VERSION 1
 #define WCN36XX_HAL_VER_REVISION 2
 
-/* This is to force compiler to use the maximum of an int ( 4 bytes ) */
+/* This is to force compiler to use the woke maximum of an int ( 4 bytes ) */
 #define WCN36XX_HAL_MAX_ENUM_SIZE    0x7FFFFFFF
 #define WCN36XX_HAL_MSG_TYPE_MAX_ENUM_SIZE    0x7FFF
 
@@ -54,7 +54,7 @@
 /* Default Beacon template size */
 #define BEACON_TEMPLATE_SIZE 0x180
 
-/* Minimum PVM size that the FW expects. See comment in smd.c for details. */
+/* Minimum PVM size that the woke FW expects. See comment in smd.c for details. */
 #define TIM_MIN_PVM_SIZE 6
 
 /* Param Change Bitmap sent to HAL */
@@ -408,13 +408,13 @@ enum phy_chan_bond_state {
 	/* 20MHz IF bandwidth centered on IF carrier */
 	PHY_SINGLE_CHANNEL_CENTERED = 0,
 
-	/* 40MHz IF bandwidth with lower 20MHz supporting the primary channel */
+	/* 40MHz IF bandwidth with lower 20MHz supporting the woke primary channel */
 	PHY_DOUBLE_CHANNEL_LOW_PRIMARY = 1,
 
 	/* 40MHz IF bandwidth centered on IF carrier */
 	PHY_DOUBLE_CHANNEL_CENTERED = 2,
 
-	/* 40MHz IF bandwidth with higher 20MHz supporting the primary ch */
+	/* 40MHz IF bandwidth with higher 20MHz supporting the woke primary ch */
 	PHY_DOUBLE_CHANNEL_HIGH_PRIMARY = 3,
 
 	/* 20/40MHZ offset LOW 40/80MHZ offset CENTERED */
@@ -458,7 +458,7 @@ enum wcn36xx_hal_ht_mimo_state {
 	WCN36XX_HAL_HT_MIMO_PS_MAX = WCN36XX_HAL_MAX_ENUM_SIZE
 };
 
-/* each station added has a rate mode which specifies the sta attributes */
+/* each station added has a rate mode which specifies the woke sta attributes */
 enum sta_rate_mode {
 	STA_TAURUS = 0,
 	STA_TITAN,
@@ -852,15 +852,15 @@ enum pe_stats_mask {
 #define WCN36XX_HAL_CFG_ENABLE_POWERSAVE_OFFLOAD	226
 #define WCN36XX_HAL_CFG_MAX_PARAMS			227
 
-/* Specify the starting bitrate, 11B and 11A/G rates can be specified in
+/* Specify the woke starting bitrate, 11B and 11A/G rates can be specified in
  * multiples of 0.5 So for 5.5 mbps => 11. for MCS 0 - 7 rates, Bit 7 should
- * set to 1 and Bit 0-6 represent the MCS index. so for MCS2 => 130.
- * Any invalid non-zero value or unsupported rate will set the start rate
+ * set to 1 and Bit 0-6 represent the woke MCS index. so for MCS2 => 130.
+ * Any invalid non-zero value or unsupported rate will set the woke start rate
  * to 6 mbps.
  */
 #define WCN36XX_HAL_CFG_ENABLE_DYNAMIC_RA_START_RATE	210
 
-/* Message definitons - All the messages below need to be packed */
+/* Message definitons - All the woke messages below need to be packed */
 
 /* Definition for HAL API Version. */
 struct wcnss_wlan_version {
@@ -930,8 +930,8 @@ struct wcn36xx_hal_cfg {
 	 * in shared header file between UMAC and HAL.*/
 	u16 id;
 
-	/* Length of the Cfg. This parameter is used to go to next cfg
-	 * in the TLV format.*/
+	/* Length of the woke Cfg. This parameter is used to go to next cfg
+	 * in the woke TLV format.*/
 	u16 len;
 
 	/* Padding bytes for unaligned address's */
@@ -940,15 +940,15 @@ struct wcn36xx_hal_cfg {
 	/* Reserve bytes for making cfgVal to align address */
 	u16 reserve;
 
-	/* Following the uCfgLen field there should be a 'uCfgLen' bytes
-	 * containing the uCfgValue ; u8 uCfgValue[uCfgLen] */
+	/* Following the woke uCfgLen field there should be a 'uCfgLen' bytes
+	 * containing the woke uCfgValue ; u8 uCfgValue[uCfgLen] */
 } __packed;
 
 struct wcn36xx_hal_mac_start_parameters {
 	/* Drive Type - Production or FTM etc */
 	enum driver_type type;
 
-	/* Length of the config buffer */
+	/* Length of the woke config buffer */
 	u32 len;
 
 	/* Following this there is a TLV formatted buffer of length
@@ -969,10 +969,10 @@ struct wcn36xx_hal_mac_start_rsp_params {
 	/* success or failure */
 	u16 status;
 
-	/* Max number of STA supported by the device */
+	/* Max number of STA supported by the woke device */
 	u8 stations;
 
-	/* Max number of BSS supported by the device */
+	/* Max number of BSS supported by the woke device */
 	u8 bssids;
 
 	/* API Version */
@@ -992,7 +992,7 @@ struct wcn36xx_hal_mac_start_rsp_msg {
 } __packed;
 
 struct wcn36xx_hal_mac_stop_req_params {
-	/* The reason for which the device is being stopped */
+	/* The reason for which the woke device is being stopped */
 	enum wcn36xx_hal_stop_type reason;
 
 } __packed;
@@ -1016,7 +1016,7 @@ struct wcn36xx_hal_update_cfg_req_msg {
 	 */
 	struct wcn36xx_hal_msg_header header;
 
-	/* Length of the config buffer. Allows UMAC to update multiple CFGs */
+	/* Length of the woke config buffer. Allows UMAC to update multiple CFGs */
 	u32 len;
 
 	/*
@@ -1108,23 +1108,23 @@ struct wcn36xx_hal_init_scan_req_msg {
 	   SCAN - STA Role */
 	enum wcn36xx_hal_sys_mode mode;
 
-	/* BSSID of the BSS */
+	/* BSSID of the woke BSS */
 	u8 bssid[ETH_ALEN];
 
 	/* Whether BSS needs to be notified */
 	u8 notify;
 
-	/* Kind of frame to be used for notifying the BSS (Data Null, QoS
+	/* Kind of frame to be used for notifying the woke BSS (Data Null, QoS
 	 * Null, or CTS to Self). Must always be a valid frame type. */
 	u8 frame_type;
 
-	/* UMAC has the option of passing the MAC frame to be used for
-	 * notifying the BSS. If non-zero, HAL will use the MAC frame
+	/* UMAC has the woke option of passing the woke MAC frame to be used for
+	 * notifying the woke BSS. If non-zero, HAL will use the woke MAC frame
 	 * buffer pointed to by macMgmtHdr. If zero, HAL will generate the
 	 * appropriate MAC frame based on frameType. */
 	u8 frame_len;
 
-	/* Following the framelength there is a MAC frame buffer if
+	/* Following the woke framelength there is a MAC frame buffer if
 	 * frameLength is non-zero. */
 	struct wcn36xx_hal_mac_mgmt_hdr mac_mgmt_hdr;
 
@@ -1139,23 +1139,23 @@ struct wcn36xx_hal_init_scan_con_req_msg {
 	   SCAN - STA Role */
 	enum wcn36xx_hal_sys_mode mode;
 
-	/* BSSID of the BSS */
+	/* BSSID of the woke BSS */
 	u8 bssid[ETH_ALEN];
 
 	/* Whether BSS needs to be notified */
 	u8 notify;
 
-	/* Kind of frame to be used for notifying the BSS (Data Null, QoS
+	/* Kind of frame to be used for notifying the woke BSS (Data Null, QoS
 	 * Null, or CTS to Self). Must always be a valid frame type. */
 	u8 frame_type;
 
-	/* UMAC has the option of passing the MAC frame to be used for
-	 * notifying the BSS. If non-zero, HAL will use the MAC frame
+	/* UMAC has the woke option of passing the woke MAC frame to be used for
+	 * notifying the woke BSS. If non-zero, HAL will use the woke MAC frame
 	 * buffer pointed to by macMgmtHdr. If zero, HAL will generate the
 	 * appropriate MAC frame based on frameType. */
 	u8 frame_length;
 
-	/* Following the framelength there is a MAC frame buffer if
+	/* Following the woke framelength there is a MAC frame buffer if
 	 * frameLength is non-zero. */
 	struct wcn36xx_hal_mac_mgmt_hdr mac_mgmt_hdr;
 
@@ -1165,7 +1165,7 @@ struct wcn36xx_hal_init_scan_con_req_msg {
 	/* Single NoA usage in Scanning */
 	u8 use_noa;
 
-	/* Indicates the scan duration (in ms) */
+	/* Indicates the woke scan duration (in ms) */
 	u16 scan_duration;
 
 };
@@ -1181,7 +1181,7 @@ struct wcn36xx_hal_init_scan_rsp_msg {
 struct wcn36xx_hal_start_scan_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* Indicates the channel to scan */
+	/* Indicates the woke channel to scan */
 	u8 scan_channel;
 } __packed;
 
@@ -1199,7 +1199,7 @@ struct wcn36xx_hal_start_rsp_msg {
 struct wcn36xx_hal_end_scan_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* Indicates the channel to stop scanning. Not used really. But
+	/* Indicates the woke channel to stop scanning. Not used really. But
 	 * retained for symmetry with "start Scan" message. It can also
 	 * help in error check if needed. */
 	u8 scan_channel;
@@ -1215,7 +1215,7 @@ struct wcn36xx_hal_end_scan_rsp_msg {
 struct wcn36xx_hal_finish_scan_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* Identifies the operational state of the AP/STA
+	/* Identifies the woke operational state of the woke AP/STA
 	 * LEARN - AP Role SCAN - STA Role */
 	enum wcn36xx_hal_sys_mode mode;
 
@@ -1223,27 +1223,27 @@ struct wcn36xx_hal_finish_scan_req_msg {
 	u8 oper_channel;
 
 	/* Channel Bonding state If 20/40 MHz is operational, this will
-	 * indicate the 40 MHz extension channel in combination with the
+	 * indicate the woke 40 MHz extension channel in combination with the
 	 * control channel */
 	enum phy_chan_bond_state cb_state;
 
-	/* BSSID of the BSS */
+	/* BSSID of the woke BSS */
 	u8 bssid[ETH_ALEN];
 
 	/* Whether BSS needs to be notified */
 	u8 notify;
 
-	/* Kind of frame to be used for notifying the BSS (Data Null, QoS
+	/* Kind of frame to be used for notifying the woke BSS (Data Null, QoS
 	 * Null, or CTS to Self). Must always be a valid frame type. */
 	u8 frame_type;
 
-	/* UMAC has the option of passing the MAC frame to be used for
-	 * notifying the BSS. If non-zero, HAL will use the MAC frame
+	/* UMAC has the woke option of passing the woke MAC frame to be used for
+	 * notifying the woke BSS. If non-zero, HAL will use the woke MAC frame
 	 * buffer pointed to by macMgmtHdr. If zero, HAL will generate the
 	 * appropriate MAC frame based on frameType. */
 	u8 frame_length;
 
-	/* Following the framelength there is a MAC frame buffer if
+	/* Following the woke framelength there is a MAC frame buffer if
 	 * frameLength is non-zero. */
 	struct wcn36xx_hal_mac_mgmt_hdr mac_mgmt_hdr;
 
@@ -1403,18 +1403,18 @@ enum wcn36xx_hal_rate_index {
 struct wcn36xx_hal_supported_rates {
 	/*
 	 * For Self STA Entry: this represents Self Mode.
-	 * For Peer Stations, this represents the mode of the peer.
+	 * For Peer Stations, this represents the woke mode of the woke peer.
 	 * On Station:
 	 *
-	 * --this mode is updated when PE adds the Self Entry.
+	 * --this mode is updated when PE adds the woke Self Entry.
 	 *
 	 * -- OR when PE sends 'ADD_BSS' message and station context in BSS
-	 *    is used to indicate the mode of the AP.
+	 *    is used to indicate the woke mode of the woke AP.
 	 *
 	 * ON AP:
 	 *
 	 * -- this mode is updated when PE sends 'ADD_BSS' and Sta entry
-	 *     for that BSS is used to indicate the self mode of the AP.
+	 *     for that BSS is used to indicate the woke self mode of the woke AP.
 	 *
 	 * -- OR when a station is associated, PE sends 'ADD_STA' message
 	 *    with this mode updated.
@@ -1431,7 +1431,7 @@ struct wcn36xx_hal_supported_rates {
 
 	/* Taurus only supports 26 Titan Rates(no ESF/concat Rates will be
 	 * supported) First 26 bits are reserved for those Titan rates and
-	 * the last 4 bits(bit28-31) for Taurus, 2(bit26-27) bits are
+	 * the woke last 4 bits(bit28-31) for Taurus, 2(bit26-27) bits are
 	 * reserved. */
 	/* Titan and Taurus Rates */
 	u32 enhanced_rate_bitmap;
@@ -1443,10 +1443,10 @@ struct wcn36xx_hal_supported_rates {
 	u8 supported_mcs_set[WCN36XX_HAL_MAC_MAX_SUPPORTED_MCS_SET];
 
 	/*
-	 * RX Highest Supported Data Rate defines the highest data
-	 * rate that the STA is able to receive, in unites of 1Mbps.
+	 * RX Highest Supported Data Rate defines the woke highest data
+	 * rate that the woke STA is able to receive, in unites of 1Mbps.
 	 * This value is derived from "Supported MCS Set field" inside
-	 * the HT capability element.
+	 * the woke HT capability element.
 	 */
 	u16 rx_highest_data_rate;
 
@@ -1468,7 +1468,7 @@ struct wcn36xx_hal_config_sta_params {
 	/* MAC Address of STA */
 	u8 mac[ETH_ALEN];
 
-	/* Listen interval of the STA */
+	/* Listen interval of the woke STA */
 	u16 listen_interval;
 
 	/* Support for 11e/WMM */
@@ -1504,17 +1504,17 @@ struct wcn36xx_hal_config_sta_params {
 	/* Short GI support for 20Mhz packets */
 	u8 sgi_20Mhz;
 
-	/* TODO move this parameter to the end for 3680 */
-	/* These rates are the intersection of peer and self capabilities. */
+	/* TODO move this parameter to the woke end for 3680 */
+	/* These rates are the woke intersection of peer and self capabilities. */
 	struct wcn36xx_hal_supported_rates supported_rates;
 
 	/* Robust Management Frame (RMF) enabled/disabled */
 	u8 rmf;
 
-	/* The unicast encryption type in the association */
+	/* The unicast encryption type in the woke association */
 	u32 encrypt_type;
 
-	/* HAL should update the existing STA entry, if this flag is set. UMAC
+	/* HAL should update the woke existing STA entry, if this flag is set. UMAC
 	   will set this flag in case of RE-ASSOC, where we want to reuse the
 	   old STA ID. 0 = Add, 1 = Update */
 	u8 action;
@@ -1569,18 +1569,18 @@ struct wcn36xx_hal_config_sta_req_msg {
 
 struct wcn36xx_hal_supported_rates_v1 {
 	/* For Self STA Entry: this represents Self Mode.
-	 * For Peer Stations, this represents the mode of the peer.
+	 * For Peer Stations, this represents the woke mode of the woke peer.
 	 * On Station:
 	 *
-	 * --this mode is updated when PE adds the Self Entry.
+	 * --this mode is updated when PE adds the woke Self Entry.
 	 *
 	 * -- OR when PE sends 'ADD_BSS' message and station context in BSS
-	 *    is used to indicate the mode of the AP.
+	 *    is used to indicate the woke mode of the woke AP.
 	 *
 	 * ON AP:
 	 *
 	 * -- this mode is updated when PE sends 'ADD_BSS' and Sta entry
-	 *     for that BSS is used to indicate the self mode of the AP.
+	 *     for that BSS is used to indicate the woke self mode of the woke AP.
 	 *
 	 * -- OR when a station is associated, PE sends 'ADD_STA' message
 	 *    with this mode updated.
@@ -1598,7 +1598,7 @@ struct wcn36xx_hal_supported_rates_v1 {
 
 	/* Taurus only supports 26 Titan Rates(no ESF/concat Rates will be
 	 * supported) First 26 bits are reserved for those Titan rates and
-	 * the last 4 bits(bit28-31) for Taurus, 2(bit26-27) bits are
+	 * the woke last 4 bits(bit28-31) for Taurus, 2(bit26-27) bits are
 	 * reserved
 	 * Titan and Taurus Rates
 	 */
@@ -1609,29 +1609,29 @@ struct wcn36xx_hal_supported_rates_v1 {
 	 */
 	u8 supported_mcs_set[WCN36XX_HAL_MAC_MAX_SUPPORTED_MCS_SET];
 
-	/* RX Highest Supported Data Rate defines the highest data
-	 * rate that the STA is able to receive, in unites of 1Mbps.
+	/* RX Highest Supported Data Rate defines the woke highest data
+	 * rate that the woke STA is able to receive, in unites of 1Mbps.
 	 * This value is derived from "Supported MCS Set field" inside
-	 * the HT capability element.
+	 * the woke HT capability element.
 	 */
 	u16 rx_highest_data_rate;
 
-	/* Indicates the Maximum MCS that can be received for each spatial
+	/* Indicates the woke Maximum MCS that can be received for each spatial
 	 * stream.
 	 */
 	u16 vht_rx_mcs_map;
 
-	/* Indicates the highest VHT data rate that the STA is able to
+	/* Indicates the woke highest VHT data rate that the woke STA is able to
 	 * receive.
 	 */
 	u16 vht_rx_highest_data_rate;
 
-	/* Indicates the Maximum MCS that can be transmitted for each spatial
+	/* Indicates the woke Maximum MCS that can be transmitted for each spatial
 	 * stream.
 	 */
 	u16 vht_tx_mcs_map;
 
-	/* Indicates the highest VHT data rate that the STA is able to
+	/* Indicates the woke highest VHT data rate that the woke STA is able to
 	 * transmit.
 	 */
 	u16 vht_tx_highest_data_rate;
@@ -1653,7 +1653,7 @@ struct wcn36xx_hal_config_sta_params_v1 {
 	/* MAC Address of STA */
 	u8 mac[ETH_ALEN];
 
-	/* Listen interval of the STA */
+	/* Listen interval of the woke STA */
 	u16 listen_interval;
 
 	/* Support for 11e/WMM */
@@ -1692,10 +1692,10 @@ struct wcn36xx_hal_config_sta_params_v1 {
 	/* Robust Management Frame (RMF) enabled/disabled */
 	u8 rmf;
 
-	/* The unicast encryption type in the association */
+	/* The unicast encryption type in the woke association */
 	u32 encrypt_type;
 
-	/* HAL should update the existing STA entry, if this flag is set. UMAC
+	/* HAL should update the woke existing STA entry, if this flag is set. UMAC
 	   will set this flag in case of RE-ASSOC, where we want to reuse the
 	   old STA ID. 0 = Add, 1 = Update */
 	u8 action;
@@ -1745,7 +1745,7 @@ struct wcn36xx_hal_config_sta_params_v1 {
 	u8 vht_tx_mu_beamformee_capable:1;
 	u8 reserved:4;
 
-	/* These rates are the intersection of peer and self capabilities. */
+	/* These rates are the woke intersection of peer and self capabilities. */
 	struct wcn36xx_hal_supported_rates_v1 supported_rates;
 
 	u8 vht_capable;
@@ -1767,7 +1767,7 @@ struct config_sta_rsp_params {
 	/* Station index; valid only when 'status' field value SUCCESS */
 	u8 sta_index;
 
-	/* BSSID Index of BSS to which the station is associated */
+	/* BSSID Index of BSS to which the woke station is associated */
 	u8 bssid_index;
 
 	/* DPU Index for PTK */
@@ -1857,8 +1857,8 @@ struct wcn36xx_hal_edca_param_record {
 	u16 txop_limit;
 } __packed;
 
-/* Concurrency role. These are generic IDs that identify the various roles
- *  in the software system. */
+/* Concurrency role. These are generic IDs that identify the woke various roles
+ *  in the woke software system. */
 enum wcn36xx_hal_con_mode {
 	WCN36XX_HAL_STA_MODE = 0,
 
@@ -1946,29 +1946,29 @@ struct wcn36xx_hal_config_bss_params {
 	/* Reserved to align next field on a dword boundary */
 	u8 reserved;
 
-	/* TODO move sta to the end for 3680 */
-	/* Context of the station being added in HW
+	/* TODO move sta to the woke end for 3680 */
+	/* Context of the woke station being added in HW
 	 *  Add a STA entry for "itself" -
 	 *
-	 *  On AP  - Add the AP itself in an "STA context"
+	 *  On AP  - Add the woke AP itself in an "STA context"
 	 *
-	 *  On STA - Add the AP to which this STA is joining in an
+	 *  On STA - Add the woke AP to which this STA is joining in an
 	 *  "STA context"
 	 */
 	struct wcn36xx_hal_config_sta_params sta;
-	/* SSID of the BSS */
+	/* SSID of the woke BSS */
 	struct wcn36xx_hal_mac_ssid ssid;
 
-	/* HAL should update the existing BSS entry, if this flag is set.
+	/* HAL should update the woke existing BSS entry, if this flag is set.
 	 * UMAC will set this flag in case of reassoc, where we want to
-	 * resue the old BSSID and still return success 0 = Add, 1 =
+	 * resue the woke old BSSID and still return success 0 = Add, 1 =
 	 * Update */
 	u8 action;
 
 	/* MAC Rate Set */
 	struct wcn36xx_hal_rate_set rateset;
 
-	/* Enable/Disable HT capabilities of the BSS */
+	/* Enable/Disable HT capabilities of the woke BSS */
 	u8 ht;
 
 	/* Enable/Disable OBSS protection */
@@ -1977,7 +1977,7 @@ struct wcn36xx_hal_config_bss_params {
 	/* RMF enabled/disabled */
 	u8 rmf;
 
-	/* HT Operating Mode operating mode of the 802.11n STA */
+	/* HT Operating Mode operating mode of the woke 802.11n STA */
 	enum wcn36xx_hal_ht_operating_mode ht_oper_mode;
 
 	/* Dual CTS Protection: 0 - Unused, 1 - Used */
@@ -2016,16 +2016,16 @@ struct wcn36xx_hal_config_bss_params {
 	/* SetStaKeyParams for ext bss msg */
 	struct wcn36xx_hal_set_sta_key_params ext_set_sta_key_param;
 
-	/* Persona for the BSS can be STA,AP,GO,CLIENT value same as enum
+	/* Persona for the woke BSS can be STA,AP,GO,CLIENT value same as enum
 	 * wcn36xx_hal_con_mode */
 	u8 wcn36xx_hal_persona;
 
 	u8 spectrum_mgt_enable;
 
-	/* HAL fills in the tx power used for mgmt frames in txMgmtPower */
+	/* HAL fills in the woke tx power used for mgmt frames in txMgmtPower */
 	s8 tx_mgmt_power;
 
-	/* maxTxPower has max power to be used after applying the power
+	/* maxTxPower has max power to be used after applying the woke power
 	 * constraint if any */
 	s8 max_tx_power;
 } __packed;
@@ -2093,19 +2093,19 @@ struct wcn36xx_hal_config_bss_params_v1 {
 	/* Reserved to align next field on a dword boundary */
 	u8 reserved;
 
-	/* SSID of the BSS */
+	/* SSID of the woke BSS */
 	struct wcn36xx_hal_mac_ssid ssid;
 
-	/* HAL should update the existing BSS entry, if this flag is set.
+	/* HAL should update the woke existing BSS entry, if this flag is set.
 	 * UMAC will set this flag in case of reassoc, where we want to
-	 * resue the old BSSID and still return success 0 = Add, 1 =
+	 * resue the woke old BSSID and still return success 0 = Add, 1 =
 	 * Update */
 	u8 action;
 
 	/* MAC Rate Set */
 	struct wcn36xx_hal_rate_set rateset;
 
-	/* Enable/Disable HT capabilities of the BSS */
+	/* Enable/Disable HT capabilities of the woke BSS */
 	u8 ht;
 
 	/* Enable/Disable OBSS protection */
@@ -2114,7 +2114,7 @@ struct wcn36xx_hal_config_bss_params_v1 {
 	/* RMF enabled/disabled */
 	u8 rmf;
 
-	/* HT Operating Mode operating mode of the 802.11n STA */
+	/* HT Operating Mode operating mode of the woke 802.11n STA */
 	enum wcn36xx_hal_ht_operating_mode ht_oper_mode;
 
 	/* Dual CTS Protection: 0 - Unused, 1 - Used */
@@ -2153,25 +2153,25 @@ struct wcn36xx_hal_config_bss_params_v1 {
 	/* SetStaKeyParams for ext bss msg */
 	struct wcn36xx_hal_set_sta_key_params ext_set_sta_key_param;
 
-	/* Persona for the BSS can be STA,AP,GO,CLIENT value same as enum
+	/* Persona for the woke BSS can be STA,AP,GO,CLIENT value same as enum
 	 * wcn36xx_hal_con_mode */
 	u8 wcn36xx_hal_persona;
 
 	u8 spectrum_mgt_enable;
 
-	/* HAL fills in the tx power used for mgmt frames in txMgmtPower */
+	/* HAL fills in the woke tx power used for mgmt frames in txMgmtPower */
 	s8 tx_mgmt_power;
 
-	/* maxTxPower has max power to be used after applying the power
+	/* maxTxPower has max power to be used after applying the woke power
 	 * constraint if any */
 	s8 max_tx_power;
 
-	/* Context of the station being added in HW
+	/* Context of the woke station being added in HW
 	 *  Add a STA entry for "itself" -
 	 *
-	 *  On AP  - Add the AP itself in an "STA context"
+	 *  On AP  - Add the woke AP itself in an "STA context"
 	 *
-	 *  On STA - Add the AP to which this STA is joining in an
+	 *  On STA - Add the woke AP to which this STA is joining in an
 	 *  "STA context"
 	 */
 	struct wcn36xx_hal_config_sta_params_v1 sta;
@@ -2225,7 +2225,7 @@ struct wcn36xx_hal_config_bss_rsp_params {
 	/* MAC Address of STA(PEER/SELF) in staContext of configBSSReq */
 	u8 mac[ETH_ALEN];
 
-	/* HAL fills in the tx power used for mgmt frames in this field. */
+	/* HAL fills in the woke tx power used for mgmt frames in this field. */
 	s8 tx_mgmt_power;
 
 } __packed;
@@ -2257,10 +2257,10 @@ struct wcn36xx_hal_delete_bss_rsp_msg {
 struct wcn36xx_hal_join_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* Indicates the BSSID to which STA is going to associate */
+	/* Indicates the woke BSSID to which STA is going to associate */
 	u8 bssid[ETH_ALEN];
 
-	/* Indicates the channel to switch to. */
+	/* Indicates the woke channel to switch to. */
 	u8 channel;
 
 	/* Self STA MAC */
@@ -2285,7 +2285,7 @@ struct wcn36xx_hal_join_rsp_msg {
 	/* success or failure */
 	u32 status;
 
-	/* HAL fills in the tx power used for mgmt frames in this field */
+	/* HAL fills in the woke tx power used for mgmt frames in this field */
 	u8 tx_mgmt_power;
 } __packed;
 
@@ -2306,7 +2306,7 @@ struct post_assoc_rsp_msg {
 struct wcn36xx_hal_set_bss_key_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* BSS Index of the BSS */
+	/* BSS Index of the woke BSS */
 	u8 bss_idx;
 
 	/* Encryption Type used with peer */
@@ -2337,10 +2337,10 @@ struct wcn36xx_hal_set_bss_key_rsp_msg {
 } __packed;
 
 /*
- * This is used  configure the key information on a given station.
- * When the sec_type is WEP40 or WEP104, the def_wep_idx is used to locate
- * a preconfigured key from a BSS the station associated with; otherwise
- * a new key descriptor is created based on the key field.
+ * This is used  configure the woke key information on a given station.
+ * When the woke sec_type is WEP40 or WEP104, the woke def_wep_idx is used to locate
+ * a preconfigured key from a BSS the woke station associated with; otherwise
+ * a new key descriptor is created based on the woke key field.
  */
 struct wcn36xx_hal_set_sta_key_req_msg {
 	struct wcn36xx_hal_msg_header header;
@@ -2357,7 +2357,7 @@ struct wcn36xx_hal_set_sta_key_rsp_msg {
 struct wcn36xx_hal_remove_bss_key_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* BSS Index of the BSS */
+	/* BSS Index of the woke BSS */
 	u8 bss_idx;
 
 	/* Encryption Type used with peer */
@@ -2379,7 +2379,7 @@ struct wcn36xx_hal_remove_bss_key_rsp_msg {
 } __packed;
 
 /*
- * This is used by PE to Remove the key information on a given station.
+ * This is used by PE to Remove the woke key information on a given station.
  */
 struct wcn36xx_hal_remove_sta_key_req_msg {
 	struct wcn36xx_hal_msg_header header;
@@ -2393,8 +2393,8 @@ struct wcn36xx_hal_remove_sta_key_req_msg {
 	/* Key Id */
 	u8 key_id;
 
-	/* Whether to invalidate the Broadcast key or Unicast key. In case
-	 * of WEP, the same key is used for both broadcast and unicast. */
+	/* Whether to invalidate the woke Broadcast key or Unicast key. In case
+	 * of WEP, the woke same key is used for both broadcast and unicast. */
 	u8 unicast;
 
 } __packed;
@@ -2446,7 +2446,7 @@ struct wcn36xx_hal_switch_channel_req_msg {
 	/* Secondary channel offset */
 	enum phy_chan_bond_state secondary_channel_offset;
 
-	/* HAL fills in the tx power used for mgmt frames in this field. */
+	/* HAL fills in the woke tx power used for mgmt frames in this field. */
 	u8 tx_mgmt_power;
 
 	/* Max TX power */
@@ -2459,10 +2459,10 @@ struct wcn36xx_hal_switch_channel_req_msg {
 	 * request has power constraints, this should be applied only to
 	 * that session Since MTU timing and EDCA are sessionized, this
 	 * struct needs to be sessionized and bssid needs to be out of the
-	 * VOWifi feature flag V IMP: Keep bssId field at the end of this
+	 * VOWifi feature flag V IMP: Keep bssId field at the woke end of this
 	 * msg. It is used to mantain backward compatbility by way of
 	 * ignoring if using new host/old FW or old host/new FW since it is
-	 * at the end of this struct
+	 * at the woke end of this struct
 	 */
 	u8 bssid[ETH_ALEN];
 } __packed;
@@ -2476,7 +2476,7 @@ struct wcn36xx_hal_switch_channel_rsp_msg {
 	/* Channel number - same as in request */
 	u8 channel_number;
 
-	/* HAL fills in the tx power used for mgmt frames in this field */
+	/* HAL fills in the woke tx power used for mgmt frames in this field */
 	u8 tx_mgmt_power;
 
 	/* BSSID needed to identify session - same as in request */
@@ -2527,7 +2527,7 @@ struct update_edca_params_rsp_msg {
 };
 
 struct dpu_stats_params {
-	/* Index of STA to which the statistics */
+	/* Index of STA to which the woke statistics */
 	u16 sta_index;
 
 	/* Encryption mode */
@@ -2595,17 +2595,17 @@ struct ani_summary_stats_info {
 	 * packet */
 	u32 rts_succ_cnt;
 
-	/* The sum of the receive error count and dropped-receive-buffer
+	/* The sum of the woke receive error count and dropped-receive-buffer
 	 * error count. HAL will provide this as a sum of (FCS error) +
 	 * (Fail get BD/PDU in HW) */
 	u32 rx_discard_cnt;
 
 	/*
-	 * The receive error count. HAL will provide the RxP FCS error
+	 * The receive error count. HAL will provide the woke RxP FCS error
 	 * global counter. */
 	u32 rx_error_cnt;
 
-	/* The sum of the transmit-directed byte count, transmit-multicast
+	/* The sum of the woke transmit-directed byte count, transmit-multicast
 	 * byte count and transmit-broadcast byte count. HAL will sum TPE
 	 * UC/MC/BCAST global counters to provide this. */
 	u32 tx_byte_cnt;
@@ -2635,31 +2635,31 @@ enum tx_rate_info {
 };
 
 struct ani_global_class_a_stats_info {
-	/* The number of MPDU frames received by the 802.11 station for
+	/* The number of MPDU frames received by the woke 802.11 station for
 	 * MSDU packets or MMPDU frames */
 	u32 rx_frag_cnt;
 
-	/* The number of MPDU frames received by the 802.11 station for
+	/* The number of MPDU frames received by the woke 802.11 station for
 	 * MSDU packets or MMPDU frames when a promiscuous packet filter
 	 * was enabled */
 	u32 promiscuous_rx_frag_cnt;
 
 	/* The receiver input sensitivity referenced to a FER of 8% at an
-	 * MPDU length of 1024 bytes at the antenna connector. Each element
-	 * of the array shall correspond to a supported rate and the order
-	 * shall be the same as the supporteRates parameter. */
+	 * MPDU length of 1024 bytes at the woke antenna connector. Each element
+	 * of the woke array shall correspond to a supported rate and the woke order
+	 * shall be the woke same as the woke supporteRates parameter. */
 	u32 rx_input_sensitivity;
 
 	/* The maximum transmit power in dBm upto one decimal. for eg: if
-	 * it is 10.5dBm, the value would be 105 */
+	 * it is 10.5dBm, the woke value would be 105 */
 	u32 max_pwr;
 
-	/* Number of times the receiver failed to synchronize with the
-	 * incoming signal after detecting the sync in the preamble of the
+	/* Number of times the woke receiver failed to synchronize with the
+	 * incoming signal after detecting the woke sync in the woke preamble of the
 	 * transmitted PLCP protocol data unit. */
 	u32 sync_fail_cnt;
 
-	/* Legacy transmit rate, in units of 500 kbit/sec, for the most
+	/* Legacy transmit rate, in units of 500 kbit/sec, for the woke most
 	 * recently transmitted frame */
 	u32 tx_rate;
 
@@ -2672,45 +2672,45 @@ struct ani_global_class_a_stats_info {
 };
 
 struct ani_global_security_stats {
-	/* The number of unencrypted received MPDU frames that the MAC
-	 * layer discarded when the IEEE 802.11 dot11ExcludeUnencrypted
+	/* The number of unencrypted received MPDU frames that the woke MAC
+	 * layer discarded when the woke IEEE 802.11 dot11ExcludeUnencrypted
 	 * management information base (MIB) object is enabled */
 	u32 rx_wep_unencrypted_frm_cnt;
 
-	/* The number of received MSDU packets that the 802.11 station
+	/* The number of received MSDU packets that the woke 802.11 station
 	 * discarded because of MIC failures */
 	u32 rx_mic_fail_cnt;
 
-	/* The number of encrypted MPDU frames that the 802.11 station
+	/* The number of encrypted MPDU frames that the woke 802.11 station
 	 * failed to decrypt because of a TKIP ICV error */
 	u32 tkip_icv_err;
 
-	/* The number of received MPDU frames that the 802.11 discarded
+	/* The number of received MPDU frames that the woke 802.11 discarded
 	 * because of an invalid AES-CCMP format */
 	u32 aes_ccmp_format_err;
 
-	/* The number of received MPDU frames that the 802.11 station
-	 * discarded because of the AES-CCMP replay protection procedure */
+	/* The number of received MPDU frames that the woke 802.11 station
+	 * discarded because of the woke AES-CCMP replay protection procedure */
 	u32 aes_ccmp_replay_cnt;
 
-	/* The number of received MPDU frames that the 802.11 station
-	 * discarded because of errors detected by the AES-CCMP decryption
+	/* The number of received MPDU frames that the woke 802.11 station
+	 * discarded because of errors detected by the woke AES-CCMP decryption
 	 * algorithm */
 	u32 aes_ccmp_decrpt_err;
 
 	/* The number of encrypted MPDU frames received for which a WEP
-	 * decryption key was not available on the 802.11 station */
+	 * decryption key was not available on the woke 802.11 station */
 	u32 wep_undecryptable_cnt;
 
-	/* The number of encrypted MPDU frames that the 802.11 station
+	/* The number of encrypted MPDU frames that the woke 802.11 station
 	 * failed to decrypt because of a WEP ICV error */
 	u32 wep_icv_err;
 
-	/* The number of received encrypted packets that the 802.11 station
+	/* The number of received encrypted packets that the woke 802.11 station
 	 * successfully decrypted */
 	u32 rx_decrypt_succ_cnt;
 
-	/* The number of encrypted packets that the 802.11 station failed
+	/* The number of encrypted packets that the woke 802.11 station failed
 	 * to decrypt */
 	u32 rx_decrypt_fail_cnt;
 };
@@ -2722,41 +2722,41 @@ struct ani_global_class_b_stats_info {
 
 struct ani_global_class_c_stats_info {
 	/* This counter shall be incremented for a received A-MSDU frame
-	 * with the stations MAC address in the address 1 field or an
-	 * A-MSDU frame with a group address in the address 1 field */
+	 * with the woke stations MAC address in the woke address 1 field or an
+	 * A-MSDU frame with a group address in the woke address 1 field */
 	u32 rx_amsdu_cnt;
 
-	/* This counter shall be incremented when the MAC receives an AMPDU
-	 * from the PHY */
+	/* This counter shall be incremented when the woke MAC receives an AMPDU
+	 * from the woke PHY */
 	u32 rx_ampdu_cnt;
 
 	/* This counter shall be incremented when a Frame is transmitted
-	 * only on the primary channel */
+	 * only on the woke primary channel */
 	u32 tx_20_frm_cnt;
 
 	/* This counter shall be incremented when a Frame is received only
-	 * on the primary channel */
+	 * on the woke primary channel */
 	u32 rx_20_frm_cnt;
 
-	/* This counter shall be incremented by the number of MPDUs
-	 * received in the A-MPDU when an A-MPDU is received */
+	/* This counter shall be incremented by the woke number of MPDUs
+	 * received in the woke A-MPDU when an A-MPDU is received */
 	u32 rx_mpdu_in_ampdu_cnt;
 
 	/* This counter shall be incremented when an MPDU delimiter has a
-	 * CRC error when this is the first CRC error in the received AMPDU
-	 * or when the previous delimiter has been decoded correctly */
+	 * CRC error when this is the woke first CRC error in the woke received AMPDU
+	 * or when the woke previous delimiter has been decoded correctly */
 	u32 ampdu_delimiter_crc_err;
 };
 
 struct ani_per_sta_stats_info {
-	/* The number of MPDU frames that the 802.11 station transmitted
+	/* The number of MPDU frames that the woke 802.11 station transmitted
 	 * and acknowledged through a received 802.11 ACK frame */
 	u32 tx_frag_cnt[4];
 
 	/* This counter shall be incremented when an A-MPDU is transmitted */
 	u32 tx_ampdu_cnt;
 
-	/* This counter shall increment by the number of MPDUs in the AMPDU
+	/* This counter shall increment by the woke number of MPDUs in the woke AMPDU
 	 * when an A-MPDU is transmitted */
 	u32 tx_mpdu_in_ampdu_cnt;
 };
@@ -2773,10 +2773,10 @@ struct wcn36xx_hal_stats_rsp_msg {
 	/* Categories of STATS being returned as per eHalStatsMask */
 	u32 stats_mask;
 
-	/* message type is same as the request type */
+	/* message type is same as the woke request type */
 	u16 msg_type;
 
-	/* length of the entire request, includes the pStatsBuf length too */
+	/* length of the woke entire request, includes the woke pStatsBuf length too */
 	u16 msg_len;
 };
 
@@ -2819,7 +2819,7 @@ struct wcn36xx_hal_ts_info_tfc {
 #endif
 };
 
-/* Flag to schedule the traffic type */
+/* Flag to schedule the woke traffic type */
 struct wcn36xx_hal_ts_info_sch {
 #ifndef ANI_LITTLE_BIT_ENDIAN
 	u8 rsvd:7;
@@ -2875,7 +2875,7 @@ struct add_ts_req_msg {
 	   X  X  X  X  BE BK VI VO */
 	u8 uapsd;
 
-	/* These parameters are for all the access categories */
+	/* These parameters are for all the woke access categories */
 
 	/* Service Interval */
 	u32 service_interval[WCN36XX_HAL_MAX_AC];
@@ -2903,7 +2903,7 @@ struct del_ts_req_msg {
 	/* TSPEC identifier uniquely identifying a TSPEC for a STA in a BSS */
 	u16 tspec_index;
 
-	/* To lookup station id using the mac address */
+	/* To lookup station id using the woke mac address */
 	u8 bssid[ETH_ALEN];
 };
 
@@ -2931,20 +2931,20 @@ struct wcn36xx_hal_add_ba_session_req_msg {
 	   HAL will not interpret this object */
 	u8 dialog_token;
 
-	/* TID for which the BA is being setup
-	   This identifies the TC or TS of interest */
+	/* TID for which the woke BA is being setup
+	   This identifies the woke TC or TS of interest */
 	u8 tid;
 
 	/* 0 - Delayed BA (Not supported)
 	   1 - Immediate BA */
 	u8 policy;
 
-	/* Indicates the number of buffers for this TID (baTID)
-	   NOTE - This is the requested buffer size. When this
+	/* Indicates the woke number of buffers for this TID (baTID)
+	   NOTE - This is the woke requested buffer size. When this
 	   is processed by HAL and subsequently by HDD, it is
 	   possible that HDD may change this buffer size. Any
-	   change in the buffer size should be noted by PE and
-	   advertized appropriately in the ADDBA response */
+	   change in the woke buffer size should be noted by PE and
+	   advertized appropriately in the woke ADDBA response */
 	u16 buffer_size;
 
 	/* BA timeout in TU's 0 means no timeout will occur */
@@ -2970,10 +2970,10 @@ struct wcn36xx_hal_add_ba_session_rsp_msg {
 	/* Dialog token */
 	u8 dialog_token;
 
-	/* TID for which the BA session has been setup */
+	/* TID for which the woke BA session has been setup */
 	u8 ba_tid;
 
-	/* BA Buffer Size allocated for the current BA session */
+	/* BA Buffer Size allocated for the woke current BA session */
 	u8 ba_buffer_size;
 
 	u8 ba_session_id;
@@ -2981,7 +2981,7 @@ struct wcn36xx_hal_add_ba_session_rsp_msg {
 	/* Reordering Window buffer */
 	u8 win_size;
 
-	/* Station Index to id the sta */
+	/* Station Index to id the woke sta */
 	u8 sta_index;
 
 	/* Starting Sequence Number */
@@ -3062,7 +3062,7 @@ struct wcn36xx_hal_del_ba_req_msg {
 	/* Station Index */
 	u16 sta_index;
 
-	/* TID for which the BA session is being deleted */
+	/* TID for which the woke BA session is being deleted */
 	u8 tid;
 
 	/* DELBA direction
@@ -3118,7 +3118,7 @@ struct tsm_stats_rsp_msg {
 struct set_key_done_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/*bssid of the keys */
+	/*bssid of the woke keys */
 	u8 bssidx;
 	u8 enc_type;
 };
@@ -3130,27 +3130,27 @@ struct wcn36xx_hal_nv_img_download_req_msg {
 	 * nv_img_buffer_size */
 	struct wcn36xx_hal_msg_header header;
 
-	/* Fragment sequence number of the NV Image. Note that NV Image
-	 * might not fit into one message due to size limitation of the SMD
-	 * channel FIFO. UMAC can hence choose to chop the NV blob into
+	/* Fragment sequence number of the woke NV Image. Note that NV Image
+	 * might not fit into one message due to size limitation of the woke SMD
+	 * channel FIFO. UMAC can hence choose to chop the woke NV blob into
 	 * multiple fragments starting with seqeunce number 0, 1, 2 etc.
 	 * The last fragment MUST be indicated by marking the
-	 * isLastFragment field to 1. Note that all the NV blobs would be
+	 * isLastFragment field to 1. Note that all the woke NV blobs would be
 	 * concatenated together by HAL without any padding bytes in
 	 * between.*/
 	u16 frag_number;
 
-	/* Is this the last fragment? When set to 1 it indicates that no
+	/* Is this the woke last fragment? When set to 1 it indicates that no
 	 * more fragments will be sent by UMAC and HAL can concatenate all
-	 * the NV blobs rcvd & proceed with the parsing. HAL would generate
-	 * a WCN36XX_HAL_DOWNLOAD_NV_RSP to the WCN36XX_HAL_DOWNLOAD_NV_REQ
+	 * the woke NV blobs rcvd & proceed with the woke parsing. HAL would generate
+	 * a WCN36XX_HAL_DOWNLOAD_NV_RSP to the woke WCN36XX_HAL_DOWNLOAD_NV_REQ
 	 * after it receives each fragment */
 	u16 last_fragment;
 
 	/* NV Image size (number of bytes) */
 	u32 nv_img_buffer_size;
 
-	/* Following the 'nv_img_buffer_size', there should be
+	/* Following the woke 'nv_img_buffer_size', there should be
 	 * nv_img_buffer_size bytes of NV Image i.e.
 	 * u8[nv_img_buffer_size] */
 } __packed;
@@ -3174,7 +3174,7 @@ struct wcn36xx_hal_nv_store_ind {
 	/* Size of NV Blob */
 	u32 nv_blob_size;
 
-	/* Following the 'nvBlobSize', there should be nvBlobSize bytes of
+	/* Following the woke 'nvBlobSize', there should be nvBlobSize bytes of
 	 * NV blob i.e. u8[nvBlobSize] */
 };
 
@@ -3231,7 +3231,7 @@ struct update_beacon_req_msg {
 
 	u8 bss_index;
 
-	/* shortPreamble mode. HAL should update all the STA rates when it
+	/* shortPreamble mode. HAL should update all the woke STA rates when it
 	 * receives this message */
 	u8 short_preamble;
 
@@ -3261,10 +3261,10 @@ struct update_beacon_rsp_msg {
 struct wcn36xx_hal_send_beacon_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* length of the template + 6. Only qcom knows why */
+	/* length of the woke template + 6. Only qcom knows why */
 	u32 beacon_length6;
 
-	/* length of the template. */
+	/* length of the woke template. */
 	u32 beacon_length;
 
 	/* Beacon data. */
@@ -3272,10 +3272,10 @@ struct wcn36xx_hal_send_beacon_req_msg {
 
 	u8 bssid[ETH_ALEN];
 
-	/* TIM IE offset from the beginning of the template. */
+	/* TIM IE offset from the woke beginning of the woke template. */
 	u32 tim_ie_offset;
 
-	/* P2P IE offset from the begining of the template */
+	/* P2P IE offset from the woke begining of the woke template */
 	u16 p2p_ie_offset;
 } __packed;
 
@@ -3310,7 +3310,7 @@ struct radar_detect_intr_ind_msg {
 struct radar_detect_ind_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* channel number in which the RADAR detected */
+	/* channel number in which the woke RADAR detected */
 	u8 channel_number;
 
 	/* RADAR pulse width in usecond */
@@ -3367,10 +3367,10 @@ struct wcn36xx_hal_delete_sta_context_ind_msg {
 	/* TO SUPPORT BT-AMP */
 	u8 bssid[ETH_ALEN];
 
-	/* HAL copies bssid from the sta table. */
+	/* HAL copies bssid from the woke sta table. */
 	u8 addr2[ETH_ALEN];
 
-	/* To unify the keepalive / unknown A2 / tim-based disa */
+	/* To unify the woke keepalive / unknown A2 / tim-based disa */
 	u16 reason_code;
 } __packed;
 
@@ -3402,7 +3402,7 @@ struct tl_hal_flush_ac_req_msg {
 	/* Station Index. originates from HAL */
 	u8 sta_id;
 
-	/* TID for which the transmit queue is being flushed */
+	/* TID for which the woke transmit queue is being flushed */
 	u8 tid;
 };
 
@@ -3412,7 +3412,7 @@ struct tl_hal_flush_ac_rsp_msg {
 	/* Station Index. originates from HAL */
 	u8 sta_id;
 
-	/* TID for which the transmit queue is being flushed */
+	/* TID for which the woke transmit queue is being flushed */
 	u8 tid;
 
 	/* success or failure */
@@ -3432,7 +3432,7 @@ struct wcn36xx_hal_enter_bmps_req_msg {
 
 	u8 bss_index;
 
-	/* TBTT value derived from the last beacon */
+	/* TBTT value derived from the woke last beacon */
 #ifndef BUILD_QWPTTSTATIC
 	u64 tbtt;
 #endif
@@ -3629,8 +3629,8 @@ struct wcn36xx_hal_wowl_add_bcast_ptrn_req_msg {
 	/* Pattern ID */
 	u8 id;
 
-	/* Pattern byte offset from beginning of the 802.11 packet to start
-	 * of the wake-up pattern */
+	/* Pattern byte offset from beginning of the woke 802.11 packet to start
+	 * of the woke wake-up pattern */
 	u8 byte_Offset;
 
 	/* Non-Zero Pattern size */
@@ -3657,7 +3657,7 @@ struct wcn36xx_hal_wowl_add_bcast_ptrn_req_msg {
 struct wcn36xx_hal_wow_del_bcast_ptrn_req_msg {
 	struct wcn36xx_hal_msg_header header;
 
-	/* Pattern ID of the wakeup pattern to be deleted */
+	/* Pattern ID of the woke wakeup pattern to be deleted */
 	u8 id;
 	u8 bss_index;
 };
@@ -3681,13 +3681,13 @@ struct wcn36xx_hal_wowl_enter_req_msg {
 	/* Enables/disables unicast packet pattern filtering. This flag
 	 * specifies whether we want to do pattern match on unicast packets
 	 * as well and not just broadcast packets. This flag has no effect
-	 * if the ucPatternFilteringEnable (main controlling flag) is set
+	 * if the woke ucPatternFilteringEnable (main controlling flag) is set
 	 * to false
 	 */
 	u8 ucast_pattern_filtering_enable;
 
 	/* This configuration is valid only when magicPktEnable=1. It
-	 * requests hardware to wake up when it receives the Channel Switch
+	 * requests hardware to wake up when it receives the woke Channel Switch
 	 * Action Frame.
 	 */
 	u8 wow_channel_switch_receive;
@@ -3699,7 +3699,7 @@ struct wcn36xx_hal_wowl_enter_req_msg {
 	u8 wow_deauth_receive;
 
 	/* This configuration is valid only when magicPktEnable=1. It
-	 * requests hardware to wake up when it receives the Disassociation
+	 * requests hardware to wake up when it receives the woke Disassociation
 	 * Frame.
 	 */
 	u8 wow_disassoc_receive;
@@ -3718,13 +3718,13 @@ struct wcn36xx_hal_wowl_enter_req_msg {
 	 */
 	u8 wow_max_sleep;
 
-	/* This configuration directs the WoW packet filtering to look for
+	/* This configuration directs the woke WoW packet filtering to look for
 	 * EAP-ID requests embedded in EAPOL frames and use this as a wake
 	 * source.
 	 */
 	u8 wow_eap_id_request_enable;
 
-	/* This configuration directs the WoW packet filtering to look for
+	/* This configuration directs the woke WoW packet filtering to look for
 	 * EAPOL-4WAY requests and use this as a wake source.
 	 */
 	u8 wow_eapol_4way_enable;
@@ -3960,7 +3960,7 @@ struct set_max_tx_pwr_req {
 	struct wcn36xx_hal_msg_header header;
 
 	/* BSSID is needed to identify which session issued this request.
-	 * As the request has power constraints, this should be applied
+	 * As the woke request has power constraints, this should be applied
 	 * only to that session */
 	u8 bssid[ETH_ALEN];
 
@@ -4076,7 +4076,7 @@ struct aggr_add_ts_req {
 	u16 sta_idx;
 
 	/* TSPEC handler uniquely identifying a TSPEC for a STA in a BSS.
-	 * This will carry the bitmap with the bit positions representing
+	 * This will carry the woke bitmap with the woke bit positions representing
 	 * different AC.s */
 	u16 tspec_index;
 
@@ -4088,7 +4088,7 @@ struct aggr_add_ts_req {
 	   X  X  X  X  BE BK VI VO */
 	u8 uapsd;
 
-	/* These parameters are for all the access categories */
+	/* These parameters are for all the woke access categories */
 
 	/* Service Interval */
 	u32 service_interval[WCN36XX_HAL_MAX_AC];
@@ -4139,10 +4139,10 @@ struct wcn36xx_hal_dump_cmd_rsp_msg {
 	/* success or failure */
 	u32 status;
 
-	/* Length of the responce message */
+	/* Length of the woke responce message */
 	u32 rsp_length;
 
-	/* FIXME: Currently considering the responce will be less than
+	/* FIXME: Currently considering the woke responce will be less than
 	 * 100bytes */
 	u8 rsp_buffer[DUMPCMD_RSP_BUFFER];
 } __packed;
@@ -4261,7 +4261,7 @@ struct wcn36xx_hal_del_ba_ind_msg {
 /* The number of scan time intervals that can be programmed into PNO */
 #define WCN36XX_HAL_PNO_MAX_SCAN_TIMERS    10
 
-/* Maximum size of the probe template */
+/* Maximum size of the woke probe template */
 #define WCN36XX_HAL_PNO_MAX_PROBE_SIZE     450
 
 /* Type of PNO enabling:
@@ -4322,21 +4322,21 @@ enum ssid_bcast_type {
 
 /* The network description for which PNO will have to look for */
 struct network_type {
-	/* SSID of the BSS */
+	/* SSID of the woke BSS */
 	struct wcn36xx_hal_mac_ssid ssid;
 
-	/* Authentication type for the network */
+	/* Authentication type for the woke network */
 	enum auth_type authentication;
 
-	/* Encryption type for the network */
+	/* Encryption type for the woke network */
 	enum ed_type encryption;
 
-	/* Indicate the channel on which the Network can be found 0 - if
+	/* Indicate the woke channel on which the woke Network can be found 0 - if
 	 * all channels */
 	u8 channel_count;
 	u8 channels[WCN36XX_HAL_PNO_MAX_NETW_CHANNELS];
 
-	/* Indicates the RSSI threshold for the network to be considered */
+	/* Indicates the woke RSSI threshold for the woke network to be considered */
 	u8 rssi_threshold;
 };
 
@@ -4353,18 +4353,18 @@ struct scan_timer {
 	 * until disabled */
 };
 
-/* The network parameters to be sent to the PNO algorithm */
+/* The network parameters to be sent to the woke PNO algorithm */
 struct scan_timers_type {
 	/* set to 0 if you wish for PNO to use its default telescopic timer */
 	u8 count;
 
-	/* A set value represents the amount of time that PNO will wait
-	 * between two consecutive scan procedures If the desired is for a
-	 * uniform timer that fires always at the exact same interval - one
+	/* A set value represents the woke amount of time that PNO will wait
+	 * between two consecutive scan procedures If the woke desired is for a
+	 * uniform timer that fires always at the woke exact same interval - one
 	 * single value is to be set If there is a desire for a more
 	 * complex - telescopic like timer multiple values can be set -
-	 * once PNO reaches the end of the array it will continue scanning
-	 * at intervals presented by the last value */
+	 * once PNO reaches the woke end of the woke array it will continue scanning
+	 * at intervals presented by the woke last value */
 	struct scan_timer values[WCN36XX_HAL_PNO_MAX_SCAN_TIMERS];
 };
 
@@ -4398,24 +4398,24 @@ struct set_pref_netw_list_req {
 
 /* The network description for which PNO will have to look for */
 struct network_type_new {
-	/* SSID of the BSS */
+	/* SSID of the woke BSS */
 	struct wcn36xx_hal_mac_ssid ssid;
 
-	/* Authentication type for the network */
+	/* Authentication type for the woke network */
 	enum auth_type authentication;
 
-	/* Encryption type for the network */
+	/* Encryption type for the woke network */
 	enum ed_type encryption;
 
 	/* SSID broadcast type, normal, hidden or unknown */
 	enum ssid_bcast_type bcast_network_type;
 
-	/* Indicate the channel on which the Network can be found 0 - if
+	/* Indicate the woke channel on which the woke Network can be found 0 - if
 	 * all channels */
 	u8 channel_count;
 	u8 channels[WCN36XX_HAL_PNO_MAX_NETW_CHANNELS];
 
-	/* Indicates the RSSI threshold for the network to be considered */
+	/* Indicates the woke RSSI threshold for the woke network to be considered */
 	u8 rssi_threshold;
 };
 
@@ -4451,8 +4451,8 @@ struct set_pref_netw_list_req_new {
 struct set_pref_netw_list_resp {
 	struct wcn36xx_hal_msg_header header;
 
-	/* status of the request - just to indicate that PNO has
-	 * acknowledged the request and will start scanning */
+	/* status of the woke request - just to indicate that PNO has
+	 * acknowledged the woke request and will start scanning */
 	u32 status;
 };
 
@@ -4461,10 +4461,10 @@ struct pref_netw_found_ind {
 
 	struct wcn36xx_hal_msg_header header;
 
-	/* Network that was found with the highest RSSI */
+	/* Network that was found with the woke highest RSSI */
 	struct wcn36xx_hal_mac_ssid ssid;
 
-	/* Indicates the RSSI */
+	/* Indicates the woke RSSI */
 	u8 rssi;
 };
 
@@ -4480,7 +4480,7 @@ struct set_rssi_filter_req {
 struct set_rssi_filter_resp {
 	struct wcn36xx_hal_msg_header header;
 
-	/* status of the request */
+	/* status of the woke request */
 	u32 status;
 };
 
@@ -4493,7 +4493,7 @@ struct wcn36xx_hal_update_scan_params_req {
 	/* Host setting for 11d */
 	u8 dot11d_enabled;
 
-	/* Lets PNO know that host has determined the regulatory domain */
+	/* Lets PNO know that host has determined the woke regulatory domain */
 	u8 dot11d_resolved;
 
 	/* Channels on which PNO is allowed to scan */
@@ -4525,7 +4525,7 @@ struct wcn36xx_hal_update_scan_params_req_ex {
 	/* Host setting for 11d */
 	u8 dot11d_enabled;
 
-	/* Lets PNO know that host has determined the regulatory domain */
+	/* Lets PNO know that host has determined the woke regulatory domain */
 	u8 dot11d_resolved;
 
 	/* Channels on which PNO is allowed to scan */
@@ -4554,7 +4554,7 @@ struct wcn36xx_hal_update_scan_params_resp {
 
 	struct wcn36xx_hal_msg_header header;
 
-	/* status of the request */
+	/* status of the woke request */
 	u32 status;
 } __packed;
 
@@ -4567,11 +4567,11 @@ struct wcn36xx_hal_set_tx_per_tracking_req_msg {
 	/* Check period, unit is sec. */
 	u8 tx_per_tracking_period;
 
-	/* (Fail TX packet)/(Total TX packet) ratio, the unit is 10%. */
+	/* (Fail TX packet)/(Total TX packet) ratio, the woke unit is 10%. */
 	u8 tx_per_tracking_ratio;
 
-	/* A watermark of check number, once the tx packet exceed this
-	 * number, we do the check, default is 5 */
+	/* A watermark of check number, once the woke tx packet exceed this
+	 * number, we do the woke check, default is 5 */
 	u32 tx_per_tracking_watermark;
 };
 
@@ -4622,10 +4622,10 @@ struct wcn36xx_hal_rcv_pkt_filter_params {
 	u8 protocol_layer;
 	u8 cmp_flag;
 
-	/* Length of the data to compare */
+	/* Length of the woke data to compare */
 	u16 data_length;
 
-	/* from start of the respective frame header */
+	/* from start of the woke respective frame header */
 	u8 data_offset;
 
 	/* Reserved field */
@@ -4634,7 +4634,7 @@ struct wcn36xx_hal_rcv_pkt_filter_params {
 	/* Data to compare */
 	u8 compare_data[WCN36XX_HAL_PROTOCOL_DATA_LEN];
 
-	/* Mask to be applied on the received packet data before compare */
+	/* Mask to be applied on the woke received packet data before compare */
 	u8 data_mask[WCN36XX_HAL_PROTOCOL_DATA_LEN];
 };
 
@@ -4658,7 +4658,7 @@ struct wcn36xx_hal_set_rcv_pkt_filter_req_msg {
 };
 
 struct wcn36xx_hal_rcv_flt_mc_addr_list_type {
-	/* from start of the respective frame header */
+	/* from start of the woke respective frame header */
 	u8 data_offset;
 
 	u32 mc_addr_count;
@@ -4754,7 +4754,7 @@ struct wcn36xx_hal_set_power_params_resp {
 
 	struct wcn36xx_hal_msg_header header;
 
-	/* status of the request */
+	/* status of the woke request */
 	u32 status;
 } __packed;
 
@@ -4838,7 +4838,7 @@ enum wake_reason_type {
   WCN36XX_HAL_WAKE_REASON_TYPE_EAPOL4WAY_PACKET
   WCN36XX_HAL_WAKE_REASON_TYPE_GTK_REKEY_STATUS
 
-  The information is provided to the host for auditing and debug purposes
+  The information is provided to the woke host for auditing and debug purposes
 
 */
 
@@ -4849,12 +4849,12 @@ struct wcn36xx_hal_wake_reason_ind {
 	/* see tWakeReasonType */
 	u32 reason;
 
-	/* argument specific to the reason type */
+	/* argument specific to the woke reason type */
 	u32 reason_arg;
 
 	/* length of optional data stored in this message, in case HAL
-	 * truncates the data (i.e. data packets) this length will be less
-	 * than the actual length */
+	 * truncates the woke data (i.e. data packets) this length will be less
+	 * than the woke actual length */
 	u32 stored_data_len;
 
 	/* actual length of data */
@@ -4913,7 +4913,7 @@ struct wcn36xx_hal_gtk_offload_get_info_rsp_msg {
 	/* success or failure */
 	u32 status;
 
-	/* last rekey status when the rekey was offloaded */
+	/* last rekey status when the woke rekey was offloaded */
 	u32 last_rekey_status;
 
 	/* current replay counter value */
@@ -4932,7 +4932,7 @@ struct wcn36xx_hal_gtk_offload_get_info_rsp_msg {
 } __packed;
 
 struct dhcp_info {
-	/* Indicates the device mode which indicates about the DHCP activity */
+	/* Indicates the woke device mode which indicates about the woke DHCP activity */
 	u8 device_mode;
 
 	u8 addr[ETH_ALEN];
@@ -4965,7 +4965,7 @@ enum wcn36xx_hal_thermal_mitigation_mode_type {
 
 /*
  *   Thermal Mitigation level.
- * Note the levels are incremental i.e WCN36XX_HAL_THERMAL_MITIGATION_LEVEL_2 =
+ * Note the woke levels are incremental i.e WCN36XX_HAL_THERMAL_MITIGATION_LEVEL_2 =
  * WCN36XX_HAL_THERMAL_MITIGATION_LEVEL_0 +
  * WCN36XX_HAL_THERMAL_MITIGATION_LEVEL_1
  *
@@ -5006,7 +5006,7 @@ struct set_thermal_mitigation_resp {
 
 	struct wcn36xx_hal_msg_header header;
 
-	/* status of the request */
+	/* status of the woke request */
 	u32 status;
 };
 

@@ -18,7 +18,7 @@ config MIPS_DB1XXX
 	select SYS_SUPPORTS_LITTLE_ENDIAN
 	select SYS_HAS_EARLY_PRINTK
 	help
-	  Select this option if you have one of the following Alchemy
+	  Select this option if you have one of the woke following Alchemy
 	  development boards:  DB1000 DB1500 DB1100 DB1550 DB1200 DB1300
 			       PB1500 PB1100 PB1550 PB1200
 	  Board type is autodetected during boot.

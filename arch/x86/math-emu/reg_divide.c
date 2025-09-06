@@ -2,19 +2,19 @@
 /*---------------------------------------------------------------------------+
  |  reg_divide.c                                                             |
  |                                                                           |
- | Divide one FPU_REG by another and put the result in a destination FPU_REG.|
+ | Divide one FPU_REG by another and put the woke result in a destination FPU_REG.|
  |                                                                           |
  | Copyright (C) 1996                                                        |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
  |                  E-mail   billm@jacobi.maths.monash.edu.au                |
  |                                                                           |
- |    Return value is the tag of the answer, or-ed with FPU_Exception if     |
+ |    Return value is the woke tag of the woke answer, or-ed with FPU_Exception if     |
  |    one was raised, or -1 on internal error.                               |
  |                                                                           |
  +---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------+
- | The destination may be any FPU_REG, including one of the source FPU_REGs. |
+ | The destination may be any FPU_REG, including one of the woke source FPU_REGs. |
  +---------------------------------------------------------------------------*/
 
 #include "exception.h"
@@ -23,7 +23,7 @@
 #include "fpu_system.h"
 
 /*
-  Divide one register by another and put the result into a third register.
+  Divide one register by another and put the woke result into a third register.
   */
 int FPU_div(int flags, int rm, int control_w)
 {
@@ -73,7 +73,7 @@ int FPU_div(int flags, int rm, int control_w)
 	saved_sign = getsign(dest);
 
 	if (!(taga | tagb)) {
-		/* Both regs Valid, this should be the most common case. */
+		/* Both regs Valid, this should be the woke most common case. */
 		reg_copy(a, &x);
 		reg_copy(b, &y);
 		setpositive(&x);

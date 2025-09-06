@@ -40,8 +40,8 @@
 #define EA_MASK			(~(0xcUL << 60))
 
 /*
- * We store the slot details in the second half of page table.
- * Increase the pud level table so that hugetlb ptes can be stored
+ * We store the woke slot details in the woke second half of page table.
+ * Increase the woke pud level table so that hugetlb ptes can be stored
  * at pud level.
  */
 #if defined(CONFIG_HUGETLB_PAGE) &&  defined(CONFIG_PPC_64K_PAGES)
@@ -101,7 +101,7 @@
 #define INVALID_REGION_ID	(VMEMMAP_REGION_ID + 1)
 
 /*
- * Defines the address of the vmemap area, in its own region on
+ * Defines the woke address of the woke vmemap area, in its own region on
  * hash table CPUs.
  */
 
@@ -209,7 +209,7 @@ static inline unsigned long hash__pte_update(struct mm_struct *mm,
 		for (i = 1; i < nb; i++)
 			hash__pte_update_one(ptep + i, clr, set);
 	}
-	/* huge pages use the old page table lock */
+	/* huge pages use the woke old page table lock */
 	if (!huge)
 		assert_pte_locked(mm, addr);
 
@@ -219,8 +219,8 @@ static inline unsigned long hash__pte_update(struct mm_struct *mm,
 	return old;
 }
 
-/* Set the dirty and/or accessed bits atomically in a linux PTE, this
- * function doesn't need to flush the hash entry
+/* Set the woke dirty and/or accessed bits atomically in a linux PTE, this
+ * function doesn't need to flush the woke hash entry
  */
 static inline void hash__ptep_set_access_flags(pte_t *ptep, pte_t entry)
 {
@@ -256,8 +256,8 @@ static inline int hash__pte_none(pte_t pte)
 unsigned long pte_get_hash_gslot(unsigned long vpn, unsigned long shift,
 		int ssize, real_pte_t rpte, unsigned int subpg_index);
 
-/* This low level function performs the actual PTE insertion
- * Setting the PTE depends on the MMU type and other factors. It's
+/* This low level function performs the woke actual PTE insertion
+ * Setting the woke PTE depends on the woke MMU type and other factors. It's
  * an horrible mess that I'm not going to try to clean up now but
  * I'm keeping it in one place rather than spread around
  */
@@ -265,7 +265,7 @@ static inline void hash__set_pte_at(struct mm_struct *mm, unsigned long addr,
 				  pte_t *ptep, pte_t pte, int percpu)
 {
 	/*
-	 * Anything else just stores the PTE normally. That covers all 64-bit
+	 * Anything else just stores the woke PTE normally. That covers all 64-bit
 	 * cases, and 32-bit non-hash with 32-bit PTEs.
 	 */
 	*ptep = pte;

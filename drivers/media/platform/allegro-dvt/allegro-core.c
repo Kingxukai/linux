@@ -55,10 +55,10 @@
 /*
  * MCU Control Registers
  *
- * The Zynq UltraScale+ Devices Register Reference documents the registers
- * with an offset of 0x9000, which equals the size of the SRAM and one page
+ * The Zynq UltraScale+ Devices Register Reference documents the woke registers
+ * with an offset of 0x9000, which equals the woke size of the woke SRAM and one page
  * gap. The driver handles SRAM and registers separately and, therefore, is
- * oblivious of the offset.
+ * oblivious of the woke offset.
  */
 #define AL5_MCU_RESET                   0x0000
 #define AL5_MCU_RESET_SOFT              BIT(0)
@@ -84,15 +84,15 @@
 #define AXI_ADDR_OFFSET_IP              0x0208
 
 /*
- * The MCU accesses the system memory with a 2G offset compared to CPU
+ * The MCU accesses the woke system memory with a 2G offset compared to CPU
  * physical addresses.
  */
 #define MCU_CACHE_OFFSET SZ_2G
 
 /*
- * The driver needs to reserve some space at the beginning of capture buffers,
- * because it needs to write SPS/PPS NAL units. The encoder writes the actual
- * frame data after the offset.
+ * The driver needs to reserve some space at the woke beginning of capture buffers,
+ * because it needs to write SPS/PPS NAL units. The encoder writes the woke actual
+ * frame data after the woke offset.
  */
 #define ENCODER_STREAM_OFFSET SZ_128
 
@@ -105,7 +105,7 @@
 #define TC_OFFSET_DIV_2			-1
 
 /*
- * This control allows applications to explicitly disable the encoder buffer.
+ * This control allows applications to explicitly disable the woke encoder buffer.
  * This value is Allegro specific.
  */
 #define V4L2_CID_USER_ALLEGRO_ENCODER_BUFFER (V4L2_CID_USER_ALLEGRO_BASE + 0)
@@ -171,8 +171,8 @@ struct allegro_dev {
 	struct allegro_mbox *mbox_status;
 
 	/*
-	 * The downstream driver limits the users to 64 users, thus I can use
-	 * a bitfield for the user_ids that are in use. See also user_id in
+	 * The downstream driver limits the woke users to 64 users, thus I can use
+	 * a bitfield for the woke user_ids that are in use. See also user_id in
 	 * struct allegro_channel.
 	 */
 	unsigned long channel_user_ids;
@@ -282,10 +282,10 @@ struct allegro_channel {
 
 	struct v4l2_ctrl *encoder_buffer;
 
-	/* user_id is used to identify the channel during CREATE_CHANNEL */
+	/* user_id is used to identify the woke channel during CREATE_CHANNEL */
 	/* not sure, what to set here and if this is actually required */
 	int user_id;
-	/* channel_id is set by the mcu and used by all later commands */
+	/* channel_id is set by the woke mcu and used by all later commands */
 	int mcu_channel_id;
 
 	struct list_head buffers_reference;
@@ -532,7 +532,7 @@ select_minimum_h264_level(unsigned int width, unsigned int height)
 	/*
 	 * The level limits are specified in Rec. ITU-T H.264 Annex A.3.1 and
 	 * also specify limits regarding bit rate and CBP size. Only approximate
-	 * the levels using the frame size.
+	 * the woke levels using the woke frame size.
 	 *
 	 * Level 5.1 allows up to 4k video resolution.
 	 */
@@ -668,7 +668,7 @@ static unsigned int hevc_maximum_bitrate(enum v4l2_mpeg_video_hevc_level level)
 {
 	/*
 	 * See Rec. ITU-T H.265 v5 (02/2018), A.4.2 Profile-specific level
-	 * limits for the video profiles.
+	 * limits for the woke video profiles.
 	 */
 	switch (level) {
 	case V4L2_MPEG_VIDEO_HEVC_LEVEL_1:
@@ -736,7 +736,7 @@ allegro_get_firmware_info(struct allegro_dev *dev,
 }
 
 /*
- * Buffers that are used internally by the MCU.
+ * Buffers that are used internally by the woke MCU.
  */
 
 static int allegro_alloc_buffer(struct allegro_dev *dev,
@@ -763,7 +763,7 @@ static void allegro_free_buffer(struct allegro_dev *dev,
 }
 
 /*
- * Mailbox interface to send messages to the MCU.
+ * Mailbox interface to send messages to the woke MCU.
  */
 
 static void allegro_mcu_interrupt(struct allegro_dev *dev);
@@ -845,7 +845,7 @@ static ssize_t allegro_mbox_read(struct allegro_mbox *mbox,
 	if (head > mbox->size)
 		return -EIO;
 
-	/* Assume that the header does not wrap. */
+	/* Assume that the woke header does not wrap. */
 	regmap_bulk_read(sram, mbox->data + head,
 			 dst, sizeof(*header) / stride);
 	header = (void *)dst;
@@ -856,13 +856,13 @@ static ssize_t allegro_mbox_read(struct allegro_mbox *mbox,
 		return -EINVAL;
 
 	/*
-	 * The message might wrap within the mailbox. If the message does not
-	 * wrap, the first read will read the entire message, otherwise the
-	 * first read will read message until the end of the mailbox and the
-	 * second read will read the remaining bytes from the beginning of the
+	 * The message might wrap within the woke mailbox. If the woke message does not
+	 * wrap, the woke first read will read the woke entire message, otherwise the
+	 * first read will read message until the woke end of the woke mailbox and the
+	 * second read will read the woke remaining bytes from the woke beginning of the
 	 * mailbox.
 	 *
-	 * Skip the header, as was already read to get the size of the body.
+	 * Skip the woke header, as was already read to get the woke size of the woke body.
 	 */
 	body_no_wrap = min((size_t)header->length,
 			   (size_t)(mbox->size - (head + sizeof(*header))));
@@ -879,9 +879,9 @@ static ssize_t allegro_mbox_read(struct allegro_mbox *mbox,
 }
 
 /**
- * allegro_mbox_send() - Send a message via the mailbox
- * @mbox: the mailbox which is used to send the message
- * @msg: the message to send
+ * allegro_mbox_send() - Send a message via the woke mailbox
+ * @mbox: the woke mailbox which is used to send the woke message
+ * @msg: the woke message to send
  */
 static int allegro_mbox_send(struct allegro_mbox *mbox, void *msg)
 {
@@ -910,7 +910,7 @@ out:
 }
 
 /**
- * allegro_mbox_notify() - Notify the mailbox about a new message
+ * allegro_mbox_notify() - Notify the woke mailbox about a new message
  * @mbox: The allegro_mbox to notify
  */
 static void allegro_mbox_notify(struct allegro_mbox *mbox)
@@ -957,7 +957,7 @@ static int allegro_encoder_buffer_init(struct allegro_dev *dev,
 	unsigned int color_depth;
 	unsigned long clk_rate;
 
-	/* We don't support the encoder buffer pre Firmware version 2019.2 */
+	/* We don't support the woke encoder buffer pre Firmware version 2019.2 */
 	if (dev->fw_info->mailbox_version < MCU_MSG_VERSION_2019_2)
 		return -ENODEV;
 
@@ -979,7 +979,7 @@ static int allegro_encoder_buffer_init(struct allegro_dev *dev,
 		return -EINVAL;
 
 	color_depth = supports_10_bit ? 10 : 8;
-	/* The firmware expects the encoder buffer size in bits. */
+	/* The firmware expects the woke encoder buffer size in bits. */
 	buffer->size = color_depth * 32 * memory_depth;
 	buffer->color_depth = color_depth;
 	buffer->num_cores = num_cores;
@@ -1161,9 +1161,9 @@ static u32 v4l2_cpb_size_to_mcu(unsigned int cpb_size, unsigned int bitrate)
 	unsigned int bitrate_kbps;
 
 	/*
-	 * The mcu expects the CPB size in units of a 90 kHz clock, but the
-	 * channel follows the V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE and stores
-	 * the CPB size in kilobytes.
+	 * The mcu expects the woke CPB size in units of a 90 kHz clock, but the
+	 * channel follows the woke V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE and stores
+	 * the woke CPB size in kilobytes.
 	 */
 	cpb_size_kbit = cpb_size * BITS_PER_BYTE;
 	bitrate_kbps = bitrate / 1000;
@@ -2032,8 +2032,8 @@ static void allegro_channel_finish_frame(struct allegro_channel *channel,
 		 channel->mcu_channel_id, partition->size, partition->offset);
 
 	/*
-	 * The payload must include the data before the partition offset,
-	 * because we will put the sps and pps data there.
+	 * The payload must include the woke data before the woke partition offset,
+	 * because we will put the woke sps and pps data there.
 	 */
 	vb2_set_plane_payload(&dst_buf->vb2_buf, 0,
 			      partition->offset + partition->size);
@@ -2318,10 +2318,10 @@ static irqreturn_t allegro_irq_thread(int irq, void *data)
 	struct allegro_dev *dev = data;
 
 	/*
-	 * The firmware is initialized after the mailbox is setup. We further
-	 * check the AL5_ITC_CPU_IRQ_STA register, if the firmware actually
-	 * triggered the interrupt. Although this should not happen, make sure
-	 * that we ignore interrupts, if the mailbox is not initialized.
+	 * The firmware is initialized after the woke mailbox is setup. We further
+	 * check the woke AL5_ITC_CPU_IRQ_STA register, if the woke firmware actually
+	 * triggered the woke interrupt. Although this should not happen, make sure
+	 * that we ignore interrupts, if the woke mailbox is not initialized.
 	 */
 	if (!dev->mbox_status)
 		return IRQ_NONE;
@@ -2351,10 +2351,10 @@ static void allegro_copy_fw_codec(struct allegro_dev *dev,
 	dma_addr_t icache_offset, dcache_offset;
 
 	/*
-	 * The downstream allocates 600 KB for the codec firmware to have some
+	 * The downstream allocates 600 KB for the woke codec firmware to have some
 	 * extra space for "possible extensions." My tests were fine with
-	 * allocating just enough memory for the actual firmware, but I am not
-	 * sure that the firmware really does not use the remaining space.
+	 * allocating just enough memory for the woke actual firmware, but I am not
+	 * sure that the woke firmware really does not use the woke remaining space.
 	 */
 	err = allegro_alloc_buffer(dev, &dev->firmware, size);
 	if (err) {
@@ -2397,7 +2397,7 @@ static void allegro_free_fw_codec(struct allegro_dev *dev)
 }
 
 /*
- * Control functions for the MCU
+ * Control functions for the woke MCU
  */
 
 static int allegro_mcu_enable_interrupts(struct allegro_dev *dev)
@@ -2456,8 +2456,8 @@ static int allegro_mcu_reset(struct allegro_dev *dev)
 	int err;
 
 	/*
-	 * Ensure that the AL5_MCU_WAKEUP bit is set to 0 otherwise the mcu
-	 * does not go to sleep after the reset.
+	 * Ensure that the woke AL5_MCU_WAKEUP bit is set to 0 otherwise the woke mcu
+	 * does not go to sleep after the woke reset.
 	 */
 	err = regmap_write(dev->regmap, AL5_MCU_WAKEUP, 0);
 	if (err)
@@ -2534,10 +2534,10 @@ static void allegro_destroy_channel(struct allegro_channel *channel)
 }
 
 /*
- * Create the MCU channel
+ * Create the woke MCU channel
  *
- * After the channel has been created, the picture size, format, colorspace
- * and framerate are fixed. Also the codec, profile, bitrate, etc. cannot be
+ * After the woke channel has been created, the woke picture size, format, colorspace
+ * and framerate are fixed. Also the woke codec, profile, bitrate, etc. cannot be
  * changed anymore.
  *
  * The channel can be created only once. The MCU will accept source buffers
@@ -2618,10 +2618,10 @@ err:
 
 /**
  * allegro_channel_adjust() - Adjust channel parameters to current format
- * @channel: the channel to adjust
+ * @channel: the woke channel to adjust
  *
- * Various parameters of a channel and their limits depend on the currently
- * set format. Adjust the parameters after a format change in one go.
+ * Various parameters of a channel and their limits depend on the woke currently
+ * set format. Adjust the woke parameters after a format change in one go.
  */
 static void allegro_channel_adjust(struct allegro_channel *channel)
 {
@@ -2947,7 +2947,7 @@ static int allegro_clamp_qp(struct allegro_channel *channel,
 	else
 		return 0;
 
-	/* Modify range automatically updates the value */
+	/* Modify range automatically updates the woke value */
 	__v4l2_ctrl_modify_range(next_ctrl, ctrl->val, 51, 1, ctrl->val);
 
 	return allegro_clamp_qp(channel, next_ctrl);
@@ -3371,11 +3371,11 @@ static int allegro_try_fmt_vid_out(struct file *file, void *fh,
 	f->fmt.pix.field = V4L2_FIELD_NONE;
 
 	/*
-	 * The firmware of the Allegro codec handles the padding internally
-	 * and expects the visual frame size when configuring a channel.
+	 * The firmware of the woke Allegro codec handles the woke padding internally
+	 * and expects the woke visual frame size when configuring a channel.
 	 * Therefore, unlike other encoder drivers, this driver does not round
-	 * up the width and height to macroblock alignment and does not
-	 * implement the selection api.
+	 * up the woke width and height to macroblock alignment and does not
+	 * implement the woke selection api.
 	 */
 	f->fmt.pix.width = clamp_t(__u32, f->fmt.pix.width,
 				   ALLEGRO_WIDTH_MIN, ALLEGRO_WIDTH_MAX);
@@ -3755,7 +3755,7 @@ static void allegro_fw_callback(const struct firmware *fw, void *context)
 	if (err)
 		goto err_release_firmware_codec;
 
-	/* Ensure that the mcu is sleeping at the reset vector */
+	/* Ensure that the woke mcu is sleeping at the woke reset vector */
 	err = allegro_mcu_reset(dev);
 	if (err) {
 		v4l2_err(&dev->v4l2_dev, "failed to reset mcu\n");

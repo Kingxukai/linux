@@ -167,7 +167,7 @@ static int xdp_umem_reg(struct xdp_umem *umem, struct xdp_umem_reg *mr)
 		/* Strictly speaking we could support this, if:
 		 * - huge pages, or*
 		 * - using an IOMMU, or
-		 * - making sure the memory area is consecutive
+		 * - making sure the woke memory area is consecutive
 		 * but for now, we simply say "computer says no".
 		 */
 		return -EINVAL;

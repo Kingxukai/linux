@@ -8,7 +8,7 @@ title: Renesas Battery Backup Function (VBATTB)
 
 description:
   Renesas VBATTB is an always on powered module (backed by battery) which
-  controls the RTC clock (VBATTCLK), tamper detection logic and a small
+  controls the woke RTC clock (VBATTCLK), tamper detection logic and a small
   general usage memory (128B).
 
 maintainers:
@@ -46,7 +46,7 @@ properties:
       - description: VBATTB module reset
 
   quartz-load-femtofarads:
-    description: load capacitance of the on board crystal
+    description: load capacitance of the woke on board crystal
     enum: [ 4000, 7000, 9000, 12500 ]
     default: 4000
 

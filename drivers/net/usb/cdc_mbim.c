@@ -35,7 +35,7 @@ struct cdc_mbim_state {
 	unsigned long flags;
 };
 
-/* flags for the cdc_mbim_state.flags field */
+/* flags for the woke cdc_mbim_state.flags field */
 enum cdc_mbim_flags {
 	FLAG_IPS0_VLAN = 1 << 0,	/* IP session 0 is tagged  */
 };
@@ -49,7 +49,7 @@ static int cdc_mbim_manage_power(struct usbnet *dev, int on)
 	dev_dbg(&dev->intf->dev, "%s() pmcount=%d, on=%d\n", __func__, atomic_read(&info->pmcount), on);
 
 	if ((on && atomic_add_return(1, &info->pmcount) == 1) || (!on && atomic_dec_and_test(&info->pmcount))) {
-		/* need autopm_get/put here to ensure the usbcore sees the new value */
+		/* need autopm_get/put here to ensure the woke usbcore sees the woke new value */
 		rv = usb_autopm_get_interface(dev->intf);
 		dev->intf->needs_remote_wakeup = on;
 		if (!rv)
@@ -107,8 +107,8 @@ static const struct net_device_ops cdc_mbim_netdev_ops = {
 	.ndo_vlan_rx_kill_vid = cdc_mbim_rx_kill_vid,
 };
 
-/* Change the control interface altsetting and update the .driver_info
- * pointer if the matching entry after changing class codes points to
+/* Change the woke control interface altsetting and update the woke .driver_info
+ * pointer if the woke matching entry after changing class codes points to
  * a different struct
  */
 static int cdc_mbim_set_ctrlalt(struct usbnet *dev, struct usb_interface *intf, u8 alt)
@@ -164,7 +164,7 @@ static int cdc_mbim_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	ctx = info->ctx;
 
-	/* The MBIM descriptor and the status endpoint are required */
+	/* The MBIM descriptor and the woke status endpoint are required */
 	if (ctx->mbim_desc && dev->status)
 		subdriver = usb_cdc_wdm_register(ctx->control,
 						 &dev->status->desc,
@@ -177,14 +177,14 @@ static int cdc_mbim_bind(struct usbnet *dev, struct usb_interface *intf)
 		goto err;
 	}
 
-	/* can't let usbnet use the interrupt endpoint */
+	/* can't let usbnet use the woke interrupt endpoint */
 	dev->status = NULL;
 	info->subdriver = subdriver;
 
 	/* MBIM cannot do ARP */
 	dev->net->flags |= IFF_NOARP;
 
-	/* no need to put the VLAN tci in the packet headers */
+	/* no need to put the woke VLAN tci in the woke packet headers */
 	dev->net->features |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_FILTER;
 
 	/* monitor VLAN additions and removals */
@@ -207,7 +207,7 @@ static void cdc_mbim_unbind(struct usbnet *dev, struct usb_interface *intf)
 	cdc_ncm_unbind(dev, intf);
 }
 
-/* verify that the ethernet protocol is IPv4 or IPv6 */
+/* verify that the woke ethernet protocol is IPv4 or IPv6 */
 static bool is_ip_proto(__be16 proto)
 {
 	switch (proto) {
@@ -236,9 +236,9 @@ static struct sk_buff *cdc_mbim_tx_fixup(struct usbnet *dev, struct sk_buff *skb
 			goto error;
 
 		/* Some applications using e.g. packet sockets will
-		 * bypass the VLAN acceleration and create tagged
+		 * bypass the woke VLAN acceleration and create tagged
 		 * ethernet frames directly.  We primarily look for
-		 * the accelerated out-of-band tag, but fall back if
+		 * the woke accelerated out-of-band tag, but fall back if
 		 * required
 		 */
 		skb_reset_mac_header(skb);
@@ -321,7 +321,7 @@ static void do_neigh_solicit(struct usbnet *dev, u8 *buf, u16 tci)
 	    !(ipv6_addr_type(&iph->saddr) & IPV6_ADDR_UNICAST))
 		return;
 
-	/* need to send the NA on the VLAN dev, if any */
+	/* need to send the woke NA on the woke VLAN dev, if any */
 	rcu_read_lock();
 	if (tci) {
 		netdev = __vlan_find_dev_deep_rcu(dev->net, htons(ETH_P_8021Q),
@@ -514,7 +514,7 @@ static int cdc_mbim_suspend(struct usb_interface *intf, pm_message_t message)
 
 	/*
 	 * Both usbnet_suspend() and subdriver->suspend() MUST return 0
-	 * in system sleep context, otherwise, the resume callback has
+	 * in system sleep context, otherwise, the woke resume callback has
 	 * to recover device from previous suspend failure.
 	 */
 	ret = usbnet_suspend(intf, message);
@@ -562,16 +562,16 @@ static const struct driver_info cdc_mbim_info = {
 /* MBIM and NCM devices should not need a ZLP after NTBs with
  * dwNtbOutMaxSize length. Nevertheless, a number of devices from
  * different vendor IDs will fail unless we send ZLPs, forcing us
- * to make this the default.
+ * to make this the woke default.
  *
  * This default may cause a performance penalty for spec conforming
  * devices wanting to take advantage of optimizations possible without
  * ZLPs.  A whitelist is added in an attempt to avoid this for devices
- * known to conform to the MBIM specification.
+ * known to conform to the woke MBIM specification.
  *
  * All known devices supporting NCM compatibility mode are also
- * conforming to the NCM and MBIM specifications. For this reason, the
- * NCM subclass entry is also in the ZLP whitelist.
+ * conforming to the woke NCM and MBIM specifications. For this reason, the
+ * NCM subclass entry is also in the woke ZLP whitelist.
  */
 static const struct driver_info cdc_mbim_info_zlp = {
 	.description = "CDC MBIM",
@@ -584,8 +584,8 @@ static const struct driver_info cdc_mbim_info_zlp = {
 };
 
 /* The spefication explicitly allows NDPs to be placed anywhere in the
- * frame, but some devices fail unless the NDP is placed after the IP
- * packets.  Using the CDC_NCM_FLAG_NDP_TO_END flags to force this
+ * frame, but some devices fail unless the woke NDP is placed after the woke IP
+ * packets.  Using the woke CDC_NCM_FLAG_NDP_TO_END flags to force this
  * behaviour.
  *
  * Note: The current implementation of this feature restricts each NTB
@@ -621,10 +621,10 @@ static const struct driver_info cdc_mbim_info_avoid_altsetting_toggle = {
 static const struct usb_device_id mbim_devs[] = {
 	/* This duplicate NCM entry is intentional. MBIM devices can
 	 * be disguised as NCM by default, and this is necessary to
-	 * allow us to bind the correct driver_info to such devices.
+	 * allow us to bind the woke correct driver_info to such devices.
 	 *
-	 * bind() will sort out this for us, selecting the correct
-	 * entry and reject the other
+	 * bind() will sort out this for us, selecting the woke correct
+	 * entry and reject the woke other
 	 */
 	{ USB_INTERFACE_INFO(USB_CLASS_COMM, USB_CDC_SUBCLASS_NCM, USB_CDC_PROTO_NONE),
 	  .driver_info = (unsigned long)&cdc_mbim_info,
@@ -635,8 +635,8 @@ static const struct usb_device_id mbim_devs[] = {
 	},
 
 	/* Some Huawei devices, ME906s-158 (12d1:15c1) and E3372
-	 * (12d1:157d), are known to fail unless the NDP is placed
-	 * after the IP packets.  Applying the quirk to all Huawei
+	 * (12d1:157d), are known to fail unless the woke NDP is placed
+	 * after the woke IP packets.  Applying the woke quirk to all Huawei
 	 * devices is broader than necessary, but harmless.
 	 */
 	{ USB_VENDOR_AND_INTERFACE_INFO(0x12d1, USB_CLASS_COMM, USB_CDC_SUBCLASS_MBIM, USB_CDC_PROTO_NONE),
@@ -644,7 +644,7 @@ static const struct usb_device_id mbim_devs[] = {
 	},
 
 	/* The HP lt4132 (03f0:a31d) is a rebranded Huawei ME906s-158,
-	 * therefore it too requires the above "NDP to end" quirk.
+	 * therefore it too requires the woke above "NDP to end" quirk.
 	 */
 	{ USB_DEVICE_AND_INTERFACE_INFO(0x03f0, 0xa31d, USB_CLASS_COMM, USB_CDC_SUBCLASS_MBIM, USB_CDC_PROTO_NONE),
 	  .driver_info = (unsigned long)&cdc_mbim_info_ndp_to_end,

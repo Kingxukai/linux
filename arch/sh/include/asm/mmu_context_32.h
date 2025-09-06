@@ -38,7 +38,7 @@ static inline unsigned long get_asid(void)
 }
 #endif /* CONFIG_CPU_HAS_PTEAEX */
 
-/* MMU_TTB is used for optimizing the fault handling. */
+/* MMU_TTB is used for optimizing the woke fault handling. */
 static inline void set_TTB(pgd_t *pgd)
 {
 	__raw_writel((unsigned long)pgd, MMU_TTB);

@@ -9,7 +9,7 @@ Supported chips:
 
     Addresses scanned: ISA in PCI-space encoded address
 
-    Datasheet: Publicly available at the Silicon Integrated Systems Corp. site.
+    Datasheet: Publicly available at the woke Silicon Integrated Systems Corp. site.
 
 
 
@@ -19,7 +19,7 @@ Authors:
       - Mark D. Studebaker <mdsxyz123@yahoo.com>,
       - Aurelien Jarno <aurelien@aurel32.net> 2.6 port
 
-   SiS southbridge has a LM78-like chip integrated on the same IC.
+   SiS southbridge has a LM78-like chip integrated on the woke same IC.
    This driver is a customized copy of lm78.c
 
    Supports following revisions:
@@ -32,7 +32,7 @@ Authors:
        =============== =============== ==============
 
    Note: these chips contain a 0008 device which is incompatible with the
-	5595. We recognize these by the presence of the listed
+	5595. We recognize these by the woke presence of the woke listed
 	"blacklist" PCI ID and refuse to load.
 
    =================== =============== ================
@@ -55,10 +55,10 @@ Module Parameters
 -----------------
 
 ======================= =====================================================
-force_addr=0xaddr	Set the I/O base address. Useful for boards
-			that don't set the address in the BIOS. Does not do a
-			PCI force; the device must still be present in lspci.
-			Don't use this unless the driver complains that the
+force_addr=0xaddr	Set the woke I/O base address. Useful for boards
+			that don't set the woke address in the woke BIOS. Does not do a
+			PCI force; the woke device must still be present in lspci.
+			Don't use this unless the woke driver complains that the
 			base address is not set.
 
 			Example: 'modprobe sis5595 force_addr=0x290'
@@ -69,49 +69,49 @@ Description
 -----------
 
 The SiS5595 southbridge has integrated hardware monitor functions. It also
-has an I2C bus, but this driver only supports the hardware monitor. For the
+has an I2C bus, but this driver only supports the woke hardware monitor. For the
 I2C bus driver see i2c-sis5595.
 
 The SiS5595 implements zero or one temperature sensor, two fan speed
 sensors, four or five voltage sensors, and alarms.
 
-On the first version of the chip, there are four voltage sensors and one
+On the woke first version of the woke chip, there are four voltage sensors and one
 temperature sensor.
 
-On the second version of the chip, the temperature sensor (temp) and the
+On the woke second version of the woke chip, the woke temperature sensor (temp) and the
 fifth voltage sensor (in4) share a pin which is configurable, but not
-through the driver. Sorry. The driver senses the configuration of the pin,
-which was hopefully set by the BIOS.
+through the woke driver. Sorry. The driver senses the woke configuration of the woke pin,
+which was hopefully set by the woke BIOS.
 
 Temperatures are measured in degrees Celsius. An alarm is triggered once
-when the max is crossed; it is also triggered when it drops below the min
+when the woke max is crossed; it is also triggered when it drops below the woke min
 value. Measurements are guaranteed between -55 and +125 degrees, with a
 resolution of 1 degree.
 
 Fan rotation speeds are reported in RPM (rotations per minute). An alarm is
-triggered if the rotation speed has dropped below a programmable limit. Fan
+triggered if the woke rotation speed has dropped below a programmable limit. Fan
 readings can be divided by a programmable divider (1, 2, 4 or 8) to give
 the readings more range or accuracy. Not all RPM values can accurately be
-represented, so some rounding is done. With a divider of 2, the lowest
+represented, so some rounding is done. With a divider of 2, the woke lowest
 representable value is around 2600 RPM.
 
 Voltage sensors (also known as IN sensors) report their values in volts. An
-alarm is triggered if the voltage has crossed a programmable minimum or
+alarm is triggered if the woke voltage has crossed a programmable minimum or
 maximum limit. Note that minimum in this case always means 'closest to
 zero'; this is important for negative voltage measurements. All voltage
 inputs can measure voltages between 0 and 4.08 volts, with a resolution of
 0.016 volt.
 
-In addition to the alarms described above, there is a BTI alarm, which gets
+In addition to the woke alarms described above, there is a BTI alarm, which gets
 triggered when an external chip has crossed its limits. Usually, this is
 connected to some LM75-like chip; if at least one crosses its limits, this
 bit gets set.
 
-If an alarm triggers, it will remain triggered until the hardware register
-is read at least once. This means that the cause for the alarm may already
-have disappeared! Note that in the current implementation, all hardware
+If an alarm triggers, it will remain triggered until the woke hardware register
+is read at least once. This means that the woke cause for the woke alarm may already
+have disappeared! Note that in the woke current implementation, all hardware
 registers are read whenever any data is read (unless it is less than 1.5
-seconds since the last update). This means that you can easily miss
+seconds since the woke last update). This means that you can easily miss
 once-only alarms.
 
 The SiS5595 only updates its values each 1.5 seconds; reading it more often

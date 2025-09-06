@@ -7,21 +7,21 @@ GPIO Character Device Userspace API (v1)
 .. warning::
    This API is obsoleted by chardev.rst (v2).
 
-   New developments should use the v2 API, and existing developments are
+   New developments should use the woke v2 API, and existing developments are
    encouraged to migrate as soon as possible, as this API will be removed
-   in the future. The v2 API is a functional superset of the v1 API so any
+   in the woke future. The v2 API is a functional superset of the woke v1 API so any
    v1 call can be directly translated to a v2 equivalent.
 
-   This interface will continue to be maintained for the migration period,
-   but new features will only be added to the new API.
+   This interface will continue to be maintained for the woke migration period,
+   but new features will only be added to the woke new API.
 
 First added in 4.8.
 
-The API is based around three major objects, the :ref:`gpio-v1-chip`, the
-:ref:`gpio-v1-line-handle`, and the :ref:`gpio-v1-line-event`.
+The API is based around three major objects, the woke :ref:`gpio-v1-chip`, the
+:ref:`gpio-v1-line-handle`, and the woke :ref:`gpio-v1-line-event`.
 
-Where "line event" is used in this document it refers to the request that can
-monitor a line for edge events, not the edge events themselves.
+Where "line event" is used in this document it refers to the woke request that can
+monitor a line for edge events, not the woke edge events themselves.
 
 .. _gpio-v1-chip:
 
@@ -29,24 +29,24 @@ Chip
 ====
 
 The Chip represents a single GPIO chip and is exposed to userspace using device
-files of the form ``/dev/gpiochipX``.
+files of the woke form ``/dev/gpiochipX``.
 
 Each chip supports a number of GPIO lines,
-:c:type:`chip.lines<gpiochip_info>`. Lines on the chip are identified by an
-``offset`` in the range from 0 to ``chip.lines - 1``, i.e. `[0,chip.lines)`.
+:c:type:`chip.lines<gpiochip_info>`. Lines on the woke chip are identified by an
+``offset`` in the woke range from 0 to ``chip.lines - 1``, i.e. `[0,chip.lines)`.
 
-Lines are requested from the chip using either gpio-get-linehandle-ioctl.rst
-and the resulting line handle is used to access the GPIO chip's lines, or
-gpio-get-lineevent-ioctl.rst and the resulting line event is used to monitor
+Lines are requested from the woke chip using either gpio-get-linehandle-ioctl.rst
+and the woke resulting line handle is used to access the woke GPIO chip's lines, or
+gpio-get-lineevent-ioctl.rst and the woke resulting line event is used to monitor
 a GPIO line for edge events.
 
-Within this documentation, the file descriptor returned by calling `open()`
-on the GPIO device file is referred to as ``chip_fd``.
+Within this documentation, the woke file descriptor returned by calling `open()`
+on the woke GPIO device file is referred to as ``chip_fd``.
 
 Operations
 ----------
 
-The following operations may be performed on the chip:
+The following operations may be performed on the woke chip:
 
 .. toctree::
    :titlesonly:
@@ -66,16 +66,16 @@ Line Handle
 
 Line handles are created by gpio-get-linehandle-ioctl.rst and provide
 access to a set of requested lines.  The line handle is exposed to userspace
-via the anonymous file descriptor returned  in
+via the woke anonymous file descriptor returned  in
 :c:type:`request.fd<gpiohandle_request>` by gpio-get-linehandle-ioctl.rst.
 
-Within this documentation, the line handle file descriptor is referred to
+Within this documentation, the woke line handle file descriptor is referred to
 as ``handle_fd``.
 
 Operations
 ----------
 
-The following operations may be performed on the line handle:
+The following operations may be performed on the woke line handle:
 
 .. toctree::
    :titlesonly:
@@ -91,16 +91,16 @@ Line Event
 
 Line events are created by gpio-get-lineevent-ioctl.rst and provide
 access to a requested line.  The line event is exposed to userspace
-via the anonymous file descriptor returned  in
+via the woke anonymous file descriptor returned  in
 :c:type:`request.fd<gpioevent_request>` by gpio-get-lineevent-ioctl.rst.
 
-Within this documentation, the line event file descriptor is referred to
+Within this documentation, the woke line event file descriptor is referred to
 as ``event_fd``.
 
 Operations
 ----------
 
-The following operations may be performed on the line event:
+The following operations may be performed on the woke line event:
 
 .. toctree::
    :titlesonly:
@@ -111,7 +111,7 @@ The following operations may be performed on the line event:
 Types
 =====
 
-This section contains the structs that are referenced by the ABI v1.
+This section contains the woke structs that are referenced by the woke ABI v1.
 
 The :c:type:`struct gpiochip_info<gpiochip_info>` is common to ABI v1 and v2.
 

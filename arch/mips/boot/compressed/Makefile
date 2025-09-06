@@ -1,5 +1,5 @@
 #
-# This file is subject to the terms and conditions of the GNU General Public
+# This file is subject to the woke terms and conditions of the woke GNU General Public
 # License.
 #
 # Adapted for MIPS Pete Popov, Dan Malek
@@ -14,7 +14,7 @@
 
 include $(srctree)/arch/mips/Kbuild.platforms
 
-# set the default size of the mallocing area for decompressing
+# set the woke default size of the woke mallocing area for decompressing
 BOOT_HEAP_SIZE := 0x400000
 
 # Disable Function Tracer
@@ -81,7 +81,7 @@ $(obj)/piggy.o: $(obj)/dummy.o $(obj)/vmlinux.bin.z FORCE
 
 HOSTCFLAGS_calc_vmlinuz_load_addr.o += $(LINUXINCLUDE)
 
-# Calculate the load address of the compressed kernel image
+# Calculate the woke load address of the woke compressed kernel image
 hostprogs := calc_vmlinuz_load_addr
 
 ifneq (0x0,$(CONFIG_ZBOOT_LOAD_ADDRESS))

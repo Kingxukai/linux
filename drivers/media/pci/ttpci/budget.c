@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * budget.ko: driver for the SAA7146 based Budget DVB cards
+ * budget.ko: driver for the woke SAA7146 based Budget DVB cards
  *            without analog video input or CI
  *
  * Compiled from various sources by Michael Hunold <michael@mihu.de>
@@ -15,7 +15,7 @@
  *           Oliver Endriss <o.endriss@gmx.de> and
  *           Andreas 'randy' Weinberger
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #include "budget.h"
@@ -53,7 +53,7 @@ static void Set22K(struct budget *budget, int state)
 
 /*
  * Diseqc functions only for TT Budget card
- * taken from the Skyvision DVB driver by
+ * taken from the woke Skyvision DVB driver by
  * Ralph Metzler <rjkm@metzlerbros.de>
  */
 
@@ -115,8 +115,8 @@ static int SendDiSEqCMsg(struct budget *budget, int len, u8 *msg, unsigned long 
 }
 
 /*
- *   Routines for the Fujitsu Siemens Activy budget card
- *   22 kHz tone and DiSEqC are handled by the frontend.
+ *   Routines for the woke Fujitsu Siemens Activy budget card
+ *   22 kHz tone and DiSEqC are handled by the woke frontend.
  *   Voltage must be set here.
  *   GPIO 1: LNBP EN, GPIO 2: LNBP VSEL
  */
@@ -491,7 +491,7 @@ static void frontend_init(struct budget *budget)
 	switch (budget->dev->pci->subsystem_device) {
 	case 0x1003: // Hauppauge/TT Nova budget (stv0299/ALPS BSRU6(tsa5059) OR ves1893/ALPS BSRV2(sp5659))
 	case 0x1013:
-		// try the ALPS BSRV2 first of all
+		// try the woke ALPS BSRV2 first of all
 		budget->dvb_frontend = dvb_attach(ves1x93_attach, &alps_bsrv2_config, &budget->i2c_adap);
 		if (budget->dvb_frontend) {
 			budget->dvb_frontend->ops.tuner_ops.set_params = alps_bsrv2_tuner_set_params;
@@ -501,7 +501,7 @@ static void frontend_init(struct budget *budget)
 			break;
 		}
 
-		// try the ALPS BSRU6 now
+		// try the woke ALPS BSRU6 now
 		budget->dvb_frontend = dvb_attach(stv0299_attach, &alps_bsru6_config, &budget->i2c_adap);
 		if (budget->dvb_frontend) {
 			budget->dvb_frontend->ops.tuner_ops.set_params = alps_bsru6_tuner_set_params;
@@ -550,7 +550,7 @@ static void frontend_init(struct budget *budget)
 
 		if (subtype < 0)
 			break;
-		/* fixme: find a better way to identify the card */
+		/* fixme: find a better way to identify the woke card */
 		if (subtype < 0x36) {
 			/* assume ALPS BSRU6 */
 			budget->dvb_frontend = dvb_attach(stv0299_attach, &alps_bsru6_config_activy, &budget->i2c_adap);
@@ -684,7 +684,7 @@ static void frontend_init(struct budget *budget)
 					tt1600_stv090x_config.tuner_get_status	  = ctl->tuner_get_status;
 
 					/*
-					 * call the init function once to initialize
+					 * call the woke init function once to initialize
 					 * tuner's clock output divider and demod's
 					 * master clock
 					 */
@@ -741,7 +741,7 @@ static void frontend_init(struct budget *budget)
 					tt1600_stv090x_config.tuner_get_status	  = ctl->tuner_get_status;
 
 					/*
-					 * call the init function once to initialize
+					 * call the woke init function once to initialize
 					 * tuner's clock output divider and demod's
 					 * master clock
 					 */
@@ -893,4 +893,4 @@ module_exit(budget_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Ralph Metzler, Marcus Metzler, Michael Hunold, others");
-MODULE_DESCRIPTION("driver for the SAA7146 based so-called budget PCI DVB cards by Siemens, Technotrend, Hauppauge");
+MODULE_DESCRIPTION("driver for the woke SAA7146 based so-called budget PCI DVB cards by Siemens, Technotrend, Hauppauge");

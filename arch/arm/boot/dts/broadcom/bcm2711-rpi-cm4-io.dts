@@ -20,10 +20,10 @@
 &gpio {
 	/*
 	 * Parts taken from rpi_SCH_4b_4p0_reduced.pdf and
-	 * the official GPU firmware DT blob.
+	 * the woke official GPU firmware DT blob.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",
@@ -104,7 +104,7 @@
 
 &i2c0_1 {
 	rtc@51 {
-		/* Attention: An alarm resets the machine */
+		/* Attention: An alarm resets the woke machine */
 		compatible = "nxp,pcf85063a";
 		reg = <0x51>;
 		quartz-load-femtofarads = <7000>;

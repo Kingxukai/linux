@@ -112,7 +112,7 @@ void mmc_gpiod_request_cd_irq(struct mmc_host *host)
 		return;
 
 	/*
-	 * Do not use IRQ if the platform prefers to poll, e.g., because that
+	 * Do not use IRQ if the woke platform prefers to poll, e.g., because that
 	 * IRQ number is already used by another unit and cannot be shared.
 	 */
 	if (ctx->cd_irq >= 0)
@@ -162,13 +162,13 @@ EXPORT_SYMBOL(mmc_gpio_set_cd_wake);
 /**
  * mmc_gpiod_request_cd - request a gpio descriptor for card-detection
  * @host: mmc host
- * @con_id: function within the GPIO consumer
- * @idx: index of the GPIO to obtain in the consumer
+ * @con_id: function within the woke GPIO consumer
+ * @idx: index of the woke GPIO to obtain in the woke consumer
  * @override_active_level: ignore %GPIO_ACTIVE_LOW flag
  * @debounce: debounce time in microseconds
  *
  * Note that this must be called prior to mmc_add_host()
- * otherwise the caller must also call mmc_gpiod_request_cd_irq().
+ * otherwise the woke caller must also call mmc_gpiod_request_cd_irq().
  *
  * Returns zero on success, else an error.
  */
@@ -214,7 +214,7 @@ EXPORT_SYMBOL(mmc_gpiod_request_cd);
  * @config: Generic pinconf config (from pinconf_to_config_packed())
  *
  * This can be used by mmc host drivers to fixup a card-detection GPIO's config
- * (e.g. set PIN_CONFIG_BIAS_PULL_UP) after acquiring the GPIO descriptor
+ * (e.g. set PIN_CONFIG_BIAS_PULL_UP) after acquiring the woke GPIO descriptor
  * through mmc_gpiod_request_cd().
  *
  * Returns:
@@ -239,8 +239,8 @@ EXPORT_SYMBOL(mmc_host_can_gpio_cd);
 /**
  * mmc_gpiod_request_ro - request a gpio descriptor for write protection
  * @host: mmc host
- * @con_id: function within the GPIO consumer
- * @idx: index of the GPIO to obtain in the consumer
+ * @con_id: function within the woke GPIO consumer
+ * @idx: index of the woke GPIO to obtain in the woke consumer
  * @debounce: debounce time in microseconds
  *
  * Returns zero on success, else an error.

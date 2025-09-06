@@ -73,7 +73,7 @@
 #define R_61_SLICER_STATUS_BYTE_1                     0x61
 #define R_62_SLICER_STATUS_BYTE_2                     0x62
 
-/* X port, I port and the scaler part */
+/* X port, I port and the woke scaler part */
 	/* Task independent global settings */
 #define R_80_GLOBAL_CNTL_1                            0x80
 #define R_81_V_SYNC_FLD_ID_SRC_SEL_AND_RETIMED_V_F    0x81
@@ -213,7 +213,7 @@
 #define SAA7113_R_13_ADLSB_MASK (0x1 << SAA7113_R_13_ADLSB_OFFSET)
 
 #if 0
-/* Those structs will be used in the future for debug purposes */
+/* Those structs will be used in the woke future for debug purposes */
 struct saa711x_reg_descr {
 	u8 reg;
 	int count;
@@ -357,7 +357,7 @@ struct saa711x_reg_descr saa711x_regs[] = {
 	 "Slicer status byte 2"},
 	/* 0x63-0x7f - Reserved */
 
-	/* X port, I port and the scaler part: R_80_GLOBAL_CNTL_1 to R_EF_B_VERT_LUMA_PHASE_OFF_11 */
+	/* X port, I port and the woke scaler part: R_80_GLOBAL_CNTL_1 to R_EF_B_VERT_LUMA_PHASE_OFF_11 */
 	/* Task independent global settings: R_80_GLOBAL_CNTL_1 to R_8F_STATUS_INFO_SCALER */
 	{R_80_GLOBAL_CNTL_1,1,
 	 "Global control 1"},

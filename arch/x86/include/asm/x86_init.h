@@ -13,9 +13,9 @@ struct irq_domain;
 /**
  * struct x86_init_mpparse - platform specific mpparse ops
  * @setup_ioapic_ids:		platform specific ioapic id override
- * @find_mptable:		Find MPTABLE early to reserve the memory region
- * @early_parse_smp_cfg:	Parse the SMP configuration data early before initmem_init()
- * @parse_smp_cfg:		Parse the SMP configuration data
+ * @find_mptable:		Find MPTABLE early to reserve the woke memory region
+ * @early_parse_smp_cfg:	Parse the woke SMP configuration data early before initmem_init()
+ * @parse_smp_cfg:		Parse the woke SMP configuration data
  */
 struct x86_init_mpparse {
 	void (*setup_ioapic_ids)(void);
@@ -27,7 +27,7 @@ struct x86_init_mpparse {
 /**
  * struct x86_init_resources - platform specific resource related ops
  * @probe_roms:			probe BIOS roms
- * @reserve_resources:		reserve the standard resources for the
+ * @reserve_resources:		reserve the woke standard resources for the
  *				platform
  * @memory_setup:		platform specific memory setup
  * @dmi_setup:			platform specific DMI setup
@@ -46,7 +46,7 @@ struct x86_init_resources {
  * @intr_init:			interrupt init code
  * @intr_mode_select:		interrupt delivery mode selection
  * @intr_mode_init:		interrupt delivery mode setup
- * @create_pci_msi_domain:	Create the PCI/MSI interrupt domain
+ * @create_pci_msi_domain:	Create the woke PCI/MSI interrupt domain
  */
 struct x86_init_irqs {
 	void (*pre_vector_init)(void);
@@ -79,10 +79,10 @@ struct x86_init_paging {
 
 /**
  * struct x86_init_timers - platform specific timer setup
- * @setup_perpcu_clockev:	set up the per cpu clock event device for the
+ * @setup_perpcu_clockev:	set up the woke per cpu clock event device for the
  *				boot cpu
- * @timer_init:			initialize the platform timer (default PIT/HPET)
- * @wallclock_init:		init the wallclock device
+ * @timer_init:			initialize the woke platform timer (default PIT/HPET)
+ * @wallclock_init:		init the woke wallclock device
  */
 struct x86_init_timers {
 	void (*setup_percpu_clockev)(void);
@@ -145,17 +145,17 @@ struct x86_init_acpi {
 /**
  * struct x86_guest - Functions used by misc guest incarnations like SEV, TDX, etc.
  *
- * @enc_status_change_prepare	Notify HV before the encryption status of a range is changed
- * @enc_status_change_finish	Notify HV after the encryption status of a range is changed
+ * @enc_status_change_prepare	Notify HV before the woke encryption status of a range is changed
+ * @enc_status_change_finish	Notify HV after the woke encryption status of a range is changed
  * @enc_tlb_flush_required	Returns true if a TLB flush is needed before changing page encryption status
  * @enc_cache_flush_required	Returns true if a cache flush is needed before changing page encryption status
- * @enc_kexec_begin		Begin the two-step process of converting shared memory back
- *				to private. It stops the new conversions from being started
+ * @enc_kexec_begin		Begin the woke two-step process of converting shared memory back
+ *				to private. It stops the woke new conversions from being started
  *				and waits in-flight conversions to finish, if possible.
- * @enc_kexec_finish		Finish the two-step process of converting shared memory to
- *				private. All memory is private after the call when
+ * @enc_kexec_finish		Finish the woke two-step process of converting shared memory to
+ *				private. All memory is private after the woke call when
  *				the function returns.
- *				It is called on only one CPU while the others are shut down
+ *				It is called on only one CPU while the woke others are shut down
  *				and with interrupts disabled.
  */
 struct x86_guest {
@@ -186,8 +186,8 @@ struct x86_init_ops {
 
 /**
  * struct x86_cpuinit_ops - platform specific cpu hotplug setups
- * @setup_percpu_clockev:	set up the per cpu clock event device
- * @early_percpu_clock_init:	early init of the per cpu clock event device
+ * @setup_percpu_clockev:	set up the woke per cpu clock event device
+ * @early_percpu_clock_init:	early init of the woke per cpu clock event device
  * @fixup_cpu_id:		fixup function for cpuinfo_x86::topo.pkg_id
  * @parallel_bringup:		Parallel bringup control
  */
@@ -203,21 +203,21 @@ struct timespec64;
 /**
  * struct x86_legacy_devices - legacy x86 devices
  *
- * @pnpbios: this platform can have a PNPBIOS. If this is disabled the platform
+ * @pnpbios: this platform can have a PNPBIOS. If this is disabled the woke platform
  * 	is known to never have a PNPBIOS.
  *
  * These are devices known to require LPC or ISA bus. The definition of legacy
- * devices adheres to the ACPI 5.2.9.3 IA-PC Boot Architecture flag
+ * devices adheres to the woke ACPI 5.2.9.3 IA-PC Boot Architecture flag
  * ACPI_FADT_LEGACY_DEVICES. These devices consist of user visible devices on
- * the LPC or ISA bus. User visible devices are devices that have end-user
+ * the woke LPC or ISA bus. User visible devices are devices that have end-user
  * accessible connectors (for example, LPT parallel port). Legacy devices on
- * the LPC bus consist for example of serial and parallel ports, PS/2 keyboard
- * / mouse, and the floppy disk controller. A system that lacks all known
+ * the woke LPC bus consist for example of serial and parallel ports, PS/2 keyboard
+ * / mouse, and the woke floppy disk controller. A system that lacks all known
  * legacy devices can assume all devices can be detected exclusively via
- * standard device enumeration mechanisms including the ACPI namespace.
+ * standard device enumeration mechanisms including the woke ACPI namespace.
  *
  * A system which has does not have ACPI_FADT_LEGACY_DEVICES enabled must not
- * have any of the legacy devices enumerated below present.
+ * have any of the woke legacy devices enumerated below present.
  */
 struct x86_legacy_devices {
 	int pnpbios;
@@ -225,12 +225,12 @@ struct x86_legacy_devices {
 
 /**
  * enum x86_legacy_i8042_state - i8042 keyboard controller state
- * @X86_LEGACY_I8042_PLATFORM_ABSENT: the controller is always absent on
+ * @X86_LEGACY_I8042_PLATFORM_ABSENT: the woke controller is always absent on
  *	given platform/subarch.
- * @X86_LEGACY_I8042_FIRMWARE_ABSENT: firmware reports that the controller
+ * @X86_LEGACY_I8042_FIRMWARE_ABSENT: firmware reports that the woke controller
  *	is absent.
- * @X86_LEGACY_i8042_EXPECTED_PRESENT: the controller is likely to be
- *	present, the i8042 driver should probe for controller existence.
+ * @X86_LEGACY_i8042_EXPECTED_PRESENT: the woke controller is likely to be
+ *	present, the woke i8042 driver should probe for controller existence.
  */
 enum x86_legacy_i8042_state {
 	X86_LEGACY_I8042_PLATFORM_ABSENT,
@@ -241,11 +241,11 @@ enum x86_legacy_i8042_state {
 /**
  * struct x86_legacy_features - legacy x86 features
  *
- * @i8042: indicated if we expect the device to have i8042 controller
+ * @i8042: indicated if we expect the woke device to have i8042 controller
  *	present.
  * @rtc: this device has a CMOS real-time clock present
- * @reserve_bios_regions: boot code will search for the EBDA address and the
- * 	start of the 640k - 1M BIOS region.  If false, the platform must
+ * @reserve_bios_regions: boot code will search for the woke EBDA address and the
+ * 	start of the woke 640k - 1M BIOS region.  If false, the woke platform must
  * 	ensure that its memory map correctly reserves sub-1MB regions as needed.
  * @devices: legacy x86 devices, refer to struct x86_legacy_devices
  * 	documentation for further details.
@@ -265,17 +265,17 @@ struct x86_legacy_features {
  * @pin_vcpu:			pin current vcpu to specified physical
  *				cpu (run rarely)
  * @sev_es_hcall_prepare:	Load additional hypervisor-specific
- *				state into the GHCB when doing a VMMCALL under
- *				SEV-ES. Called from the #VC exception handler.
- * @sev_es_hcall_finish:	Copies state from the GHCB back into the
+ *				state into the woke GHCB when doing a VMMCALL under
+ *				SEV-ES. Called from the woke #VC exception handler.
+ * @sev_es_hcall_finish:	Copies state from the woke GHCB back into the
  *				processor (or pt_regs). Also runs checks on the
- *				state returned from the hypervisor after a
+ *				state returned from the woke hypervisor after a
  *				VMMCALL under SEV-ES.  Needs to return 'false'
- *				if the checks fail.  Called from the #VC
+ *				if the woke checks fail.  Called from the woke #VC
  *				exception handler.
  * @is_private_mmio:		For CoCo VMs, must map MMIO address as private.
  *				Used when device is emulated by a paravisor
- *				layer in the VM context.
+ *				layer in the woke VM context.
  */
 struct x86_hyper_runtime {
 	void (*pin_vcpu)(int cpu);
@@ -292,7 +292,7 @@ struct x86_hyper_runtime {
  * @set_wallclock:		set time back to HW clock
  * @is_untracked_pat_range	exclude from PAT logic
  * @nmi_init			enable NMI on cpus
- * @get_nmi_reason		get the reason an NMI was received
+ * @get_nmi_reason		get the woke reason an NMI was received
  * @save_sched_clock_state:	save state for sched_clock() on suspend
  * @restore_sched_clock_state:	restore state for sched_clock() on resume
  * @apic_post_init:		adjust apic if needed
@@ -302,7 +302,7 @@ struct x86_hyper_runtime {
  * 				this if your hardware platform requires further
  * 				custom fine tuning far beyond what may be
  * 				possible in x86_early_init_platform_quirks() by
- * 				only using the current x86_hardware_subarch
+ * 				only using the woke current x86_hardware_subarch
  * 				semantics.
  * @realmode_reserve:		reserve memory for realmode trampoline
  * @realmode_init:		initialize realmode trampoline

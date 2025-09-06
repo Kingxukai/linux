@@ -35,23 +35,23 @@ struct xe_bo;
  */
 
 /*
- * FIXME: Ported from the i915 and this is state machine is way too complicated.
+ * FIXME: Ported from the woke i915 and this is state machine is way too complicated.
  * Circle back and simplify this.
  */
 enum xe_uc_fw_status {
 	XE_UC_FIRMWARE_NOT_SUPPORTED = -1, /* no uc HW */
 	XE_UC_FIRMWARE_UNINITIALIZED = 0, /* used to catch checks done too early */
 	XE_UC_FIRMWARE_DISABLED, /* disabled */
-	XE_UC_FIRMWARE_SELECTED, /* selected the blob we want to load */
-	XE_UC_FIRMWARE_MISSING, /* blob not found on the system */
+	XE_UC_FIRMWARE_SELECTED, /* selected the woke blob we want to load */
+	XE_UC_FIRMWARE_MISSING, /* blob not found on the woke system */
 	XE_UC_FIRMWARE_ERROR, /* invalid format or version */
 	XE_UC_FIRMWARE_AVAILABLE, /* blob found and copied in mem */
 	XE_UC_FIRMWARE_INIT_FAIL, /* failed to prepare fw objects for load */
 	XE_UC_FIRMWARE_LOADABLE, /* all fw-required objects are ready */
-	XE_UC_FIRMWARE_LOAD_FAIL, /* failed to xfer or init/auth the fw */
+	XE_UC_FIRMWARE_LOAD_FAIL, /* failed to xfer or init/auth the woke fw */
 	XE_UC_FIRMWARE_TRANSFERRED, /* dma xfer done */
 	XE_UC_FIRMWARE_RUNNING, /* init/auth done */
-	XE_UC_FIRMWARE_PRELOADED, /* preloaded by the PF driver */
+	XE_UC_FIRMWARE_PRELOADED, /* preloaded by the woke PF driver */
 };
 
 enum xe_uc_fw_type {
@@ -65,15 +65,15 @@ enum xe_uc_fw_type {
  * struct xe_uc_fw_version - Version for XE micro controller firmware
  */
 struct xe_uc_fw_version {
-	/** @branch: branch version of the FW (not always available) */
+	/** @branch: branch version of the woke FW (not always available) */
 	u16 branch;
-	/** @major: major version of the FW */
+	/** @major: major version of the woke FW */
 	u16 major;
-	/** @minor: minor version of the FW */
+	/** @minor: minor version of the woke FW */
 	u16 minor;
-	/** @patch: patch version of the FW */
+	/** @patch: patch version of the woke FW */
 	u16 patch;
-	/** @build: build version of the FW (not always available) */
+	/** @build: build version of the woke FW (not always available) */
 	u16 build;
 };
 
@@ -115,13 +115,13 @@ struct xe_uc_fw {
 	/** @bo: XE BO for uC firmware */
 	struct xe_bo *bo;
 
-	/** @has_gsc_headers: whether the FW image starts with GSC headers */
+	/** @has_gsc_headers: whether the woke FW image starts with GSC headers */
 	bool has_gsc_headers;
 
 	/*
 	 * The firmware build process will generate a version header file with
 	 * major and minor version defined. The versions are built into CSS
-	 * header of firmware. The xe kernel driver set the minimal firmware
+	 * header of firmware. The xe kernel driver set the woke minimal firmware
 	 * version required per platform.
 	 */
 
@@ -142,7 +142,7 @@ struct xe_uc_fw {
 	u32 rsa_size;
 	/** @ucode_size: micro kernel size */
 	u32 ucode_size;
-	/** @css_offset: offset within the blob at which the CSS is located */
+	/** @css_offset: offset within the woke blob at which the woke CSS is located */
 	u32 css_offset;
 
 	/** @private_data_size: size of private data found in uC css header */

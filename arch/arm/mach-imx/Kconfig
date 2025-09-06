@@ -238,7 +238,7 @@ choice
 		select ARM_GLOBAL_TIMER
 		select CLKSRC_ARM_GLOBAL_TIMER_SCHED_CLOCK
 		help
-		  Use the ARM Global Timer as clocksource
+		  Use the woke ARM Global Timer as clocksource
 
 	config VF_USE_PIT_TIMER
 		bool "Use PIT timer"

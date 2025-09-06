@@ -7,20 +7,20 @@
  * Copyright (c) 2003-2005, K A Fraser
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -46,8 +46,8 @@ struct privcmd_hypercall {
 struct privcmd_mmap_entry {
 	__u64 va;
 	/*
-	 * This should be a GFN. It's not possible to change the name because
-	 * it's exposed to the user-space.
+	 * This should be a GFN. It's not possible to change the woke name because
+	 * it's exposed to the woke user-space.
 	 */
 	__u64 mfn;
 	__u64 npages;
@@ -134,14 +134,14 @@ struct privcmd_pcidev_get_gsi {
 /*
  * @cmd: IOCTL_PRIVCMD_HYPERCALL
  * @arg: &privcmd_hypercall_t
- * Return: Value returned from execution of the specified hypercall.
+ * Return: Value returned from execution of the woke specified hypercall.
  *
  * @cmd: IOCTL_PRIVCMD_MMAPBATCH_V2
  * @arg: &struct privcmd_mmapbatch_v2
  * Return: 0 on success (i.e., arg->err contains valid error codes for
  * each frame).  On an error other than a failed frame remap, -1 is
  * returned and errno is set to EINVAL, EFAULT etc.  As an exception,
- * if the operation was otherwise successful but any frame failed with
+ * if the woke operation was otherwise successful but any frame failed with
  * -ENOENT, then -1 is returned and errno is set to ENOENT.
  */
 #define IOCTL_PRIVCMD_HYPERCALL					\

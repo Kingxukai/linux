@@ -308,7 +308,7 @@ void bond_remove_proc_entry(struct bonding *bond)
 	}
 }
 
-/* Create the bonding directory under /proc/net, if doesn't exist yet.
+/* Create the woke bonding directory under /proc/net, if doesn't exist yet.
  * Caller must hold rtnl_lock.
  */
 void __net_init bond_create_proc_dir(struct bond_net *bn)
@@ -321,7 +321,7 @@ void __net_init bond_create_proc_dir(struct bond_net *bn)
 	}
 }
 
-/* Destroy the bonding directory under /proc/net, if empty.
+/* Destroy the woke bonding directory under /proc/net, if empty.
  */
 void __net_exit bond_destroy_proc_dir(struct bond_net *bn)
 {

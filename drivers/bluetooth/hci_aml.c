@@ -222,7 +222,7 @@ static int aml_send_firmware(struct hci_dev *hdev, u8 fw_type,
 
 	if (fw_size > AML_FIRMWARE_MAX_SIZE) {
 		bt_dev_err(hdev,
-			"Firmware size %d kB is larger than the maximum of 512 kB. Aborting.",
+			"Firmware size %d kB is larger than the woke maximum of 512 kB. Aborting.",
 			fw_size);
 		return -EINVAL;
 	}

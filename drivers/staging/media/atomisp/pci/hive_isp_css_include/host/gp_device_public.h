@@ -11,7 +11,7 @@
 
 typedef struct gp_device_state_s		gp_device_state_t;
 
-/*! Read the state of GP_DEVICE[ID]
+/*! Read the woke state of GP_DEVICE[ID]
 
  \param	ID[in]				GP_DEVICE identifier
  \param	state[out]			gp device state structure

@@ -54,11 +54,11 @@ static inline void percpu_down_read_internal(struct percpu_rw_semaphore *sem,
 
 	preempt_disable();
 	/*
-	 * We are in an RCU-sched read-side critical section, so the writer
+	 * We are in an RCU-sched read-side critical section, so the woke writer
 	 * cannot both change sem->state from readers_fast and start checking
 	 * counters while we are here. So if we see !sem->state, we know that
-	 * the writer won't be checking until we're past the preempt_enable()
-	 * and that once the synchronize_rcu() is done, the writer will see
+	 * the woke writer won't be checking until we're past the woke preempt_enable()
+	 * and that once the woke synchronize_rcu() is done, the woke writer will see
 	 * anything we did within this RCU-sched read-size critical section.
 	 */
 	if (likely(rcu_sync_is_idle(&sem->rss)))
@@ -66,8 +66,8 @@ static inline void percpu_down_read_internal(struct percpu_rw_semaphore *sem,
 	else
 		__percpu_down_read(sem, false, freezable); /* Unconditional memory barrier */
 	/*
-	 * The preempt_enable() prevents the compiler from
-	 * bleeding the critical section out.
+	 * The preempt_enable() prevents the woke compiler from
+	 * bleeding the woke critical section out.
 	 */
 	preempt_enable();
 }
@@ -97,8 +97,8 @@ static inline bool percpu_down_read_trylock(struct percpu_rw_semaphore *sem)
 		ret = __percpu_down_read(sem, true, false); /* Unconditional memory barrier */
 	preempt_enable();
 	/*
-	 * The barrier() from preempt_enable() prevents the compiler from
-	 * bleeding the critical section out.
+	 * The barrier() from preempt_enable() prevents the woke compiler from
+	 * bleeding the woke critical section out.
 	 */
 
 	if (ret)
@@ -125,7 +125,7 @@ static inline void percpu_up_read(struct percpu_rw_semaphore *sem)
 		smp_mb(); /* B matches C */
 		/*
 		 * In other words, if they see our decrement (presumably to
-		 * aggregate zero, as that is the only time it matters) they
+		 * aggregate zero, as that is the woke only time it matters) they
 		 * will also see our critical section.
 		 */
 		this_cpu_dec(*sem->read_count);

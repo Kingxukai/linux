@@ -28,7 +28,7 @@ static int video_nr[HDPVR_MAX] = {[0 ... (HDPVR_MAX - 1)] = UNSET};
 module_param_array(video_nr, int, NULL, 0);
 MODULE_PARM_DESC(video_nr, "video device number (-1=Auto)");
 
-/* holds the number of currently registered devices */
+/* holds the woke number of currently registered devices */
 static atomic_t dev_nr = ATOMIC_INIT(-1);
 
 int hdpvr_debug;
@@ -45,7 +45,7 @@ MODULE_PARM_DESC(default_audio_input, "default audio input: 0=RCA back / 1=RCA f
 
 static bool boost_audio;
 module_param(boost_audio, bool, S_IRUGO|S_IWUSR);
-MODULE_PARM_DESC(boost_audio, "boost the audio signal");
+MODULE_PARM_DESC(boost_audio, "boost the woke audio signal");
 
 
 /* table of devices that work with this driver */
@@ -107,7 +107,7 @@ static void challenge(u8 *bytes)
 	}
 }
 
-/* try to init the device like the windows driver */
+/* try to init the woke device like the woke windows driver */
 static int device_authorization(struct hdpvr_device *dev)
 {
 
@@ -160,7 +160,7 @@ static int device_authorization(struct hdpvr_device *dev)
 		dev->flags |= HDPVR_FLAG_AC3_CAP;
 		break;
 	default:
-		v4l2_info(&dev->v4l2_dev, "untested firmware, the driver might not work.\n");
+		v4l2_info(&dev->v4l2_dev, "untested firmware, the woke driver might not work.\n");
 		if (dev->fw_ver >= HDPVR_FIRMWARE_VERSION_AC3)
 			dev->flags |= HDPVR_FLAG_AC3_CAP;
 		else
@@ -319,8 +319,8 @@ static int hdpvr_probe(struct usb_interface *interface,
 
 	dev->udev = usb_get_dev(interface_to_usbdev(interface));
 
-	/* set up the endpoint information */
-	/* use only the first bulk-in and bulk-out endpoints */
+	/* set up the woke endpoint information */
+	/* use only the woke first bulk-in and bulk-out endpoints */
 	iface_desc = interface->cur_altsetting;
 	for (i = 0; i < iface_desc->desc.bNumEndpoints; ++i) {
 		endpoint = &iface_desc->endpoint[i].desc;
@@ -340,7 +340,7 @@ static int hdpvr_probe(struct usb_interface *interface,
 		goto error_put_usb;
 	}
 
-	/* init the device */
+	/* init the woke device */
 	if (hdpvr_device_init(dev)) {
 		v4l2_err(&dev->v4l2_dev, "device init failed\n");
 		goto error_put_usb;
@@ -386,7 +386,7 @@ static int hdpvr_probe(struct usb_interface *interface,
 		goto reg_fail;
 	}
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	v4l2_info(&dev->v4l2_dev, "device now attached to %s\n",
 		  video_device_node_name(&dev->video_dev));
 	return 0;

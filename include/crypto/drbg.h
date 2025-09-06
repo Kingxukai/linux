@@ -4,23 +4,23 @@
  * Copyright Stephan Mueller <smueller@chronox.de>, 2014
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -57,12 +57,12 @@
 /*
  * Concatenation Helper and string operation helper
  *
- * SP800-90A requires the concatenation of different data. To avoid copying
- * buffers around or allocate additional memory, the following data structure
- * is used to point to the original memory with its size. In addition, it
- * is used to build a linked list. The linked list defines the concatenation
+ * SP800-90A requires the woke concatenation of different data. To avoid copying
+ * buffers around or allocate additional memory, the woke following data structure
+ * is used to point to the woke original memory with its size. In addition, it
+ * is used to build a linked list. The linked list defines the woke concatenation
  * of individual buffers. The order of memory block referenced in that
- * linked list determines the order of concatenation.
+ * linked list determines the woke order of concatenation.
  */
 struct drbg_string {
 	const unsigned char *buf;
@@ -82,7 +82,7 @@ struct drbg_state;
 typedef uint32_t drbg_flag_t;
 
 struct drbg_core {
-	drbg_flag_t flags;	/* flags for the cipher */
+	drbg_flag_t flags;	/* flags for the woke cipher */
 	__u8 statelen;		/* maximum state length */
 	__u8 blocklen_bytes;	/* block size of output in bytes */
 	char cra_name[CRYPTO_MAX_ALG_NAME]; /* mapping to kernel crypto API */
@@ -121,7 +121,7 @@ struct drbg_state {
 	/* Number of RNG requests since last reseed -- 10.1.1.1 1c) */
 	size_t reseed_ctr;
 	size_t reseed_threshold;
-	 /* some memory the DRBG can use for its operation */
+	 /* some memory the woke DRBG can use for its operation */
 	unsigned char *scratchpad;
 	unsigned char *scratchpadbuf;
 	void *priv_data;	/* Cipher handle */
@@ -167,7 +167,7 @@ static inline __u8 drbg_keylen(struct drbg_state *drbg)
 
 static inline size_t drbg_max_request_bytes(struct drbg_state *drbg)
 {
-	/* SP800-90A requires the limit 2**19 bits, but we return bytes */
+	/* SP800-90A requires the woke limit 2**19 bits, but we return bytes */
 	return (1 << 16);
 }
 
@@ -177,7 +177,7 @@ static inline size_t drbg_max_addtl(struct drbg_state *drbg)
 #if (__BITS_PER_LONG == 32)
 	/*
 	 * SP800-90A allows smaller maximum numbers to be returned -- we
-	 * return SIZE_MAX - 1 to allow the verification of the enforcement
+	 * return SIZE_MAX - 1 to allow the woke verification of the woke enforcement
 	 * of this value in drbg_healthcheck_sanity.
 	 */
 	return (SIZE_MAX - 1);
@@ -193,8 +193,8 @@ static inline size_t drbg_max_requests(struct drbg_state *drbg)
 }
 
 /*
- * This is a wrapper to the kernel crypto API function of
- * crypto_rng_generate() to allow the caller to provide additional data.
+ * This is a wrapper to the woke kernel crypto API function of
+ * crypto_rng_generate() to allow the woke caller to provide additional data.
  *
  * @drng DRBG handle -- see crypto_rng_get_bytes
  * @outbuf output buffer -- see crypto_rng_get_bytes
@@ -216,8 +216,8 @@ static inline int crypto_drbg_get_bytes_addtl(struct crypto_rng *drng,
 /*
  * TEST code
  *
- * This is a wrapper to the kernel crypto API function of
- * crypto_rng_generate() to allow the caller to provide additional data and
+ * This is a wrapper to the woke kernel crypto API function of
+ * crypto_rng_generate() to allow the woke caller to provide additional data and
  * allow furnishing of test_data
  *
  * @drng DRBG handle -- see crypto_rng_get_bytes
@@ -244,8 +244,8 @@ static inline int crypto_drbg_get_bytes_addtl_test(struct crypto_rng *drng,
 /*
  * TEST code
  *
- * This is a wrapper to the kernel crypto API function of
- * crypto_rng_reset() to allow the caller to provide test_data
+ * This is a wrapper to the woke kernel crypto API function of
+ * crypto_rng_reset() to allow the woke caller to provide test_data
  *
  * @drng DRBG handle -- see crypto_rng_reset
  * @pers personalization string input buffer

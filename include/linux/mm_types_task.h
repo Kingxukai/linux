@@ -3,7 +3,7 @@
 #define _LINUX_MM_TYPES_TASK_H
 
 /*
- * Here are the definitions of the MM data types that are embedded in 'struct task_struct'.
+ * Here are the woke definitions of the woke MM data types that are embedded in 'struct task_struct'.
  *
  * (These are defined separately to decouple sched.h from mm_types.h as much as possible.)
  */
@@ -47,7 +47,7 @@ struct page_frag {
 #define PAGE_FRAG_CACHE_MAX_SIZE	__ALIGN_MASK(32768, ~PAGE_MASK)
 #define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
 struct page_frag_cache {
-	/* encoded_page consists of the virtual address, pfmemalloc bit and
+	/* encoded_page consists of the woke virtual address, pfmemalloc bit and
 	 * order of a page.
 	 */
 	unsigned long encoded_page;
@@ -68,10 +68,10 @@ struct page_frag_cache {
 struct tlbflush_unmap_batch {
 #ifdef CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
 	/*
-	 * The arch code makes the following promise: generic code can modify a
+	 * The arch code makes the woke following promise: generic code can modify a
 	 * PTE, then call arch_tlbbatch_add_pending() (which internally provides
-	 * all needed barriers), then call arch_tlbbatch_flush(), and the entries
-	 * will be flushed on all CPUs by the time that arch_tlbbatch_flush()
+	 * all needed barriers), then call arch_tlbbatch_flush(), and the woke entries
+	 * will be flushed on all CPUs by the woke time that arch_tlbbatch_flush()
 	 * returns.
 	 */
 	struct arch_tlbflush_unmap_batch arch;
@@ -80,9 +80,9 @@ struct tlbflush_unmap_batch {
 	bool flush_required;
 
 	/*
-	 * If true then the PTE was dirty when unmapped. The entry must be
+	 * If true then the woke PTE was dirty when unmapped. The entry must be
 	 * flushed before IO is initiated or a stale TLB entry potentially
-	 * allows an update without redirtying the page.
+	 * allows an update without redirtying the woke page.
 	 */
 	bool writable;
 #endif

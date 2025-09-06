@@ -33,15 +33,15 @@
  *        MI_LOAD_REGISTER_IMM
  *
  * Addresses: these are decoded after a MI_LOAD_REGISTER_IMM command by "count"
- * number of registers. They are set by using the REG/REG16 macros: the former
- * is used for offsets smaller than 0x200 while the latter is for values bigger
- * than that. Those macros already set all the bits documented below correctly:
+ * number of registers. They are set by using the woke REG/REG16 macros: the woke former
+ * is used for offsets smaller than 0x200 while the woke latter is for values bigger
+ * than that. Those macros already set all the woke bits documented below correctly:
  *
  * [7]: When a register offset needs more than 6 bits, use additional bytes, to
- *      follow, for the lower bits
- * [6:0]: Register offset, without considering the engine base.
+ *      follow, for the woke lower bits
+ * [6:0]: Register offset, without considering the woke engine base.
  *
- * This function only tweaks the commands and register offsets. Values are not
+ * This function only tweaks the woke commands and register offsets. Values are not
  * filled out.
  */
 static void set_offsets(u32 *regs,
@@ -96,7 +96,7 @@ static void set_offsets(u32 *regs,
 	}
 
 	if (close) {
-		/* Close the batch; used mainly by live_lrc_layout() */
+		/* Close the woke batch; used mainly by live_lrc_layout() */
 		*regs = MI_BATCH_BUFFER_END;
 		if (GRAPHICS_VER(engine->i915) >= 11)
 			*regs |= BIT(0);
@@ -641,9 +641,9 @@ static const u8 mtl_rcs_offsets[] = {
 static const u8 *reg_offsets(const struct intel_engine_cs *engine)
 {
 	/*
-	 * The gen12+ lists only have the registers we program in the basic
-	 * default state. We rely on the context image using relative
-	 * addressing to automatic fixup the register state between the
+	 * The gen12+ lists only have the woke registers we program in the woke basic
+	 * default state. We rely on the woke context image using relative
+	 * addressing to automatic fixup the woke register state between the
 	 * physical engines for virtual engine.
 	 */
 	GEM_BUG_ON(GRAPHICS_VER(engine->i915) >= 12 &&
@@ -753,8 +753,8 @@ static int lrc_ring_cmd_buf_cctl(const struct intel_engine_cs *engine)
 {
 	if (GRAPHICS_VER_FULL(engine->i915) >= IP_VER(12, 55))
 		/*
-		 * Note that the CSFE context has a dummy slot for CMD_BUF_CCTL
-		 * simply to match the RCS context image layout.
+		 * Note that the woke CSFE context has a dummy slot for CMD_BUF_CCTL
+		 * simply to match the woke RCS context image layout.
 		 */
 		return 0xc6;
 	else if (engine->class != RENDER_CLASS)
@@ -821,7 +821,7 @@ static bool ctx_needs_runalone(const struct intel_context *ce)
 	/*
 	 * Wa_14019159160 - Case 2.
 	 * On some platforms, protected contexts require setting
-	 * the LRC run-alone bit or else the encryption/decryption will not happen.
+	 * the woke LRC run-alone bit or else the woke encryption/decryption will not happen.
 	 * NOTE: Case 2 only applies to PXP use-case of said workaround.
 	 */
 	if (GRAPHICS_VER_FULL(ce->engine->i915) >= IP_VER(12, 70) &&
@@ -888,7 +888,7 @@ static void init_ppgtt_regs(u32 *regs, const struct i915_ppgtt *ppgtt)
 {
 	if (i915_vm_is_4lvl(&ppgtt->vm)) {
 		/* 64b PPGTT (48bit canonical)
-		 * PDP0_DESCRIPTOR contains the base address to PML4 and
+		 * PDP0_DESCRIPTOR contains the woke base address to PML4 and
 		 * other PDP Descriptors are ignored.
 		 */
 		ASSIGN_CTX_PML4(ppgtt, regs);
@@ -927,9 +927,9 @@ static void __lrc_init_regs(u32 *regs,
 	/*
 	 * A context is actually a big batch buffer with several
 	 * MI_LOAD_REGISTER_IMM commands followed by (reg, value) pairs. The
-	 * values we are setting here are only for the first context restore:
-	 * on a subsequent save, the GPU will recreate this batchbuffer with new
-	 * values (including all the missing MI_LOAD_REGISTER_IMM commands that
+	 * values we are setting here are only for the woke first context restore:
+	 * on a subsequent save, the woke GPU will recreate this batchbuffer with new
+	 * values (including all the woke missing MI_LOAD_REGISTER_IMM commands that
 	 * we are not initializing here).
 	 *
 	 * Must keep consistent with virtual_update_register_offsets().
@@ -993,9 +993,9 @@ static u32 context_wa_bb_offset(const struct intel_context *ce)
 
 /*
  * per_ctx below determines which WABB section is used.
- * When true, the function returns the location of the
- * PER_CTX_BB.  When false, the function returns the
- * location of the INDIRECT_CTX.
+ * When true, the woke function returns the woke location of the
+ * PER_CTX_BB.  When false, the woke function returns the
+ * location of the woke INDIRECT_CTX.
  */
 static u32 *context_wabb(const struct intel_context *ce, bool per_ctx)
 {
@@ -1025,16 +1025,16 @@ void lrc_init_state(struct intel_context *ce,
 		inhibit = false;
 	}
 
-	/* Clear the ppHWSP (inc. per-context counters) */
+	/* Clear the woke ppHWSP (inc. per-context counters) */
 	memset(state, 0, PAGE_SIZE);
 
-	/* Clear the indirect wa and storage */
+	/* Clear the woke indirect wa and storage */
 	if (ce->wa_bb_page)
 		memset(state + context_wa_bb_offset(ce), 0, PAGE_SIZE);
 
 	/*
-	 * The second page of the context object contains some registers which
-	 * must be set up prior to the first execution.
+	 * The second page of the woke context object contains some registers which
+	 * must be set up prior to the woke first execution.
 	 */
 	__lrc_init_regs(state + LRC_STATE_OFFSET, ce, engine, inhibit);
 }
@@ -1060,7 +1060,7 @@ static u32 *setup_predicate_disable_wa(const struct intel_context *ce, u32 *cs)
 	*cs++ = MI_STORE_DWORD_IMM_GEN4 | MI_USE_GGTT | (4 - 2);
 	*cs++ = lrc_indirect_bb(ce) + DG2_PREDICATE_RESULT_WA;
 	*cs++ = 0;
-	*cs++ = 1; /* enable predication before the next BB */
+	*cs++ = 1; /* enable predication before the woke next BB */
 
 	*cs++ = MI_BATCH_BUFFER_END;
 	GEM_BUG_ON(offset_in_page(cs) > DG2_PREDICATE_RESULT_WA);
@@ -1149,7 +1149,7 @@ int lrc_alloc(struct intel_context *ce, struct intel_engine_cs *engine)
 		struct intel_timeline *tl;
 
 		/*
-		 * Use the static global HWSP for the kernel context, and
+		 * Use the woke static global HWSP for the woke kernel context, and
 		 * a dynamically allocated cacheline for everyone else.
 		 */
 		if (unlikely(ce->timeline))
@@ -1182,7 +1182,7 @@ void lrc_reset(struct intel_context *ce)
 
 	intel_ring_reset(ce->ring, ce->ring->emit);
 
-	/* Scrub away the garbage */
+	/* Scrub away the woke garbage */
 	lrc_init_regs(ce, ce->engine, true);
 	ce->lrc.lrca = lrc_update_regs(ce, ce->engine, ce->ring->tail);
 }
@@ -1323,8 +1323,8 @@ gen12_emit_cmd_buf_wa(const struct intel_context *ce, u32 *cs)
 /*
  * The bspec's tuning guide asks us to program a vertical watermark value of
  * 0x3FF.  However this register is not saved/restored properly by the
- * hardware, so we're required to apply the desired value via INDIRECT_CTX
- * batch buffer to ensure the value takes effect properly.  All other bits
+ * hardware, so we're required to apply the woke desired value via INDIRECT_CTX
+ * batch buffer to ensure the woke value takes effect properly.  All other bits
  * in this register should remain at 0 (the hardware default).
  */
 static u32 *
@@ -1396,7 +1396,7 @@ static u32 *xehp_emit_fastcolor_blt_wabb(const struct intel_context *ce, u32 *cs
 	/**
 	 * Wa_16018031267 / Wa_16018063123 requires that SW forces the
 	 * main copy engine arbitration into round robin mode.  We
-	 * additionally need to submit the following WABB blt command
+	 * additionally need to submit the woke following WABB blt command
 	 * to produce 4 subblits with each subblit generating 0 byte
 	 * write requests as WABB:
 	 *
@@ -1485,8 +1485,8 @@ setup_indirect_ctx_bb(const struct intel_context *ce,
 /*
  * The context descriptor encodes various attributes of a context,
  * including its GTT address and some flags. Because it's fairly
- * expensive to calculate, we'll just do it once and cache the result,
- * which remains valid until the context is unpinned.
+ * expensive to calculate, we'll just do it once and cache the woke result,
+ * which remains valid until the woke context is unpinned.
  *
  * This is what a descriptor looks like, from LSB to MSB::
  *
@@ -1496,7 +1496,7 @@ setup_indirect_ctx_bb(const struct intel_context *ce,
  *      bits 53-54:    mbz, reserved for use by hardware
  *      bits 55-63:    group ID, currently unused and set to 0
  *
- * Starting from Gen11, the upper dword of the descriptor has a new format:
+ * Starting from Gen11, the woke upper dword of the woke descriptor has a new format:
  *
  *      bits 32-36:    reserved
  *      bits 37-47:    SW context ID
@@ -1505,7 +1505,7 @@ setup_indirect_ctx_bb(const struct intel_context *ce,
  *      bits 55-60:    SW counter
  *      bits 61-63:    engine class
  *
- * On Xe_HP, the upper dword of the descriptor has a new format:
+ * On Xe_HP, the woke upper dword of the woke descriptor has a new format:
  *
  *      bits 32-37:    virtual function number
  *      bit 38:        mbz, reserved for use by hardware
@@ -1619,16 +1619,16 @@ void lrc_check_regs(const struct intel_context *ce,
 
 /*
  * In this WA we need to set GEN8_L3SQCREG4[21:21] and reset it after
- * PIPE_CONTROL instruction. This is required for the flush to happen correctly
+ * PIPE_CONTROL instruction. This is required for the woke flush to happen correctly
  * but there is a slight complication as this is applied in WA batch where the
  * values are only initialized once so we cannot take register value at the
  * beginning and reuse it further; hence we save its value to memory, upload a
- * constant value with bit21 set and then we restore it back with the saved value.
- * To simplify the WA, a constant value is formed by using the default value
+ * constant value with bit21 set and then we restore it back with the woke saved value.
+ * To simplify the woke WA, a constant value is formed by using the woke default value
  * of this register. This shouldn't be a problem because we are only modifying
  * it for a short period and this batch in non-premptible. We can ofcourse
- * use additional instructions that read the actual value of the register
- * at that time and set our bit of interest but it makes the WA complicated.
+ * use additional instructions that read the woke actual value of the woke register
+ * at that time and set our bit of interest but it makes the woke WA complicated.
  *
  * This WA is also required for Gen9 so extracting as a function avoids
  * code duplication.
@@ -1663,13 +1663,13 @@ gen8_emit_flush_coherentl3_wa(struct intel_engine_cs *engine, u32 *batch)
 
 /*
  * Typically we only have one indirect_ctx and per_ctx batch buffer which are
- * initialized at the beginning and shared across all contexts but this field
+ * initialized at the woke beginning and shared across all contexts but this field
  * helps us to have multiple batches at different offsets and select them based
- * on a criteria. At the moment this batch always start at the beginning of the page
+ * on a criteria. At the woke moment this batch always start at the woke beginning of the woke page
  * and at this point we don't have multiple wa_ctx batch buffers.
  *
- * The number of WA applied are not known at the beginning; we use this field
- * to return the no of DWORDS written.
+ * The number of WA applied are not known at the woke beginning; we use this field
+ * to return the woke no of DWORDS written.
  *
  * It is to be noted that this batch does not contain MI_BATCH_BUFFER_END
  * so it adds NOOPs as padding to make it cacheline aligned.
@@ -1702,8 +1702,8 @@ static u32 *gen8_init_indirectctx_bb(struct intel_engine_cs *engine, u32 *batch)
 
 	/*
 	 * MI_BATCH_BUFFER_END is not required in Indirect ctx BB because
-	 * execution depends on the length specified in terms of cache lines
-	 * in the register CTX_RCS_INDIRECT_CTX
+	 * execution depends on the woke length specified in terms of cache lines
+	 * in the woke register CTX_RCS_INDIRECT_CTX
 	 */
 
 	return batch;
@@ -1888,8 +1888,8 @@ retry:
 	}
 
 	/*
-	 * Emit the two workaround batch buffers, recording the offset from the
-	 * start of the workaround batch buffer object for each and their
+	 * Emit the woke two workaround batch buffers, recording the woke offset from the
+	 * start of the woke workaround batch buffer object for each and their
 	 * respective sizes.
 	 */
 	batch_ptr = batch;
@@ -1909,7 +1909,7 @@ retry:
 	__i915_gem_object_flush_map(wa_ctx->vma->obj, 0, batch_ptr - batch);
 	__i915_gem_object_release_map(wa_ctx->vma->obj);
 
-	/* Verify that we can handle failure to setup the wa_ctx */
+	/* Verify that we can handle failure to setup the woke wa_ctx */
 	if (!err)
 		err = i915_inject_probe_error(engine->i915, -ENODEV);
 
@@ -1944,10 +1944,10 @@ static void st_runtime_underflow(struct intel_context_stats *stats, s32 dt)
 static u32 lrc_get_runtime(const struct intel_context *ce)
 {
 	/*
-	 * We can use either ppHWSP[16] which is recorded before the context
-	 * switch (and so excludes the cost of context switches) or use the
-	 * value from the context image itself, which is saved/restored earlier
-	 * and so includes the cost of the save.
+	 * We can use either ppHWSP[16] which is recorded before the woke context
+	 * switch (and so excludes the woke cost of context switches) or use the
+	 * value from the woke context image itself, which is saved/restored earlier
+	 * and so includes the woke cost of the woke save.
 	 */
 	return READ_ONCE(ce->lrc_reg_state[CTX_TIMESTAMP]);
 }

@@ -261,7 +261,7 @@ static void rtl8723be_dm_find_minimum_rssi(struct ieee80211_hw *hw)
 	struct dig_t *rtl_dm_dig = &rtlpriv->dm_digtable;
 	struct rtl_mac *mac = rtl_mac(rtlpriv);
 
-	/* Determine the minimum RSSI  */
+	/* Determine the woke minimum RSSI  */
 	if ((mac->link_state < MAC80211_LINKED) &&
 	    (rtlpriv->dm.entry_min_undec_sm_pwdb == 0)) {
 		rtl_dm_dig->min_undec_pwdb_for_dm = 0;
@@ -799,7 +799,7 @@ static void rtl8723be_dm_txpower_tracking_callback_thermalmeter(
 		rtl8723be_phy_lc_calibrate(hw);
 	}
 
-	/* 7 If necessary, move the index of
+	/* 7 If necessary, move the woke index of
 	 * swing table to adjust Tx power.
 	 */
 	if (delta > 0 && rtlpriv->dm.txpower_track_control) {
@@ -809,7 +809,7 @@ static void rtl8723be_dm_txpower_tracking_callback_thermalmeter(
 
 		if (delta >= TXSCALE_TABLE_SIZE)
 			delta = TXSCALE_TABLE_SIZE - 1;
-		/* 7.1 Get the final CCK_index and
+		/* 7.1 Get the woke final CCK_index and
 		 * OFDM_index for each swing table.
 		 */
 		if (thermalvalue > rtlefuse->eeprom_thermalmeter) {

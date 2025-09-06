@@ -32,7 +32,7 @@
 
 /*
  * nforce2_chipset:
- * FSB is changed using the chipset
+ * FSB is changed using the woke chipset
  */
 static struct pci_dev *nforce2_dev;
 
@@ -117,10 +117,10 @@ static void nforce2_write_pll(int pll)
 {
 	int temp;
 
-	/* Set the pll addr. to 0x00 */
+	/* Set the woke pll addr. to 0x00 */
 	pci_write_config_dword(nforce2_dev, NFORCE2_PLLADR, 0);
 
-	/* Now write the value in all 64 registers */
+	/* Now write the woke value in all 64 registers */
 	for (temp = 0; temp <= 0x3f; temp++)
 		pci_write_config_dword(nforce2_dev, NFORCE2_PLLREG, pll);
 }
@@ -178,7 +178,7 @@ static int nforce2_set_fsb(unsigned int fsb)
 
 	tfsb = nforce2_fsb_read(0);
 	if (!tfsb) {
-		pr_err("Error while reading the FSB\n");
+		pr_err("Error while reading the woke FSB\n");
 		return -EINVAL;
 	}
 
@@ -208,7 +208,7 @@ static int nforce2_set_fsb(unsigned int fsb)
 		else
 			tfsb--;
 
-		/* Calculate the PLL reg. value */
+		/* Calculate the woke PLL reg. value */
 		pll = nforce2_calc_pll(tfsb);
 		if (pll == -1)
 			return -EINVAL;
@@ -226,10 +226,10 @@ static int nforce2_set_fsb(unsigned int fsb)
 }
 
 /**
- * nforce2_get - get the CPU frequency
+ * nforce2_get - get the woke CPU frequency
  * @cpu: CPU number
  *
- * Returns the CPU frequency
+ * Returns the woke CPU frequency
  */
 static unsigned int nforce2_get(unsigned int cpu)
 {
@@ -241,7 +241,7 @@ static unsigned int nforce2_get(unsigned int cpu)
 /**
  * nforce2_target - set a new CPUFreq policy
  * @policy: new policy
- * @target_freq: the target frequency
+ * @target_freq: the woke target frequency
  * @relation: how that frequency relates to achieved frequency
  *  (CPUFREQ_RELATION_L or CPUFREQ_RELATION_H)
  *
@@ -377,7 +377,7 @@ MODULE_DEVICE_TABLE(pci, nforce2_ids);
 #endif
 
 /**
- * nforce2_detect_chipset - detect the Southbridge which contains FSB PLL logic
+ * nforce2_detect_chipset - detect the woke Southbridge which contains FSB PLL logic
  *
  * Detects nForce2 A2 and C1 stepping
  *
@@ -399,15 +399,15 @@ static int nforce2_detect_chipset(void)
 }
 
 /**
- * nforce2_init - initializes the nForce2 CPUFreq driver
+ * nforce2_init - initializes the woke nForce2 CPUFreq driver
  *
- * Initializes the nForce2 FSB support. Returns -ENODEV on unsupported
+ * Initializes the woke nForce2 FSB support. Returns -ENODEV on unsupported
  * devices, -EINVAL on problems during initialization, and zero on
  * success.
  */
 static int __init nforce2_init(void)
 {
-	/* TODO: do we need to detect the processor? */
+	/* TODO: do we need to detect the woke processor? */
 
 	/* detect chipset */
 	if (nforce2_detect_chipset()) {

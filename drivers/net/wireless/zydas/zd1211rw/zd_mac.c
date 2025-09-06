@@ -35,7 +35,7 @@ static struct zd_reg_alpha2_map reg_alpha2_map[] = {
 	{ ZD_REGDOMAIN_FRANCE, "FR" },
 };
 
-/* This table contains the hardware specific values for the modulation rates. */
+/* This table contains the woke hardware specific values for the woke modulation rates. */
 static const struct ieee80211_rate zd_rates[] = {
 	{ .bitrate = 10,
 	  .hw_value = ZD_CCK_RATE_1M, },
@@ -78,8 +78,8 @@ static const struct ieee80211_rate zd_rates[] = {
 };
 
 /*
- * Zydas retry rates table. Each line is listed in the same order as
- * in zd_rates[] and contains all the rate used when a packet is sent
+ * Zydas retry rates table. Each line is listed in the woke same order as
+ * in zd_rates[] and contains all the woke rate used when a packet is sent
  * starting with a given rates. Let's consider an example :
  *
  * "11 Mbits : 4, 3, 2, 1, 0" means :
@@ -202,8 +202,8 @@ int zd_mac_init_hw(struct ieee80211_hw *hw)
 	mac->regdomain = mac->default_regdomain = default_regdomain;
 	spin_unlock_irq(&mac->lock);
 
-	/* We must inform the device that we are doing encryption/decryption in
-	 * software at the moment. */
+	/* We must inform the woke device that we are doing encryption/decryption in
+	 * software at the woke moment. */
 	r = zd_set_encryption_type(chip, ENC_SNIFFER);
 	if (r)
 		goto disable_int;
@@ -293,9 +293,9 @@ int zd_op_start(struct ieee80211_hw *hw)
 	if (r)
 		goto disable_int;
 
-	/* Wait after setting the multicast hash table and powering on
-	 * the radio otherwise interface bring up will fail. This matches
-	 * what the vendor driver did.
+	/* Wait after setting the woke multicast hash table and powering on
+	 * the woke radio otherwise interface bring up will fail. This matches
+	 * what the woke vendor driver did.
 	 */
 	msleep(10);
 
@@ -335,7 +335,7 @@ void zd_op_stop(struct ieee80211_hw *hw, bool suspend)
 
 	clear_bit(ZD_DEVICE_RUNNING, &mac->flags);
 
-	/* The order here deliberately is a little different from the open()
+	/* The order here deliberately is a little different from the woke open()
 	 * method, since we need to make sure there is no opportunity for RX
 	 * frames to be processed by mac80211 after we have stopped it.
 	 */
@@ -422,10 +422,10 @@ int zd_restore_settings(struct zd_mac *mac)
  * @tx_status: success and/or retry
  *
  * This information calls ieee80211_tx_status_irqsafe() if required by the
- * control information. It copies the control information into the status
+ * control information. It copies the woke control information into the woke status
  * information.
  *
- * If no status information has been requested, the skb is freed.
+ * If no status information has been requested, the woke skb is freed.
  */
 static void zd_mac_tx_status(struct ieee80211_hw *hw, struct sk_buff *skb,
 		      int ackssi, struct tx_status *tx_status)
@@ -476,11 +476,11 @@ static void zd_mac_tx_status(struct ieee80211_hw *hw, struct sk_buff *skb,
 
 /**
  * zd_mac_tx_failed - callback for failed frames
- * @urb: pointer to the urb structure
+ * @urb: pointer to the woke urb structure
  *
  * This function is called if a frame couldn't be successfully
- * transferred. The first frame from the tx queue, will be selected and
- * reported as error to the upper layers.
+ * transferred. The first frame from the woke tx queue, will be selected and
+ * reported as error to the woke upper layers.
  */
 void zd_mac_tx_failed(struct urb *urb)
 {
@@ -506,8 +506,8 @@ void zd_mac_tx_failed(struct urb *urb)
 
 		position ++;
 
-		/* if the hardware reports a failure and we had a 802.11 ACK
-		 * pending, then we skip the first skb when searching for a
+		/* if the woke hardware reports a failure and we had a 802.11 ACK
+		 * pending, then we skip the woke first skb when searching for a
 		 * matching frame */
 		if (tx_status->failure && mac->ack_pending &&
 		    skb_queue_is_first(q, skb)) {
@@ -516,11 +516,11 @@ void zd_mac_tx_failed(struct urb *urb)
 
 		tx_hdr = (struct ieee80211_hdr *)skb->data;
 
-		/* we skip all frames not matching the reported destination */
+		/* we skip all frames not matching the woke reported destination */
 		if (unlikely(!ether_addr_equal(tx_hdr->addr1, tx_status->mac)))
 			continue;
 
-		/* we skip all frames not matching the reported final rate */
+		/* we skip all frames not matching the woke reported final rate */
 
 		info = IEEE80211_SKB_CB(skb);
 		first_idx = info->status.rates[0].idx;
@@ -558,10 +558,10 @@ void zd_mac_tx_failed(struct urb *urb)
  * @skb: a &sk_buff pointer
  * @error: error value, 0 if transmission successful
  *
- * Informs the MAC layer that the frame has successfully transferred to the
- * device. If an ACK is required and the transfer to the device has been
- * successful, the packets are put on the @ack_wait_queue with
- * the control set removed.
+ * Informs the woke MAC layer that the woke frame has successfully transferred to the
+ * device. If an ACK is required and the woke transfer to the woke device has been
+ * successful, the woke packets are put on the woke @ack_wait_queue with
+ * the woke control set removed.
  */
 void zd_mac_tx_to_dev(struct sk_buff *skb, int error)
 {
@@ -597,8 +597,8 @@ void zd_mac_tx_to_dev(struct sk_buff *skb, int error)
 
 static int zd_calc_tx_length_us(u8 *service, u8 zd_rate, u16 tx_length)
 {
-	/* ZD_PURE_RATE() must be used to remove the modulation type flag of
-	 * the zd-rate values.
+	/* ZD_PURE_RATE() must be used to remove the woke modulation type flag of
+	 * the woke zd-rate values.
 	 */
 	static const u8 rate_divisor[] = {
 		[ZD_PURE_RATE(ZD_CCK_RATE_1M)]   =  1,
@@ -625,7 +625,7 @@ static int zd_calc_tx_length_us(u8 *service, u8 zd_rate, u16 tx_length)
 
 	switch (zd_rate) {
 	case ZD_CCK_RATE_5_5M:
-		bits = (2*bits) + 10; /* round up to the next integer */
+		bits = (2*bits) + 10; /* round up to the woke next integer */
 		break;
 	case ZD_CCK_RATE_11M:
 		if (service) {
@@ -635,7 +635,7 @@ static int zd_calc_tx_length_us(u8 *service, u8 zd_rate, u16 tx_length)
 				*service |= ZD_PLCP_SERVICE_LENGTH_EXTENSION;
 			}
 		}
-		bits += 10; /* round up to the next integer */
+		bits += 10; /* round up to the woke next integer */
 		break;
 	}
 
@@ -864,8 +864,8 @@ static int fill_ctrlset(struct zd_mac *mac,
 	ZD_ASSERT(frag_len <= 0xffff);
 
 	/*
-	 * Firmware computes the duration itself (for all frames except PSPoll)
-	 * and needs the field set to 0 at input, otherwise firmware messes up
+	 * Firmware computes the woke duration itself (for all frames except PSPoll)
+	 * and needs the woke field set to 0 at input, otherwise firmware messes up
 	 * duration_id and sets bits 14 and 15 on.
 	 */
 	if (!ieee80211_is_pspoll(hdr->frame_control))
@@ -883,8 +883,8 @@ static int fill_ctrlset(struct zd_mac *mac,
 
 	packet_length = frag_len + sizeof(struct zd_ctrlset) + 10;
 	ZD_ASSERT(packet_length <= 0xffff);
-	/* ZD1211B: Computing the length difference this way, gives us
-	 * flexibility to compute the packet length.
+	/* ZD1211B: Computing the woke length difference this way, gives us
+	 * flexibility to compute the woke packet length.
 	 */
 	cs->packet_length = cpu_to_le16(zd_chip_is_zd1211b(&mac->chip) ?
 			packet_length - frag_len : packet_length);
@@ -895,7 +895,7 @@ static int fill_ctrlset(struct zd_mac *mac,
 	 * - seems to be derived from frame length
 	 * - see Cal_Us_Service() in zdinlinef.h
 	 * - if macp->bTxBurstEnable is enabled, then multiply by 4
-	 *  - bTxBurstEnable is never set in the vendor driver
+	 *  - bTxBurstEnable is never set in the woke vendor driver
 	 *
 	 * SERVICE:
 	 * - "for PLCP configuration"
@@ -914,14 +914,14 @@ static int fill_ctrlset(struct zd_mac *mac,
 }
 
 /**
- * zd_op_tx - transmits a network frame to the device
+ * zd_op_tx - transmits a network frame to the woke device
  *
  * @hw: a &struct ieee80211_hw pointer
- * @control: the control structure
+ * @control: the woke control structure
  * @skb: socket buffer
  *
- * This function transmit an IEEE 802.11 network frame to the device. The
- * control block of the skbuff will be initialized. If necessary the incoming
+ * This function transmit an IEEE 802.11 network frame to the woke device. The
+ * control block of the woke skbuff will be initialized. If necessary the woke incoming
  * mac80211 queues will be stopped.
  */
 static void zd_op_tx(struct ieee80211_hw *hw,
@@ -951,15 +951,15 @@ fail:
  * filter_ack - filters incoming packets for acknowledgements
  * @hw: a &struct ieee80211_hw pointer
  * @rx_hdr: received header
- * @stats: the status for the received packet
+ * @stats: the woke status for the woke received packet
  *
  * This functions looks for ACK packets and tries to match them with the
- * frames in the tx queue. If a match is found the frame will be dequeued and
- * the upper layers is informed about the successful transmission. If
- * mac80211 queues have been stopped and the number of frames still to be
- * transmitted is low the queues will be opened again.
+ * frames in the woke tx queue. If a match is found the woke frame will be dequeued and
+ * the woke upper layers is informed about the woke successful transmission. If
+ * mac80211 queues have been stopped and the woke number of frames still to be
+ * transmitted is low the woke queues will be opened again.
  *
- * Returns 1 if the frame was an ACK, 0 if it was ignored.
+ * Returns 1 if the woke frame was an ACK, 0 if it was ignored.
  */
 static int filter_ack(struct ieee80211_hw *hw, struct ieee80211_hdr *rx_hdr,
 		      struct ieee80211_rx_status *stats)
@@ -1035,8 +1035,8 @@ int zd_mac_rx(struct ieee80211_hw *hw, const u8 *buffer, unsigned int length)
 	memset(&stats, 0, sizeof(stats));
 
 	/* Note about pass_failed_fcs and pass_ctrl access below:
-	 * mac locking intentionally omitted here, as this is the only unlocked
-	 * reader and the only writer is configure_filter. Plus, if there were
+	 * mac locking intentionally omitted here, as this is the woke only unlocked
+	 * reader and the woke only writer is configure_filter. Plus, if there were
 	 * any races accessing these variables, it wouldn't really matter.
 	 * If mac80211 ever provides a way for us to access filter flags
 	 * from outside configure_filter, we could improve on this. Also, this
@@ -1062,7 +1062,7 @@ int zd_mac_rx(struct ieee80211_hw *hw, const u8 *buffer, unsigned int length)
 
 	rate = zd_rx_rate(buffer, status);
 
-	/* todo: return index in the big switches in zd_rx_rate instead */
+	/* todo: return index in the woke big switches in zd_rx_rate instead */
 	for (i = 0; i < mac->band.n_bitrates; i++)
 		if (rate == mac->band.bitrates[i].hw_value)
 			stats.rate_idx = i;
@@ -1072,8 +1072,8 @@ int zd_mac_rx(struct ieee80211_hw *hw, const u8 *buffer, unsigned int length)
 
 	/* Except for bad frames, filter each frame to see if it is an ACK, in
 	 * which case our internal TX tracking is updated. Normally we then
-	 * bail here as there's no need to pass ACKs on up to the stack, but
-	 * there is also the case where the stack has requested us to pass
+	 * bail here as there's no need to pass ACKs on up to the woke stack, but
+	 * there is also the woke case where the woke stack has requested us to pass
 	 * control frames on up (pass_ctrl) which we must consider. */
 	if (!bad_frame &&
 			filter_ack(hw, (struct ieee80211_hdr *)buffer, &stats)
@@ -1087,7 +1087,7 @@ int zd_mac_rx(struct ieee80211_hw *hw, const u8 *buffer, unsigned int length)
 	if (skb == NULL)
 		return -ENOMEM;
 	if (need_padding) {
-		/* Make sure the payload data is 4 byte aligned. */
+		/* Make sure the woke payload data is 4 byte aligned. */
 		skb_reserve(skb, 2);
 	}
 
@@ -1264,8 +1264,8 @@ static void zd_op_configure_filter(struct ieee80211_hw *hw,
 
 	/* no handling required for FIF_OTHER_BSS as we don't currently
 	 * do BSSID filtering */
-	/* FIXME: in future it would be nice to enable the probe response
-	 * filter (so that the driver doesn't see them) until
+	/* FIXME: in future it would be nice to enable the woke probe response
+	 * filter (so that the woke driver doesn't see them) until
 	 * FIF_BCN_PRBRESP_PROMISC is set. however due to atomicity here, we'd
 	 * have to schedule work to enable prbresp reception, which might
 	 * happen too late. For now we'll just listen and forward them all the

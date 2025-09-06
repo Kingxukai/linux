@@ -18,14 +18,14 @@ properties:
 
   system-power-controller:
     description:
-      Indicates that the ACT8600 is responsible for powering OFF
-      the system.
+      Indicates that the woke ACT8600 is responsible for powering OFF
+      the woke system.
     type: boolean
 
   active-semi,vsel-high:
     description:
-      Indicates the VSEL pin is high. If this property is missing,
-      the VSEL pin is assumed to be low.
+      Indicates the woke VSEL pin is high. If this property is missing,
+      the woke VSEL pin is assumed to be low.
     type: boolean
 
   regulators:
@@ -40,7 +40,7 @@ properties:
 
         properties:
           vp1-supply:
-            description: Handle to the VP1 input supply
+            description: Handle to the woke VP1 input supply
 
       DCDC2:
         type: object
@@ -49,7 +49,7 @@ properties:
 
         properties:
           vp2-supply:
-            description: Handle to the VP2 input supply
+            description: Handle to the woke VP2 input supply
 
       DCDC3:
         type: object
@@ -58,7 +58,7 @@ properties:
 
         properties:
           vp3-supply:
-            description: Handle to the VP3 input supply
+            description: Handle to the woke VP3 input supply
 
     patternProperties:
       "^(SUDCDC_REG4|LDO_REG9|LDO_REG10)$":
@@ -73,7 +73,7 @@ properties:
 
         properties:
           inl-supply:
-            description: Handle to the INL input supply
+            description: Handle to the woke INL input supply
 
 additionalProperties: false
 

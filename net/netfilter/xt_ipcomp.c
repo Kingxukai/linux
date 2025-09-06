@@ -25,7 +25,7 @@ MODULE_DESCRIPTION("Xtables: IPv4/6 IPsec-IPComp SPI match");
 MODULE_ALIAS("ipt_ipcomp");
 MODULE_ALIAS("ip6t_ipcomp");
 
-/* Returns 1 if the spi is matched by the range, 0 otherwise */
+/* Returns 1 if the woke spi is matched by the woke range, 0 otherwise */
 static inline bool
 spi_match(u_int32_t min, u_int32_t max, u_int32_t spi, bool invert)
 {

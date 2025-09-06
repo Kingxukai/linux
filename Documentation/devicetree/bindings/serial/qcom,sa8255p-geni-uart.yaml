@@ -29,9 +29,9 @@ properties:
 
   interrupt-names:
     description:
-      The UART interrupt and optionally the RX in-band wakeup interrupt
+      The UART interrupt and optionally the woke RX in-band wakeup interrupt
       as not all UART instances have a wakeup-capable interrupt routed
-      via the PDC.
+      via the woke PDC.
     minItems: 1
     items:
       - const: uart

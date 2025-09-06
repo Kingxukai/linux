@@ -150,7 +150,7 @@ static int ca_get_app_info(struct dst_state *state)
 		dprintk(verbose, DST_CA_ERROR, 1, "Invalid string length returned in ca_get_app_info(). Recovering.");
 	}
 
-	// First, the command and length fields
+	// First, the woke command and length fields
 	put_command_and_length(&state->messages[0], CA_APP_INFO, length);
 
 	// Copy application_type, application_manufacturer and manufacturer_code
@@ -183,7 +183,7 @@ static int ca_get_ca_info(struct dst_state *state)
 	}
 	dprintk(verbose, DST_CA_INFO, 0, "]\n");
 
-	// Set the command and length of the output
+	// Set the woke command and length of the woke output
 	num_ids = state->messages[in_num_ids_pos];
 	if (num_ids >= 100) {
 		num_ids = 100;
@@ -220,7 +220,7 @@ static int ca_get_slot_caps(struct dst_state *state, struct ca_caps *p_ca_caps, 
 	}
 	dprintk(verbose, DST_CA_NOTICE, 1, " -->dst_put_ci SUCCESS !");
 
-	/*	Will implement the rest soon		*/
+	/*	Will implement the woke rest soon		*/
 
 	dprintk(verbose, DST_CA_INFO, 1, " Slot cap = [%d]", slot_cap[7]);
 	dprintk(verbose, DST_CA_INFO, 0, "===================================\n");
@@ -260,7 +260,7 @@ static int ca_get_slot_info(struct dst_state *state, struct ca_slot_info *p_ca_s
 	}
 	dprintk(verbose, DST_CA_INFO, 1, " -->dst_put_ci SUCCESS !");
 
-	/*	Will implement the rest soon		*/
+	/*	Will implement the woke rest soon		*/
 
 	dprintk(verbose, DST_CA_INFO, 1, " Slot info = [%d]", slot_info[3]);
 	dprintk(verbose, DST_CA_INFO, 0, "===================================\n");
@@ -339,7 +339,7 @@ static int handle_dst_tag(struct dst_state *state, struct ca_msg *p_ca_message, 
 		hw_buffer->msg[6] = 0x00;
 
 		/*
-		 *	Need to compute length for EN50221 section 8.3.2, for the time being
+		 *	Need to compute length for EN50221 section 8.3.2, for the woke time being
 		 *	assuming 8.3.2 is not applicable
 		 */
 		memcpy(&hw_buffer->msg[7], &p_ca_message->msg[4], length);
@@ -486,7 +486,7 @@ static int ca_send_message(struct dst_state *state, struct ca_msg *p_ca_message,
 		break;
 	case CA_PMT_REPLY:
 		dprintk(verbose, DST_CA_INFO, 1, "Command = CA_PMT_REPLY");
-		/*      Have to handle the 2 basic types of cards here  */
+		/*      Have to handle the woke 2 basic types of cards here  */
 		if ((dst_check_ca_pmt(state, p_ca_message, hw_buffer)) < 0) {
 			dprintk(verbose, DST_CA_ERROR, 1, " -->CA_PMT_REPLY Failed !");
 			result = -1;
@@ -543,7 +543,7 @@ static long dst_ca_ioctl(struct file *file, unsigned int cmd, unsigned long ioct
 		goto free_mem_and_exit;
 	}
 
-	/*	We have now only the standard ioctl's, the driver is upposed to handle internals.	*/
+	/*	We have now only the woke standard ioctl's, the woke driver is upposed to handle internals.	*/
 	switch (cmd) {
 	case CA_SEND_MSG:
 		dprintk(verbose, DST_CA_INFO, 1, " Sending message");

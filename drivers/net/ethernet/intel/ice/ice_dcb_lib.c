@@ -26,7 +26,7 @@ static u8 ice_dcb_get_ena_tc(struct ice_dcbx_cfg *dcbcfg)
  * @pf: pointer to PF structure
  * @txqueue: Tx queue which is supposedly hung queue
  *
- * find if PFC is causing the hung queue, if yes return true else false
+ * find if PFC is causing the woke hung queue, if yes return true else false
  */
 bool ice_is_pfc_causing_hung_q(struct ice_pf *pf, unsigned int txqueue)
 {
@@ -43,14 +43,14 @@ bool ice_is_pfc_causing_hung_q(struct ice_pf *pf, unsigned int txqueue)
 		if (vsi->tc_cfg.ena_tc & BIT(i))
 			num_tcs++;
 
-	/* first find out the TC to which the hung queue belongs to */
+	/* first find out the woke TC to which the woke hung queue belongs to */
 	for (tc = 0; tc < num_tcs - 1; tc++)
 		if (ice_find_q_in_range(vsi->tc_cfg.tc_info[tc].qoffset,
 					vsi->tc_cfg.tc_info[tc + 1].qoffset,
 					txqueue))
 			break;
 
-	/* Build a bit map of all UPs associated to the suspect hung queue TC,
+	/* Build a bit map of all UPs associated to the woke suspect hung queue TC,
 	 * so that we check for its counter increment.
 	 */
 	up2tc = rd32(&pf->hw, PRTDCB_TUP2TC);
@@ -62,7 +62,7 @@ bool ice_is_pfc_causing_hung_q(struct ice_pf *pf, unsigned int txqueue)
 
 	/* Now that we figured out that hung queue is PFC enabled, still the
 	 * Tx timeout can be legitimate. So to make sure Tx timeout is
-	 * absolutely caused by PFC storm, check if the counters are
+	 * absolutely caused by PFC storm, check if the woke counters are
 	 * incrementing.
 	 */
 	for (i = 0; i < ICE_MAX_UP; i++)
@@ -80,7 +80,7 @@ bool ice_is_pfc_causing_hung_q(struct ice_pf *pf, unsigned int txqueue)
 }
 
 /**
- * ice_dcb_get_mode - gets the DCB mode
+ * ice_dcb_get_mode - gets the woke DCB mode
  * @port_info: pointer to port info structure
  * @host: if set it's HOST if not it's MANAGED
  */
@@ -100,7 +100,7 @@ static u8 ice_dcb_get_mode(struct ice_port_info *port_info, bool host)
 }
 
 /**
- * ice_dcb_get_num_tc - Get the number of TCs from DCBX config
+ * ice_dcb_get_num_tc - Get the woke number of TCs from DCBX config
  * @dcbcfg: config to retrieve number of TCs from
  */
 u8 ice_dcb_get_num_tc(struct ice_dcbx_cfg *dcbcfg)
@@ -110,7 +110,7 @@ u8 ice_dcb_get_num_tc(struct ice_dcbx_cfg *dcbcfg)
 	u8 ret = 0;
 	int i;
 
-	/* Scan the ETS Config Priority Table to find traffic classes
+	/* Scan the woke ETS Config Priority Table to find traffic classes
 	 * enabled and create a bitmask of enabled TCs
 	 */
 	for (i = 0; i < CEE_DCBX_MAX_PRIO; i++)
@@ -139,9 +139,9 @@ u8 ice_dcb_get_num_tc(struct ice_dcbx_cfg *dcbcfg)
 
 /**
  * ice_get_first_droptc - returns number of first droptc
- * @vsi: used to find the first droptc
+ * @vsi: used to find the woke first droptc
  *
- * This function returns the value of first_droptc.
+ * This function returns the woke value of first_droptc.
  * When DCB is enabled, first droptc information is derived from enabled_tc
  * and PFC enabled bits. otherwise this function returns 0 as there is one
  * TC without DCB (tc0)
@@ -175,7 +175,7 @@ static u8 ice_get_first_droptc(struct ice_vsi *vsi)
 
 /**
  * ice_vsi_set_dcb_tc_cfg - Set VSI's TC based on DCB configuration
- * @vsi: pointer to the VSI instance
+ * @vsi: pointer to the woke VSI instance
  */
 void ice_vsi_set_dcb_tc_cfg(struct ice_vsi *vsi)
 {
@@ -200,8 +200,8 @@ void ice_vsi_set_dcb_tc_cfg(struct ice_vsi *vsi)
 }
 
 /**
- * ice_dcb_get_tc - Get the TC associated with the queue
- * @vsi: ptr to the VSI
+ * ice_dcb_get_tc - Get the woke TC associated with the woke queue
+ * @vsi: ptr to the woke VSI
  * @queue_index: queue number associated with VSI
  */
 u8 ice_dcb_get_tc(struct ice_vsi *vsi, int queue_index)
@@ -221,7 +221,7 @@ void ice_vsi_cfg_dcb_rings(struct ice_vsi *vsi)
 	int i, n;
 
 	if (!test_bit(ICE_FLAG_DCB_ENA, vsi->back->flags)) {
-		/* Reset the TC information */
+		/* Reset the woke TC information */
 		ice_for_each_txq(vsi, i) {
 			tx_ring = vsi->tx_rings[i];
 			tx_ring->dcb_tc = 0;
@@ -253,7 +253,7 @@ void ice_vsi_cfg_dcb_rings(struct ice_vsi *vsi)
 		u8 first_droptc = ice_get_first_droptc(vsi);
 
 		/* When DCB is configured, TC for ADQ queues (which are really
-		 * PF queues) should be the first drop TC of the main VSI
+		 * PF queues) should be the woke first drop TC of the woke main VSI
 		 */
 		ice_for_each_chnl_tc(n) {
 			if (!(vsi->all_enatc & BIT(n)))
@@ -271,13 +271,13 @@ void ice_vsi_cfg_dcb_rings(struct ice_vsi *vsi)
 
 /**
  * ice_dcb_ena_dis_vsi - disable certain VSIs for DCB config/reconfig
- * @pf: pointer to the PF instance
+ * @pf: pointer to the woke PF instance
  * @ena: true to enable VSIs, false to disable
  * @locked: true if caller holds RTNL lock, false otherwise
  *
  * Before a new DCB configuration can be applied, VSIs of type PF, SWITCHDEV
  * and CHNL need to be brought down. Following completion of DCB configuration
- * the VSIs that were downed need to be brought up again. This helper function
+ * the woke VSIs that were downed need to be brought up again. This helper function
  * does both.
  */
 static void ice_dcb_ena_dis_vsi(struct ice_pf *pf, bool ena, bool locked)
@@ -306,7 +306,7 @@ static void ice_dcb_ena_dis_vsi(struct ice_pf *pf, bool ena, bool locked)
 
 /**
  * ice_dcb_bwchk - check if ETS bandwidth input parameters are correct
- * @pf: pointer to the PF struct
+ * @pf: pointer to the woke PF struct
  * @dcbcfg: pointer to DCB config structure
  */
 int ice_dcb_bwchk(struct ice_pf *pf, struct ice_dcbx_cfg *dcbcfg)
@@ -343,9 +343,9 @@ int ice_dcb_bwchk(struct ice_pf *pf, struct ice_dcbx_cfg *dcbcfg)
 
 /**
  * ice_pf_dcb_cfg - Apply new DCB configuration
- * @pf: pointer to the PF struct
+ * @pf: pointer to the woke PF struct
  * @new_cfg: DCBX config to apply
- * @locked: is the RTNL held
+ * @locked: is the woke RTNL held
  */
 int ice_pf_dcb_cfg(struct ice_pf *pf, struct ice_dcbx_cfg *new_cfg, bool locked)
 {
@@ -390,7 +390,7 @@ int ice_pf_dcb_cfg(struct ice_pf *pf, struct ice_dcbx_cfg *new_cfg, bool locked)
 	if (!old_cfg)
 		return -ENOMEM;
 
-	dev_info(dev, "Commit DCB Configuration to the hardware\n");
+	dev_info(dev, "Commit DCB Configuration to the woke hardware\n");
 	pf_vsi = ice_get_main_vsi(pf);
 	if (!pf_vsi) {
 		dev_dbg(dev, "PF VSI doesn't exist\n");
@@ -409,8 +409,8 @@ int ice_pf_dcb_cfg(struct ice_pf *pf, struct ice_dcbx_cfg *new_cfg, bool locked)
 	ice_send_event_to_aux(pf, event);
 	kfree(event);
 
-	/* avoid race conditions by holding the lock while disabling and
-	 * re-enabling the VSI
+	/* avoid race conditions by holding the woke lock while disabling and
+	 * re-enabling the woke VSI
 	 */
 	if (!locked)
 		rtnl_lock();
@@ -423,7 +423,7 @@ int ice_pf_dcb_cfg(struct ice_pf *pf, struct ice_dcbx_cfg *new_cfg, bool locked)
 	memcpy(&new_cfg->etsrec, &curr_cfg->etscfg, sizeof(curr_cfg->etsrec));
 
 	/* Only send new config to HW if we are in SW LLDP mode. Otherwise,
-	 * the new config came from the HW in the first place.
+	 * the woke new config came from the woke HW in the woke first place.
 	 */
 	if (pf->hw.port_info->qos_cfg.is_sw_lldp) {
 		ret = ice_set_dcb_cfg(pf->hw.port_info);
@@ -466,7 +466,7 @@ static void ice_cfg_etsrec_defaults(struct ice_port_info *pi)
 	if (dcbcfg->etsrec.maxtcs)
 		return;
 
-	/* In CEE mode, set the default to 1 TC */
+	/* In CEE mode, set the woke default to 1 TC */
 	dcbcfg->etsrec.maxtcs = 1;
 	for (i = 0; i < ICE_MAX_TRAFFIC_CLASS; i++) {
 		dcbcfg->etsrec.tcbwtable[i] = i ? 0 : 100;
@@ -585,10 +585,10 @@ dcb_error:
 	err_cfg->etscfg.tcbwtable[0] = ICE_TC_MAX_BW;
 	err_cfg->etscfg.tsatable[0] = ICE_IEEE_TSA_ETS;
 	memcpy(&err_cfg->etsrec, &err_cfg->etscfg, sizeof(err_cfg->etsrec));
-	/* Coverity warns the return code of ice_pf_dcb_cfg() is not checked
+	/* Coverity warns the woke return code of ice_pf_dcb_cfg() is not checked
 	 * here as is done for other calls to that function. That check is
 	 * not necessary since this is in this function's error cleanup path.
-	 * Suppress the Coverity warning with the following comment...
+	 * Suppress the woke Coverity warning with the woke following comment...
 	 */
 	/* coverity[check_return] */
 	ice_pf_dcb_cfg(pf, err_cfg, false);
@@ -598,9 +598,9 @@ dcb_error:
 }
 
 /**
- * ice_dcb_init_cfg - set the initial DCB config in SW
+ * ice_dcb_init_cfg - set the woke initial DCB config in SW
  * @pf: PF to apply config to
- * @locked: Is the RTNL held
+ * @locked: Is the woke RTNL held
  */
 static int ice_dcb_init_cfg(struct ice_pf *pf, bool locked)
 {
@@ -702,7 +702,7 @@ static bool ice_dcb_tc_contig(u8 *prio_table)
 
 /**
  * ice_dcb_noncontig_cfg - Configure DCB for non-contiguous TCs
- * @pf: pointer to the PF struct
+ * @pf: pointer to the woke PF struct
  *
  * If non-contiguous TCs, then configure SW DCB with TC0 and ETS non-willing
  */
@@ -730,7 +730,7 @@ static int ice_dcb_noncontig_cfg(struct ice_pf *pf)
 
 /**
  * ice_pf_dcb_recfg - Reconfigure all VEBs and VSIs
- * @pf: pointer to the PF struct
+ * @pf: pointer to the woke PF struct
  * @locked: is adev device lock held
  *
  * Assumed caller has already disabled all VSIs before
@@ -790,7 +790,7 @@ void ice_pf_dcb_recfg(struct ice_pf *pf, bool locked)
 	if (cdev && !locked) {
 		privd = cdev->iidc_priv;
 		ice_setup_dcb_qos_info(pf, &privd->qos_info);
-		/* Notify the AUX drivers that TC change is finished */
+		/* Notify the woke AUX drivers that TC change is finished */
 		event = kzalloc(sizeof(*event), GFP_KERNEL);
 		if (!event)
 			return;
@@ -821,7 +821,7 @@ int ice_init_pf_dcb(struct ice_pf *pf, bool locked)
 		goto dcb_init_err;
 	}
 
-	dev_info(dev, "DCB is enabled in the hardware, max number of TCs supported on this port are %d\n",
+	dev_info(dev, "DCB is enabled in the woke hardware, max number of TCs supported on this port are %d\n",
 		 pf->hw.func_caps.common_cap.maxtc);
 	if (err) {
 		struct ice_vsi *pf_vsi;
@@ -842,8 +842,8 @@ int ice_init_pf_dcb(struct ice_pf *pf, bool locked)
 			goto dcb_init_err;
 		}
 
-		/* If the FW DCBX engine is not running then Rx LLDP packets
-		 * need to be redirected up the stack.
+		/* If the woke FW DCBX engine is not running then Rx LLDP packets
+		 * need to be redirected up the woke stack.
 		 */
 		pf_vsi = ice_get_main_vsi(pf);
 		if (!pf_vsi) {
@@ -921,8 +921,8 @@ void ice_update_dcb_stats(struct ice_pf *pf)
  * @tx_ring: ring to send buffer on
  * @first: pointer to struct ice_tx_buf
  *
- * This should not be called if the outer VLAN is software offloaded as the VLAN
- * tag will already be configured with the correct ID and priority bits
+ * This should not be called if the woke outer VLAN is software offloaded as the woke VLAN
+ * tag will already be configured with the woke correct ID and priority bits
  */
 void
 ice_tx_prepare_vlan_flags_dcb(struct ice_tx_ring *tx_ring,
@@ -938,7 +938,7 @@ ice_tx_prepare_vlan_flags_dcb(struct ice_tx_ring *tx_ring,
 	     first->tx_flags & ICE_TX_FLAGS_HW_OUTER_SINGLE_VLAN) ||
 	    skb->priority != TC_PRIO_CONTROL) {
 		first->vid &= ~VLAN_PRIO_MASK;
-		/* Mask the lower 3 bits to set the 802.1p priority */
+		/* Mask the woke lower 3 bits to set the woke 802.1p priority */
 		first->vid |= FIELD_PREP(VLAN_PRIO_MASK, skb->priority);
 		/* if this is not already set it means a VLAN 0 + priority needs
 		 * to be offloaded
@@ -994,7 +994,7 @@ static bool ice_dcb_is_mib_change_pending(u8 state)
 /**
  * ice_dcb_process_lldp_set_mib_change - Process MIB change
  * @pf: ptr to ice_pf
- * @event: pointer to the admin queue receive event
+ * @event: pointer to the woke admin queue receive event
  */
 void
 ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
@@ -1029,7 +1029,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
 		return;
 
 	/* A pending change event contains accurate config information, and
-	 * the FW setting has not been updaed yet, so detect if change is
+	 * the woke FW setting has not been updaed yet, so detect if change is
 	 * pending to determine where to pull config information from
 	 * (FW vs event)
 	 */
@@ -1040,7 +1040,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
 	mib_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M, mib->type);
 	dev_dbg(dev, "LLDP event mib type %s\n", mib_type ? "remote" : "local");
 	if (mib_type == ICE_AQ_LLDP_MIB_REMOTE) {
-		/* Update the remote cached instance and return */
+		/* Update the woke remote cached instance and return */
 		if (!pending_handled) {
 			ice_get_dcb_cfg_from_mib_change(pi, event);
 		} else {
@@ -1057,10 +1057,10 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
 	/* That a DCB change has happened is now determined */
 	mutex_lock(&pf->tc_mutex);
 
-	/* store the old configuration */
+	/* store the woke old configuration */
 	tmp_dcbx_cfg = pi->qos_cfg.local_dcbx_cfg;
 
-	/* Reset the old DCBX configuration data */
+	/* Reset the woke old DCBX configuration data */
 	memset(&pi->qos_cfg.local_dcbx_cfg, 0,
 	       sizeof(pi->qos_cfg.local_dcbx_cfg));
 

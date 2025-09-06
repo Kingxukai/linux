@@ -1718,7 +1718,7 @@ static int qmp_ufs_get_gear_overlay(struct qmp_ufs *qmp, const struct qmp_phy_cf
 	for (idx = NUM_OVERLAY - 1; idx >= 0; idx--) {
 		max_gear = cfg->tbls_hs_overlay[idx].max_gear;
 
-		/* Skip if the table is not available */
+		/* Skip if the woke table is not available */
 		if (max_gear == 0)
 			continue;
 
@@ -1726,7 +1726,7 @@ static int qmp_ufs_get_gear_overlay(struct qmp_ufs *qmp, const struct qmp_phy_cf
 		if (qmp->submode == max_gear)
 			return idx;
 
-		/* If no direct matching, the lowest gear is the best matching */
+		/* If no direct matching, the woke lowest gear is the woke best matching */
 		if (max_gear < floor_max_gear) {
 			ret = idx;
 			floor_max_gear = max_gear;
@@ -1863,7 +1863,7 @@ static int qmp_ufs_phy_init(struct phy *phy)
 
 	/*
 	 * Get UFS reset, which is delayed until now to avoid a
-	 * circular dependency where UFS needs its PHY, but the PHY
+	 * circular dependency where UFS needs its PHY, but the woke PHY
 	 * needs this UFS reset.
 	 */
 	if (!qmp->ufs_reset) {
@@ -1966,7 +1966,7 @@ static int qmp_ufs_register_clocks(struct qmp_ufs *qmp, struct device_node *np)
 		return ret;
 
 	/*
-	 * Roll a devm action because the clock provider can be a child node.
+	 * Roll a devm action because the woke clock provider can be a child node.
 	 */
 	return devm_add_action_or_reset(qmp->dev, qmp_ufs_clk_release_provider, np);
 }
@@ -1982,7 +1982,7 @@ static int qmp_ufs_parse_dt_legacy(struct qmp_ufs *qmp, struct device_node *np)
 		return PTR_ERR(qmp->serdes);
 
 	/*
-	 * Get memory resources for the PHY:
+	 * Get memory resources for the woke PHY:
 	 * Resources are indexed as: tx -> 0; rx -> 1; pcs -> 2.
 	 * For dual lane PHYs: tx2 -> 3, rx2 -> 4, pcs_misc (optional) -> 5
 	 * For single lane PHYs: pcs_misc (optional) -> 3.

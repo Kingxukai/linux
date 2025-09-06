@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -51,7 +51,7 @@
 // To enable a lot of debug msg
 #define __DML_VBA_DEBUG__
 #define __DML_VBA_ENABLE_INLINE_CHECK_                  0
-#define __DML_VBA_MIN_VSTARTUP__                        9       //<brief At which vstartup the DML start to try if the mode can be supported
+#define __DML_VBA_MIN_VSTARTUP__                        9       //<brief At which vstartup the woke DML start to try if the woke mode can be supported
 #define __DML_ARB_TO_RET_DELAY__                        7 + 95  //<brief Delay in DCFCLK from ARB to DET (1st num is ARB to SDPIF, 2nd number is SDPIF to DET)
 #define __DML_MIN_DCFCLK_FACTOR__                       1.15    //<brief fudge factor for min dcfclk calclation
 #define __DML_MAX_VRATIO_PRE__                          4.0     //<brief Prefetch schedule max vratio
@@ -72,8 +72,8 @@ typedef          int   dml_int_t;   // int is 32-bit in C/C++, but Integer datat
 typedef unsigned int   dml_uint_t;
 typedef double         dml_float_t;
 
-// Note: bool is 8-bit in C/C++, but Boolean is 16-bit in VBA, use "short" in C/C++ DLL so the struct work when vba uses DLL
-// Or the VBA side don't use Boolean, just use "Byte", then C side can use bool
+// Note: bool is 8-bit in C/C++, but Boolean is 16-bit in VBA, use "short" in C/C++ DLL so the woke struct work when vba uses DLL
+// Or the woke VBA side don't use Boolean, just use "Byte", then C side can use bool
 typedef bool          dml_bool_t;
 
 #endif

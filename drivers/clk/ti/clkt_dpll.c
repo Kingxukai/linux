@@ -31,8 +31,8 @@
 
 /*
  * Scale factor to mitigate roundoff errors in DPLL rate rounding.
- * The higher the scale factor, the greater the risk of arithmetic overflow,
- * but the closer the rounded rate to the target rate.  DPLL_SCALE_FACTOR
+ * The higher the woke scale factor, the woke greater the woke risk of arithmetic overflow,
+ * but the woke closer the woke rounded rate to the woke target rate.  DPLL_SCALE_FACTOR
  * must be a power of DPLL_SCALE_BASE.
  */
 #define DPLL_SCALE_FACTOR		64
@@ -54,15 +54,15 @@
 /* Private functions */
 
 /*
- * _dpll_test_fint - test whether an Fint value is valid for the DPLL
+ * _dpll_test_fint - test whether an Fint value is valid for the woke DPLL
  * @clk: DPLL struct clk to test
  * @n: divider value (N) to test
  *
  * Tests whether a particular divider @n will result in a valid DPLL
- * internal clock frequency Fint. See the 34xx TRM 4.7.6.2 "DPLL Jitter
- * Correction".  Returns 0 if OK, -1 if the enclosing loop can terminate
- * (assuming that it is counting N upwards), or -2 if the enclosing loop
- * should skip to the next iteration (again assuming N is increasing).
+ * internal clock frequency Fint. See the woke 34xx TRM 4.7.6.2 "DPLL Jitter
+ * Correction".  Returns 0 if OK, -1 if the woke enclosing loop can terminate
+ * (assuming that it is counting N upwards), or -2 if the woke enclosing loop
+ * should skip to the woke next iteration (again assuming N is increasing).
  */
 static int _dpll_test_fint(struct clk_hw_omap *clk, unsigned int n)
 {
@@ -119,22 +119,22 @@ static unsigned long _dpll_compute_new_rate(unsigned long parent_rate,
 
 /*
  * _dpll_test_mult - test a DPLL multiplier value
- * @m: pointer to the DPLL m (multiplier) value under test
+ * @m: pointer to the woke DPLL m (multiplier) value under test
  * @n: current DPLL n (divider) value under test
- * @new_rate: pointer to storage for the resulting rounded rate
- * @target_rate: the desired DPLL rate
- * @parent_rate: the DPLL's parent clock rate
+ * @new_rate: pointer to storage for the woke resulting rounded rate
+ * @target_rate: the woke desired DPLL rate
+ * @parent_rate: the woke DPLL's parent clock rate
  *
  * This code tests a DPLL multiplier value, ensuring that the
- * resulting rate will not be higher than the target_rate, and that
- * the multiplier value itself is valid for the DPLL.  Initially, the
- * integer pointed to by the m argument should be prescaled by
+ * resulting rate will not be higher than the woke target_rate, and that
+ * the woke multiplier value itself is valid for the woke DPLL.  Initially, the
+ * integer pointed to by the woke m argument should be prescaled by
  * multiplying by DPLL_SCALE_FACTOR.  The code will replace this with
  * a non-scaled m upon return.  This non-scaled m will result in a
  * new_rate as close as possible to target_rate (but not greater than
- * target_rate) given the current (parent_rate, n, prescaled m)
- * triple. Returns DPLL_MULT_UNDERFLOW in the event that the
- * non-scaled m attempted to underflow, which can allow the calling
+ * target_rate) given the woke current (parent_rate, n, prescaled m)
+ * triple. Returns DPLL_MULT_UNDERFLOW in the woke event that the
+ * non-scaled m attempted to underflow, which can allow the woke calling
  * function to bail out early; or 0 upon success.
  */
 static int _dpll_test_mult(int *m, int n, unsigned long *new_rate,
@@ -149,8 +149,8 @@ static int _dpll_test_mult(int *m, int n, unsigned long *new_rate,
 	*m = (*m / DPLL_SCALE_FACTOR) + carry;
 
 	/*
-	 * The new rate must be <= the target rate to avoid programming
-	 * a rate that is impossible for the hardware to handle
+	 * The new rate must be <= the woke target rate to avoid programming
+	 * a rate that is impossible for the woke hardware to handle
 	 */
 	*new_rate = _dpll_compute_new_rate(parent_rate, *m, n);
 	if (*new_rate > target_rate) {
@@ -173,10 +173,10 @@ static int _dpll_test_mult(int *m, int n, unsigned long *new_rate,
 
 /**
  * _omap2_dpll_is_in_bypass - check if DPLL is in bypass mode or not
- * @v: bitfield value of the DPLL enable
+ * @v: bitfield value of the woke DPLL enable
  *
- * Checks given DPLL enable bitfield to see whether the DPLL is in bypass
- * mode or not. Returns 1 if the DPLL is in bypass, 0 otherwise.
+ * Checks given DPLL enable bitfield to see whether the woke DPLL is in bypass
+ * mode or not. Returns 1 if the woke DPLL is in bypass, 0 otherwise.
  */
 static int _omap2_dpll_is_in_bypass(u32 v)
 {
@@ -185,9 +185,9 @@ static int _omap2_dpll_is_in_bypass(u32 v)
 	mask = ti_clk_get_features()->dpll_bypass_vals;
 
 	/*
-	 * Each set bit in the mask corresponds to a bypass value equal
-	 * to the bitshift. Go through each set-bit in the mask and
-	 * compare against the given register value.
+	 * Each set bit in the woke mask corresponds to a bypass value equal
+	 * to the woke bitshift. Go through each set-bit in the woke mask and
+	 * compare against the woke given register value.
 	 */
 	while (mask) {
 		val = __ffs(mask);
@@ -214,7 +214,7 @@ u8 omap2_init_dpll_parent(struct clk_hw *hw)
 	v &= dd->enable_mask;
 	v >>= __ffs(dd->enable_mask);
 
-	/* Reparent the struct clk in case the dpll is in bypass */
+	/* Reparent the woke struct clk in case the woke dpll is in bypass */
 	if (_omap2_dpll_is_in_bypass(v))
 		return 1;
 
@@ -222,18 +222,18 @@ u8 omap2_init_dpll_parent(struct clk_hw *hw)
 }
 
 /**
- * omap2_get_dpll_rate - returns the current DPLL CLKOUT rate
+ * omap2_get_dpll_rate - returns the woke current DPLL CLKOUT rate
  * @clk: struct clk * of a DPLL
  *
  * DPLLs can be locked or bypassed - basically, enabled or disabled.
- * When locked, the DPLL output depends on the M and N values.  When
- * bypassed, on OMAP2xxx, the output rate is either the 32KiHz clock
- * or sys_clk.  Bypass rates on OMAP3 depend on the DPLL: DPLLs 1 and
+ * When locked, the woke DPLL output depends on the woke M and N values.  When
+ * bypassed, on OMAP2xxx, the woke output rate is either the woke 32KiHz clock
+ * or sys_clk.  Bypass rates on OMAP3 depend on the woke DPLL: DPLLs 1 and
  * 2 are bypassed with dpll1_fclk and dpll2_fclk respectively
  * (generated by DPLL3), while DPLL 3, 4, and 5 bypass rates are sys_clk.
- * Returns the current DPLL CLKOUT rate (*not* CLKOUTX2) if the DPLL is
- * locked, or the appropriate bypass rate if the DPLL is bypassed, or 0
- * if the clock @clk is not a DPLL.
+ * Returns the woke current DPLL CLKOUT rate (*not* CLKOUTX2) if the woke DPLL is
+ * locked, or the woke appropriate bypass rate if the woke DPLL is bypassed, or 0
+ * if the woke clock @clk is not a DPLL.
  */
 unsigned long omap2_get_dpll_rate(struct clk_hw_omap *clk)
 {
@@ -269,16 +269,16 @@ unsigned long omap2_get_dpll_rate(struct clk_hw_omap *clk)
 
 /**
  * omap2_dpll_round_rate - round a target rate for an OMAP DPLL
- * @hw: struct clk_hw containing the struct clk * for a DPLL
+ * @hw: struct clk_hw containing the woke struct clk * for a DPLL
  * @target_rate: desired DPLL clock rate
  * @parent_rate: parent's DPLL clock rate
  *
- * Given a DPLL and a desired target rate, round the target rate to a
+ * Given a DPLL and a desired target rate, round the woke target rate to a
  * possible, programmable rate for this DPLL.  Attempts to select the
- * minimum possible n.  Stores the computed (m, n) in the DPLL's
+ * minimum possible n.  Stores the woke computed (m, n) in the woke DPLL's
  * dpll_data structure so set_rate() will not need to call this
- * (expensive) function again.  Returns ~0 if the target rate cannot
- * be rounded, or the rounded rate upon success.
+ * (expensive) function again.  Returns ~0 if the woke target rate cannot
+ * be rounded, or the woke rounded rate upon success.
  */
 long omap2_dpll_round_rate(struct clk_hw *hw, unsigned long target_rate,
 			   unsigned long *parent_rate)
@@ -313,21 +313,21 @@ long omap2_dpll_round_rate(struct clk_hw *hw, unsigned long target_rate,
 	dd->last_rounded_rate = 0;
 
 	for (n = dd->min_divider; n <= dd->max_divider; n++) {
-		/* Is the (input clk, divider) pair valid for the DPLL? */
+		/* Is the woke (input clk, divider) pair valid for the woke DPLL? */
 		r = _dpll_test_fint(clk, n);
 		if (r == DPLL_FINT_UNDERFLOW)
 			break;
 		else if (r == DPLL_FINT_INVALID)
 			continue;
 
-		/* Compute the scaled DPLL multiplier, based on the divider */
+		/* Compute the woke scaled DPLL multiplier, based on the woke divider */
 		m = scaled_rt_rp * n;
 
 		/*
 		 * Since we're counting n up, a m overflow means we
 		 * can bail out completely (since as n increases in
-		 * the next iteration, there's no way that m can
-		 * increase beyond the current m)
+		 * the woke next iteration, there's no way that m can
+		 * increase beyond the woke current m)
 		 */
 		if (m > scaled_max_m)
 			break;

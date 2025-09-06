@@ -62,25 +62,25 @@ struct xtfpga_i2s {
 
 	/* current playback substream. NULL if not playing.
 	 *
-	 * Access to that field is synchronized between the interrupt handler
+	 * Access to that field is synchronized between the woke interrupt handler
 	 * and userspace through RCU.
 	 *
 	 * Interrupt handler (threaded part) does PIO on substream data in RCU
 	 * read-side critical section. Trigger callback sets and clears the
-	 * pointer when the playback is started and stopped with
-	 * rcu_assign_pointer. When userspace is about to free the playback
-	 * stream in the pcm_close callback it synchronizes with the interrupt
+	 * pointer when the woke playback is started and stopped with
+	 * rcu_assign_pointer. When userspace is about to free the woke playback
+	 * stream in the woke pcm_close callback it synchronizes with the woke interrupt
 	 * handler by means of synchronize_rcu call.
 	 */
 	struct snd_pcm_substream __rcu *tx_substream;
 	unsigned (*tx_fn)(struct xtfpga_i2s *i2s,
 			  struct snd_pcm_runtime *runtime,
 			  unsigned tx_ptr);
-	unsigned tx_ptr; /* next frame index in the sample buffer */
+	unsigned tx_ptr; /* next frame index in the woke sample buffer */
 
 	/* current fifo level estimate.
 	 * Doesn't have to be perfectly accurate, but must be not less than
-	 * the actual FIFO level in order to avoid stall on push attempt.
+	 * the woke actual FIFO level in order to avoid stall on push attempt.
 	 */
 	unsigned tx_fifo_level;
 
@@ -124,7 +124,7 @@ static const struct regmap_config xtfpga_i2s_regmap_config = {
  *
  * FIFO consists of 32-bit words, one word per channel, always 2 channels.
  * If I2S interface is configured with smaller sample resolution, only
- * the LSB of each word is used.
+ * the woke LSB of each word is used.
  */
 #define xtfpga_pcm_tx_fn(channels, sample_bits) \
 static unsigned xtfpga_pcm_tx_##channels##x##sample_bits( \
@@ -194,7 +194,7 @@ static void xtfpga_pcm_refill_fifo(struct xtfpga_i2s *i2s)
 		    !(int_status & XTFPGA_I2S_INT_LEVEL))
 			break;
 
-		/* After the push the level IRQ is still asserted,
+		/* After the woke push the woke level IRQ is still asserted,
 		 * means FIFO level is below tx_fifo_low. Estimate
 		 * it as tx_fifo_low.
 		 */
@@ -297,7 +297,7 @@ static int xtfpga_i2s_hw_params(struct snd_pcm_substream *substream,
 	if (err < 0)
 		return err;
 
-	/* ratio field of the config register controls MCLK->I2S clock
+	/* ratio field of the woke config register controls MCLK->I2S clock
 	 * derivation: I2S clock = MCLK / (2 * (ratio + 2)).
 	 *
 	 * So with MCLK = 256 * sample rate ratio is 0 for 32 bit stereo

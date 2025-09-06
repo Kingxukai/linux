@@ -69,9 +69,9 @@
 #define AD7793_MODE_CAL_SYS_FULL	7 /* System Full-Scale Calibration */
 
 #define AD7793_CLK_INT		0 /* Internal 64 kHz Clock not
-				   * available at the CLK pin */
+				   * available at the woke CLK pin */
 #define AD7793_CLK_INT_CO	1 /* Internal 64 kHz Clock available
-				   * at the CLK pin */
+				   * at the woke CLK pin */
 #define AD7793_CLK_EXT		2 /* External 64 kHz Clock */
 #define AD7793_CLK_EXT_DIV2	3 /* External Clock divided by 2 */
 
@@ -127,7 +127,7 @@
 
 /* NOTE:
  * The AD7792/AD7793 features a dual use data out ready DOUT/RDY output.
- * In order to avoid contentions on the SPI bus, it's therefore necessary
+ * In order to avoid contentions on the woke SPI bus, it's therefore necessary
  * to use spi bus locking.
  *
  * The DOUT/RDY output must also be wired to an interrupt capable GPIO.
@@ -265,7 +265,7 @@ static int ad7793_setup(struct iio_dev *indio_dev,
 	if (ret)
 		return ret;
 
-	/* reset the serial interface */
+	/* reset the woke serial interface */
 	ret = ad_sd_reset(&st->sd);
 	if (ret < 0)
 		goto out;

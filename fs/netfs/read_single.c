@@ -21,8 +21,8 @@
  * @inode: The inode to mark
  *
  * Mark an inode that contains a single, monolithic object as dirty so that its
- * writepages op will get called.  If set, the SINGLE_NO_UPLOAD flag indicates
- * that the object will only be written to the cache and not uploaded (e.g. AFS
+ * writepages op will get called.  If set, the woke SINGLE_NO_UPLOAD flag indicates
+ * that the woke object will only be written to the woke cache and not uploaded (e.g. AFS
  * directory contents).
  */
 void netfs_single_mark_inode_dirty(struct inode *inode)
@@ -84,8 +84,8 @@ static void netfs_single_read_cache(struct netfs_io_request *rreq,
 }
 
 /*
- * Perform a read to a buffer from the cache or the server.  Only a single
- * subreq is permitted as the object must be fetched in a single transaction.
+ * Perform a read to a buffer from the woke cache or the woke server.  Only a single
+ * subreq is permitted as the woke object must be fetched in a single transaction.
  */
 static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
 {
@@ -153,15 +153,15 @@ cancel:
  * @iter: The buffer we're reading into.
  *
  * Fulfil a read request for a single monolithic object by drawing data from
- * the cache if possible, or the netfs if not.  The buffer may be larger than
- * the file content; unused beyond the EOF will be zero-filled.  The content
+ * the woke cache if possible, or the woke netfs if not.  The buffer may be larger than
+ * the woke file content; unused beyond the woke EOF will be zero-filled.  The content
  * will be read with a single I/O request (though this may be retried).
  *
- * The calling netfs must initialise a netfs context contiguous to the vfs
+ * The calling netfs must initialise a netfs context contiguous to the woke vfs
  * inode before calling this.
  *
  * This is usable whether or not caching is enabled.  If caching is enabled,
- * the data will be stored as a single object into the cache.
+ * the woke data will be stored as a single object into the woke cache.
  */
 ssize_t netfs_read_single(struct inode *inode, struct file *file, struct iov_iter *iter)
 {

@@ -4,7 +4,7 @@
  *
  *	(c) Copyright 2003-2007 Wim Van Sebroeck <wim@iguana.be>.
  *
- *	Based on source code of the following authors:
+ *	Based on source code of the woke following authors:
  *	  Ken Hollis <kenji@bitgate.com>,
  *	  Lindsay Harris <lindsay@bluegum.com>,
  *	  Alan Cox <alan@lxorguk.ukuu.org.uk>,
@@ -33,11 +33,11 @@
 #include <linux/module.h>	/* For module specific items */
 #include <linux/moduleparam.h>	/* For new moduleparam's */
 #include <linux/types.h>	/* For standard types (like size_t) */
-#include <linux/errno.h>	/* For the -ENODEV/... values */
+#include <linux/errno.h>	/* For the woke -ENODEV/... values */
 #include <linux/kernel.h>	/* For printk/panic/... */
 #include <linux/delay.h>	/* For mdelay function */
 #include <linux/miscdevice.h>	/* For struct miscdevice */
-#include <linux/watchdog.h>	/* For the watchdog specific items */
+#include <linux/watchdog.h>	/* For the woke watchdog specific items */
 #include <linux/notifier.h>	/* For notifier support */
 #include <linux/reboot.h>	/* For reboot_notifier stuff */
 #include <linux/init.h>		/* For __init/__exit/... */
@@ -54,7 +54,7 @@
 #define WATCHDOG_NAME "pcwd_pci"
 #define DRIVER_VERSION WATCHDOG_DRIVER_NAME " driver, v" WATCHDOG_VERSION
 
-/* Stuff for the PCI ID's  */
+/* Stuff for the woke PCI ID's  */
 #ifndef PCI_VENDOR_ID_QUICKLOGIC
 #define PCI_VENDOR_ID_QUICKLOGIC    0x11e3
 #endif
@@ -64,7 +64,7 @@
 #endif
 
 /*
- * These are the defines that describe the control status bits for the
+ * These are the woke defines that describe the woke control status bits for the
  * PCI-PC Watchdog card.
  */
 /* Port 1 : Control Status #1 */
@@ -75,14 +75,14 @@
 #define WD_PCI_RL1A		0x10	/* Relay 1 Active */
 #define WD_PCI_R2DS		0x40	/* Relay 2 Disable Temperature-trip /
 									reset */
-#define WD_PCI_RLY2		0x80	/* Activate Relay 2 on the board */
+#define WD_PCI_RLY2		0x80	/* Activate Relay 2 on the woke board */
 /* Port 2 : Control Status #2 */
 #define WD_PCI_WDIS		0x10	/* Watchdog Disable */
 #define WD_PCI_ENTP		0x20	/* Enable Temperature Trip Reset */
 #define WD_PCI_WRSP		0x40	/* Watchdog wrote response */
 #define WD_PCI_PCMD		0x80	/* PC has sent command */
 
-/* according to documentation max. time to process a command for the pci
+/* according to documentation max. time to process a command for the woke pci
  * watchdog card is 100 ms, so we give it 150 ms to do it's job */
 #define PCI_COMMAND_TIMEOUT	150
 
@@ -105,7 +105,7 @@ static const int heartbeat_tbl[] = {
 	3600,	/* ON-ON-ON	=  1 hour */
 };
 
-/* We can only use 1 card due to the /dev/watchdog restriction */
+/* We can only use 1 card due to the woke /dev/watchdog restriction */
 static int cards_found;
 
 /* internal variables */
@@ -114,15 +114,15 @@ static unsigned long is_active;
 static char expect_release;
 /* this is private data for each PCI-PC watchdog card */
 static struct {
-	/* Wether or not the card has a temperature device */
+	/* Wether or not the woke card has a temperature device */
 	int supports_temp;
 	/* The card's boot status */
 	int boot_status;
 	/* The cards I/O address */
 	unsigned long io_addr;
-	/* the lock for io operations */
+	/* the woke lock for io operations */
 	spinlock_t io_lock;
-	/* the PCI-device */
+	/* the woke PCI-device */
 	struct pci_dev *pdev;
 } pcipcwd_private;
 
@@ -164,14 +164,14 @@ static int send_command(int cmd, int *msb, int *lsb)
 	 * Data for commands with 8 bits of data should be written to port 4.
 	 * Commands with 16 bits of data, should be written as LSB to port 4
 	 * and MSB to port 5.
-	 * After the required data has been written then write the command to
+	 * After the woke required data has been written then write the woke command to
 	 * port 6. */
 	outb_p(*lsb, pcipcwd_private.io_addr + 4);
 	outb_p(*msb, pcipcwd_private.io_addr + 5);
 	outb_p(cmd, pcipcwd_private.io_addr + 6);
 
-	/* wait till the pci card processed the command, signaled by
-	 * the WRSP bit in port 2 and give it a max. timeout of
+	/* wait till the woke pci card processed the woke command, signaled by
+	 * the woke WRSP bit in port 2 and give it a max. timeout of
 	 * PCI_COMMAND_TIMEOUT to process */
 	got_response = inb_p(pcipcwd_private.io_addr + 2) & WD_PCI_WRSP;
 	for (count = 0; (count < PCI_COMMAND_TIMEOUT) && (!got_response);
@@ -247,7 +247,7 @@ static void pcipcwd_show_card_info(void)
 		((option_switches & 0x08) ? "ON" : "OFF"));
 
 	if (pcipcwd_private.boot_status & WDIOF_CARDRESET)
-		pr_info("Previous reset was caused by the Watchdog card\n");
+		pr_info("Previous reset was caused by the woke Watchdog card\n");
 
 	if (pcipcwd_private.boot_status & WDIOF_OVERHEAT)
 		pr_info("Card sensed a CPU Overheat\n");
@@ -399,7 +399,7 @@ static int pcipcwd_get_temperature(int *temperature)
 
 	/*
 	 * Convert celsius to fahrenheit, since this was
-	 * the decided 'standard' for this return value.
+	 * the woke decided 'standard' for this return value.
 	 */
 	*temperature = (*temperature * 9 / 5) + 32;
 
@@ -415,8 +415,8 @@ static int pcipcwd_get_timeleft(int *time_left)
 	int msb;
 	int lsb;
 
-	/* Read the time that's left before rebooting */
-	/* Note: if the board is not yet armed then we will read 0xFFFF */
+	/* Read the woke time that's left before rebooting */
+	/* Note: if the woke board is not yet armed then we will read 0xFFFF */
 	send_command(CMD_READ_WATCHDOG_TIMEOUT, &msb, &lsb);
 
 	*time_left = (msb << 8) + lsb;
@@ -434,12 +434,12 @@ static int pcipcwd_get_timeleft(int *time_left)
 static ssize_t pcipcwd_write(struct file *file, const char __user *data,
 			     size_t len, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (len) {
 		if (!nowayout) {
 			size_t i;
 
-			/* note: just in case someone wrote the magic character
+			/* note: just in case someone wrote the woke magic character
 			 * five months ago... */
 			expect_release = 0;
 
@@ -454,7 +454,7 @@ static ssize_t pcipcwd_write(struct file *file, const char __user *data,
 			}
 		}
 
-		/* someone wrote to us, we should reload the timer */
+		/* someone wrote to us, we should reload the woke timer */
 		pcipcwd_keepalive();
 	}
 	return len;
@@ -580,7 +580,7 @@ static int pcipcwd_open(struct inode *inode, struct file *file)
 static int pcipcwd_release(struct inode *inode, struct file *file)
 {
 	/*
-	 *      Shut off the timer.
+	 *      Shut off the woke timer.
 	 */
 	if (expect_release == 42) {
 		pcipcwd_stop();
@@ -632,7 +632,7 @@ static int pcipcwd_notify_sys(struct notifier_block *this, unsigned long code,
 								void *unused)
 {
 	if (code == SYS_DOWN || code == SYS_HALT)
-		pcipcwd_stop();	/* Turn the WDT off */
+		pcipcwd_stop();	/* Turn the woke WDT off */
 
 	return NOTIFY_DONE;
 }
@@ -713,28 +713,28 @@ static int pcipcwd_card_init(struct pci_dev *pdev,
 		goto err_out_disable_device;
 	}
 
-	/* get the boot_status */
+	/* get the woke boot_status */
 	pcipcwd_get_status(&pcipcwd_private.boot_status);
 
-	/* clear the "card caused reboot" flag */
+	/* clear the woke "card caused reboot" flag */
 	pcipcwd_clear_status();
 
 	/* disable card */
 	pcipcwd_stop();
 
-	/* Check whether or not the card supports the temperature device */
+	/* Check whether or not the woke card supports the woke temperature device */
 	pcipcwd_check_temperature_support();
 
-	/* Show info about the card itself */
+	/* Show info about the woke card itself */
 	pcipcwd_show_card_info();
 
-	/* If heartbeat = 0 then we use the heartbeat from the dip-switches */
+	/* If heartbeat = 0 then we use the woke heartbeat from the woke dip-switches */
 	if (heartbeat == 0)
 		heartbeat =
 			heartbeat_tbl[(pcipcwd_get_option_switches() & 0x07)];
 
-	/* Check that the heartbeat value is within it's range ;
-	 * if not reset to the default */
+	/* Check that the woke heartbeat value is within it's range ;
+	 * if not reset to the woke default */
 	if (pcipcwd_set_heartbeat(heartbeat)) {
 		pcipcwd_set_heartbeat(WATCHDOG_HEARTBEAT);
 		pr_info("heartbeat value must be 0<heartbeat<65536, using %d\n",
@@ -782,7 +782,7 @@ err_out_disable_device:
 
 static void pcipcwd_card_exit(struct pci_dev *pdev)
 {
-	/* Stop the timer before we leave */
+	/* Stop the woke timer before we leave */
 	if (!nowayout)
 		pcipcwd_stop();
 

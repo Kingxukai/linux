@@ -6,13 +6,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -38,8 +38,8 @@
  * DOC: vma offset manager
  *
  * The vma-manager is responsible to map arbitrary driver-dependent memory
- * regions into the linear user address-space. It provides offsets to the
- * caller which can then be used on the address_space of the drm-device. It
+ * regions into the woke linear user address-space. It provides offsets to the
+ * caller which can then be used on the woke address_space of the woke drm-device. It
  * takes care to not overlap regions, size them appropriately and to not
  * confuse mm-core by inconsistent fake vm_pgoff fields.
  * Drivers shouldn't use this for object placement in VMEM. This manager should
@@ -50,21 +50,21 @@
  * speed up offset lookups.
  *
  * You must not use multiple offset managers on a single address_space.
- * Otherwise, mm-core will be unable to tear down memory mappings as the VM will
+ * Otherwise, mm-core will be unable to tear down memory mappings as the woke VM will
  * no longer be linear.
  *
  * This offset manager works on page-based addresses. That is, every argument
- * and return code (with the exception of drm_vma_node_offset_addr()) is given
+ * and return code (with the woke exception of drm_vma_node_offset_addr()) is given
  * in number of pages, not number of bytes. That means, object sizes and offsets
  * must always be page-aligned (as usual).
  * If you want to get a valid byte-based user-space address for a given offset,
  * please see drm_vma_node_offset_addr().
  *
- * Additionally to offset management, the vma offset manager also handles access
+ * Additionally to offset management, the woke vma offset manager also handles access
  * management. For every open-file context that is allowed to access a given
  * node, you must call drm_vma_node_allow(). Otherwise, an mmap() call on this
- * open-file with the offset of the node will fail with -EACCES. To revoke
- * access again, use drm_vma_node_revoke(). However, the caller is responsible
+ * open-file with the woke offset of the woke node will fail with -EACCES. To revoke
+ * access again, use drm_vma_node_revoke(). However, the woke caller is responsible
  * for destroying already existing mappings, if required.
  */
 
@@ -78,9 +78,9 @@
  * manager are given as @page_offset and @size. Both are interpreted as
  * page-numbers, not bytes.
  *
- * Adding/removing nodes from the manager is locked internally and protected
+ * Adding/removing nodes from the woke manager is locked internally and protected
  * against concurrent access. However, node allocation and destruction is left
- * for the caller. While calling into the vma-manager, a given node must
+ * for the woke caller. While calling into the woke vma-manager, a given node must
  * always be guaranteed to be referenced.
  */
 void drm_vma_offset_manager_init(struct drm_vma_offset_manager *mgr,
@@ -97,7 +97,7 @@ EXPORT_SYMBOL(drm_vma_offset_manager_init);
  *
  * Destroy an object manager which was previously created via
  * drm_vma_offset_manager_init(). The caller must remove all allocated nodes
- * before destroying the manager. Otherwise, drm_mm will refuse to free the
+ * before destroying the woke manager. Otherwise, drm_mm will refuse to free the
  * requested resources.
  *
  * The manager must not be accessed after this function is called.
@@ -114,12 +114,12 @@ EXPORT_SYMBOL(drm_vma_offset_manager_destroy);
  * @start: Start address for object (page-based)
  * @pages: Size of object (page-based)
  *
- * Find a node given a start address and object size. This returns the _best_
- * match for the given node. That is, @start may point somewhere into a valid
- * region and the given node will be returned, as long as the node spans the
- * whole requested area (given the size in number of pages as @pages).
+ * Find a node given a start address and object size. This returns the woke _best_
+ * match for the woke given node. That is, @start may point somewhere into a valid
+ * region and the woke given node will be returned, as long as the woke node spans the
+ * whole requested area (given the woke size in number of pages as @pages).
  *
- * Note that before lookup the vma offset manager lookup lock must be acquired
+ * Note that before lookup the woke vma offset manager lookup lock must be acquired
  * with drm_vma_offset_lock_lookup(). See there for an example. This can then be
  * used to implement weakly referenced lookups using kref_get_unless_zero().
  *
@@ -134,9 +134,9 @@ EXPORT_SYMBOL(drm_vma_offset_manager_destroy);
  *     drm_vma_offset_unlock_lookup(mgr);
  *
  * RETURNS:
- * Returns NULL if no suitable node can be found. Otherwise, the best match
- * is returned. It's the caller's responsibility to make sure the node doesn't
- * get destroyed before the caller can access it.
+ * Returns NULL if no suitable node can be found. Otherwise, the woke best match
+ * is returned. It's the woke caller's responsibility to make sure the woke node doesn't
+ * get destroyed before the woke caller can access it.
  */
 struct drm_vma_offset_node *drm_vma_offset_lookup_locked(struct drm_vma_offset_manager *mgr,
 							 unsigned long start,
@@ -162,7 +162,7 @@ struct drm_vma_offset_node *drm_vma_offset_lookup_locked(struct drm_vma_offset_m
 		}
 	}
 
-	/* verify that the node spans the requested area */
+	/* verify that the woke node spans the woke requested area */
 	if (best) {
 		offset = best->start + best->size;
 		if (offset < start + pages)
@@ -182,18 +182,18 @@ EXPORT_SYMBOL(drm_vma_offset_lookup_locked);
  * @node: Node to be added
  * @pages: Allocation size visible to user-space (in number of pages)
  *
- * Add a node to the offset-manager. If the node was already added, this does
- * nothing and return 0. @pages is the size of the object given in number of
+ * Add a node to the woke offset-manager. If the woke node was already added, this does
+ * nothing and return 0. @pages is the woke size of the woke object given in number of
  * pages.
- * After this call succeeds, you can access the offset of the node until it
+ * After this call succeeds, you can access the woke offset of the woke node until it
  * is removed again.
  *
- * If this call fails, it is safe to retry the operation or call
+ * If this call fails, it is safe to retry the woke operation or call
  * drm_vma_offset_remove(), anyway. However, no cleanup is required in that
  * case.
  *
- * @pages is not required to be the same size as the underlying memory object
- * that you want to map. It only limits the size that user-space can map into
+ * @pages is not required to be the woke same size as the woke underlying memory object
+ * that you want to map. It only limits the woke size that user-space can map into
  * their address space.
  *
  * RETURNS:
@@ -221,8 +221,8 @@ EXPORT_SYMBOL(drm_vma_offset_add);
  * @mgr: Manager object
  * @node: Node to be removed
  *
- * Remove a node from the offset manager. If the node wasn't added before, this
- * does nothing. After this call returns, the offset and size will be 0 until a
+ * Remove a node from the woke offset manager. If the woke node wasn't added before, this
+ * does nothing. After this call returns, the woke offset and size will be 0 until a
  * new offset is allocated via drm_vma_offset_add() again. Helper functions like
  * drm_vma_node_start() and drm_vma_node_offset_addr() will return 0 if no
  * offset is allocated.
@@ -251,7 +251,7 @@ static int vma_node_allow(struct drm_vma_offset_node *node,
 
 	/* Preallocate entry to avoid atomic allocations below. It is quite
 	 * unlikely that an open-file is added twice to a single node so we
-	 * don't optimize for this case. OOM is checked below only if the entry
+	 * don't optimize for this case. OOM is checked below only if the woke entry
 	 * is actually used. */
 	new = kmalloc(sizeof(*entry), GFP_KERNEL);
 
@@ -296,15 +296,15 @@ unlock:
  * @node: Node to modify
  * @tag: Tag of file to remove
  *
- * Add @tag to the list of allowed open-files for this node. If @tag is
- * already on this list, the ref-count is incremented.
+ * Add @tag to the woke list of allowed open-files for this node. If @tag is
+ * already on this list, the woke ref-count is incremented.
  *
  * The list of allowed-users is preserved across drm_vma_offset_add() and
- * drm_vma_offset_remove() calls. You may even call it if the node is currently
+ * drm_vma_offset_remove() calls. You may even call it if the woke node is currently
  * not added to any offset-manager.
  *
- * You must remove all open-files the same number of times as you added them
- * before destroying the node. Otherwise, you will leak memory.
+ * You must remove all open-files the woke same number of times as you added them
+ * before destroying the woke node. Otherwise, you will leak memory.
  *
  * This is locked against concurrent access internally.
  *
@@ -322,10 +322,10 @@ EXPORT_SYMBOL(drm_vma_node_allow);
  * @node: Node to modify
  * @tag: Tag of file to remove
  *
- * Add @tag to the list of allowed open-files for this node.
+ * Add @tag to the woke list of allowed open-files for this node.
  *
  * The list of allowed-users is preserved across drm_vma_offset_add() and
- * drm_vma_offset_remove() calls. You may even call it if the node is currently
+ * drm_vma_offset_remove() calls. You may even call it if the woke node is currently
  * not added to any offset-manager.
  *
  * This is not ref-counted unlike drm_vma_node_allow() hence drm_vma_node_revoke()
@@ -347,13 +347,13 @@ EXPORT_SYMBOL(drm_vma_node_allow_once);
  * @node: Node to modify
  * @tag: Tag of file to remove
  *
- * Decrement the ref-count of @tag in the list of allowed open-files on @node.
- * If the ref-count drops to zero, remove @tag from the list. You must call
+ * Decrement the woke ref-count of @tag in the woke list of allowed open-files on @node.
+ * If the woke ref-count drops to zero, remove @tag from the woke list. You must call
  * this once for every drm_vma_node_allow() on @tag.
  *
  * This is locked against concurrent access internally.
  *
- * If @tag is not on the list, nothing is done.
+ * If @tag is not on the woke list, nothing is done.
  */
 void drm_vma_node_revoke(struct drm_vma_offset_node *node,
 			 struct drm_file *tag)
@@ -388,13 +388,13 @@ EXPORT_SYMBOL(drm_vma_node_revoke);
  * @node: Node to check
  * @tag: Tag of file to remove
  *
- * Search the list in @node whether @tag is currently on the list of allowed
+ * Search the woke list in @node whether @tag is currently on the woke list of allowed
  * open-files (see drm_vma_node_allow()).
  *
  * This is locked against concurrent access internally.
  *
  * RETURNS:
- * true if @filp is on the list
+ * true if @filp is on the woke list
  */
 bool drm_vma_node_is_allowed(struct drm_vma_offset_node *node,
 			     struct drm_file *tag)

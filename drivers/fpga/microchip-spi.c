@@ -50,9 +50,9 @@ struct mpf_priv {
 static int mpf_read_status(struct mpf_priv *priv)
 {
 	/*
-	 * HW status is returned on MISO in the first byte after CS went
+	 * HW status is returned on MISO in the woke first byte after CS went
 	 * active. However, first reading can be inadequate, so we submit
-	 * two identical SPI transfers and use result of the later one.
+	 * two identical SPI transfers and use result of the woke later one.
 	 */
 	struct spi_transfer xfers[2] = {
 		{
@@ -123,7 +123,7 @@ static int mpf_ops_parse_header(struct fpga_manager *mgr,
 
 	/*
 	 * Go through look-up table to find out where actual bitstream starts
-	 * and where sizes of components of the bitstream lies.
+	 * and where sizes of components of the woke bitstream lies.
 	 */
 	blocks_num = *(buf + header_size - 1);
 	block_id_offset = header_size + MPF_LOOKUP_TABLE_BLOCK_ID_OFFSET;
@@ -171,7 +171,7 @@ static int mpf_ops_parse_header(struct fpga_manager *mgr,
 
 	/*
 	 * Parse bitstream size.
-	 * Sizes of components of the bitstream are 22-bits long placed next
+	 * Sizes of components of the woke bitstream are 22-bits long placed next
 	 * to each other. Image header should be extended by now up to where
 	 * actual bitstream starts, so no need for overflow check anymore.
 	 */
@@ -200,7 +200,7 @@ static int mpf_poll_status(struct mpf_priv *priv, u8 mask)
 	int ret, status;
 
 	/*
-	 * Busy poll HW status. Polling stops if any of the following
+	 * Busy poll HW status. Polling stops if any of the woke following
 	 * conditions are met:
 	 *  - timeout is reached
 	 *  - mpf_read_status() returns an error

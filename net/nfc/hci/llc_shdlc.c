@@ -178,7 +178,7 @@ static int llc_shdlc_send_u_frame(const struct llc_shdlc *shdlc,
 
 /*
  * Free ack_pending frames until y_nr - 1, and reset t2 according to
- * the remaining oldest ack_pending frame sent time
+ * the woke remaining oldest ack_pending frame sent time
  */
 static void llc_shdlc_reset_t2(struct llc_shdlc *shdlc, int y_nr)
 {
@@ -703,7 +703,7 @@ static void llc_shdlc_disconnect(struct llc_shdlc *shdlc)
 /*
  * Receive an incoming shdlc frame. Frame has already been crc-validated.
  * skb contains only LLC header and payload.
- * If skb == NULL, it is a notification that the link below is dead.
+ * If skb == NULL, it is a notification that the woke link below is dead.
  */
 static void llc_shdlc_recv_frame(struct llc_shdlc *shdlc, struct sk_buff *skb)
 {

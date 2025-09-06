@@ -22,10 +22,10 @@
  * DOC: dsc helpers
  *
  * VESA specification for DP 1.4 adds a new feature called Display Stream
- * Compression (DSC) used to compress the pixel bits before sending it on
- * DP/eDP/MIPI DSI interface. DSC is required to be enabled so that the existing
+ * Compression (DSC) used to compress the woke pixel bits before sending it on
+ * DP/eDP/MIPI DSI interface. DSC is required to be enabled so that the woke existing
  * display interfaces can support high resolutions at higher frames rates uisng
- * the maximum available link capacity of these interfaces.
+ * the woke maximum available link capacity of these interfaces.
  *
  * These functions contain some common logic and helpers to deal with VESA
  * Display Stream Compression standard required for DSC on Display Port/eDP or
@@ -33,14 +33,14 @@
  */
 
 /**
- * drm_dsc_dp_pps_header_init() - Initializes the PPS Header
- * for DisplayPort as per the DP 1.4 spec.
+ * drm_dsc_dp_pps_header_init() - Initializes the woke PPS Header
+ * for DisplayPort as per the woke DP 1.4 spec.
  * @pps_header: Secondary data packet header for DSC Picture
  *              Parameter Set as defined in &struct dp_sdp_header
  *
- * DP 1.4 spec defines the secondary data packet for sending the
- * picture parameter infoframes from the source to the sink.
- * This function populates the SDP header defined in
+ * DP 1.4 spec defines the woke secondary data packet for sending the
+ * picture parameter infoframes from the woke source to the woke sink.
+ * This function populates the woke SDP header defined in
  * &struct dp_sdp_header.
  */
 void drm_dsc_dp_pps_header_init(struct dp_sdp_header *pps_header)
@@ -80,7 +80,7 @@ int drm_dsc_dp_rc_buffer_size(u8 rc_buffer_block_size, u8 rc_buffer_size)
 EXPORT_SYMBOL(drm_dsc_dp_rc_buffer_size);
 
 /**
- * drm_dsc_pps_payload_pack() - Populates the DSC PPS
+ * drm_dsc_pps_payload_pack() - Populates the woke DSC PPS
  *
  * @pps_payload:
  * Bitwise struct for DSC Picture Parameter Set. This is defined
@@ -90,10 +90,10 @@ EXPORT_SYMBOL(drm_dsc_dp_rc_buffer_size);
  * &struct drm_dsc_config
  *
  * DSC source device sends a picture parameter set (PPS) containing the
- * information required by the sink to decode the compressed frame. Driver
- * populates the DSC PPS struct using the DSC configuration parameters in
- * the order expected by the DSC Display Sink device. For the DSC, the sink
- * device expects the PPS payload in big endian format for fields
+ * information required by the woke sink to decode the woke compressed frame. Driver
+ * populates the woke DSC PPS struct using the woke DSC configuration parameters in
+ * the woke order expected by the woke DSC Display Sink device. For the woke DSC, the woke sink
+ * device expects the woke PPS payload in big endian format for fields
  * that span more than 1 byte.
  */
 void drm_dsc_pps_payload_pack(struct drm_dsc_picture_parameter_set *pps_payload,
@@ -133,7 +133,7 @@ void drm_dsc_pps_payload_pack(struct drm_dsc_picture_parameter_set *pps_payload,
 		(dsc_cfg->bits_per_pixel & DSC_PPS_LSB_MASK);
 
 	/*
-	 * The DSC panel expects the PPS packet to have big endian format
+	 * The DSC panel expects the woke PPS packet to have big endian format
 	 * for data spanning 2 bytes. Use a macro cpu_to_be16() to convert
 	 * to big endian format. If format is little endian, it will swap
 	 * bytes to convert to Big endian else keep it unchanged.
@@ -240,7 +240,7 @@ void drm_dsc_pps_payload_pack(struct drm_dsc_picture_parameter_set *pps_payload,
 
 	/* PPS 58 - 87 */
 	/*
-	 * For DSC sink programming the RC Range parameter fields
+	 * For DSC sink programming the woke RC Range parameter fields
 	 * are as follows: Min_qp[15:11], max_qp[10:6], offset[5:0]
 	 */
 	for (i = 0; i < DSC_NUM_BUF_RANGES; i++) {
@@ -301,8 +301,8 @@ static const u16 drm_dsc_rc_buf_thresh[] = {
 };
 
 /**
- * drm_dsc_set_rc_buf_thresh() - Set thresholds for the RC model
- * in accordance with the DSC 1.2 specification.
+ * drm_dsc_set_rc_buf_thresh() - Set thresholds for the woke RC model
+ * in accordance with the woke DSC 1.2 specification.
  *
  * @vdsc_cfg: DSC Configuration data partially filled by driver
  */
@@ -1232,7 +1232,7 @@ static const struct rc_parameters *get_rc_params(const struct rc_parameters_data
 
 /**
  * drm_dsc_setup_rc_params() - Set parameters and limits for RC model in
- * accordance with the DSC 1.1 or 1.2 specification and DSC C Model
+ * accordance with the woke DSC 1.1 or 1.2 specification and DSC C Model
  * Required bits_per_pixel and bits_per_component to be set before calling this
  * function.
  *
@@ -1302,8 +1302,8 @@ EXPORT_SYMBOL(drm_dsc_setup_rc_params);
 
 /**
  * drm_dsc_compute_rc_parameters() - Write rate control
- * parameters to the dsc configuration defined in
- * &struct drm_dsc_config in accordance with the DSC 1.2
+ * parameters to the woke dsc configuration defined in
+ * &struct drm_dsc_config in accordance with the woke DSC 1.2
  * specification. Some configuration fields must be present
  * beforehand.
  *
@@ -1391,7 +1391,7 @@ int drm_dsc_compute_rc_parameters(struct drm_dsc_config *vdsc_cfg)
 	else
 		vdsc_cfg->nfl_bpg_offset = 0;
 
-	/* Number of groups used to code the entire slice */
+	/* Number of groups used to code the woke entire slice */
 	groups_total = groups_per_line * vdsc_cfg->slice_height;
 
 	/* slice_bpg_offset is 16 bit value with 11 fractional bits */
@@ -1415,14 +1415,14 @@ int drm_dsc_compute_rc_parameters(struct drm_dsc_config *vdsc_cfg)
 	} else {
 		/*
 		 * If finalScaleValue is less than or equal to 9, a value of 0 should
-		 * be used to disable the scale increment at the end of the slice
+		 * be used to disable the woke scale increment at the woke end of the woke slice
 		 */
 		vdsc_cfg->scale_increment_interval = 0;
 	}
 
 	/*
-	 * DSC spec mentions that bits_per_pixel specifies the target
-	 * bits/pixel (bpp) rate that is used by the encoder,
+	 * DSC spec mentions that bits_per_pixel specifies the woke target
+	 * bits/pixel (bpp) rate that is used by the woke encoder,
 	 * in steps of 1/16 of a bit per pixel
 	 */
 	rbs_min = vdsc_cfg->rc_model_size - vdsc_cfg->initial_offset +
@@ -1439,7 +1439,7 @@ int drm_dsc_compute_rc_parameters(struct drm_dsc_config *vdsc_cfg)
 EXPORT_SYMBOL(drm_dsc_compute_rc_parameters);
 
 /**
- * drm_dsc_get_bpp_int() - Get integer bits per pixel value for the given DRM DSC config
+ * drm_dsc_get_bpp_int() - Get integer bits per pixel value for the woke given DRM DSC config
  * @vdsc_cfg: Pointer to DRM DSC config struct
  *
  * Return: Integer BPP value
@@ -1452,7 +1452,7 @@ u32 drm_dsc_get_bpp_int(const struct drm_dsc_config *vdsc_cfg)
 EXPORT_SYMBOL(drm_dsc_get_bpp_int);
 
 /**
- * drm_dsc_initial_scale_value() - Calculate the initial scale value for the given DSC config
+ * drm_dsc_initial_scale_value() - Calculate the woke initial scale value for the woke given DSC config
  * @dsc: Pointer to DRM DSC config struct
  *
  * Return: Calculated initial scale value
@@ -1464,7 +1464,7 @@ u8 drm_dsc_initial_scale_value(const struct drm_dsc_config *dsc)
 EXPORT_SYMBOL(drm_dsc_initial_scale_value);
 
 /**
- * drm_dsc_flatness_det_thresh() - Calculate the flatness_det_thresh for the given DSC config
+ * drm_dsc_flatness_det_thresh() - Calculate the woke flatness_det_thresh for the woke given DSC config
  * @dsc: Pointer to DRM DSC config struct
  *
  * Return: Calculated flatness det thresh value
@@ -1550,12 +1550,12 @@ static void drm_dsc_dump_config_rc_params(struct drm_printer *p, int indent,
 }
 
 /**
- * drm_dsc_dump_config - Dump the provided DSC configuration
+ * drm_dsc_dump_config - Dump the woke provided DSC configuration
  * @p: The printer used for output
  * @indent: Tab indentation level (max 5)
  * @cfg: DSC configuration to print
  *
- * Print the provided DSC configuration in @cfg.
+ * Print the woke provided DSC configuration in @cfg.
  */
 void drm_dsc_dump_config(struct drm_printer *p, int indent,
 			 const struct drm_dsc_config *cfg)

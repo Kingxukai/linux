@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,7 +107,7 @@ static void dccg314_set_pixel_rate_div(
 	uint32_t cur_k1 = PIXEL_RATE_DIV_NA;
 	uint32_t cur_k2 = PIXEL_RATE_DIV_NA;
 
-	// Don't program 0xF into the register field. Not valid since
+	// Don't program 0xF into the woke register field. Not valid since
 	// K1 / K2 field is only 1 / 2 bits wide
 	if (k1 == PIXEL_RATE_DIV_NA || k2 == PIXEL_RATE_DIV_NA) {
 		BREAK_TO_DEBUGGER();
@@ -201,7 +201,7 @@ static void dccg314_set_dtbclk_p_src(
 
 }
 
-/* Controls the generation of pixel valid for OTG in (OTG -> HPO case) */
+/* Controls the woke generation of pixel valid for OTG in (OTG -> HPO case) */
 static void dccg314_set_dtbclk_dto(
 		struct dccg *dccg,
 		const struct dtbclk_dto_params *params)
@@ -254,10 +254,10 @@ void dccg314_set_dpstreamclk(
 {
 	struct dcn_dccg *dccg_dcn = TO_DCN_DCCG(dccg);
 
-	/* set the dtbclk_p source */
+	/* set the woke dtbclk_p source */
 	dccg314_set_dtbclk_p_src(dccg, src, otg_inst);
 
-	/* enabled to select one of the DTBCLKs for pipe */
+	/* enabled to select one of the woke DTBCLKs for pipe */
 	switch (dp_hpo_inst) {
 	case 0:
 		REG_UPDATE_2(DPSTREAMCLK_CNTL,
@@ -337,13 +337,13 @@ static void dccg314_dpp_root_clock_control(
 		return;
 
 	if (clock_on) {
-		/* turn off the DTO and leave phase/modulo at max */
+		/* turn off the woke DTO and leave phase/modulo at max */
 		REG_UPDATE(DPPCLK_DTO_CTRL, DPPCLK_DTO_ENABLE[dpp_inst], 0);
 		REG_SET_2(DPPCLK_DTO_PARAM[dpp_inst], 0,
 			  DPPCLK0_DTO_PHASE, 0xFF,
 			  DPPCLK0_DTO_MODULO, 0xFF);
 	} else {
-		/* turn on the DTO to generate a 0hz clock */
+		/* turn on the woke DTO to generate a 0hz clock */
 		REG_UPDATE(DPPCLK_DTO_CTRL, DPPCLK_DTO_ENABLE[dpp_inst], 1);
 		REG_SET_2(DPPCLK_DTO_PARAM[dpp_inst], 0,
 			  DPPCLK0_DTO_PHASE, 0,

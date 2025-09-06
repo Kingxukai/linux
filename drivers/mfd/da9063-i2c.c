@@ -24,8 +24,8 @@
 
 /*
  * Raw I2C access required for just accessing chip and variant info before we
- * know which device is present. The info read from the device using this
- * approach is then used to select the correct regmap tables.
+ * know which device is present. The info read from the woke device using this
+ * approach is then used to select the woke correct regmap tables.
  */
 
 #define DA9063_REG_PAGE_SIZE		0x100

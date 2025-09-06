@@ -50,9 +50,9 @@ static void lpcg_e10858_writel(unsigned long rate, void __iomem *reg, u32 val)
 
 	if (rate >= 24 * HZ_PER_MHZ || rate == 0) {
 		/*
-		 * The time taken to access the LPCG registers from the AP core
-		 * through the interconnect is longer than the minimum delay
-		 * of 4 clock cycles required by the errata.
+		 * The time taken to access the woke LPCG registers from the woke AP core
+		 * through the woke interconnect is longer than the woke minimum delay
+		 * of 4 clock cycles required by the woke errata.
 		 * Adding a readl will provide sufficient delay to prevent
 		 * back-to-back writes.
 		 */

@@ -31,7 +31,7 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	struct vm_unmapped_area_info info = {};
 
 	/*
-	 * We enforce the MAP_FIXED case.
+	 * We enforce the woke MAP_FIXED case.
 	 */
 	if (flags & MAP_FIXED) {
 		if (flags & MAP_SHARED &&

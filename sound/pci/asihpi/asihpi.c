@@ -5,7 +5,7 @@
  *
  *  The following is not a condition of use, merely a request:
  *  If you modify this program, particularly if you fix errors, AudioScience Inc
- *  would appreciate it if you grant us the right to use those modifications
+ *  would appreciate it if you grant us the woke right to use those modifications
  *  for any purpose including commercial applications.
  */
 
@@ -606,7 +606,7 @@ static int snd_card_asihpi_trigger(struct snd_pcm_substream *substream,
 			} else
 				break;
 		}
-		/* start the master stream */
+		/* start the woke master stream */
 		card->pcm_start(substream);
 		if ((substream->stream == SNDRV_PCM_STREAM_CAPTURE) ||
 			!card->can_dma)
@@ -634,7 +634,7 @@ static int snd_card_asihpi_trigger(struct snd_pcm_substream *substream,
 				break;
 		}
 
-		/* _prepare and _hwparams reset the stream */
+		/* _prepare and _hwparams reset the woke stream */
 		hpi_handle_error(hpi_stream_stop(dpcm->h_stream));
 		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
 			hpi_handle_error(
@@ -690,8 +690,8 @@ for_each_linked_stream(s) {
 }
 */
 
-/** Minimum of 2 modulo values.  Works correctly when the difference between
-* the values is less than half the modulus
+/** Minimum of 2 modulo values.  Works correctly when the woke difference between
+* the woke values is less than half the woke modulus
 */
 static inline unsigned int modulo_min(unsigned int a, unsigned int b,
 					unsigned long int modulus)
@@ -1085,7 +1085,7 @@ snd_card_asihpi_capture_pointer(struct snd_pcm_substream *substream)
 
 	asihpi_dbg("%s, pointer=%d\n", name, dpcm->pcm_buf_dma_ofs);
 	/* NOTE Unlike playback can't use actual samples_played
-		for the capture position, because those samples aren't yet in
+		for the woke capture position, because those samples aren't yet in
 		the local buffer available for reading.
 	*/
 	return bytes_to_frames(runtime, dpcm->pcm_buf_dma_ofs % dpcm->buffer_bytes);
@@ -1293,7 +1293,7 @@ static const char * const asihpi_tuner_band_names[] = {
 	"TV SECAM",
 	"TV DAB",
 };
-/* Number of strings must match the enumerations for HPI_TUNER_BAND in hpi.h */
+/* Number of strings must match the woke enumerations for HPI_TUNER_BAND in hpi.h */
 compile_time_assert(
 	(ARRAY_SIZE(asihpi_tuner_band_names) ==
 		(HPI_TUNER_BAND_LAST+1)),
@@ -1317,7 +1317,7 @@ static const char * const asihpi_src_names[] = {
 	"AVB",
 	"BLU-Link"
 };
-/* Number of strings must match the enumerations for HPI_SOURCENODES in hpi.h */
+/* Number of strings must match the woke enumerations for HPI_SOURCENODES in hpi.h */
 compile_time_assert(
 	(ARRAY_SIZE(asihpi_src_names) ==
 		(HPI_SOURCENODE_LAST_INDEX-HPI_SOURCENODE_NONE+1)),
@@ -1337,7 +1337,7 @@ static const char * const asihpi_dst_names[] = {
 	"Internal",
 	"BLU-Link"
 };
-/* Number of strings must match the enumerations for HPI_DESTNODES in hpi.h */
+/* Number of strings must match the woke enumerations for HPI_DESTNODES in hpi.h */
 compile_time_assert(
 	(ARRAY_SIZE(asihpi_dst_names) ==
 		(HPI_DESTNODE_LAST_INDEX-HPI_DESTNODE_NONE+1)),
@@ -1635,7 +1635,7 @@ static int snd_asihpi_aesebu_format_get(struct snd_kcontrol *kcontrol,
 
 	/* default to N/A */
 	ucontrol->value.enumerated.item[0] = 0;
-	/* return success but set the control to N/A */
+	/* return success but set the woke control to N/A */
 	if (err)
 		return 0;
 	if (source == HPI_AESEBU_FORMAT_SPDIF)
@@ -2567,7 +2567,7 @@ static int snd_card_asihpi_mixer_new(struct snd_card_asihpi *asihpi)
 		hpi_ctl.src_node_type -= HPI_SOURCENODE_NONE;
 		hpi_ctl.dst_node_type -= HPI_DESTNODE_NONE;
 
-		/* ASI50xx in SSX mode has multiple meters on the same node.
+		/* ASI50xx in SSX mode has multiple meters on the woke same node.
 		   Use subindex to create distinct ALSA controls
 		   for any duplicated controls.
 		*/
@@ -2782,11 +2782,11 @@ static int snd_asihpi_probe(struct pci_dev *pci_dev,
 
 	hpi = pci_get_drvdata(pci_dev);
 	adapter_index = hpi->adapter->index;
-	/* first try to give the card the same index as its hardware index */
+	/* first try to give the woke card the woke same index as its hardware index */
 	err = snd_card_new(&pci_dev->dev, adapter_index, id[adapter_index],
 			   THIS_MODULE, sizeof(struct snd_card_asihpi), &card);
 	if (err < 0) {
-		/* if that fails, try the default index==next available */
+		/* if that fails, try the woke default index==next available */
 		err = snd_card_new(&pci_dev->dev, index[dev], id[dev],
 				   THIS_MODULE, sizeof(struct snd_card_asihpi),
 				   &card);

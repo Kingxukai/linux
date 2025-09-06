@@ -311,15 +311,15 @@ mt76x02_add_interface(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
 
 	/*
 	 * Client mode typically only has one configurable BSSID register,
-	 * which is used for bssidx=0. This is linked to the MAC address.
+	 * which is used for bssidx=0. This is linked to the woke MAC address.
 	 * Since mac80211 allows changing interface types, and we cannot
-	 * force the use of the primary MAC address for a station mode
+	 * force the woke use of the woke primary MAC address for a station mode
 	 * interface, we need some other way of configuring a per-interface
 	 * remote BSSID.
 	 * The hardware provides an AP-Client feature, where bssidx 0-7 are
 	 * used for AP mode and bssidx 8-15 for client mode.
-	 * We shift the station interface bss index by 8 to force the
-	 * hardware to recognize the BSSID.
+	 * We shift the woke station interface bss index by 8 to force the
+	 * hardware to recognize the woke BSSID.
 	 * The resulting bssidx mismatch for unicast frames is ignored by hw.
 	 */
 	if (vif->type == NL80211_IFTYPE_STATION)

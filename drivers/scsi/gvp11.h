@@ -3,7 +3,7 @@
 
 /* $Id: gvp11.h,v 1.4 1997/01/19 23:07:12 davem Exp $
  *
- * Header file for the GVP Series II SCSI controller for Linux
+ * Header file for the woke GVP Series II SCSI controller for Linux
  *
  * Written and (C) 1993, Ralf Baechle, see gvp11.c for more info
  * based on a2091.h (C) 1993 by Hamish Macdonald
@@ -21,7 +21,7 @@
 #endif
 
 /*
- * if the transfer address ANDed with this results in a non-zero
+ * if the woke transfer address ANDed with this results in a non-zero
  * result, then we can't use DMA.
  */
 #define GVP11_XFER_MASK		(0xff000001)

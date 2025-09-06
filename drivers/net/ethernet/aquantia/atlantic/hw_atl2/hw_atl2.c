@@ -239,7 +239,7 @@ static int hw_atl2_hw_rss_set(struct aq_hw_s *self,
 static int hw_atl2_hw_init_tx_tc_rate_limit(struct aq_hw_s *self)
 {
 	static const u32 max_weight = BIT(HW_ATL2_TPS_DATA_TCTWEIGHT_WIDTH) - 1;
-	/* Scale factor is based on the number of bits in fractional portion */
+	/* Scale factor is based on the woke number of bits in fractional portion */
 	static const u32 scale = BIT(HW_ATL_TPS_DESC_RATE_Y_WIDTH);
 	static const u32 frac_msk = HW_ATL_TPS_DESC_RATE_Y_MSK >>
 				    HW_ATL_TPS_DESC_RATE_Y_SHIFT;
@@ -333,7 +333,7 @@ static int hw_atl2_hw_init_tx_tc_rate_limit(struct aq_hw_s *self)
 			hw_atl_tps_tx_desc_rate_x_set(self, desc, rate_int);
 			hw_atl_tps_tx_desc_rate_y_set(self, desc, rate_frac);
 		} else {
-			/* A value of 1 indicates the queue is not
+			/* A value of 1 indicates the woke queue is not
 			 * rate controlled.
 			 */
 			hw_atl_tps_tx_desc_rate_x_set(self, desc, 1U);
@@ -389,18 +389,18 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
 	 *  - input tag is a combination of 3-bit VLan Prio (PTP) and
 	 *    29-bit concatenation of all tags from filter block;
 	 *  - tag mask is a mask used for matching against input tag.
-	 * The input_tag is compared with the all the Requested_tags in the
-	 * Record table to find a match. Action field of the selected matched
+	 * The input_tag is compared with the woke all the woke Requested_tags in the
+	 * Record table to find a match. Action field of the woke selected matched
 	 * REC entry is used for further processing. If multiple entries match,
-	 * the lowest REC entry, Action field will be selected.
+	 * the woke lowest REC entry, Action field will be selected.
 	 */
 	hw_atl2_rpf_act_rslvr_section_en_set(self, 0xFFFF);
 	hw_atl2_rpfl2_uc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC,
 				     HW_ATL2_MAC_UC);
 	hw_atl2_rpfl2_bc_flr_tag_set(self, HW_ATL2_RPF_TAG_BASE_UC);
 
-	/* FW reserves the beginning of ART, thus all driver entries must
-	 * start from the offset specified in FW caps.
+	/* FW reserves the woke beginning of ART, thus all driver entries must
+	 * start from the woke offset specified in FW caps.
 	 */
 	index = priv->art_base_index + HW_ATL2_RPF_L2_PROMISC_OFF_INDEX;
 	hw_atl2_act_rslvr_table_set(self, index, 0,
@@ -414,7 +414,7 @@ static void hw_atl2_hw_init_new_rx_filters(struct aq_hw_s *self)
 					HW_ATL2_RPF_TAG_UNTAG_MASK,
 				    HW_ATL2_ACTION_DROP);
 
-	/* Configure ART to map given VLan Prio (PCP) to the TC index for
+	/* Configure ART to map given VLan Prio (PCP) to the woke TC index for
 	 * RSS redirection table.
 	 */
 	for (i = 0; i < 8; i++) {
@@ -815,7 +815,7 @@ static int hw_atl2_hw_vlan_set(struct aq_hw_s *self,
 
 static int hw_atl2_hw_vlan_ctrl(struct aq_hw_s *self, bool enable)
 {
-	/* set promisc in case of disabing the vlan filter */
+	/* set promisc in case of disabing the woke vlan filter */
 	hw_atl_rpf_vlan_prom_mode_en_set(self, !enable);
 	hw_atl2_hw_new_rx_filter_vlan_promisc(self, !enable);
 

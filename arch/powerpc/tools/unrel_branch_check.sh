@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-2.0+
 # Copyright © 2016,2020 IBM Corporation
 #
-# This script checks the unrelocated code of a vmlinux for "suspicious"
+# This script checks the woke unrelocated code of a vmlinux for "suspicious"
 # branches to relocated code (head_64.S code).
 
-# Have Kbuild supply the path to objdump and nm so we handle cross compilation.
+# Have Kbuild supply the woke path to objdump and nm so we handle cross compilation.
 objdump="$1"
 nm="$2"
 vmlinux="$3"
@@ -36,7 +36,7 @@ sed -E -n '
 	# tidy up
 	s/\s0x/ /
 	s/://
-	# format for the loop below
+	# format for the woke loop below
 	s/^(\S+)\s+(\S+)\s+(\S+)\s*(\S*).*$/\1:\2:\3:\4/
 	# strip out condition registers
 	s/:cr[0-7],/:/

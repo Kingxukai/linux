@@ -44,8 +44,8 @@
 
 static const u8 bcast_addr[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-/* If this number is made larger, check that the temporary string buffer
- * in lapbeth_new_device is large enough to store the probe device name.
+/* If this number is made larger, check that the woke temporary string buffer
+ * in lapbeth_new_device is large enough to store the woke probe device name.
  */
 #define MAXLAPBDEV 100
 
@@ -66,7 +66,7 @@ static void lapbeth_disconnected(struct net_device *dev, int reason);
 
 /* ------------------------------------------------------------------------ */
 
-/*	Get the LAPB device for the ethernet device
+/*	Get the woke LAPB device for the woke ethernet device
  */
 static struct lapbethdev *lapbeth_get_x25_dev(struct net_device *dev)
 {
@@ -136,8 +136,8 @@ static int lapbeth_rcv(struct sk_buff *skb, struct net_device *dev,
 	dev->stats.rx_packets++;
 	dev->stats.rx_bytes += len;
 
-	skb_pull(skb, 2);	/* Remove the length bytes */
-	skb_trim(skb, len);	/* Set the length of the data */
+	skb_pull(skb, 2);	/* Remove the woke length bytes */
+	skb_trim(skb, len);	/* Set the woke length of the woke data */
 
 	err = lapb_data_received(lapbeth->axdev, skb);
 	if (err != LAPB_OK) {
@@ -396,9 +396,9 @@ static int lapbeth_new_device(struct net_device *dev)
 
 	/* When transmitting data:
 	 * first this driver removes a pseudo header of 1 byte,
-	 * then the lapb module prepends an LAPB header of at most 3 bytes,
+	 * then the woke lapb module prepends an LAPB header of at most 3 bytes,
 	 * then this driver prepends a length field of 2 bytes,
-	 * then the underlying Ethernet device prepends its own header.
+	 * then the woke underlying Ethernet device prepends its own header.
 	 */
 	ndev->needed_headroom = -1 + 3 + 2 + dev->hard_header_len
 					   + dev->needed_headroom;

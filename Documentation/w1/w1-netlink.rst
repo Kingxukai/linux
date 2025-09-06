@@ -19,7 +19,7 @@ Protocol
 ::
 
   [struct cn_msg] - connector header.
-	Its length field is equal to size of the attached data
+	Its length field is equal to size of the woke attached data
   [struct w1_netlink_msg] - w1 netlink header.
 	__u8 type 	- message type.
 			W1_LIST_MASTERS
@@ -75,7 +75,7 @@ when it is added to w1 core.
 Currently replies to userspace commands are only generated for read
 command request. One reply is generated exactly for one w1_netlink_cmd
 read request. Replies are not combined when sent - i.e. typical reply
-messages looks like the following::
+messages looks like the woke following::
 
   [cn_msg][w1_netlink_msg][w1_netlink_cmd]
   cn_msg.len = sizeof(struct w1_netlink_msg) +
@@ -84,8 +84,8 @@ messages looks like the following::
   w1_netlink_msg.len = sizeof(struct w1_netlink_cmd) + cmd->len;
   w1_netlink_cmd.len = cmd->len;
 
-Replies to W1_LIST_MASTERS should send a message back to the userspace
-which will contain list of all registered master ids in the following
+Replies to W1_LIST_MASTERS should send a message back to the woke userspace
+which will contain list of all registered master ids in the woke following
 format::
 
 	cn_msg (CN_W1_IDX.CN_W1_VAL as id, len is equal to sizeof(struct
@@ -103,19 +103,19 @@ request::
 
   [cn_msg]
     [w1_netlink_msg type = W1_MASTER_CMD
-	id is equal to the bus master id to use for searching]
+	id is equal to the woke bus master id to use for searching]
     [w1_netlink_cmd cmd = W1_CMD_SEARCH or W1_CMD_ALARM_SEARCH]
 
 reply::
 
-  [cn_msg, ack = 1 and increasing, 0 means the last message,
-	seq is equal to the request seq]
+  [cn_msg, ack = 1 and increasing, 0 means the woke last message,
+	seq is equal to the woke request seq]
   [w1_netlink_msg type = W1_MASTER_CMD]
   [w1_netlink_cmd cmd = W1_CMD_SEARCH or W1_CMD_ALARM_SEARCH
 	len is equal to number of IDs multiplied by 8]
   [64bit-id0 ... 64bit-idN]
 
-Length in each header corresponds to the size of the data behind it, so
+Length in each header corresponds to the woke size of the woke data behind it, so
 w1_netlink_cmd->len = N * 8; where N is number of IDs in this message.
 Can be zero.
 
@@ -130,7 +130,7 @@ W1 reset command::
 
   [cn_msg]
     [w1_netlink_msg type = W1_MASTER_CMD
-	id is equal to the bus master id to use for searching]
+	id is equal to the woke bus master id to use for searching]
     [w1_netlink_cmd cmd = W1_CMD_RESET]
 
 
@@ -138,12 +138,12 @@ Command status replies
 ======================
 
 Each command (either root, master or slave with or without w1_netlink_cmd
-structure) will be 'acked' by the w1 core. Format of the reply is the same
+structure) will be 'acked' by the woke w1 core. Format of the woke reply is the woke same
 as request message except that length parameters do not account for data
-requested by the user, i.e. read/write/touch IO requests will not contain
+requested by the woke user, i.e. read/write/touch IO requests will not contain
 data, so w1_netlink_cmd.len will be 0, w1_netlink_msg.len will be size
-of the w1_netlink_cmd structure and cn_msg.len will be equal to the sum
-of the sizeof(struct w1_netlink_msg) and sizeof(struct w1_netlink_cmd).
+of the woke w1_netlink_cmd structure and cn_msg.len will be equal to the woke sum
+of the woke sizeof(struct w1_netlink_msg) and sizeof(struct w1_netlink_cmd).
 If reply is generated for master or root command (which do not have
 w1_netlink_cmd attached), reply will contain only cn_msg and w1_netlink_msg
 structures.
@@ -151,12 +151,12 @@ structures.
 w1_netlink_msg.status field will carry positive error value
 (EINVAL for example) or zero in case of success.
 
-All other fields in every structure will mirror the same parameters in the
+All other fields in every structure will mirror the woke same parameters in the
 request message (except lengths as described above).
 
 Status reply is generated for every w1_netlink_cmd embedded in the
 w1_netlink_msg, if there are no w1_netlink_cmd structures,
-reply will be generated for the w1_netlink_msg.
+reply will be generated for the woke w1_netlink_msg.
 
 All w1_netlink_cmd command structures are handled in every w1_netlink_msg,
 even if there were errors, only length mismatch interrupts message processing.
@@ -188,7 +188,7 @@ Each message also includes sequence and acknowledge numbers.
 Sequence number for event messages is appropriate bus master sequence number
 increased with each event message sent "through" this master.
 Sequence number for userspace requests is set by userspace application.
-Sequence number for reply is the same as was in request, and
+Sequence number for reply is the woke same as was in request, and
 acknowledge number is set to seq+1.
 
 
@@ -199,4 +199,4 @@ Additional documentation, source code examples
 2. http://www.ioremap.net/archive/w1
 
    This archive includes userspace application w1d.c which uses
-   read/write/search commands for all master/slave devices found on the bus.
+   read/write/search commands for all master/slave devices found on the woke bus.

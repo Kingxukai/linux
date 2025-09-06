@@ -9,9 +9,9 @@ Contact:	linux-iio@vger.kernel.org
 Description:
 		Reading returns either '1' or '0'.
 
-		'1' means that the clock in question is present.
+		'1' means that the woke clock in question is present.
 
-		'0' means that the clock is missing.
+		'0' means that the woke clock is missing.
 
 What:		/sys/bus/iio/devices/iio:deviceX/pllY_locked
 KernelVersion:	3.4.0
@@ -24,8 +24,8 @@ What:		/sys/bus/iio/devices/iio:deviceX/sync_dividers
 KernelVersion:	3.4.0
 Contact:	linux-iio@vger.kernel.org
 Description:
-		Writing '1' triggers the clock distribution synchronization
-		functionality. All dividers are reset and the channels start
+		Writing '1' triggers the woke clock distribution synchronization
+		functionality. All dividers are reset and the woke channels start
 		with their predefined phase offsets (out_altvoltageY_phase).
-		Writing this file has the effect as driving the external
+		Writing this file has the woke effect as driving the woke external
 		/SYNC pin low.

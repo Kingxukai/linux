@@ -48,16 +48,16 @@
     "BriefDescription": "This event counts valid cycles of PRX pipeline."
   },
   {
-    "PublicDescription": "This event counts the number of 1's in the predicate bits of request in FLA pipeline, where it is corrected so that it becomes 16 when all bits are 1.",
+    "PublicDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLA pipeline, where it is corrected so that it becomes 16 when all bits are 1.",
     "EventCode": "0x1B4",
     "EventName": "FLA_VAL_PRD_CNT",
-    "BriefDescription": "This event counts the number of 1's in the predicate bits of request in FLA pipeline, where it is corrected so that it becomes 16 when all bits are 1."
+    "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLA pipeline, where it is corrected so that it becomes 16 when all bits are 1."
   },
   {
-    "PublicDescription": "This event counts the number of 1's in the predicate bits of request in FLB pipeline, where it is corrected so that it becomes 16 when all bits are 1.",
+    "PublicDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLB pipeline, where it is corrected so that it becomes 16 when all bits are 1.",
     "EventCode": "0x1B5",
     "EventName": "FLB_VAL_PRD_CNT",
-    "BriefDescription": "This event counts the number of 1's in the predicate bits of request in FLB pipeline, where it is corrected so that it becomes 16 when all bits are 1."
+    "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in FLB pipeline, where it is corrected so that it becomes 16 when all bits are 1."
   },
   {
     "PublicDescription": "This event counts valid cycles of L1D cache pipeline#0.",
@@ -138,40 +138,40 @@
     "BriefDescription": "This event counts requests in L1D cache pipeline#1 that its sector cache ID is not 0."
   },
   {
-    "PublicDescription": "This event counts the number of times where 2 elements of the gather instructions became 2 flows because 2 elements could not be combined.",
+    "PublicDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 2 flows because 2 elements could not be combined.",
     "EventCode": "0x2B0",
     "EventName": "L1_PIPE_COMP_GATHER_2FLOW",
-    "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 2 flows because 2 elements could not be combined."
+    "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 2 flows because 2 elements could not be combined."
   },
   {
-    "PublicDescription": "This event counts the number of times where 2 elements of the gather instructions became 1 flow because 2 elements could be combined.",
+    "PublicDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 1 flow because 2 elements could be combined.",
     "EventCode": "0x2B1",
     "EventName": "L1_PIPE_COMP_GATHER_1FLOW",
-    "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 1 flow because 2 elements could be combined."
+    "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 1 flow because 2 elements could be combined."
   },
   {
-    "PublicDescription": "This event counts the number of times where 2 elements of the gather instructions became 0 flow because both predicate values are 0.",
+    "PublicDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 0 flow because both predicate values are 0.",
     "EventCode": "0x2B2",
     "EventName": "L1_PIPE_COMP_GATHER_0FLOW",
-    "BriefDescription": "This event counts the number of times where 2 elements of the gather instructions became 0 flow because both predicate values are 0."
+    "BriefDescription": "This event counts the woke number of times where 2 elements of the woke gather instructions became 0 flow because both predicate values are 0."
   },
   {
-    "PublicDescription": "This event counts the number of flows of the scatter instructions.",
+    "PublicDescription": "This event counts the woke number of flows of the woke scatter instructions.",
     "EventCode": "0x2B3",
     "EventName": "L1_PIPE_COMP_SCATTER_1FLOW",
-    "BriefDescription": "This event counts the number of flows of the scatter instructions."
+    "BriefDescription": "This event counts the woke number of flows of the woke scatter instructions."
   },
   {
-    "PublicDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 16 when all bits are 1.",
+    "PublicDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 16 when all bits are 1.",
     "EventCode": "0x2B8",
     "EventName": "L1_PIPE0_COMP_PRD_CNT",
-    "BriefDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 16 when all bits are 1."
+    "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#0, where it is corrected so that it becomes 16 when all bits are 1."
   },
   {
-    "PublicDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 16 when all bits are 1.",
+    "PublicDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 16 when all bits are 1.",
     "EventCode": "0x2B9",
     "EventName": "L1_PIPE1_COMP_PRD_CNT",
-    "BriefDescription": "This event counts the number of 1's in the predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 16 when all bits are 1."
+    "BriefDescription": "This event counts the woke number of 1's in the woke predicate bits of request in L1D cache pipeline#1, where it is corrected so that it becomes 16 when all bits are 1."
   },
   {
     "PublicDescription": "This event counts valid cycles of L2 cache pipeline.",

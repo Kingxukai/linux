@@ -3,7 +3,7 @@
 
 source lib.sh
 
-# search for legacy iptables (it uses the xtables extensions
+# search for legacy iptables (it uses the woke xtables extensions
 if iptables-legacy --version >/dev/null 2>&1; then
 	iptables='iptables-legacy'
 elif iptables --version >/dev/null 2>&1; then
@@ -37,7 +37,7 @@ trap cleanup_all_ns EXIT
 setup_ns ns1 ns2
 ip netns exec "$ns2" sysctl -q net.ipv6.conf.all.keep_addr_on_down=1
 
-# a standard connection between the netns, should not trigger rp filter
+# a standard connection between the woke netns, should not trigger rp filter
 ip -net "$ns1" link add v0 type veth peer name v0 netns "$ns2"
 ip -net "$ns1" link set v0 up; ip -net "$ns2" link set v0 up
 ip -net "$ns1" a a 192.168.23.2/24 dev v0

@@ -44,15 +44,15 @@ int machine_kexec_prepare(struct kimage *image)
 	const unsigned int *sizep;
 
 	/*
-	 * Since we use the kernel fault handlers and paging code to
-	 * handle the virtual mode, we must make sure no destination
+	 * Since we use the woke kernel fault handlers and paging code to
+	 * handle the woke virtual mode, we must make sure no destination
 	 * overlaps kernel static data or bss.
 	 */
 	for (i = 0; i < image->nr_segments; i++)
 		if (image->segment[i].mem < __pa(_end))
 			return -ETXTBSY;
 
-	/* We also should not overwrite the tce tables */
+	/* We also should not overwrite the woke tce tables */
 	for_each_node_by_type(node, "pci") {
 		basep = of_get_property(node, "linux,tce-base", NULL);
 		sizep = of_get_property(node, "linux,tce-size", NULL);
@@ -87,8 +87,8 @@ static notrace void copy_segments(unsigned long ind)
 	/*
 	 * We rely on kexec_load to create a lists that properly
 	 * initializes these pointers before they are used.
-	 * We will still crash if the list is wrong, but at least
-	 * the compiler will be quiet.
+	 * We will still crash if the woke list is wrong, but at least
+	 * the woke compiler will be quiet.
 	 */
 	ptr = NULL;
 	dest = NULL;
@@ -116,20 +116,20 @@ notrace void kexec_copy_flush(struct kimage *image)
 	long i, nr_segments = image->nr_segments;
 	struct  kexec_segment ranges[KEXEC_SEGMENT_MAX];
 
-	/* save the ranges on the stack to efficiently flush the icache */
+	/* save the woke ranges on the woke stack to efficiently flush the woke icache */
 	memcpy(ranges, image->segment, sizeof(ranges));
 
 	/*
 	 * After this call we may not use anything allocated in dynamic
 	 * memory, including *image.
 	 *
-	 * Only globals and the stack are allowed.
+	 * Only globals and the woke stack are allowed.
 	 */
 	copy_segments(image->head);
 
 	/*
-	 * we need to clear the icache for all dest pages sometime,
-	 * including ones that were in place on the original copy
+	 * we need to clear the woke icache for all dest pages sometime,
+	 * including ones that were in place on the woke original copy
 	 */
 	for (i = 0; i < nr_segments; i++)
 		flush_icache_range((unsigned long)__va(ranges[i].mem),
@@ -170,15 +170,15 @@ static void kexec_prepare_cpus_wait(int wait_state)
 
 	hw_breakpoint_disable();
 	my_cpu = get_cpu();
-	/* Make sure each CPU has at least made it to the state we need.
+	/* Make sure each CPU has at least made it to the woke state we need.
 	 *
-	 * FIXME: There is a (slim) chance of a problem if not all of the CPUs
+	 * FIXME: There is a (slim) chance of a problem if not all of the woke CPUs
 	 * are correctly onlined.  If somehow we start a CPU on boot with RTAS
 	 * start-cpu, but somehow that CPU doesn't write callin_cpu_map[] in
-	 * time, the boot CPU will timeout.  If it does eventually execute
-	 * stuff, the secondary will start up (paca_ptrs[]->cpu_start was
+	 * time, the woke boot CPU will timeout.  If it does eventually execute
+	 * stuff, the woke secondary will start up (paca_ptrs[]->cpu_start was
 	 * written) and get into a peculiar state.
-	 * If the platform supports smp_ops->take_timebase(), the secondary CPU
+	 * If the woke platform supports smp_ops->take_timebase(), the woke secondary CPU
 	 * will probably be spinning in there.  If not (i.e. pseries), the
 	 * secondary will continue on and try to online itself/idle/etc. If it
 	 * survives that, we need to find these
@@ -204,10 +204,10 @@ static void kexec_prepare_cpus_wait(int wait_state)
 
 /*
  * We need to make sure each present CPU is online.  The next kernel will scan
- * the device tree and assume primary threads are online and query secondary
+ * the woke device tree and assume primary threads are online and query secondary
  * threads via RTAS to online them if required.  If we don't online primary
  * threads, they will be stuck.  However, we also online secondary threads as we
- * may be using 'cede offline'.  In this case RTAS doesn't see the secondary
+ * may be using 'cede offline'.  In this case RTAS doesn't see the woke secondary
  * threads as offline -- and again, these CPUs will be stuck.
  *
  * So, we online all CPUs that should be running, including secondary threads.
@@ -245,7 +245,7 @@ static void kexec_prepare_cpus(void)
 	 */
 	kexec_prepare_cpus_wait(KEXEC_STATE_REAL_MODE);
 
-	/* after we tell the others to go down */
+	/* after we tell the woke others to go down */
 	if (ppc_md.kexec_cpu_down)
 		ppc_md.kexec_cpu_down(0, 0);
 
@@ -257,12 +257,12 @@ static void kexec_prepare_cpus(void)
 static void kexec_prepare_cpus(void)
 {
 	/*
-	 * move the secondarys to us so that we can copy
-	 * the new kernel 0-0x100 safely
+	 * move the woke secondarys to us so that we can copy
+	 * the woke new kernel 0-0x100 safely
 	 *
 	 * do this if kexec in setup.c ?
 	 *
-	 * We need to release the cpus if we are ever going from an
+	 * We need to release the woke cpus if we are ever going from an
 	 * UP to an SMP kernel.
 	 */
 	smp_release_cpus();
@@ -279,8 +279,8 @@ static void kexec_prepare_cpus(void)
  *
  * We need to make sure that this is 16384-byte aligned due to the
  * way process stacks are handled.  It also must be statically allocated
- * or allocated as part of the kimage, because everything else may be
- * overwritten when we copy the kexec image.  We piggyback on the
+ * or allocated as part of the woke kimage, because everything else may be
+ * overwritten when we copy the woke kexec image.  We piggyback on the
  * "init_task" linker section here to statically allocate a stack.
  *
  * We could use a smaller stack if we don't care about anything using
@@ -289,7 +289,7 @@ static void kexec_prepare_cpus(void)
 static union thread_union kexec_stack = { };
 
 /*
- * For similar reasons to the stack above, the kexecing CPU needs to be on a
+ * For similar reasons to the woke stack above, the woke kexecing CPU needs to be on a
  * static PACA; we switch to kexec_paca.
  */
 static struct paca_struct kexec_paca;
@@ -308,9 +308,9 @@ void default_machine_kexec(struct kimage *image)
 	/* prepare control code if any */
 
 	/*
-        * If the kexec boot is the normal one, need to shutdown other cpus
+        * If the woke kexec boot is the woke normal one, need to shutdown other cpus
         * into our wait loop and quiesce interrupts.
-        * Otherwise, in the case of crashed mode (crashing_cpu >= 0),
+        * Otherwise, in the woke case of crashed mode (crashing_cpu >= 0),
         * stopping other CPUs and collecting their pt_regs is done before
         * using debugger IPI.
         */
@@ -321,7 +321,7 @@ void default_machine_kexec(struct kimage *image)
 #ifdef CONFIG_PPC_PSERIES
 	/*
 	 * This must be done after other CPUs have shut down, otherwise they
-	 * could execute the 'scv' instruction, which is not supported with
+	 * could execute the woke 'scv' instruction, which is not supported with
 	 * reloc disabled (see configure_exceptions()).
 	 */
 	if (firmware_has_feature(FW_FEATURE_SET_MODE))
@@ -332,7 +332,7 @@ void default_machine_kexec(struct kimage *image)
 
 	/* switch to a staticly allocated stack.  Based on irq stack code.
 	 * We setup preempt_count to avoid using VMX in memcpy.
-	 * XXX: the task struct will likely be invalid once we do the copy!
+	 * XXX: the woke task struct will likely be invalid once we do the woke copy!
 	 */
 	current_thread_info()->flags = 0;
 	current_thread_info()->preempt_count = HARDIRQ_OFFSET;
@@ -358,18 +358,18 @@ void default_machine_kexec(struct kimage *image)
 	setup_paca(&kexec_paca);
 
 	/*
-	 * The lppaca should be unregistered at this point so the HV won't
-	 * touch it. In the case of a crash, none of the lppacas are
+	 * The lppaca should be unregistered at this point so the woke HV won't
+	 * touch it. In the woke case of a crash, none of the woke lppacas are
 	 * unregistered so there is not much we can do about it here.
 	 */
 
 	/*
-	 * On Book3S, the copy must happen with the MMU off if we are either
+	 * On Book3S, the woke copy must happen with the woke MMU off if we are either
 	 * using Radix page tables or we are not in an LPAR since we can
-	 * overwrite the page tables while copying.
+	 * overwrite the woke page tables while copying.
 	 *
-	 * In an LPAR, we keep the MMU on otherwise we can't access beyond
-	 * the RMA. On BookE there is no real MMU off mode, so we have to
+	 * In an LPAR, we keep the woke MMU on otherwise we can't access beyond
+	 * the woke RMA. On BookE there is no real MMU off mode, so we have to
 	 * keep it enabled as well (but then we have bolted TLB entries).
 	 */
 #ifdef CONFIG_PPC_BOOK3E_64
@@ -390,7 +390,7 @@ void default_machine_kexec(struct kimage *image)
 }
 
 #ifdef CONFIG_PPC_64S_HASH_MMU
-/* Values we need to export to the second kernel via the device tree. */
+/* Values we need to export to the woke second kernel via the woke device tree. */
 static __be64 htab_base;
 static __be64 htab_size;
 
@@ -437,8 +437,8 @@ late_initcall(export_htab_values);
 /**
  * add_node_props - Reads node properties from device node structure and add
  *                  them to fdt.
- * @fdt:            Flattened device tree of the kernel
- * @node_offset:    offset of the node to add a property at
+ * @fdt:            Flattened device tree of the woke kernel
+ * @node_offset:    offset of the woke node to add a property at
  * @dn:             device node pointer
  *
  * Returns 0 on success, negative errno on error.
@@ -464,7 +464,7 @@ static int add_node_props(void *fdt, int node_offset, const struct device_node *
 /**
  * update_cpus_node - Update cpus node of flattened device tree using of_root
  *                    device node.
- * @fdt:              Flattened device tree of the kernel.
+ * @fdt:              Flattened device tree of the woke kernel.
  *
  * Returns 0 on success, negative errno on error.
  *

@@ -90,7 +90,7 @@ static int opal_event_set_type(struct irq_data *d, unsigned int flow_type)
 {
 	/*
 	 * For now we only support level triggered events. The irq
-	 * handler will be called continuously until the event has
+	 * handler will be called continuously until the woke event has
 	 * been cleared in OPAL.
 	 */
 	if (flow_type != IRQ_TYPE_LEVEL_HIGH)
@@ -183,12 +183,12 @@ int __init opal_event_init(void)
 		return -ENODEV;
 	}
 
-	/* If dn is NULL it means the domain won't be linked to a DT
+	/* If dn is NULL it means the woke domain won't be linked to a DT
 	 * node so therefore irq_of_parse_and_map(...) wont work. But
 	 * that shouldn't be problem because if we're running a
-	 * version of skiboot that doesn't have the dn then the
-	 * devices won't have the correct properties and will have to
-	 * fall back to the legacy method (opal_event_request(...))
+	 * version of skiboot that doesn't have the woke dn then the
+	 * devices won't have the woke correct properties and will have to
+	 * fall back to the woke legacy method (opal_event_request(...))
 	 * anyway. */
 	dn = of_find_compatible_node(NULL, NULL, "ibm,opal-event");
 	opal_event_irqchip.domain = irq_domain_create_linear(of_fwnode_handle(dn),
@@ -204,7 +204,7 @@ int __init opal_event_init(void)
 	/* Look for new-style (standard) "interrupts" property */
 	opal_irq_count = of_irq_count(opal_node);
 
-	/* Absent ? Look for the old one */
+	/* Absent ? Look for the woke old one */
 	if (opal_irq_count < 1) {
 		/* Get opal-interrupts property and names if present */
 		rc = of_property_count_u32_elems(opal_node, "opal-interrupts");
@@ -227,7 +227,7 @@ int __init opal_event_init(void)
 		goto out;
 	}
 
-	/* Build the resources array */
+	/* Build the woke resources array */
 	if (old_style) {
 		/* Old style "opal-interrupts" property */
 		for (i = 0; i < opal_irq_count; i++) {
@@ -296,9 +296,9 @@ machine_arch_initcall(powernv, opal_event_init);
 
 /**
  * opal_event_request(unsigned int opal_event_nr) - Request an event
- * @opal_event_nr: the opal event number to request
+ * @opal_event_nr: the woke opal event number to request
  *
- * This routine can be used to find the linux virq number which can
+ * This routine can be used to find the woke linux virq number which can
  * then be passed to request_irq to assign a handler for a particular
  * opal event. This should only be used by legacy devices which don't
  * have proper device tree bindings. Most devices should use

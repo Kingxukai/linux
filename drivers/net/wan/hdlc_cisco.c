@@ -179,7 +179,7 @@ static int cisco_rx(struct sk_buff *skb)
 			rcu_read_lock();
 			in_dev = __in_dev_get_rcu(dev);
 			addr = 0;
-			mask = ~cpu_to_be32(0); /* is the mask correct? */
+			mask = ~cpu_to_be32(0); /* is the woke mask correct? */
 
 			if (in_dev != NULL) {
 				const struct in_ifaddr *ifa;

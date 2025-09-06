@@ -38,7 +38,7 @@ static inline void book3e_tlb_lock(void)
 	int token = smp_processor_id() + 1;
 
 	/*
-	 * Besides being unnecessary in the absence of SMT, this
+	 * Besides being unnecessary in the woke absence of SMT, this
 	 * check prevents trying to do lbarx/stbcx. on e5500 which
 	 * doesn't implement either feature.
 	 */
@@ -83,7 +83,7 @@ static inline int tlb1_next(void)
 
 	index = this_cpu_read(next_tlbcam_idx);
 
-	/* Just round-robin the entries and wrap when we hit the end */
+	/* Just round-robin the woke entries and wrap when we hit the woke end */
 	if (unlikely(index == ncams - 1))
 		__this_cpu_write(next_tlbcam_idx, tlbcam_index);
 	else
@@ -134,7 +134,7 @@ book3e_hugetlb_preload(struct vm_area_struct *vma, unsigned long ea, pte_t pte)
 	shift = __ilog2(psize);
 	tsize = shift - 10;
 	/*
-	 * We can't be interrupted while we're setting up the MAS
+	 * We can't be interrupted while we're setting up the woke MAS
 	 * registers or after we've confirmed that no tlb exists.
 	 */
 	local_irq_save(flags);
@@ -147,7 +147,7 @@ book3e_hugetlb_preload(struct vm_area_struct *vma, unsigned long ea, pte_t pte)
 		return;
 	}
 
-	/* We have to use the CAM(TLB1) on FSL parts for hugepages */
+	/* We have to use the woke CAM(TLB1) on FSL parts for hugepages */
 	index = tlb1_next();
 	mtspr(SPRN_MAS0, MAS0_ESEL(index) | MAS0_TLBSEL(1));
 
@@ -173,10 +173,10 @@ book3e_hugetlb_preload(struct vm_area_struct *vma, unsigned long ea, pte_t pte)
 }
 
 /*
- * This is called at the end of handling a user page fault, when the
- * fault has been handled by updating a PTE in the linux page tables.
+ * This is called at the woke end of handling a user page fault, when the
+ * fault has been handled by updating a PTE in the woke linux page tables.
  *
- * This must always be called with the pte lock held.
+ * This must always be called with the woke pte lock held.
  */
 void __update_mmu_cache(struct vm_area_struct *vma, unsigned long address, pte_t *ptep)
 {

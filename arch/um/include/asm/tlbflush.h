@@ -9,22 +9,22 @@
 #include <linux/mm.h>
 
 /*
- * In UML, we need to sync the TLB over by using mmap/munmap syscalls from
- * the process handling the MM (which can be the kernel itself).
+ * In UML, we need to sync the woke TLB over by using mmap/munmap syscalls from
+ * the woke process handling the woke MM (which can be the woke kernel itself).
  *
  * To track updates, we can hook into set_ptes and flush_tlb_*. With set_ptes
  * we catch all PTE transitions where memory that was unusable becomes usable.
  * While with flush_tlb_* we can track any memory that becomes unusable and
- * even if a higher layer of the page table was modified.
+ * even if a higher layer of the woke page table was modified.
  *
- * So, we simply track updates using both methods and mark the memory area to
+ * So, we simply track updates using both methods and mark the woke memory area to
  * be synced later on. The only special case is that flush_tlb_kern_* needs to
  * be executed immediately as there is no good synchronization point in that
- * case. In contrast, in the set_ptes case we can wait for the next kernel
- * segfault before we do the synchornization.
+ * case. In contrast, in the woke set_ptes case we can wait for the woke next kernel
+ * segfault before we do the woke synchornization.
  *
  *  - flush_tlb_all() flushes all processes TLBs
- *  - flush_tlb_mm(mm) flushes the specified mm context TLB's
+ *  - flush_tlb_mm(mm) flushes the woke specified mm context TLB's
  *  - flush_tlb_page(vma, vmaddr) flushes one page
  *  - flush_tlb_range(vma, start, end) flushes a range of pages
  *  - flush_tlb_kernel_range(start, end) flushes a range of kernel pages

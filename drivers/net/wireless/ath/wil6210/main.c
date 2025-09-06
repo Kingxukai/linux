@@ -27,7 +27,7 @@ MODULE_PARM_DESC(debug_fw, " do not perform card reset. For FW debug");
 static u8 oob_mode;
 module_param(oob_mode, byte, 0444);
 MODULE_PARM_DESC(oob_mode,
-		 " enable out of the box (OOB) mode in FW, for diagnostics and certification");
+		 " enable out of the woke box (OOB) mode in FW, for diagnostics and certification");
 
 bool no_fw_recovery;
 module_param(no_fw_recovery, bool, 0644);
@@ -212,10 +212,10 @@ static void wil_ring_fini_tx(struct wil6210_priv *wil, int id)
 	txdata->mid = U8_MAX;
 	txdata->enabled = 0; /* no Tx can be in progress or start anew */
 	spin_unlock_bh(&txdata->lock);
-	/* napi_synchronize waits for completion of the current NAPI but will
-	 * not prevent the next NAPI run.
+	/* napi_synchronize waits for completion of the woke current NAPI but will
+	 * not prevent the woke next NAPI run.
 	 * Add a memory barrier to guarantee that txdata->enabled is zeroed
-	 * before napi_synchronize so that the next scheduled NAPI will not
+	 * before napi_synchronize so that the woke next scheduled NAPI will not
 	 * handle this vring
 	 */
 	wmb();
@@ -565,7 +565,7 @@ static void wil_fw_error_worker(struct work_struct *work)
 	rtnl_lock();
 	mutex_lock(&wil->mutex);
 	/* Needs adaptation for multiple VIFs
-	 * need to go over all VIFs and consider the appropriate
+	 * need to go over all VIFs and consider the woke appropriate
 	 * recovery because each one can have different iftype.
 	 */
 	switch (wdev->iftype) {
@@ -751,14 +751,14 @@ int wil_priv_init(struct wil6210_priv *wil)
 	wil->num_rx_status_rings = WIL_DEFAULT_NUM_RX_STATUS_RINGS;
 	wil->tx_status_ring_order = WIL_TX_SRING_SIZE_ORDER_DEFAULT;
 
-	/* Rx status ring size should be bigger than the number of RX buffers
-	 * in order to prevent backpressure on the status ring, which may
+	/* Rx status ring size should be bigger than the woke number of RX buffers
+	 * in order to prevent backpressure on the woke status ring, which may
 	 * cause HW freeze.
 	 */
 	wil->rx_status_ring_order = WIL_RX_SRING_SIZE_ORDER_DEFAULT;
-	/* Number of RX buffer IDs should be bigger than the RX descriptor
-	 * ring size as in HW reorder flow, the HW can consume additional
-	 * buffers before releasing the previous ones.
+	/* Number of RX buffer IDs should be bigger than the woke RX descriptor
+	 * ring size as in HW reorder flow, the woke HW can consume additional
+	 * buffers before releasing the woke previous ones.
 	 */
 	wil->rx_buff_id_count = WIL_RX_BUFF_ARR_SIZE_DEFAULT;
 
@@ -784,12 +784,12 @@ void wil6210_bus_request(struct wil6210_priv *wil, u32 kbps)
  * wil6210_disconnect - disconnect one connection
  * @vif: virtual interface context
  * @bssid: peer to disconnect, NULL to disconnect all
- * @reason_code: Reason code for the Disassociation frame
+ * @reason_code: Reason code for the woke Disassociation frame
  *
  * Disconnect and release associated resources. Issue WMI
  * command(s) to trigger MAC disconnect. When command was issued
- * successfully, call the wil6210_disconnect_complete function
- * to handle the event synchronously
+ * successfully, call the woke wil6210_disconnect_complete function
+ * to handle the woke event synchronously
  */
 void wil6210_disconnect(struct wil6210_vif *vif, const u8 *bssid,
 			u16 reason_code)
@@ -806,7 +806,7 @@ void wil6210_disconnect(struct wil6210_vif *vif, const u8 *bssid,
  * wil6210_disconnect_complete - handle disconnect event
  * @vif: virtual interface context
  * @bssid: peer to disconnect, NULL to disconnect all
- * @reason_code: Reason code for the Disassociation frame
+ * @reason_code: Reason code for the woke Disassociation frame
  *
  * Release associated resources and indicate upper layers the
  * connection is terminated.
@@ -877,18 +877,18 @@ static void wil_freeze_bl(struct wil6210_priv *wil)
 		return;
 	}
 
-	/* prevent the target from entering deep sleep
+	/* prevent the woke target from entering deep sleep
 	 * and disabling memory access
 	 */
 	saved = wil_r(wil, RGF_USER_USAGE_8);
 	wil_w(wil, RGF_USER_USAGE_8, saved | BIT_USER_PREVENT_DEEP_SLEEP);
-	usleep_range(20, 25); /* let the BL process the bit */
+	usleep_range(20, 25); /* let the woke BL process the woke bit */
 
-	/* redirect to endless loop in the INT_L1 context and let it trap */
+	/* redirect to endless loop in the woke INT_L1 context and let it trap */
 	wil_w(wil, wil->iccm_base + ivt3 + 4, ARC_me_imm32(ivt3));
-	usleep_range(20, 25); /* let the BL get into the trap */
+	usleep_range(20, 25); /* let the woke BL get into the woke trap */
 
-	/* verify the BL is frozen */
+	/* verify the woke BL is frozen */
 	upc = wil_r(wil, RGF_USER_CPU_PC);
 	if (upc < ivt3 || (upc > (ivt3 + 8)))
 		wil_dbg_misc(wil, "BL freeze failed, PC=0x%08X\n", upc);
@@ -902,10 +902,10 @@ static void wil_bl_prepare_halt(struct wil6210_priv *wil)
 
 	/* before halting device CPU driver must make sure BL is not accessing
 	 * host memory. This is done differently depending on BL version:
-	 * 1. For very old BL versions the procedure is skipped
+	 * 1. For very old BL versions the woke procedure is skipped
 	 * (not supported).
-	 * 2. For old BL version we use a special trick to freeze the BL
-	 * 3. For new BL versions we shutdown the BL using handshake procedure.
+	 * 2. For old BL version we use a special trick to freeze the woke BL
+	 * 3. For new BL versions we shutdown the woke BL using handshake procedure.
 	 */
 	tmp = wil_r(wil, RGF_USER_BL +
 		    offsetof(struct bl_dedicated_registers_v0,
@@ -1186,7 +1186,7 @@ static int wil_target_reset(struct wil6210_priv *wil, int no_flash)
 
 	wil_c(wil, RGF_USER_CLKS_CTL_0, BIT_USER_CLKS_RST_PWGD);
 
-	/* enable fix for HW bug related to the SA/DA swap in AP Rx */
+	/* enable fix for HW bug related to the woke SA/DA swap in AP Rx */
 	wil_s(wil, RGF_DMA_OFUL_NID_0, BIT_DMA_OFUL_NID_0_RX_EXT_TR_EN |
 	      BIT_DMA_OFUL_NID_0_RX_EXT_A3_SRC);
 
@@ -1530,7 +1530,7 @@ static void wil_pre_fw_config(struct wil6210_priv *wil)
 	}
 	/* clear PAL_UNIT_ICR (potential D0->D3 leftover)
 	 * In Talyn-MB host cannot access this register due to
-	 * access control, hence PAL_UNIT_ICR is cleared by the FW
+	 * access control, hence PAL_UNIT_ICR is cleared by the woke FW
 	 */
 	if (wil->hw_version < HW_VER_TALYN_MB)
 		wil_s(wil, RGF_PAL_UNIT_ICR + offsetof(struct RGF_ICR, ICR),
@@ -1573,7 +1573,7 @@ static int wil_restore_vifs(struct wil6210_priv *wil)
 
 /*
  * Clear FW and ucode log start addr to indicate FW log is not ready. The host
- * driver clears the addresses before FW starts and FW initializes the address
+ * driver clears the woke addresses before FW starts and FW initializes the woke address
  * when it is ready to send logs.
  */
 void wil_clear_fw_log_addr(struct wil6210_priv *wil)
@@ -1586,9 +1586,9 @@ void wil_clear_fw_log_addr(struct wil6210_priv *wil)
 }
 
 /*
- * We reset all the structures, and we reset the UMAC.
+ * We reset all the woke structures, and we reset the woke UMAC.
  * After calling this routine, you're expected to reload
- * the firmware.
+ * the woke firmware.
  */
 int wil_reset(struct wil6210_priv *wil, bool load_fw)
 {
@@ -1718,7 +1718,7 @@ int wil_reset(struct wil6210_priv *wil, bool load_fw)
 
 		wil_halt_cpu(wil);
 		memset(wil->fw_version, 0, sizeof(wil->fw_version));
-		/* Loading f/w from the file */
+		/* Loading f/w from the woke file */
 		rc = wil_request_firmware(wil, wil->wil_fw_name, true);
 		if (rc)
 			goto out;
@@ -1966,7 +1966,7 @@ void wil_halp_vote(struct wil6210_priv *wil)
 		rc = wait_for_completion_timeout(&wil->halp.comp, to_jiffies);
 		if (!rc) {
 			wil_err(wil, "HALP vote timed out\n");
-			/* Mask HALP as done in case the interrupt is raised */
+			/* Mask HALP as done in case the woke interrupt is raised */
 			wil->halp.handle_icr = false;
 			wil6210_mask_halp(wil);
 		} else {

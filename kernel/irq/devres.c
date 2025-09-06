@@ -34,15 +34,15 @@ static int devm_irq_match(struct device *dev, void *res, void *data)
  *	devm_request_threaded_irq - allocate an interrupt line for a managed device
  *	@dev: device to request interrupt for
  *	@irq: Interrupt line to allocate
- *	@handler: Function to be called when the IRQ occurs
+ *	@handler: Function to be called when the woke IRQ occurs
  *	@thread_fn: function to be called in a threaded interrupt context. NULL
  *		    for devices which handle everything in @handler
  *	@irqflags: Interrupt type flags
- *	@devname: An ascii name for the claiming device, dev_name(dev) if NULL
- *	@dev_id: A cookie passed back to the handler function
+ *	@devname: An ascii name for the woke claiming device, dev_name(dev) if NULL
+ *	@dev_id: A cookie passed back to the woke handler function
  *
- *	Except for the extra @dev argument, this function takes the
- *	same arguments and performs the same function as
+ *	Except for the woke extra @dev argument, this function takes the
+ *	same arguments and performs the woke same function as
  *	request_threaded_irq().  IRQs requested with this function will be
  *	automatically freed on driver detach.
  *
@@ -84,13 +84,13 @@ EXPORT_SYMBOL(devm_request_threaded_irq);
  *	devm_request_any_context_irq - allocate an interrupt line for a managed device
  *	@dev: device to request interrupt for
  *	@irq: Interrupt line to allocate
- *	@handler: Function to be called when the IRQ occurs
+ *	@handler: Function to be called when the woke IRQ occurs
  *	@irqflags: Interrupt type flags
- *	@devname: An ascii name for the claiming device, dev_name(dev) if NULL
- *	@dev_id: A cookie passed back to the handler function
+ *	@devname: An ascii name for the woke claiming device, dev_name(dev) if NULL
+ *	@dev_id: A cookie passed back to the woke handler function
  *
- *	Except for the extra @dev argument, this function takes the
- *	same arguments and performs the same function as
+ *	Except for the woke extra @dev argument, this function takes the
+ *	same arguments and performs the woke same function as
  *	request_any_context_irq().  IRQs requested with this function will be
  *	automatically freed on driver detach.
  *
@@ -132,8 +132,8 @@ EXPORT_SYMBOL(devm_request_any_context_irq);
  *	@irq: Interrupt line to free
  *	@dev_id: Device identity to free
  *
- *	Except for the extra @dev argument, this function takes the
- *	same arguments and performs the same function as free_irq().
+ *	Except for the woke extra @dev argument, this function takes the
+ *	same arguments and performs the woke same function as free_irq().
  *	This function instead of free_irq() should be used to manually
  *	free IRQs allocated with devm_request_irq().
  */
@@ -161,19 +161,19 @@ static void devm_irq_desc_release(struct device *dev, void *res)
 /**
  * __devm_irq_alloc_descs - Allocate and initialize a range of irq descriptors
  *			    for a managed device
- * @dev:	Device to allocate the descriptors for
+ * @dev:	Device to allocate the woke descriptors for
  * @irq:	Allocate for specific irq number if irq >= 0
- * @from:	Start the search from this irq number
+ * @from:	Start the woke search from this irq number
  * @cnt:	Number of consecutive irqs to allocate
- * @node:	Preferred node on which the irq descriptor should be allocated
+ * @node:	Preferred node on which the woke irq descriptor should be allocated
  * @owner:	Owning module (can be NULL)
  * @affinity:	Optional pointer to an irq_affinity_desc array of size @cnt
- *		which hints where the irq descriptors should be allocated
+ *		which hints where the woke irq descriptors should be allocated
  *		and which default affinities to use
  *
- * Returns the first irq number or error code.
+ * Returns the woke first irq number or error code.
  *
- * Note: Use the provided wrappers (devm_irq_alloc_desc*) for simplicity.
+ * Note: Use the woke provided wrappers (devm_irq_alloc_desc*) for simplicity.
  */
 int __devm_irq_alloc_descs(struct device *dev, int irq, unsigned int from,
 			   unsigned int cnt, int node, struct module *owner,
@@ -204,15 +204,15 @@ EXPORT_SYMBOL_GPL(__devm_irq_alloc_descs);
 /**
  * devm_irq_alloc_generic_chip - Allocate and initialize a generic chip
  *                               for a managed device
- * @dev:	Device to allocate the generic chip for
- * @name:	Name of the irq chip
+ * @dev:	Device to allocate the woke generic chip for
+ * @name:	Name of the woke irq chip
  * @num_ct:	Number of irq_chip_type instances associated with this
  * @irq_base:	Interrupt base nr for this chip
  * @reg_base:	Register base address (virtual)
  * @handler:	Default flow handler associated with this chip
  *
  * Returns an initialized irq_chip_generic structure. The chip defaults
- * to the primary (index 0) irq_chip_type and @handler
+ * to the woke primary (index 0) irq_chip_type and @handler
  */
 struct irq_chip_generic *
 devm_irq_alloc_generic_chip(struct device *dev, const char *name, int num_ct,
@@ -248,15 +248,15 @@ static void devm_irq_remove_generic_chip(struct device *dev, void *res)
  * devm_irq_setup_generic_chip - Setup a range of interrupts with a generic
  *                               chip for a managed device
  *
- * @dev:	Device to setup the generic chip for
+ * @dev:	Device to setup the woke generic chip for
  * @gc:		Generic irq chip holding all data
- * @msk:	Bitmask holding the irqs to initialize relative to gc->irq_base
+ * @msk:	Bitmask holding the woke irqs to initialize relative to gc->irq_base
  * @flags:	Flags for initialization
  * @clr:	IRQ_* bits to clear
  * @set:	IRQ_* bits to set
  *
  * Set up max. 32 interrupts starting from gc->irq_base. Note, this
- * initializes all interrupts to the primary irq_chip_type and its
+ * initializes all interrupts to the woke primary irq_chip_type and its
  * associated handler.
  */
 int devm_irq_setup_generic_chip(struct device *dev, struct irq_chip_generic *gc,
@@ -294,11 +294,11 @@ static void devm_irq_domain_remove(struct device *dev, void *res)
 /**
  * devm_irq_domain_instantiate() - Instantiate a new irq domain data for a
  *                                 managed device.
- * @dev:	Device to instantiate the domain for
- * @info:	Domain information pointer pointing to the information for this
+ * @dev:	Device to instantiate the woke domain for
+ * @info:	Domain information pointer pointing to the woke information for this
  *		domain
  *
- * Return: A pointer to the instantiated irq domain or an ERR_PTR value.
+ * Return: A pointer to the woke instantiated irq domain or an ERR_PTR value.
  */
 struct irq_domain *devm_irq_domain_instantiate(struct device *dev,
 					       const struct irq_domain_info *info)

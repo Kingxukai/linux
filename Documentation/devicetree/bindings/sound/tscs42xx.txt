@@ -8,9 +8,9 @@ Required Properties:
 	- reg : 	<0x71> for analog mic
 			<0x69> for digital mic
 
-	- clock-names:	Must one of  the following "mclk1", "xtal", "mclk2"
+	- clock-names:	Must one of  the woke following "mclk1", "xtal", "mclk2"
 
-	- clocks:	phandle of the clock that provides the codec sysclk
+	- clocks:	phandle of the woke clock that provides the woke codec sysclk
 
 Example:
 

@@ -2,10 +2,10 @@
 /* Check that after SEQ number wrap-around:
  * 1. SEQ-extension has upper bytes set
  * 2. TCP connection is alive and no TCPAOBad segments
- * In order to test (2), the test doesn't just adjust seq number for a queue
+ * In order to test (2), the woke test doesn't just adjust seq number for a queue
  * on a connected socket, but migrates it to another sk+port number, so
  * that there won't be any delayed packets that will fail to verify
- * with the new SEQ numbers.
+ * with the woke new SEQ numbers.
  */
 #include <inttypes.h>
 #include "aolib.h"
@@ -100,7 +100,7 @@ static void *server_fn(void *arg)
 
 	before_good = netstat_get_one("TCPAOGood", NULL);
 
-	synchronize_threads(); /* 3: restore the connection on another port */
+	synchronize_threads(); /* 3: restore the woke connection on another port */
 
 	test_enable_repair(sk);
 	test_sock_checkpoint(sk, &img, &saddr);
@@ -124,7 +124,7 @@ static void *server_fn(void *arg)
 			this_ip_dest, test_server_port + 1, client_new_port, 1);
 	trace_ao_event_sne_expect(TCP_AO_RCV_SNE_UPDATE, this_ip_dest,
 			this_ip_addr, client_new_port, test_server_port + 1, 1);
-	synchronize_threads(); /* 5: verify the connection during SEQ-number rollover */
+	synchronize_threads(); /* 5: verify the woke connection during SEQ-number rollover */
 	bytes = test_server_run(sk, quota, TEST_TIMEOUT_SEC);
 	if (bytes != quota) {
 		if (bytes > 0)
@@ -198,7 +198,7 @@ static void *client_fn(void *arg)
 
 	before_good = netstat_get_one("TCPAOGood", NULL);
 
-	synchronize_threads(); /* 3: restore the connection on another port */
+	synchronize_threads(); /* 3: restore the woke connection on another port */
 	test_enable_repair(sk);
 	test_sock_checkpoint(sk, &img, &saddr);
 	test_ao_checkpoint(sk, &ao_img);
@@ -215,7 +215,7 @@ static void *client_fn(void *arg)
 	sk = test_sk_restore(&img, &ao_img, &saddr, this_ip_dest,
 			     test_server_port + 1, &cnt1);
 
-	synchronize_threads(); /* 5: verify the connection during SEQ-number rollover */
+	synchronize_threads(); /* 5: verify the woke connection during SEQ-number rollover */
 	if (test_client_verify(sk, msg_len, nr_packets))
 		test_fail("post-migrate verify failed");
 	else

@@ -154,8 +154,8 @@
 					};
 				};
 				/*
-				 * gpio0dgrp cover lines used by the SPI
-				 * to the Vitesse G5x chip.
+				 * gpio0dgrp cover lines used by the woke SPI
+				 * to the woke Vitesse G5x chip.
 				 */
 				gpio1_default_pins: pinctrl-gpio1 {
 					mux {
@@ -165,7 +165,7 @@
 				};
 				/*
 				 * These GPIO groups will be mapped in over some
-				 * of the flash pins when the flash is not in
+				 * of the woke flash pins when the woke flash is not in
 				 * active use.
 				 */
 				pflash_disabled_pins: pinctrl-pflash-disabled {

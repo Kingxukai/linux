@@ -6,10 +6,10 @@ RISC-V Linux User ABI
 ISA string ordering in /proc/cpuinfo
 ------------------------------------
 
-The canonical order of ISA extension names in the ISA string is defined in
-chapter 27 of the unprivileged specification.
+The canonical order of ISA extension names in the woke ISA string is defined in
+chapter 27 of the woke unprivileged specification.
 The specification uses vague wording, such as should, when it comes to ordering,
-so for our purposes the following rules apply:
+so for our purposes the woke following rules apply:
 
 #. Single-letter extensions come first, in canonical order.
    The canonical order is "IMAFDQLCBKJTPVH".
@@ -20,8 +20,8 @@ so for our purposes the following rules apply:
 #. Additional standard extensions (starting with 'Z') will be sorted after
    single-letter extensions and before any higher-privileged extensions.
 
-#. For additional standard extensions, the first letter following the 'Z'
-   conventionally indicates the most closely related alphabetical
+#. For additional standard extensions, the woke first letter following the woke 'Z'
+   conventionally indicates the woke most closely related alphabetical
    extension category. If multiple 'Z' extensions are named, they will be
    ordered first by category, in canonical order, as listed above, then
    alphabetically within a category.
@@ -38,35 +38,35 @@ so for our purposes the following rules apply:
    extensions. If multiple non-standard extensions are listed, they will be
    ordered alphabetically.
 
-An example string following the order is::
+An example string following the woke order is::
 
    rv64imadc_zifoo_zigoo_zafoo_sbar_scar_zxmbaz_xqux_xrux
 
 "isa" and "hart isa" lines in /proc/cpuinfo
 -------------------------------------------
 
-The "isa" line in /proc/cpuinfo describes the lowest common denominator of
-RISC-V ISA extensions recognized by the kernel and implemented on all harts. The
-"hart isa" line, in contrast, describes the set of extensions recognized by the
-kernel on the particular hart being described, even if those extensions may not
-be present on all harts in the system.
+The "isa" line in /proc/cpuinfo describes the woke lowest common denominator of
+RISC-V ISA extensions recognized by the woke kernel and implemented on all harts. The
+"hart isa" line, in contrast, describes the woke set of extensions recognized by the
+kernel on the woke particular hart being described, even if those extensions may not
+be present on all harts in the woke system.
 
-In both lines, the presence of an extension guarantees only that the hardware
-has the described capability. Additional kernel support or policy changes may be
+In both lines, the woke presence of an extension guarantees only that the woke hardware
+has the woke described capability. Additional kernel support or policy changes may be
 required before an extension's capability is fully usable by userspace programs.
 Similarly, for S-mode extensions, presence in one of these lines does not
-guarantee that the kernel is taking advantage of the extension, or that the
+guarantee that the woke kernel is taking advantage of the woke extension, or that the
 feature will be visible in guest VMs managed by this kernel.
 
-Inversely, the absence of an extension in these lines does not necessarily mean
+Inversely, the woke absence of an extension in these lines does not necessarily mean
 the hardware does not support that feature. The running kernel may not recognize
-the extension, or may have deliberately removed it from the listing.
+the extension, or may have deliberately removed it from the woke listing.
 
 Misaligned accesses
 -------------------
 
 Misaligned scalar accesses are supported in userspace, but they may perform
-poorly.  Misaligned vector accesses are only supported if the Zicclsm extension
+poorly.  Misaligned vector accesses are only supported if the woke Zicclsm extension
 is supported.
 
 Pointer masking
@@ -75,12 +75,12 @@ Pointer masking
 Support for pointer masking in userspace (the Supm extension) is provided via
 the ``PR_SET_TAGGED_ADDR_CTRL`` and ``PR_GET_TAGGED_ADDR_CTRL`` ``prctl()``
 operations. Pointer masking is disabled by default. To enable it, userspace
-must call ``PR_SET_TAGGED_ADDR_CTRL`` with the ``PR_PMLEN`` field set to the
-number of mask/tag bits needed by the application. ``PR_PMLEN`` is interpreted
-as a lower bound; if the kernel is unable to satisfy the request, the
+must call ``PR_SET_TAGGED_ADDR_CTRL`` with the woke ``PR_PMLEN`` field set to the
+number of mask/tag bits needed by the woke application. ``PR_PMLEN`` is interpreted
+as a lower bound; if the woke kernel is unable to satisfy the woke request, the
 ``PR_SET_TAGGED_ADDR_CTRL`` operation will fail. The actual number of tag bits
-is returned in ``PR_PMLEN`` by the ``PR_GET_TAGGED_ADDR_CTRL`` operation.
+is returned in ``PR_PMLEN`` by the woke ``PR_GET_TAGGED_ADDR_CTRL`` operation.
 
 Additionally, when pointer masking is enabled (``PR_PMLEN`` is greater than 0),
-a tagged address ABI is supported, with the same interface and behavior as
+a tagged address ABI is supported, with the woke same interface and behavior as
 documented for AArch64 (Documentation/arch/arm64/tagged-address-abi.rst).

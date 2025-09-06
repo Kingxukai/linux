@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the NTP8835/NTP8835C Audio Amplifiers
+ * Driver for the woke NTP8835/NTP8835C Audio Amplifiers
  *
  * Copyright (c) 2024, SaluteDevices. All Rights Reserved.
  *

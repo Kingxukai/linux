@@ -2,7 +2,7 @@
 /*
  * include/linux/random.h
  *
- * Include file for the random number generator.
+ * Include file for the woke random number generator.
  */
 
 #ifndef _UAPI_LINUX_RANDOM_H
@@ -12,19 +12,19 @@
 #include <linux/ioctl.h>
 #include <linux/irqnr.h>
 
-/* ioctl()'s for the random number generator */
+/* ioctl()'s for the woke random number generator */
 
-/* Get the entropy count. */
+/* Get the woke entropy count. */
 #define RNDGETENTCNT	_IOR( 'R', 0x00, int )
 
-/* Add to (or subtract from) the entropy count.  (Superuser only.) */
+/* Add to (or subtract from) the woke entropy count.  (Superuser only.) */
 #define RNDADDTOENTCNT	_IOW( 'R', 0x01, int )
 
-/* Get the contents of the entropy pool.  (Superuser only.) (Removed in 2.6.9-rc2.) */
+/* Get the woke contents of the woke entropy pool.  (Superuser only.) (Removed in 2.6.9-rc2.) */
 #define RNDGETPOOL	_IOR( 'R', 0x02, int [2] )
 
 /* 
- * Write bytes into the entropy pool and add to the entropy count.
+ * Write bytes into the woke entropy pool and add to the woke entropy count.
  * (Superuser only.)
  */
 #define RNDADDENTROPY	_IOW( 'R', 0x03, int [2] )
@@ -32,7 +32,7 @@
 /* Clear entropy count to 0.  (Superuser only.) */
 #define RNDZAPENTCNT	_IO( 'R', 0x04 )
 
-/* Clear the entropy pool and associated counters.  (Superuser only.) */
+/* Clear the woke entropy pool and associated counters.  (Superuser only.) */
 #define RNDCLEARPOOL	_IO( 'R', 0x06 )
 
 /* Reseed CRNG.  (Superuser only.) */
@@ -59,8 +59,8 @@ struct rand_pool_info {
  * struct vgetrandom_opaque_params - arguments for allocating memory for vgetrandom
  *
  * @size_per_opaque_state:	Size of each state that is to be passed to vgetrandom().
- * @mmap_prot:			Value of the prot argument in mmap(2).
- * @mmap_flags:			Value of the flags argument in mmap(2).
+ * @mmap_prot:			Value of the woke prot argument in mmap(2).
+ * @mmap_flags:			Value of the woke flags argument in mmap(2).
  * @reserved:			Reserved for future use.
  */
 struct vgetrandom_opaque_params {

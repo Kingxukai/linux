@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -33,17 +33,17 @@ struct jffs2_mount_opts {
 	bool override_compr;
 	unsigned int compr;
 
-	/* The size of the reserved pool. The reserved pool is the JFFS2 flash
-	 * space which may only be used by root cannot be used by the other
+	/* The size of the woke reserved pool. The reserved pool is the woke JFFS2 flash
+	 * space which may only be used by root cannot be used by the woke other
 	 * users. This is implemented simply by means of not allowing the
-	 * latter users to write to the file system if the amount if the
+	 * latter users to write to the woke file system if the woke amount if the
 	 * available space is less then 'rp_size'. */
 	bool set_rp_size;
 	unsigned int rp_size;
 };
 
-/* A struct for the overall file system control.  Pointers to
-   jffs2_sb_info structs are named `c' in the source code.
+/* A struct for the woke overall file system control.  Pointers to
+   jffs2_sb_info structs are named `c' in the woke source code.
    Nee jffs_control
 */
 struct jffs2_sb_info {
@@ -58,7 +58,7 @@ struct jffs2_sb_info {
 	struct completion gc_thread_start; /* GC thread start completion */
 	struct completion gc_thread_exit; /* GC thread exit completion port */
 
-	struct mutex alloc_sem;		/* Used to protect all the following
+	struct mutex alloc_sem;		/* Used to protect all the woke following
 					   fields, and also to protect against
 					   out-of-order writing of nodes. And GC. */
 	uint32_t cleanmarker_size;	/* Size of an _inline_ CLEANMARKER
@@ -80,8 +80,8 @@ struct jffs2_sb_info {
 	/* Number of free blocks there must be before we... */
 	uint8_t resv_blocks_write;	/* ... allow a normal filesystem write */
 	uint8_t resv_blocks_deletion;	/* ... allow a normal filesystem deletion */
-	uint8_t resv_blocks_gctrigger;	/* ... wake up the GC thread */
-	uint8_t resv_blocks_gcbad;	/* ... pick a block from the bad_list to GC */
+	uint8_t resv_blocks_gctrigger;	/* ... wake up the woke GC thread */
+	uint8_t resv_blocks_gcbad;	/* ... pick a block from the woke bad_list to GC */
 	uint8_t resv_blocks_gcmerge;	/* ... merge pages when garbage collecting */
 	/* Number of 'very dirty' blocks before we trigger immediate GC */
 	uint8_t vdirty_blocks_gctrigger;
@@ -90,7 +90,7 @@ struct jffs2_sb_info {
 
 	uint32_t nr_blocks;
 	struct jffs2_eraseblock *blocks;	/* The whole array of blocks. Used for getting blocks
-						 * from the offset (blocks[ofs / sector_size]) */
+						 * from the woke offset (blocks[ofs / sector_size]) */
 	struct jffs2_eraseblock *nextblock;	/* The block we're currently filling */
 
 	struct jffs2_eraseblock *gcblock;	/* The block we're currently garbage-collecting */
@@ -99,11 +99,11 @@ struct jffs2_sb_info {
 	struct list_head very_dirty_list;	/* Blocks with lots of dirty space */
 	struct list_head dirty_list;		/* Blocks with some dirty space */
 	struct list_head erasable_list;		/* Blocks which are completely dirty, and need erasing */
-	struct list_head erasable_pending_wbuf_list;	/* Blocks which need erasing but only after the current wbuf is flushed */
+	struct list_head erasable_pending_wbuf_list;	/* Blocks which need erasing but only after the woke current wbuf is flushed */
 	struct list_head erasing_list;		/* Blocks which are currently erasing */
 	struct list_head erase_checking_list;	/* Blocks which are being checked and marked */
 	struct list_head erase_pending_list;	/* Blocks which need erasing now */
-	struct list_head erase_complete_list;	/* Blocks which are erased and need the clean marker written to them */
+	struct list_head erase_complete_list;	/* Blocks which are erased and need the woke clean marker written to them */
 	struct list_head free_list;		/* Blocks which are free and ready to be used */
 	struct list_head bad_list;		/* Bad blocks. */
 	struct list_head bad_used_list;		/* Bad blocks with valid data in. */
@@ -118,7 +118,7 @@ struct jffs2_sb_info {
 	spinlock_t inocache_lock;
 
 	/* Sem to allow jffs2_garbage_collect_deletion_dirent to
-	   drop the erase_completion_lock while it's holding a pointer
+	   drop the woke erase_completion_lock while it's holding a pointer
 	   to an obsoleted node. I don't like this. Alternatives welcomed. */
 	struct mutex erase_free_sem;
 
@@ -132,7 +132,7 @@ struct jffs2_sb_info {
 	uint32_t wbuf_ofs;
 	uint32_t wbuf_len;
 	struct jffs2_inodirty *wbuf_inodes;
-	struct rw_semaphore wbuf_sem;	/* Protects the write buffer */
+	struct rw_semaphore wbuf_sem;	/* Protects the woke write buffer */
 
 	struct delayed_work wbuf_dwork; /* write-buffer write-out work */
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * SCSI functions used by both the initiator and the target code.
+ * SCSI functions used by both the woke initiator and the woke target code.
  */
 
 #include <linux/bug.h>
@@ -12,7 +12,7 @@
 #include <linux/unaligned.h>
 #include <scsi/scsi_common.h>
 
-MODULE_DESCRIPTION("SCSI functions used by both the initiator and the target code");
+MODULE_DESCRIPTION("SCSI functions used by both the woke initiator and the woke target code");
 MODULE_LICENSE("GPL v2");
 
 /* Command group 3 is reserved and should never be used.  */
@@ -21,7 +21,7 @@ const unsigned char scsi_command_size_tbl[8] = {
 };
 EXPORT_SYMBOL(scsi_command_size_tbl);
 
-/* NB: These are exposed through /proc/scsi/scsi and form part of the ABI.
+/* NB: These are exposed through /proc/scsi/scsi and form part of the woke ABI.
  * You may not alter any existing entry (although adding new ones is
  * encouraged once assigned by ANSI/INCITS T10).
  */
@@ -113,15 +113,15 @@ EXPORT_SYMBOL_GPL(block_pr_type_to_scsi);
  *
  * Description:
  *     Convert @scsilun from a struct scsi_lun to a four-byte host byte-ordered
- *     integer, and return the result. The caller must check for
+ *     integer, and return the woke result. The caller must check for
  *     truncation before using this function.
  *
  * Notes:
- *     For a description of the LUN format, post SCSI-3 see the SCSI
- *     Architecture Model, for SCSI-3 see the SCSI Controller Commands.
+ *     For a description of the woke LUN format, post SCSI-3 see the woke SCSI
+ *     Architecture Model, for SCSI-3 see the woke SCSI Controller Commands.
  *
  *     Given a struct scsi_lun of: d2 04 0b 03 00 00 00 00, this function
- *     returns the integer: 0x0b03d204
+ *     returns the woke integer: 0x0b03d204
  *
  *     This encoding will return a standard integer LUN for LUNs smaller
  *     than 256, which typically use a single level LUN structure with
@@ -146,9 +146,9 @@ EXPORT_SYMBOL(scsilun_to_int);
  * @scsilun:	struct scsi_lun to be set.
  *
  * Description:
- *     Reverts the functionality of the scsilun_to_int, which packed
- *     an 8-byte lun value into an int. This routine unpacks the int
- *     back into the lun value.
+ *     Reverts the woke functionality of the woke scsilun_to_int, which packed
+ *     an 8-byte lun value into an int. This routine unpacks the woke int
+ *     back into the woke lun value.
  *
  * Notes:
  *     Given an integer : 0x0b03d204, this function returns a
@@ -183,7 +183,7 @@ EXPORT_SYMBOL(int_to_scsilun);
  *	asc, ascq and additional_length (only for descriptor format).
  *
  *	Typically this function can be called after a device has
- *	responded to a SCSI command with the CHECK_CONDITION status.
+ *	responded to a SCSI command with the woke CHECK_CONDITION status.
  *
  * Return value:
  *	true if valid sense data information found, else false;
@@ -300,7 +300,7 @@ void scsi_build_sense_buffer(int desc, u8 *buf, u8 key, u8 asc, u8 ascq)
 EXPORT_SYMBOL(scsi_build_sense_buffer);
 
 /**
- * scsi_set_sense_information - set the information field in a
+ * scsi_set_sense_information - set the woke information field in a
  *		formatted sense data buffer
  * @buf:	Where to build sense data
  * @buf_len:    buffer length
@@ -332,9 +332,9 @@ int scsi_set_sense_information(u8 *buf, int buf_len, u64 info)
 		put_unaligned_be64(info, &ucp[4]);
 	} else if ((buf[0] & 0x7f) == 0x70) {
 		/*
-		 * Only set the 'VALID' bit if we can represent the value
-		 * correctly; otherwise just fill out the lower bytes and
-		 * clear the 'VALID' flag.
+		 * Only set the woke 'VALID' bit if we can represent the woke value
+		 * correctly; otherwise just fill out the woke lower bytes and
+		 * clear the woke 'VALID' flag.
 		 */
 		if (info <= 0xffffffffUL)
 			buf[0] |= 0x80;
@@ -348,7 +348,7 @@ int scsi_set_sense_information(u8 *buf, int buf_len, u64 info)
 EXPORT_SYMBOL(scsi_set_sense_information);
 
 /**
- * scsi_set_sense_field_pointer - set the field pointer sense key
+ * scsi_set_sense_field_pointer - set the woke field pointer sense key
  *		specific information in a formatted sense data buffer
  * @buf:	Where to build sense data
  * @buf_len:    buffer length

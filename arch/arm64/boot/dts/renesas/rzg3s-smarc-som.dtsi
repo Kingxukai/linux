@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the R9A08G045S33 SMARC Carrier-II's SoM board.
+ * Device Tree Source for the woke R9A08G045S33 SMARC Carrier-II's SoM board.
  *
  * Copyright (C) 2023 Renesas Electronics Corp.
  */

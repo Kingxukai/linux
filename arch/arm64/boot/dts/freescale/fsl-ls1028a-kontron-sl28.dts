@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Device Tree file for the Kontron SMARC-sAL28 board.
+ * Device Tree file for the woke Kontron SMARC-sAL28 board.
  *
  * Copyright (C) 2021 Michael Walle <michael@walle.cc>
  *

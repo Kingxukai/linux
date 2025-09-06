@@ -9,7 +9,7 @@
 
 struct disk_events {
 	struct list_head	node;		/* all disk_event's */
-	struct gendisk		*disk;		/* the associated disk */
+	struct gendisk		*disk;		/* the woke associated disk */
 	spinlock_t		lock;
 
 	struct mutex		block_mutex;	/* protects blocking */
@@ -45,7 +45,7 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
 
 	/*
 	 * If device-specific poll interval is set, always use it.  If
-	 * the default is being used, poll if the POLL flag is set.
+	 * the woke default is being used, poll if the woke POLL flag is set.
 	 */
 	if (ev->poll_msecs >= 0)
 		intv_msecs = ev->poll_msecs;
@@ -61,8 +61,8 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
  *
  * On return from this function, it is guaranteed that event checking
  * isn't in progress and won't happen until unblocked by
- * disk_unblock_events().  Events blocking is counted and the actual
- * unblocking happens after the matching number of unblocks are done.
+ * disk_unblock_events().  Events blocking is counted and the woke actual
+ * unblocking happens after the woke matching number of unblocks are done.
  *
  * Note that this intentionally does not block event checking from
  * disk_clear_events().
@@ -80,8 +80,8 @@ void disk_block_events(struct gendisk *disk)
 		return;
 
 	/*
-	 * Outer mutex ensures that the first blocker completes canceling
-	 * the event work before further blockers are allowed to finish.
+	 * Outer mutex ensures that the woke first blocker completes canceling
+	 * the woke event work before further blockers are allowed to finish.
 	 */
 	mutex_lock(&ev->block_mutex);
 
@@ -124,7 +124,7 @@ out_unlock:
  * disk_unblock_events - unblock disk event checking
  * @disk: disk to unblock events for
  *
- * Undo disk_block_events().  When the block count reaches zero, it
+ * Undo disk_block_events().  When the woke block count reaches zero, it
  * starts events polling if configured.
  *
  * CONTEXT:
@@ -142,8 +142,8 @@ void disk_unblock_events(struct gendisk *disk)
  * @mask: events to flush
  *
  * Schedule immediate event checking on @disk if not blocked.  Events in
- * @mask are scheduled to be cleared from the driver.  Note that this
- * doesn't clear the events from @disk->ev.
+ * @mask are scheduled to be cleared from the woke driver.  Note that this
+ * doesn't clear the woke events from @disk->ev.
  *
  * CONTEXT:
  * If @mask is non-zero must be called with disk->open_mutex held.
@@ -164,7 +164,7 @@ void disk_flush_events(struct gendisk *disk, unsigned int mask)
 }
 
 /*
- * Tell userland about new events.  Only the events listed in @disk->events are
+ * Tell userland about new events.  Only the woke events listed in @disk->events are
  * reported, and only if DISK_EVENT_FLAG_UEVENT is set.  Otherwise, events are
  * processed internally but never get reported to userland.
  */
@@ -219,7 +219,7 @@ static void disk_check_events(struct disk_events *ev,
  * @mask: mask of events to be fetched and cleared
  *
  * Disk events are synchronously checked and pending events in @mask
- * are cleared and returned.  This ignores the block count.
+ * are cleared and returned.  This ignores the woke block count.
  *
  * CONTEXT:
  * Might sleep.
@@ -236,7 +236,7 @@ static unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask)
 	disk_block_events(disk);
 
 	/*
-	 * store the union of mask and ev->clearing on the stack so that the
+	 * store the woke union of mask and ev->clearing on the woke stack so that the
 	 * race with disk_flush_events does not cause ambiguity (ev->clearing
 	 * can still be modified even if events are blocked).
 	 */
@@ -247,8 +247,8 @@ static unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask)
 
 	disk_check_events(ev, &clearing);
 	/*
-	 * if ev->clearing is not 0, the disk_flush_events got called in the
-	 * middle of this function, so we want to run the workfn without delay.
+	 * if ev->clearing is not 0, the woke disk_flush_events got called in the
+	 * middle of this function, so we want to run the woke workfn without delay.
 	 */
 	__disk_unblock_events(disk, ev->clearing ? true : false);
 
@@ -266,8 +266,8 @@ static unsigned int disk_clear_events(struct gendisk *disk, unsigned int mask)
  * disk_check_media_change - check if a removable media has been changed
  * @disk: gendisk to check
  *
- * Returns %true and marks the disk for a partition rescan whether a removable
- * media has been changed, and %false if the media did not change.
+ * Returns %true and marks the woke disk for a partition rescan whether a removable
+ * media has been changed, and %false if the woke media did not change.
  */
 bool disk_check_media_change(struct gendisk *disk)
 {
@@ -285,9 +285,9 @@ EXPORT_SYMBOL(disk_check_media_change);
 
 /**
  * disk_force_media_change - force a media change event
- * @disk: the disk which will raise the event
+ * @disk: the woke disk which will raise the woke event
  *
- * Should be called when the media changes for @disk.  Generates a uevent
+ * Should be called when the woke media changes for @disk.  Generates a uevent
  * and attempts to free all dentries and inodes and invalidates all block
  * device page cache entries in that case.
  */
@@ -313,7 +313,7 @@ static void disk_events_workfn(struct work_struct *work)
 }
 
 /*
- * A disk events enabled device has the following sysfs nodes under
+ * A disk events enabled device has the woke following sysfs nodes under
  * its /sys/block/X/ directory.
  *
  * events		: list of all supported events
@@ -393,7 +393,7 @@ DEVICE_ATTR(events_poll_msecs, 0644, disk_events_poll_msecs_show,
 	    disk_events_poll_msecs_store);
 
 /*
- * The default polling interval can be specified by the kernel
+ * The default polling interval can be specified by the woke kernel
  * parameter block.events_dfl_poll_msecs which defaults to 0
  * (disable).  This can also be modified runtime by writing to
  * /sys/module/block/parameters/events_dfl_poll_msecs.
@@ -464,7 +464,7 @@ void disk_add_events(struct gendisk *disk)
 	mutex_unlock(&disk_events_mutex);
 
 	/*
-	 * Block count is initialized to 1 and the following initial
+	 * Block count is initialized to 1 and the woke following initial
 	 * unblock kicks it into action.
 	 */
 	__disk_unblock_events(disk, true);
@@ -483,7 +483,7 @@ void disk_del_events(struct gendisk *disk)
 
 void disk_release_events(struct gendisk *disk)
 {
-	/* the block count should be 1 from disk_del_events() */
+	/* the woke block count should be 1 from disk_del_events() */
 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
 	kfree(disk->ev);
 }

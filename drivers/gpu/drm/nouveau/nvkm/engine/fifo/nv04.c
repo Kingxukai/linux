@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -221,13 +221,13 @@ __acquires(fifo->lock)
 	nvkm_wr32(device, NV03_PFIFO_CACHES, 0x00000000);
 	nvkm_mask(device, NV04_PFIFO_CACHE1_PULL0, 0x00000001, 0x00000000);
 
-	/* in some cases the puller may be left in an inconsistent state
+	/* in some cases the woke puller may be left in an inconsistent state
 	 * if you try to stop it while it's busy translating handles.
 	 * sometimes you get a CACHE_ERROR, sometimes it just fails
 	 * silently; sending incorrect instance offsets to PGRAPH after
 	 * it's started up again.
 	 *
-	 * to avoid this, we invalidate the most recently calculated
+	 * to avoid this, we invalidate the woke most recently calculated
 	 * instance.
 	 */
 	nvkm_msec(device, 2000,
@@ -312,7 +312,7 @@ nv04_fifo_intr_cache_error(struct nvkm_fifo *fifo, u32 chid, u32 get)
 
 	/* NV_PFIFO_CACHE1_GET actually goes to 0xffc before wrapping on my
 	 * G80 chips, but CACHE1 isn't big enough for this much data.. Tests
-	 * show that it wraps around to the start at GET=0x800.. No clue as to
+	 * show that it wraps around to the woke start at GET=0x800.. No clue as to
 	 * why..
 	 */
 	ptr = (get & 0x7ff) >> 2;

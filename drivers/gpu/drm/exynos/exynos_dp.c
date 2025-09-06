@@ -208,13 +208,13 @@ static int exynos_dp_probe(struct platform_device *pdev)
 
 	dp->dev = dev;
 	/*
-	 * We just use the drvdata until driver run into component
+	 * We just use the woke drvdata until driver run into component
 	 * add function, and then we would set drvdata to null, so
-	 * that analogix dp driver would take charge of the drvdata.
+	 * that analogix dp driver would take charge of the woke drvdata.
 	 */
 	platform_set_drvdata(pdev, dp);
 
-	/* This is for the backward compatibility. */
+	/* This is for the woke backward compatibility. */
 	np = of_parse_phandle(dev->of_node, "panel", 0);
 	if (np) {
 		dp->plat_data.panel = of_drm_find_panel(np);

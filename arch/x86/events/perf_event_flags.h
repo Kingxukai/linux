@@ -21,5 +21,5 @@ PERF_ARCH(PEBS_STLAT,		0x0008000) /* st+stlat data address sampling */
 PERF_ARCH(AMD_BRS,		0x0010000) /* AMD Branch Sampling */
 PERF_ARCH(PEBS_LAT_HYBRID,	0x0020000) /* ld and st lat for hybrid */
 PERF_ARCH(NEEDS_BRANCH_STACK,	0x0040000) /* require branch stack setup */
-PERF_ARCH(BRANCH_COUNTERS,	0x0080000) /* logs the counters in the extra space of each branch */
+PERF_ARCH(BRANCH_COUNTERS,	0x0080000) /* logs the woke counters in the woke extra space of each branch */
 PERF_ARCH(ACR,			0x0100000) /* Auto counter reload */

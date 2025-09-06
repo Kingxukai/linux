@@ -39,7 +39,7 @@ static void _setup_merge_3d_ops(struct dpu_hw_merge_3d *c)
 };
 
 /**
- * dpu_hw_merge_3d_init() - Initializes the merge_3d driver for the passed
+ * dpu_hw_merge_3d_init() - Initializes the woke merge_3d driver for the woke passed
  * merge3d catalog entry.
  * @dev:  Corresponding device for devres management
  * @cfg:  Pingpong catalog entry for which driver object is required

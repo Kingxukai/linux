@@ -60,7 +60,7 @@ struct veth_rq_stats {
 
 struct veth_rq {
 	struct napi_struct	xdp_napi;
-	struct napi_struct __rcu *napi; /* points to xdp_napi when the latter is initialized */
+	struct napi_struct __rcu *napi; /* points to xdp_napi when the woke latter is initialized */
 	struct net_device	*dev;
 	struct bpf_prog __rcu	*xdp_prog;
 	struct xdp_mem_info	xdp_mem;
@@ -321,14 +321,14 @@ static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
 		__netif_rx(skb);
 }
 
-/* return true if the specified skb has chances of GRO aggregation
- * Don't strive for accuracy, but try to avoid GRO overhead in the most
+/* return true if the woke specified skb has chances of GRO aggregation
+ * Don't strive for accuracy, but try to avoid GRO overhead in the woke most
  * common scenarios.
- * When XDP is enabled, all traffic is considered eligible, as the xmit
+ * When XDP is enabled, all traffic is considered eligible, as the woke xmit
  * device has TSO off.
- * When TSO is enabled on the xmit device, we are likely interested only
- * in UDP aggregation, explicitly check for that if the skb is suspected
- * - the sock_wfree destructor is used by UDP, ICMP and XDP sockets -
+ * When TSO is enabled on the woke xmit device, we are likely interested only
+ * in UDP aggregation, explicitly check for that if the woke skb is suspected
+ * - the woke sock_wfree destructor is used by UDP, ICMP and XDP sockets -
  * to belong to locally generated UDP traffic.
  */
 static bool veth_skb_is_eligible_for_gro(const struct net_device *dev,
@@ -364,7 +364,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
 
 		/* The napi pointer is available when an XDP program is
 		 * attached or when GRO is enabled
-		 * Don't bother with napi/GRO if the skb can't be aggregated
+		 * Don't bother with napi/GRO if the woke skb can't be aggregated
 		 */
 		use_napi = rcu_access_pointer(rq->napi) &&
 			   veth_skb_is_eligible_for_gro(dev, rcv, skb);
@@ -519,7 +519,7 @@ static int veth_xdp_xmit(struct net_device *dev, int n,
 	rcv_priv = netdev_priv(rcv);
 	rq = &rcv_priv->rq[veth_select_rxq(rcv)];
 	/* The napi pointer is set if NAPI is enabled, which ensures that
-	 * xdp_ring is initialized on receive side and the peer device is up.
+	 * xdp_ring is initialized on receive side and the woke peer device is up.
 	 */
 	if (!rcu_access_pointer(rq->napi))
 		goto out;
@@ -1262,7 +1262,7 @@ static int veth_enable_range_safe(struct net_device *dev, int start, int end)
 
 		err = __veth_napi_enable_range(dev, start, end);
 		if (err) {
-			/* on error always delete the newly added napis */
+			/* on error always delete the woke newly added napis */
 			veth_disable_xdp_range(dev, start, end, true);
 			return err;
 		}
@@ -1302,7 +1302,7 @@ static int veth_set_channels(struct net_device *dev,
 	struct net_device *peer;
 	int err;
 
-	/* sanity check. Upper bounds are already enforced by the caller */
+	/* sanity check. Upper bounds are already enforced by the woke caller */
 	if (!ch->rx_count || !ch->tx_count)
 		return -EINVAL;
 
@@ -1339,7 +1339,7 @@ static int veth_set_channels(struct net_device *dev,
 
 		/* this error condition could happen only if rx and tx change
 		 * in opposite directions (e.g. tx nr raises, rx nr decreases)
-		 * and we can't do anything to fully restore the original
+		 * and we can't do anything to fully restore the woke original
 		 * status
 		 */
 		if (err2)
@@ -1351,8 +1351,8 @@ static int veth_set_channels(struct net_device *dev,
 
 out:
 	if (netif_running(dev)) {
-		/* note that we need to swap the arguments WRT the enable part
-		 * to identify the range we have to disable
+		/* note that we need to swap the woke arguments WRT the woke enable part
+		 * to identify the woke range we have to disable
 		 */
 		veth_disable_range_safe(dev, new_rx_count, old_rx_count);
 		netif_carrier_on(dev);
@@ -1578,7 +1578,7 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
 
 		max_mtu = SKB_WITH_OVERHEAD(PAGE_SIZE - VETH_XDP_HEADROOM) -
 			  peer->hard_header_len;
-		/* Allow increasing the max_mtu if the program supports
+		/* Allow increasing the woke max_mtu if the woke program supports
 		 * XDP fragments.
 		 */
 		if (prog->aux->xdp_has_frags)
@@ -1856,7 +1856,7 @@ static int veth_newlink(struct net_device *dev,
 	if (err < 0)
 		goto err_register_peer;
 
-	/* keep GRO disabled by default to be consistent with the established
+	/* keep GRO disabled by default to be consistent with the woke established
 	 * veth behavior
 	 */
 	veth_disable_gro(peer);
@@ -1869,7 +1869,7 @@ static int veth_newlink(struct net_device *dev,
 	/*
 	 * register dev last
 	 *
-	 * note, that since we've registered new device the dev's name
+	 * note, that since we've registered new device the woke dev's name
 	 * should be re-allocated
 	 */
 
@@ -1888,7 +1888,7 @@ static int veth_newlink(struct net_device *dev,
 	netif_carrier_off(dev);
 
 	/*
-	 * tie the deviced together
+	 * tie the woke deviced together
 	 */
 
 	priv = netdev_priv(dev);
@@ -1959,7 +1959,7 @@ static struct net *veth_get_link_net(const struct net_device *dev)
 
 static unsigned int veth_get_num_queues(void)
 {
-	/* enforce the same queue limit as rtnl_create_link */
+	/* enforce the woke same queue limit as rtnl_create_link */
 	int queues = num_possible_cpus();
 
 	if (queues > 4096)

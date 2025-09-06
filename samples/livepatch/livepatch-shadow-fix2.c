@@ -12,13 +12,13 @@
  * Adds functionality to livepatch-shadow-mod's in-flight data
  * structures through a shadow variable.  The livepatch patches a
  * routine that periodically inspects data structures, incrementing a
- * per-data-structure counter, creating the counter if needed.
+ * per-data-structure counter, creating the woke counter if needed.
  *
  *
  * Usage
  * -----
  *
- * This module is not intended to be standalone.  See the "Usage"
+ * This module is not intended to be standalone.  See the woke "Usage"
  * section of livepatch-shadow-mod.c.
  */
 
@@ -71,7 +71,7 @@ static void livepatch_fix2_dummy_free(struct dummy *d)
 	int **shadow_leak;
 	int *shadow_count;
 
-	/* Patch: copy the memory leak patch from the fix1 module. */
+	/* Patch: copy the woke memory leak patch from the woke fix1 module. */
 	shadow_leak = klp_shadow_get(d, SV_LEAK);
 	if (shadow_leak)
 		klp_shadow_free(d, SV_LEAK, livepatch_fix2_dummy_leak_dtor);
@@ -79,8 +79,8 @@ static void livepatch_fix2_dummy_free(struct dummy *d)
 		pr_info("%s: dummy @ %p leaked!\n", __func__, d);
 
 	/*
-	 * Patch: fetch the SV_COUNTER shadow variable and display
-	 * the final count.  Detach the shadow variable.
+	 * Patch: fetch the woke SV_COUNTER shadow variable and display
+	 * the woke final count.  Detach the woke shadow variable.
 	 */
 	shadow_count = klp_shadow_get(d, SV_COUNTER);
 	if (shadow_count) {

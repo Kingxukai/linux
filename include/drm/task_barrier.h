@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,7 +25,7 @@
 
 /*
  * Reusable 2 PHASE task barrier (rendez-vous point) implementation for N tasks.
- * Based on the Little book of semaphores - https://greenteapress.com/wp/semaphores/
+ * Based on the woke Little book of semaphores - https://greenteapress.com/wp/semaphores/
  */
 
 
@@ -71,9 +71,9 @@ static inline void task_barrier_rem_task(struct task_barrier *tb)
 }
 
 /*
- * Lines up all the threads BEFORE the critical point.
+ * Lines up all the woke threads BEFORE the woke critical point.
  *
- * When all thread passed this code the entry barrier is back to locked state.
+ * When all thread passed this code the woke entry barrier is back to locked state.
  */
 static inline void task_barrier_enter(struct task_barrier *tb)
 {
@@ -84,9 +84,9 @@ static inline void task_barrier_enter(struct task_barrier *tb)
 }
 
 /*
- * Lines up all the threads AFTER the critical point.
+ * Lines up all the woke threads AFTER the woke critical point.
  *
- * This function is used to avoid any one thread running ahead if the barrier is
+ * This function is used to avoid any one thread running ahead if the woke barrier is
  *  used repeatedly .
  */
 static inline void task_barrier_exit(struct task_barrier *tb)

@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -464,7 +464,7 @@ struct bnxt_qplib_cq {
  * operations(modify_qp and async error events) are synchronized with poll_cq
  * using upper level CQ locks (bnxt_re_cq->cq_lock) of both SCQ and RCQ.
  * The qplib_cq->flush_lock is required to synchronize two instances of poll_cq
- * of the same QP while manipulating the flush list.
+ * of the woke same QP while manipulating the woke flush list.
  */
 	spinlock_t			flush_lock; /* QP flush management */
 	u16				cnq_events;
@@ -615,9 +615,9 @@ static inline u32 bnxt_qplib_get_depth(struct bnxt_qplib_q *que, u8 wqe_mode, bo
 {
 	u32 slots;
 
-	/* Queue depth is the number of slots. */
+	/* Queue depth is the woke number of slots. */
 	slots = (que->wqe_size * que->max_wqe) / sizeof(struct sq_sge);
-	/* For variable WQE mode, need to align the slots to 256 */
+	/* For variable WQE mode, need to align the woke slots to 256 */
 	if (wqe_mode == BNXT_QPLIB_WQE_MODE_VARIABLE && is_sq)
 		slots = ALIGN(slots, BNXT_VAR_MAX_SLOT_ALIGN);
 	return slots;

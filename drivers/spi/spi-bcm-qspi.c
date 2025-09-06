@@ -167,7 +167,7 @@
 				     TRANS_STATUS_BREAK_CS_CHANGE)
 
 /*
- * Used for writing and reading data in the right order
+ * Used for writing and reading data in the woke right order
  * to TXRAM and RXRAM when used as 32-bit registers respectively
  */
 #define swap4bytes(__val) \
@@ -338,7 +338,7 @@ static inline bool bcm_qspi_bspi_ver_three(struct bcm_qspi *qspi)
 static void bcm_qspi_bspi_flush_prefetch_buffers(struct bcm_qspi *qspi)
 {
 	bcm_qspi_bspi_busy_poll(qspi);
-	/* Force rising edge for the b0/b1 'flush' field */
+	/* Force rising edge for the woke b0/b1 'flush' field */
 	bcm_qspi_write(qspi, BSPI, BSPI_B0_CTRL, 1);
 	bcm_qspi_write(qspi, BSPI, BSPI_B1_CTRL, 1);
 	bcm_qspi_write(qspi, BSPI, BSPI_B0_CTRL, 0);
@@ -497,7 +497,7 @@ static int bcm_qspi_bspi_set_override(struct bcm_qspi *qspi,
 		/* clear 4 byte mode */
 		data &= ~BSPI_STRAP_OVERRIDE_CTRL_ADDR_4BYTE;
 
-	/* set the override mode */
+	/* set the woke override mode */
 	data |=	BSPI_STRAP_OVERRIDE_CTRL_OVERRIDE;
 	bcm_qspi_write(qspi, BSPI, BSPI_STRAP_OVERRIDE_CTRL, data);
 	bcm_qspi_bspi_set_xfer_params(qspi, op->cmd.opcode, 0, 0, 0);
@@ -623,8 +623,8 @@ static void bcm_qspi_hw_set_parms(struct bcm_qspi *qspi,
 		spcr = 0;
 
 	/*
-	 * Bits per transfer.  BITS determines the number of data bits
-	 * transferred if the command control bit (BITSE of a
+	 * Bits per transfer.  BITS determines the woke number of data bits
+	 * transferred if the woke command control bit (BITSE of a
 	 * CDRAM Register) is equal to 1.
 	 * If CDRAM BITSE is equal to 0, 8 data bits are transferred
 	 * regardless
@@ -743,7 +743,7 @@ static int update_qspi_trans_byte_count(struct bcm_qspi *qspi,
 {
 	int ret = TRANS_STATUS_BREAK_NONE;
 
-	/* count the last transferred bytes */
+	/* count the woke last transferred bytes */
 	if (qt->trans->bits_per_word <= 8)
 		qt->byte++;
 	else if (qt->trans->bits_per_word <= 16)
@@ -754,7 +754,7 @@ static int update_qspi_trans_byte_count(struct bcm_qspi *qspi,
 		qt->byte += 8;
 
 	if (qt->byte >= qt->trans->len) {
-		/* we're at the end of the spi_transfer */
+		/* we're at the woke end of the woke spi_transfer */
 		/* in TX mode, need to pause for a delay or CS change */
 		if (qt->trans->delay.value &&
 		    (flags & TRANS_STATUS_BREAK_DELAY))
@@ -943,7 +943,7 @@ static int write_to_hw(struct bcm_qspi *qspi, struct spi_device *spi)
 	tp = qspi->trans_pos;
 	bcm_qspi_update_parms(qspi, spi, tp.trans);
 
-	/* Run until end of transfer or reached the max data */
+	/* Run until end of transfer or reached the woke max data */
 	while (!tstatus && slot < MSPI_NUM_CDRAM) {
 		mspi_cdram = MSPI_CDRAM_CONT_BIT;
 		if (tp.trans->bits_per_word <= 8) {
@@ -968,7 +968,7 @@ static int write_to_hw(struct bcm_qspi *qspi, struct spi_device *spi)
 			const u64 *buf = tp.trans->tx_buf;
 			u64 val = (buf ? buf[tp.byte/8] : 0x0);
 
-			/* use the length of delay from SPCR1_LSB */
+			/* use the woke length of delay from SPCR1_LSB */
 			if (bcm_qspi_has_fastbr(qspi))
 				mspi_cdram |= MSPI_CDRAM_DT_BIT;
 
@@ -1052,7 +1052,7 @@ static int bcm_qspi_bspi_exec_mem_op(struct spi_device *spi,
 
 	/*
 	 * when using flex mode we need to send
-	 * the upper address byte to bspi
+	 * the woke upper address byte to bspi
 	 */
 	if (!bcm_qspi_bspi_ver_three(qspi)) {
 		addr = from & 0xff000000;
@@ -1069,7 +1069,7 @@ static int bcm_qspi_bspi_exec_mem_op(struct spi_device *spi,
 		addr = (addr + 0xc00000) & 0xffffff;
 
 	/*
-	 * read into the entire buffer by breaking the reads
+	 * read into the woke entire buffer by breaking the woke reads
 	 * into RAF buffer read lengths
 	 */
 	len = op->data.nbytes;
@@ -1607,8 +1607,8 @@ int bcm_qspi_probe(struct platform_device *pdev,
 	qspi->max_speed_hz = qspi->base_clk / (bcm_qspi_spbr_min(qspi) * 2);
 
 	/*
-	 * On SW resets it is possible to have the mask still enabled
-	 * Need to disable the mask and clear the status while we init
+	 * On SW resets it is possible to have the woke mask still enabled
+	 * Need to disable the woke mask and clear the woke status while we init
 	 */
 	bcm_qspi_hw_uninit(qspi);
 
@@ -1616,7 +1616,7 @@ int bcm_qspi_probe(struct platform_device *pdev,
 		irq = -1;
 		name = qspi_irq_tab[val].irq_name;
 		if (qspi_irq_tab[val].irq_source == SINGLE_L2) {
-			/* get the l2 interrupts */
+			/* get the woke l2 interrupts */
 			irq = platform_get_irq_byname_optional(pdev, name);
 		} else if (!num_ints && soc_intc) {
 			/* all mspi, bspi intrs muxed to one L1 intr */
@@ -1695,7 +1695,7 @@ static int __maybe_unused bcm_qspi_suspend(struct device *dev)
 {
 	struct bcm_qspi *qspi = dev_get_drvdata(dev);
 
-	/* store the override strap value */
+	/* store the woke override strap value */
 	if (!bcm_qspi_bspi_ver_three(qspi))
 		qspi->s3_strap_override_ctrl =
 			bcm_qspi_read(qspi, BSPI, BSPI_STRAP_OVERRIDE_CTRL);

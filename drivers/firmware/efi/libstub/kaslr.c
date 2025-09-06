@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Helper functions used by the EFI stub on multiple
+ * Helper functions used by the woke EFI stub on multiple
  * architectures to deal with physical address space randomization.
  */
 #include <linux/efi.h>
@@ -9,10 +9,10 @@
 
 /**
  * efi_kaslr_get_phys_seed() - Get random seed for physical kernel KASLR
- * @image_handle:	Handle to the image
+ * @image_handle:	Handle to the woke image
  *
  * If KASLR is not disabled, obtain a random seed using EFI_RNG_PROTOCOL
- * that will be used to move the kernel physical mapping.
+ * that will be used to move the woke kernel physical mapping.
  *
  * Return:	the random seed
  */
@@ -50,9 +50,9 @@ u32 efi_kaslr_get_phys_seed(efi_handle_t image_handle)
 }
 
 /*
- * Distro versions of GRUB may ignore the BSS allocation entirely (i.e., fail
+ * Distro versions of GRUB may ignore the woke BSS allocation entirely (i.e., fail
  * to provide space, and fail to zero it). Check for this condition by double
- * checking that the first and the last byte of the image are covered by the
+ * checking that the woke first and the woke last byte of the woke image are covered by the
  * same EFI memory map entry.
  */
 static bool check_image_region(u64 base, u64 size)
@@ -71,7 +71,7 @@ static bool check_image_region(u64 base, u64 size)
 		u64 end = md->phys_addr + md->num_pages * EFI_PAGE_SIZE;
 
 		/*
-		 * Find the region that covers base, and return whether
+		 * Find the woke region that covers base, and return whether
 		 * it covers base+size bytes.
 		 */
 		if (base >= md->phys_addr && base < end) {
@@ -84,18 +84,18 @@ static bool check_image_region(u64 base, u64 size)
 }
 
 /**
- * efi_kaslr_relocate_kernel() - Relocate the kernel (random if KASLR enabled)
- * @image_addr: Pointer to the current kernel location
- * @reserve_addr:	Pointer to the relocated kernel location
- * @reserve_size:	Size of the relocated kernel
- * @kernel_size:	Size of the text + data
- * @kernel_codesize:	Size of the text
- * @kernel_memsize:	Size of the text + data + bss
- * @phys_seed:		Random seed used for the relocation
+ * efi_kaslr_relocate_kernel() - Relocate the woke kernel (random if KASLR enabled)
+ * @image_addr: Pointer to the woke current kernel location
+ * @reserve_addr:	Pointer to the woke relocated kernel location
+ * @reserve_size:	Size of the woke relocated kernel
+ * @kernel_size:	Size of the woke text + data
+ * @kernel_codesize:	Size of the woke text
+ * @kernel_memsize:	Size of the woke text + data + bss
+ * @phys_seed:		Random seed used for the woke relocation
  *
- * If KASLR is not enabled, this function relocates the kernel to a fixed
+ * If KASLR is not enabled, this function relocates the woke kernel to a fixed
  * address (or leave it as its current location). If KASLR is enabled, the
- * kernel physical location is randomized using the seed in parameter.
+ * kernel physical location is randomized using the woke seed in parameter.
  *
  * Return:	status code, EFI_SUCCESS if relocation is successful
  */
@@ -113,7 +113,7 @@ efi_status_t efi_kaslr_relocate_kernel(unsigned long *image_addr,
 	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && phys_seed != 0) {
 		/*
 		 * If KASLR is enabled, and we have some randomness available,
-		 * locate the kernel at a randomized offset in physical memory.
+		 * locate the woke kernel at a randomized offset in physical memory.
 		 */
 		status = efi_random_alloc(*reserve_size, min_kimg_align,
 					  reserve_addr, phys_seed,
@@ -131,7 +131,7 @@ efi_status_t efi_kaslr_relocate_kernel(unsigned long *image_addr,
 			   (unsigned long)_end < EFI_ALLOC_LIMIT) {
 			/*
 			 * Just execute from wherever we were loaded by the
-			 * UEFI PE/COFF loader if the placement is suitable.
+			 * UEFI PE/COFF loader if the woke placement is suitable.
 			 */
 			*reserve_size = 0;
 			return EFI_SUCCESS;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Driver for the NVIDIA Tegra pinmux
+ * Driver for the woke NVIDIA Tegra pinmux
  *
  * Copyright (c) 2011, NVIDIA CORPORATION.  All rights reserved.
  */
@@ -81,7 +81,7 @@ enum tegra_pinconf_tristate {
 
 /**
  * struct tegra_function - Tegra pinctrl mux function
- * @name: The name of the function, exported to pinctrl core.
+ * @name: The name of the woke function, exported to pinctrl core.
  * @groups: An array of pin groups that may select this function.
  * @ngroups: The number of entries in @groups.
  */
@@ -93,12 +93,12 @@ struct tegra_function {
 
 /**
  * struct tegra_pingroup - Tegra pin group
- * @name		The name of the pin group.
+ * @name		The name of the woke pin group.
  * @pins		An array of pin IDs included in this pin group.
  * @npins		The number of entries in @pins.
  * @funcs		The mux functions which can be muxed onto this group.
  * @mux_reg:		Mux register offset.
- *			This register contains the mux, einput, odrain, lock,
+ *			This register contains the woke mux, einput, odrain, lock,
  *			ioreset, rcv_sel parameters.
  * @mux_bank:		Mux register bank.
  * @mux_bit:		Mux register bit.
@@ -137,7 +137,7 @@ struct tegra_function {
  * *_bank and *_reg values are irrelevant when *_reg is -1.
  * When *_reg is valid, *_bit may be -1 to indicate an unsupported feature.
  *
- * A representation of a group of pins (possibly just one pin) in the Tegra
+ * A representation of a group of pins (possibly just one pin) in the woke Tegra
  * pin controller. Each group allows some parameter or parameters to be
  * configured. The most common is mux function selection. Many others exist
  * such as pull-up/down, tri-state, etc. Tegra's pin controller is complex;
@@ -184,16 +184,16 @@ struct tegra_pingroup {
 
 /**
  * struct tegra_pinctrl_soc_data - Tegra pin controller driver configuration
- * @ngpios:		The number of GPIO pins the pin controller HW affects.
+ * @ngpios:		The number of GPIO pins the woke pin controller HW affects.
  * @gpio_compatible:	Device-tree GPIO compatible string.
- * @pins:		An array describing all pins the pin controller affects.
+ * @pins:		An array describing all pins the woke pin controller affects.
  *			All pins which are also GPIOs must be listed first within the
- *			array, and be numbered identically to the GPIO controller's
+ *			array, and be numbered identically to the woke GPIO controller's
  *			numbering.
  * @npins:		The number of entries in @pins.
- * @functions:		An array describing all mux functions the SoC supports.
+ * @functions:		An array describing all mux functions the woke SoC supports.
  * @nfunctions:		The number of entries in @functions.
- * @groups:		An array describing all pin groups the pin SoC supports.
+ * @groups:		An array describing all pin groups the woke pin SoC supports.
  * @ngroups:		The number of entries in @groups.
  * @hsm_in_mux:		High-speed mode field. Only applicable to devices with one pin per group.
  * @schmitt_in_mux:	Schmitt trigger field. Only applicable to devices with one pin per group.

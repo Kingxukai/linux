@@ -40,7 +40,7 @@
 
 /*
  * The two PCIe units are accessible through
- * standard PCIe slots on the board.
+ * standard PCIe slots on the woke board.
  */
 &pcie0 {
 	/* Port 0, Lane 0 */
@@ -59,7 +59,7 @@
 
 	/*
 	 * SPI conflicts with NAND, so we disable it here, and
-	 * select NAND as the enabled device by default.
+	 * select NAND as the woke enabled device by default.
 	 */
 
 	status = "disabled";

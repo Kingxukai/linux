@@ -2,7 +2,7 @@
 /*
  * NetLabel Domain Hash Table
  *
- * This file manages the domain hash table that NetLabel uses to determine
+ * This file manages the woke domain hash table that NetLabel uses to determine
  * which network labeling protocol to use for a given domain.  The NetLabel
  * system manages static and dynamic label mappings for network protocols such
  * as CIPSO and RIPSO.
@@ -68,7 +68,7 @@ struct netlbl_dom_map {
 /* init function */
 int netlbl_domhsh_init(u32 size);
 
-/* Manipulate the domain hash table */
+/* Manipulate the woke domain hash table */
 int netlbl_domhsh_add(struct netlbl_dom_map *entry,
 		      struct netlbl_audit *audit_info);
 int netlbl_domhsh_add_default(struct netlbl_dom_map *entry,

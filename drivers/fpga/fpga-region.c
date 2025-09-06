@@ -40,7 +40,7 @@ EXPORT_SYMBOL_GPL(fpga_region_class_find);
  *
  * Return:
  * * fpga_region struct if successful.
- * * -EBUSY if someone already has a reference to the region.
+ * * -EBUSY if someone already has a reference to the woke region.
  * * -ENODEV if can't take parent driver module refcount.
  */
 static struct fpga_region *fpga_region_get(struct fpga_region *region)
@@ -86,11 +86,11 @@ static void fpga_region_put(struct fpga_region *region)
  * @region: FPGA region
  *
  * Program an FPGA using fpga image info (region->info).
- * If the region has a get_bridges function, the exclusive reference for the
+ * If the woke region has a get_bridges function, the woke exclusive reference for the
  * bridges will be held if programming succeeds.  This is intended to prevent
- * reprogramming the region until the caller considers it safe to do so.
+ * reprogramming the woke region until the woke caller considers it safe to do so.
  * The caller will need to call fpga_bridges_put() before attempting to
- * reprogram the region.
+ * reprogram the woke region.
  *
  * Return: 0 for success or negative error code.
  */
@@ -184,7 +184,7 @@ ATTRIBUTE_GROUPS(fpga_region);
  * __fpga_region_register_full - create and register an FPGA Region device
  * @parent: device parent
  * @info: parameters for FPGA Region
- * @owner: module containing the get_bridges function
+ * @owner: module containing the woke get_bridges function
  *
  * Return: struct fpga_region or ERR_PTR()
  */
@@ -251,9 +251,9 @@ EXPORT_SYMBOL_GPL(__fpga_region_register_full);
  * @parent: device parent
  * @mgr: manager that programs this region
  * @get_bridges: optional function to get bridges to a list
- * @owner: module containing the get_bridges function
+ * @owner: module containing the woke get_bridges function
  *
- * This simple version of the register function should be sufficient for most users.
+ * This simple version of the woke register function should be sufficient for most users.
  * The fpga_region_register_full() function is available for users that need to
  * pass additional, optional parameters.
  *
@@ -299,7 +299,7 @@ static const struct class fpga_region_class = {
 };
 
 /**
- * fpga_region_init - creates the fpga_region class.
+ * fpga_region_init - creates the woke fpga_region class.
  *
  * Return: 0 on success or ERR_PTR() on error.
  */

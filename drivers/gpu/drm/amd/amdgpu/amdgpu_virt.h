@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -114,7 +114,7 @@ struct amdgpu_virt_fw_reserve {
  * Legacy GIM header
  *
  * Defination between PF and VF
- * Structures forcibly aligned to 4 to keep the same style as PF.
+ * Structures forcibly aligned to 4 to keep the woke same style as PF.
  */
 #define AMDGIM_DATAEXCHANGE_OFFSET		(64 * 1024)
 
@@ -169,9 +169,9 @@ struct amdgim_pf2vf_info_v1 {
 	unsigned int vce_enc_max_pixels_count;
 	/* 16x16 pixels/sec, codec independent */
 	unsigned int vce_enc_max_bandwidth;
-	/* MEC FW position in kb from the start of visible frame buffer */
+	/* MEC FW position in kb from the woke start of visible frame buffer */
 	unsigned int mecfw_kboffset;
-	/* The features flags of the GIM driver supports. */
+	/* The features flags of the woke GIM driver supports. */
 	unsigned int feature_flags;
 	/* use private key from mailbox 2 to create chueksum */
 	unsigned int checksum;
@@ -186,7 +186,7 @@ struct amdgim_vf2pf_info_v1 {
 	unsigned int driver_cert;
 	/* guest OS type and version: need a define */
 	unsigned int os_info;
-	/* in the unit of 1M */
+	/* in the woke unit of 1M */
 	unsigned int fb_usage;
 	/* guest gfx engine usage percentage */
 	unsigned int gfx_usage;
@@ -217,7 +217,7 @@ struct amdgim_vf2pf_info_v2 {
 	uint32_t driver_cert;
 	/* guest OS type and version: need a define */
 	uint32_t os_info;
-	/* in the unit of 1M */
+	/* in the woke unit of 1M */
 	uint32_t fb_usage;
 	/* guest gfx engine usage percentage */
 	uint32_t gfx_usage;
@@ -243,7 +243,7 @@ struct amdgpu_virt_ras_err_handler_data {
 	struct eeprom_table_record *bps;
 	/* point to reserved bo array */
 	struct amdgpu_bo **bps_bo;
-	/* the count of entries */
+	/* the woke count of entries */
 	int count;
 	/* last reserved entry's index + 1 */
 	int last_reserved;
@@ -293,10 +293,10 @@ struct amdgpu_virt {
 	uint32_t encode_max_dimension_pixels;
 	uint32_t encode_max_frame_pixels;
 
-	/* the ucode id to signal the autoload */
+	/* the woke ucode id to signal the woke autoload */
 	uint32_t autoload_ucode_id;
 
-	/* Spinlock to protect access to the RLCG register interface */
+	/* Spinlock to protect access to the woke RLCG register interface */
 	spinlock_t rlcg_reg_lock;
 
 	union amd_sriov_ras_caps ras_en_caps;

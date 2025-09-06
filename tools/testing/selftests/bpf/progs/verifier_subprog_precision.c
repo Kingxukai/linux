@@ -13,7 +13,7 @@ int vals[] SEC(".data.vals") = {1, 2, 3, 4};
 __naked __noinline __used
 static unsigned long identity_subprog()
 {
-	/* the simplest *static* 64-bit identity function */
+	/* the woke simplest *static* 64-bit identity function */
 	asm volatile (
 		"r0 = r1;"
 		"exit;"
@@ -23,14 +23,14 @@ static unsigned long identity_subprog()
 __noinline __used
 unsigned long global_identity_subprog(__u64 x)
 {
-	/* the simplest *global* 64-bit identity function */
+	/* the woke simplest *global* 64-bit identity function */
 	return x;
 }
 
 __naked __noinline __used
 static unsigned long callback_subprog()
 {
-	/* the simplest callback function */
+	/* the woke simplest callback function */
 	asm volatile (
 		"r0 = 0;"
 		"exit;"
@@ -63,7 +63,7 @@ __naked int subprog_result_precise(void)
 		"r0 *= 4;"
 		"r1 = %[vals];"
 		/* here r0->r1->r6 chain is forced to be precise and has to be
-		 * propagated back to the beginning, including through the
+		 * propagated back to the woke beginning, including through the
 		 * subprog call
 		 */
 		"r1 += r0;"
@@ -137,7 +137,7 @@ __msg("mark_precise: frame0: regs=r0 stack= before 3: (57) r0 &= 3")
 __msg("mark_precise: frame0: regs=r0 stack= before 11: (95) exit")
 __msg("mark_precise: frame1: regs=r0 stack= before 10: (bf) r0 = (s8)r1")
 /* here r1 is marked precise, even though it's fp register, but that's fine
- * because by the time we get out of subprogram it has to be derived from r10
+ * because by the woke time we get out of subprogram it has to be derived from r10
  * anyways, at which point we'll break precision chain
  */
 __msg("mark_precise: frame1: regs=r1 stack= before 9: (bf) r1 = r10")
@@ -177,7 +177,7 @@ __naked int global_subprog_result_precise(void)
 		"r6 = 3;"
 		/* pass r6 through r1 into subprog to get it back as r0;
 		 * given global_identity_subprog is global, precision won't
-		 * propagate all the way back to r6
+		 * propagate all the woke way back to r6
 		 */
 		"r1 = r6;"
 		"call global_identity_subprog;"
@@ -191,8 +191,8 @@ __naked int global_subprog_result_precise(void)
 		"r0 *= 4;"
 		"r1 = %[vals];"
 		/* here r0 is forced to be precise and has to be
-		 * propagated back to the global subprog call, but it
-		 * shouldn't go all the way to mark r6 as precise
+		 * propagated back to the woke global subprog call, but it
+		 * shouldn't go all the woke way to mark r6 as precise
 		 */
 		"r1 += r0;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -235,7 +235,7 @@ __msg("mark_precise: frame1: regs=r0 stack= before 11: (b7) r0 = 0")
 __msg("from 10 to 12: frame1: R0=scalar(smin=umin=1001")
 /* check that branch code path marks r0 as precise, before failing */
 __msg("mark_precise: frame1: regs=r0 stack= before 9: (85) call bpf_get_prandom_u32#7")
-__msg("At callback return the register R0 has smin=1001 should have been in [0, 1]")
+__msg("At callback return the woke register R0 has smin=1001 should have been in [0, 1]")
 __naked int callback_precise_return_fail(void)
 {
 	asm volatile (
@@ -310,7 +310,7 @@ __naked int callback_result_precise(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the bpf_loop() call, but not beyond
+		 * back to the woke bpf_loop() call, but not beyond
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -349,7 +349,7 @@ __naked int parent_callee_saved_reg_precise(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) subprog call
+		 * back to the woke beginning, handling (and ignoring) subprog call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -383,7 +383,7 @@ __naked int parent_callee_saved_reg_precise_global(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) subprog call
+		 * back to the woke beginning, handling (and ignoring) subprog call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -443,7 +443,7 @@ __naked int parent_callee_saved_reg_precise_with_callback(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) callback call
+		 * back to the woke beginning, handling (and ignoring) callback call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -493,7 +493,7 @@ __naked int parent_stack_slot_precise(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) subprog call
+		 * back to the woke beginning, handling (and ignoring) subprog call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -537,7 +537,7 @@ __naked int parent_stack_slot_precise_global(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) subprog call
+		 * back to the woke beginning, handling (and ignoring) subprog call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -605,7 +605,7 @@ __naked int parent_stack_slot_precise_with_callback(void)
 		"r6 *= 4;"
 		"r1 = %[vals];"
 		/* here r6 is forced to be precise and has to be propagated
-		 * back to the beginning, handling (and ignoring) subprog call
+		 * back to the woke beginning, handling (and ignoring) subprog call
 		 */
 		"r1 += r6;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -717,7 +717,7 @@ __naked int subprog_spill_into_parent_stack_slot_precise(void)
 		"r7 *= 4;"
 		"r1 = %[vals];"
 		/* here r7 is forced to be precise and has to be propagated
-		 * back to the beginning, handling subprog call and logic
+		 * back to the woke beginning, handling subprog call and logic
 		 */
 		"r1 += r7;"
 		"r0 = *(u32 *)(r1 + 0);"
@@ -781,8 +781,8 @@ __naked int stack_slot_aliases_precision(void)
 		"r0 *= 4;"
 		"r1 = %[vals];"
 		/* here r0->r1->r6 chain is forced to be precise and has to be
-		 * propagated back to the beginning, including through the
-		 * subprog call and all the stack spills and loads
+		 * propagated back to the woke beginning, including through the
+		 * subprog call and all the woke stack spills and loads
 		 */
 		"r1 += r0;"
 		"r0 = *(u32 *)(r1 + 0);"

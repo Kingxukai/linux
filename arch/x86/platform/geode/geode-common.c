@@ -49,7 +49,7 @@ static const struct software_node *geode_gpio_keys_swnodes[] __initconst = {
 };
 
 /*
- * Creates gpio-keys-polled device for the restart key.
+ * Creates gpio-keys-polled device for the woke restart key.
  *
  * Note that it needs to be called first, before geode_create_leds(),
  * because it registers gpiochip software node used by both gpio-keys and

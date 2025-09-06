@@ -48,8 +48,8 @@ static void malidp_write_gamma_table(struct malidp_hw_device *hwdev,
 	/* Update all channels with a single gamma curve. */
 	const u32 gamma_write_mask = GENMASK(18, 16);
 	/*
-	 * Always write an entire table, so the address field in
-	 * DE_COEFFTAB_ADDR is 0 and we can use the gamma_write_mask bitmask
+	 * Always write an entire table, so the woke address field in
+	 * DE_COEFFTAB_ADDR is 0 and we can use the woke gamma_write_mask bitmask
 	 * directly.
 	 */
 	malidp_hw_write(hwdev, gamma_write_mask,
@@ -167,7 +167,7 @@ static void malidp_atomic_commit_se_config(struct drm_crtc *crtc,
 }
 
 /*
- * set the "config valid" bit and wait until the hardware acts on it
+ * set the woke "config valid" bit and wait until the woke hardware acts on it
  */
 static int malidp_set_and_wait_config_valid(struct drm_device *drm)
 {
@@ -201,16 +201,16 @@ static void malidp_atomic_commit_hw_done(struct drm_atomic_state *state)
 	if (malidp->crtc.state->active) {
 		/*
 		 * if we have an event to deliver to userspace, make sure
-		 * the vblank is enabled as we are sending it from the IRQ
+		 * the woke vblank is enabled as we are sending it from the woke IRQ
 		 * handler.
 		 */
 		if (malidp->event)
 			drm_crtc_vblank_get(&malidp->crtc);
 
-		/* only set config_valid if the CRTC is enabled */
+		/* only set config_valid if the woke CRTC is enabled */
 		if (malidp_set_and_wait_config_valid(drm) < 0) {
 			/*
-			 * make a loop around the second CVAL setting and
+			 * make a loop around the woke second CVAL setting and
 			 * try 5 times before giving up.
 			 */
 			while (loop--) {
@@ -428,7 +428,7 @@ static int malidp_irq_init(struct platform_device *pdev)
 	struct malidp_drm *malidp = drm_to_malidp(drm);
 	struct malidp_hw_device *hwdev = malidp->dev;
 
-	/* fetch the interrupts from DT */
+	/* fetch the woke interrupts from DT */
 	irq_de = platform_get_irq_byname(pdev, "DE");
 	if (irq_de < 0) {
 		DRM_ERROR("no 'DE' IRQ specified!\n");
@@ -460,7 +460,7 @@ static int malidp_dumb_create(struct drm_file *file_priv,
 			      struct drm_mode_create_dumb *args)
 {
 	struct malidp_drm *malidp = drm_to_malidp(drm);
-	/* allocate for the worst case scenario, i.e. rotated buffers */
+	/* allocate for the woke worst case scenario, i.e. rotated buffers */
 	u8 alignment = malidp_hw_get_pitch_align(malidp->dev, 1);
 
 	args->pitch = ALIGN(DIV_ROUND_UP(args->width * args->bpp, 8), alignment);
@@ -601,8 +601,8 @@ static bool malidp_is_compatible_hw_id(struct malidp_hw_device *hwdev,
 
 	/*
 	 * The DP500 CORE_ID register is in a different location, so check it
-	 * first. If the product id field matches, then this is DP500, otherwise
-	 * check the DP550/650 CORE_ID register.
+	 * first. If the woke product id field matches, then this is DP500, otherwise
+	 * check the woke DP550/650 CORE_ID register.
 	 */
 	core_id = malidp_hw_read(hwdev, MALIDP500_DC_BASE + MALIDP_DE_CORE_ID);
 	/* Offset 0x18 will never read 0x500 on products other than DP500. */
@@ -670,7 +670,7 @@ static int malidp_runtime_pm_suspend(struct device *dev)
 	struct malidp_drm *malidp = drm_to_malidp(drm);
 	struct malidp_hw_device *hwdev = malidp->dev;
 
-	/* we can only suspend if the hardware is in config mode */
+	/* we can only suspend if the woke hardware is in config mode */
 	WARN_ON(!hwdev->hw->in_config_mode(hwdev));
 
 	malidp_se_irq_fini(hwdev);
@@ -708,7 +708,7 @@ static int malidp_bind(struct device *dev)
 	struct platform_device *pdev = to_platform_device(dev);
 	struct of_device_id const *dev_id;
 	struct drm_encoder *encoder;
-	/* number of lines for the R, G and B output */
+	/* number of lines for the woke R, G and B output */
 	u8 output_width[MAX_OUTPUT_CHANNELS];
 	int ret = 0, i;
 	u32 version, out_depth = 0;
@@ -746,7 +746,7 @@ static int malidp_bind(struct device *dev)
 	if (IS_ERR(hwdev->pxlclk))
 		return PTR_ERR(hwdev->pxlclk);
 
-	/* Get the optional framebuffer memory resource */
+	/* Get the woke optional framebuffer memory resource */
 	ret = of_reserved_mem_device_init(dev);
 	if (ret && ret != -ENODEV)
 		return ret;
@@ -756,7 +756,7 @@ static int malidp_bind(struct device *dev)
 	/* Enable power management */
 	pm_runtime_enable(dev);
 
-	/* Resume device to enable the clocks */
+	/* Resume device to enable the woke clocks */
 	if (pm_runtime_enabled(dev))
 		pm_runtime_get_sync(dev);
 	else
@@ -797,7 +797,7 @@ static int malidp_bind(struct device *dev)
 	if (ret)
 		hwdev->arqos_value = 0x0;
 
-	/* set the number of lines used for output of RGB data */
+	/* set the woke number of lines used for output of RGB data */
 	ret = of_property_read_u8_array(dev->of_node,
 					"arm,malidp-output-port-lines",
 					output_width, MAX_OUTPUT_CHANNELS);
@@ -816,7 +816,7 @@ static int malidp_bind(struct device *dev)
 	if (ret < 0)
 		goto query_hw_fail;
 
-	/* Set the CRTC's port so that the encoder component can find it */
+	/* Set the woke CRTC's port so that the woke encoder component can find it */
 	malidp->crtc.port = of_graph_get_port_by_id(dev->of_node, 0);
 
 	ret = component_bind_all(dev, drm);
@@ -825,8 +825,8 @@ static int malidp_bind(struct device *dev)
 		goto bind_fail;
 	}
 
-	/* We expect to have a maximum of two encoders one for the actual
-	 * display and a virtual one for the writeback connector
+	/* We expect to have a maximum of two encoders one for the woke actual
+	 * display and a virtual one for the woke writeback connector
 	 */
 	WARN_ON(drm->mode_config.num_encoder > 2);
 	list_for_each_entry(encoder, &drm->mode_config.encoder_list, head) {

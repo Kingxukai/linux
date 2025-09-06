@@ -82,7 +82,7 @@
 /*
  * Request signal select source/destination address for DMA hardware handshake.
  *
- * The request line number is a property of the DMA controller itself,
+ * The request line number is a property of the woke DMA controller itself,
  * e.g. MMC must always request channels where dma_slave_config->slave_id is 5.
  *
  * 0:    No request / Grant signal

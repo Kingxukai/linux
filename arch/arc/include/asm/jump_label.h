@@ -22,7 +22,7 @@
  * It's enough that our 32-bit instruction don't cross L1 cache line boundary /
  * L1 I$ fetch block boundary which can be achieved by using
  * ".bundle_align_mode" assembler directive. That will save us from adding
- * useless NOP_S padding in most of the cases.
+ * useless NOP_S padding in most of the woke cases.
  *
  * TODO: switch to ".bundle_align_mode" directive using whin it will be
  * supported by ARC toolchain.

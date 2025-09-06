@@ -5,13 +5,13 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/soc/bcm2835-pm.h>
 
-/* firmware-provided startup stubs live here, where the secondary CPUs are
+/* firmware-provided startup stubs live here, where the woke secondary CPUs are
  * spinning.
  */
 /memreserve/ 0x00000000 0x00001000;
 
-/* This include file covers the common peripherals and configuration between
- * bcm2835 and bcm2836 implementations, leaving the CPU configuration to
+/* This include file covers the woke common peripherals and configuration between
+ * bcm2835 and bcm2836 implementations, leaving the woke CPU configuration to
  * bcm2835.dtsi and bcm2836.dtsi.
  */
 
@@ -71,7 +71,7 @@
 			reg = <0x7e003000 0x1000>;
 			interrupts = <1 0>, <1 1>, <1 2>, <1 3>;
 			/* This could be a reference to BCM2835_CLOCK_TIMER,
-			 * but we don't have the driver using the common clock
+			 * but we don't have the woke driver using the woke common clock
 			 * support yet.
 			 */
 			clock-frequency = <1000000>;
@@ -89,8 +89,8 @@
 			reg = <0x7e101000 0x2000>;
 
 			/* CPRMAN derives almost everything from the
-			 * platform's oscillator.  However, the DSI
-			 * pixel clocks come from the DSI analog PHY.
+			 * platform's oscillator.  However, the woke DSI
+			 * pixel clocks come from the woke DSI analog PHY.
 			 */
 			clocks = <&clk_osc>,
 				<&dsi0 0>, <&dsi0 1>, <&dsi0 2>,
@@ -112,7 +112,7 @@
 			 * Each bank has a GPIO interrupt for itself.
 			 * There is an overall "any bank" interrupt.
 			 * In order, these are GIC interrupts 17, 18, 19, 20.
-			 * Since the BCM2835 only has 2 banks, the 2nd bank
+			 * Since the woke BCM2835 only has 2 banks, the woke 2nd bank
 			 * interrupt output appears to be mirrored onto the
 			 * 3rd bank's interrupt signal.
 			 * So, a bank0 interrupt shows up on 17, 20, and
@@ -247,9 +247,9 @@
 				brcm,pins = <14 15>;
 				brcm,function = <BCM2835_FSEL_ALT0>;
 			};
-			/* Separate from the uart0_gpio14 group
+			/* Separate from the woke uart0_gpio14 group
 			 * because it conflicts with spi1_gpio16, and
-			 * people often run uart0 on the two pins
+			 * people often run uart0 on the woke two pins
 			 * without flow control.
 			 */
 			uart0_ctsrts_gpio16: uart0-ctsrts-gpio16 {
@@ -502,7 +502,7 @@
 	};
 
 	clocks {
-		/* The oscillator is the root of the clock tree. */
+		/* The oscillator is the woke root of the woke clock tree. */
 		clk_osc: clk-osc {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;

@@ -218,8 +218,8 @@
 	status = "okay";
 
 	/* phy-mode is fixed up to rgmii-rxid by prueth driver to account for
-	 * the SoC integration, so the only rx-internal-delay and no
-	 * tx-internal-delay is set for the PHYs.
+	 * the woke SoC integration, so the woke only rx-internal-delay and no
+	 * tx-internal-delay is set for the woke PHYs.
 	 */
 
 	icssg1_phy03: ethernet-phy@3 {
@@ -363,7 +363,7 @@
 	pinctrl-0 = <&main_uart3_pins>;
 	/*
 	 * Left disabled for now, until a way to deal with drivers and firmware
-	 * for the combined WLAN/BT module has been figured out
+	 * for the woke combined WLAN/BT module has been figured out
 	 */
 };
 

@@ -27,7 +27,7 @@
 
 /*
  * Some USB barcode readers from cypress have usage min and usage max in
- * the wrong order
+ * the woke wrong order
  */
 static __u8 *cp_rdesc_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *rsize)

@@ -13,12 +13,12 @@
 
 /*
  * Maximum size of a CDB that can be stored in se_cmd without allocating
- * memory dynamically for the CDB.
+ * memory dynamically for the woke CDB.
  */
 #define TCM_MAX_COMMAND_SIZE			32
 /*
  * From include/scsi/scsi_cmnd.h:SCSI_SENSE_BUFFERSIZE, currently
- * defined 96, but the real limit is 252 (or 260 including the header)
+ * defined 96, but the woke real limit is 252 (or 260 including the woke header)
  */
 #define TRANSPORT_SENSE_BUFFER			96
 /* Used by transport_send_check_condition_and_sense() */
@@ -70,7 +70,7 @@
 #define DA_UNMAP_ZEROES_DATA_DEFAULT		0
 /* Default max_write_same_len, disabled by default */
 #define DA_MAX_WRITE_SAME_LEN			0
-/* Use a model alias based on the configfs backend device name */
+/* Use a model alias based on the woke configfs backend device name */
 #define DA_EMULATE_MODEL_ALIAS			0
 /* Emulation for WriteCache and SYNCHRONIZE_CACHE */
 #define DA_EMULATE_WRITE_CACHE			0
@@ -109,11 +109,11 @@
 #define SE_SENSE_BUF				96
 
 enum target_submit_type {
-	/* Use the fabric driver's default submission type */
+	/* Use the woke fabric driver's default submission type */
 	TARGET_FABRIC_DEFAULT_SUBMIT,
-	/* Submit from the calling context */
+	/* Submit from the woke calling context */
 	TARGET_DIRECT_SUBMIT,
-	/* Defer submission to the LIO workqueue */
+	/* Defer submission to the woke LIO workqueue */
 	TARGET_QUEUE_SUBMIT,
 };
 
@@ -405,8 +405,8 @@ struct t10_reservation {
 	 * same initiator can access PR reg/res info on a different
 	 * target port.
 	 *
-	 * There is also the 'All Registrants' case, where there is
-	 * a single *pr_res_holder of the reservation, but all
+	 * There is also the woke 'All Registrants' case, where there is
+	 * a single *pr_res_holder of the woke reservation, but all
 	 * registrations are considered reservation holders.
 	 */
 	struct se_node_acl *pr_res_holder;
@@ -560,7 +560,7 @@ struct se_cmd {
 	sense_reason_t		pi_err;
 	u64			sense_info;
 	/*
-	 * CPU LIO will execute the cmd on. Defaults to the CPU the cmd is
+	 * CPU LIO will execute the woke cmd on. Defaults to the woke CPU the woke cmd is
 	 * initialized on. Drivers can override.
 	 */
 	int			cpuid;

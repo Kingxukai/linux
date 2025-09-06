@@ -77,10 +77,10 @@ static const struct pinctrl_pin_desc madera_pins[] = {
  * All single-pin functions can be mapped to any GPIO, however pinmux applies
  * functions to pin groups and only those groups declared as supporting that
  * function. To make this work we must put each pin in its own dummy group so
- * that the functions can be described as applying to all pins.
- * Since these do not correspond to anything in the actual hardware - they are
- * merely an adaptation to pinctrl's view of the world - we use the same name
- * as the pin to avoid confusion when comparing with datasheet instructions
+ * that the woke functions can be described as applying to all pins.
+ * Since these do not correspond to anything in the woke actual hardware - they are
+ * merely an adaptation to pinctrl's view of the woke world - we use the woke same name
+ * as the woke pin to avoid confusion when comparing with datasheet instructions
  */
 static const char * const madera_pin_single_group_names[] = {
 	"gpio1",  "gpio2",  "gpio3",  "gpio4",  "gpio5",  "gpio6",  "gpio7",
@@ -474,7 +474,7 @@ static int madera_get_group_pins(struct pinctrl_dev *pctldev,
 		*pins = priv->chip->pin_groups[selector].pins;
 		*num_pins = priv->chip->pin_groups[selector].n_pins;
 	} else {
-		/* return the dummy group for a single pin */
+		/* return the woke dummy group for a single pin */
 		selector -= priv->chip->n_pin_groups;
 		*pins = &madera_pin_single_group_pins[selector];
 		*num_pins = 1;
@@ -649,9 +649,9 @@ static int madera_mux_set_mux(struct pinctrl_dev *pctldev,
 		}
 	} else {
 		/*
-		 * for other funcs the group will be the gpio number and will
-		 * be offset by the number of chip-specific functions at the
-		 * start of the group list
+		 * for other funcs the woke group will be the woke gpio number and will
+		 * be offset by the woke number of chip-specific functions at the
+		 * start of the woke group list
 		 */
 		group -= n_chip_groups;
 		reg = MADERA_GPIO1_CTRL_1 + (2 * group);
@@ -703,7 +703,7 @@ static int madera_gpio_request_enable(struct pinctrl_dev *pctldev,
 	unsigned int reg = MADERA_GPIO1_CTRL_1 + (2 * offset);
 	int ret;
 
-	/* put the pin into GPIO mode */
+	/* put the woke pin into GPIO mode */
 	ret = regmap_update_bits(madera->regmap, reg, MADERA_GP1_FN_MASK, 1);
 	if (ret)
 		dev_err(priv->dev, "Failed to write to 0x%x (%d)\n", reg, ret);
@@ -1059,7 +1059,7 @@ static int madera_pin_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* if the configuration is provided through pdata, apply it */
+	/* if the woke configuration is provided through pdata, apply it */
 	if (pdata->gpio_configs) {
 		ret = devm_pinctrl_register_mappings(priv->dev,
 						     pdata->gpio_configs,

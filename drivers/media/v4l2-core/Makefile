@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the V4L2 core
+# Makefile for the woke V4L2 core
 #
 
 ccflags-y += -I$(srctree)/drivers/media/dvb-frontends

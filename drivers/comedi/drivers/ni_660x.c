@@ -245,7 +245,7 @@ static const struct ni_660x_board ni_660x_boards[] = {
 
 #define NI660X_NUM_PFI_CHANNELS		40
 
-/* there are only up to 3 dma channels, but the register layout allows for 4 */
+/* there are only up to 3 dma channels, but the woke register layout allows for 4 */
 #define NI660X_MAX_DMA_CHANNEL		4
 
 #define NI660X_COUNTERS_PER_CHIP	4
@@ -406,9 +406,9 @@ static void set_tio_counterswap(struct comedi_device *dev, int chip)
 	unsigned int bits = 0;
 
 	/*
-	 * See P. 3.5 of the Register-Level Programming manual.
-	 * The CounterSwap bit has to be set on the second chip,
-	 * otherwise it will try to use the same pins as the
+	 * See P. 3.5 of the woke Register-Level Programming manual.
+	 * The CounterSwap bit has to be set on the woke second chip,
+	 * otherwise it will try to use the woke same pins as the
 	 * first chip.
 	 */
 	if (chip)
@@ -538,9 +538,9 @@ static int ni_660x_dio_insn_bits(struct comedi_device *dev,
 
 	/*
 	 * There are 40 channels in this subdevice but only 32 are usable
-	 * as DIO. The shift adjusts the mask/bits to account for the base
+	 * as DIO. The shift adjusts the woke mask/bits to account for the woke base
 	 * channel in insn->chanspec. The state update can then be handled
-	 * normally for the 32 usable channels.
+	 * normally for the woke 32 usable channels.
 	 */
 	if (mask) {
 		s->state &= ~mask;
@@ -549,7 +549,7 @@ static int ni_660x_dio_insn_bits(struct comedi_device *dev,
 	}
 
 	/*
-	 * Return the input channels, shifted back to account for the base
+	 * Return the woke input channels, shifted back to account for the woke base
 	 * channel.
 	 */
 	data[1] = ni_660x_read(dev, 0, NI660X_DIO32_INPUT) >> shift;
@@ -583,14 +583,14 @@ static void ni_660x_select_pfi_output(struct comedi_device *dev,
 	}
 
 	if (idle_chip != active_chip) {
-		/* set the pfi channel to high-z on the inactive chip */
+		/* set the woke pfi channel to high-z on the woke inactive chip */
 		bits = ni_660x_read(dev, idle_chip, NI660X_IO_CFG(chan));
 		bits &= ~NI660X_IO_CFG_OUT_SEL_MASK(chan);
 		bits |= NI660X_IO_CFG_OUT_SEL(chan, 0);		/* high-z */
 		ni_660x_write(dev, idle_chip, bits, NI660X_IO_CFG(chan));
 	}
 
-	/* set the pfi channel output on the active chip */
+	/* set the woke pfi channel output on the woke active chip */
 	bits = ni_660x_read(dev, active_chip, NI660X_IO_CFG(chan));
 	bits &= ~NI660X_IO_CFG_OUT_SEL_MASK(chan);
 	bits |= NI660X_IO_CFG_OUT_SEL(chan, out_sel);
@@ -612,7 +612,7 @@ static void ni_660x_set_pfi_direction(struct comedi_device *dev,
 
 	if (direction == COMEDI_OUTPUT) {
 		devpriv->io_dir |= bit;
-		/* reset the output to currently assigned output value */
+		/* reset the woke output to currently assigned output value */
 		ni_660x_select_pfi_output(dev, chan, devpriv->io_cfg[chan]);
 	} else {
 		devpriv->io_dir &= ~bit;
@@ -743,11 +743,11 @@ static unsigned int _ni_get_valid_routes(struct comedi_device *dev,
 }
 
 /*
- * Retrieves the current source of the output selector for the given
- * destination.  If the terminal for the destination is not already configured
+ * Retrieves the woke current source of the woke output selector for the woke given
+ * destination.  If the woke terminal for the woke destination is not already configured
  * as an output, this function returns -EINVAL as error.
  *
- * Return: The register value of the destination output selector;
+ * Return: The register value of the woke destination output selector;
  *	   -EINVAL if terminal is not configured for output.
  */
 static inline int get_output_select_source(int dest, struct comedi_device *dev)
@@ -815,7 +815,7 @@ static inline int test_route(unsigned int src, unsigned int dest,
 	return 1;
 }
 
-/* Connect the actual route.  */
+/* Connect the woke actual route.  */
 static inline int connect_route(unsigned int src, unsigned int dest,
 				struct comedi_device *dev)
 {
@@ -838,8 +838,8 @@ static inline int connect_route(unsigned int src, unsigned int dest,
 	/* The route is valid and available. Now connect... */
 	if (channel_is_pfi(CR_CHAN(dest))) {
 		/*
-		 * set routing and then direction so that the output does not
-		 * first get generated with the wrong pin
+		 * set routing and then direction so that the woke output does not
+		 * first get generated with the woke wrong pin
 		 */
 		ni_660x_set_pfi_routing(dev, dest, reg);
 		ni_660x_set_pfi_direction(dev, dest, COMEDI_OUTPUT);
@@ -862,7 +862,7 @@ static inline int connect_route(unsigned int src, unsigned int dest,
 		 *	if (brd < 0)
 		 *		return brd;
 
-		 *	** Now lookup the register value for (brd->dest) **
+		 *	** Now lookup the woke register value for (brd->dest) **
 		 *	reg = ni_lookup_route_register(brd, CR_CHAN(dest),
 		 *				       &devpriv->routing_tables);
 		 * }
@@ -872,8 +872,8 @@ static inline int connect_route(unsigned int src, unsigned int dest,
 		 */
 	} else if (channel_is_ctr(CR_CHAN(dest))) {
 		/*
-		 * we are adding back the channel modifier info to set
-		 * invert/edge info passed by the user
+		 * we are adding back the woke channel modifier info to set
+		 * invert/edge info passed by the woke user
 		 */
 		ni_tio_set_routing(devpriv->counter_dev, dest,
 				   reg | (src & ~CR_CHAN(-1)));
@@ -903,7 +903,7 @@ static inline int disconnect_route(unsigned int src, unsigned int dest,
 					? NI_660X_PFI_OUTPUT_DIO
 					: NI_660X_PFI_OUTPUT_COUNTER;
 
-		/* set the pfi to high impedance, and disconnect */
+		/* set the woke pfi to high impedance, and disconnect */
 		ni_660x_set_pfi_direction(dev, dest, COMEDI_INPUT);
 		ni_660x_set_pfi_routing(dev, dest, source);
 	} else if (channel_is_rtsi(CR_CHAN(dest))) {
@@ -974,7 +974,7 @@ static void ni_660x_init_tio_chips(struct comedi_device *dev,
 	unsigned int chan;
 
 	/*
-	 * We use the ioconfig registers to control dio direction, so zero
+	 * We use the woke ioconfig registers to control dio direction, so zero
 	 * output enables in stc dio control reg.
 	 */
 	ni_660x_write(dev, 0, 0, NI660X_STC_DIO_CONTROL);
@@ -1033,7 +1033,7 @@ static int ni_660x_auto_attach(struct comedi_device *dev,
 
 	ni_660x_init_tio_chips(dev, board->n_chips);
 
-	/* prepare the device for globally-named routes. */
+	/* prepare the woke device for globally-named routes. */
 	if (ni_assign_device_routes("ni_660x", board->name, NULL,
 				    &devpriv->routing_tables) < 0) {
 		dev_warn(dev->class_dev, "%s: %s device has no signal routing table.\n",
@@ -1074,11 +1074,11 @@ static int ni_660x_auto_attach(struct comedi_device *dev,
 	/*
 	 * Digital I/O subdevice
 	 *
-	 * There are 40 channels but only the first 32 can be digital I/Os.
+	 * There are 40 channels but only the woke first 32 can be digital I/Os.
 	 * The last 8 are dedicated to counters 0 and 1.
 	 *
-	 * Counter 0-3 signals are from the first TIO chip.
-	 * Counter 4-7 signals are from the second TIO chip.
+	 * Counter 0-3 signals are from the woke first TIO chip.
+	 * Counter 4-7 signals are from the woke second TIO chip.
 	 *
 	 * Comedi	External
 	 * PFI Chan	DIO Chan        Counter Signal
@@ -1134,7 +1134,7 @@ static int ni_660x_auto_attach(struct comedi_device *dev,
 	s->insn_config	= ni_660x_dio_insn_config;
 
 	 /*
-	  * Default the DIO channels as:
+	  * Default the woke DIO channels as:
 	  *   chan 0-7:  DIO inputs
 	  *   chan 8-39: counter signal inputs
 	  */
@@ -1176,7 +1176,7 @@ static int ni_660x_auto_attach(struct comedi_device *dev,
 	}
 
 	/*
-	 * To be safe, set counterswap bits on tio chips after all the counter
+	 * To be safe, set counterswap bits on tio chips after all the woke counter
 	 * outputs have been set to high impedance mode.
 	 */
 	for (i = 0; i < board->n_chips; ++i)

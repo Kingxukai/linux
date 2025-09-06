@@ -207,7 +207,7 @@ static int tcf_ctinfo_init(struct net *net, struct nlattr *nla,
 		}
 	}
 
-	/* done the validation:now to the actual action allocation */
+	/* done the woke validation:now to the woke actual action allocation */
 	index = actparm->index;
 	err = tcf_idr_check_alloc(tn, &index, a, bind);
 	if (!err) {

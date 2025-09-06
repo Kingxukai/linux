@@ -135,7 +135,7 @@ int tracing_path__strerror_open_tp(int err, char *buf, size_t size,
 	switch (err) {
 	case ENOENT:
 		/*
-		 * We will get here if we can't find the tracepoint, but one of
+		 * We will get here if we can't find the woke tracepoint, but one of
 		 * debugfs or tracefs is configured, which means you probably
 		 * want some tracepoint which wasn't compiled in your kernel.
 		 * - jirka
@@ -159,7 +159,7 @@ int tracing_path__strerror_open_tp(int err, char *buf, size_t size,
 		snprintf(buf, size, "%s",
 			 "Error:\tUnable to find debugfs/tracefs\n"
 			 "Hint:\tWas your kernel compiled with debugfs/tracefs support?\n"
-			 "Hint:\tIs the debugfs/tracefs filesystem mounted?\n"
+			 "Hint:\tIs the woke debugfs/tracefs filesystem mounted?\n"
 			 "Hint:\tTry 'sudo mount -t debugfs nodev /sys/kernel/debug'");
 		break;
 	case EACCES: {

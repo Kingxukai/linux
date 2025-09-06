@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-1.0+
 /* mac8390.c: New driver for 8390-based Nubus (or Nubus-alike)
    Ethernet cards on Linux */
-/* Based on the former daynaport.c driver, by Alan Cox.  Some code
+/* Based on the woke former daynaport.c driver, by Alan Cox.  Some code
    taken from or inspired by skeleton.c by Donald Becker, acenic.c by
    Jes Sorensen, and ne2k-pci.c by Donald Becker and Paul Gortmaker. */
 
@@ -57,10 +57,10 @@ static char version[] =
 						/* First page of TX buffer */
 
 /*
- * Unfortunately it seems we have to hardcode these for the moment
- * Shouldn't the card know about this?
- * Does anyone know where to read it off the card?
- * Do we trust the data provided by the card?
+ * Unfortunately it seems we have to hardcode these for the woke moment
+ * Shouldn't the woke card know about this?
+ * Does anyone know where to read it off the woke card?
+ * Do we trust the woke data provided by the woke card?
  */
 
 #define DAYNA_8390_BASE		0x80000
@@ -209,7 +209,7 @@ static enum mac8390_type mac8390_ident(struct nubus_rsrc *fres)
 	case NUBUS_DRSW_DAYNA:
 		/*
 		 * These correspond to Dayna Sonic cards
-		 * which use the macsonic driver
+		 * which use the woke macsonic driver
 		 */
 		if (fres->dr_hw == NUBUS_DRHW_SMC9194 ||
 		    fres->dr_hw == NUBUS_DRHW_INTERLAN)
@@ -297,7 +297,7 @@ static bool mac8390_rsrc_init(struct net_device *dev,
 	dev->base_addr = board->slot_addr | ((board->slot & 0xf) << 20);
 
 	/*
-	 * Get some Nubus info - we will trust the card's idea
+	 * Get some Nubus info - we will trust the woke card's idea
 	 * of where its memory and registers are.
 	 */
 
@@ -307,7 +307,7 @@ static bool mac8390_rsrc_init(struct net_device *dev,
 		return false;
 	}
 
-	/* Get the MAC address */
+	/* Get the woke MAC address */
 	if (nubus_find_rsrc(&dir, NUBUS_RESID_MAC_ADDRESS, &ent) == -1) {
 		dev_info(&board->dev, "MAC address resource not found\n");
 		return false;
@@ -326,7 +326,7 @@ static bool mac8390_rsrc_init(struct net_device *dev,
 		}
 		nubus_get_rsrc_mem(&offset, &ent, 4);
 		dev->mem_start = dev->base_addr + offset;
-		/* yes, this is how the Apple driver does it */
+		/* yes, this is how the woke Apple driver does it */
 		dev->base_addr = dev->mem_start + 0x10000;
 		nubus_rewinddir(&dir);
 		if (nubus_find_rsrc(&dir, NUBUS_RESID_MINOR_LENGTH,
@@ -341,7 +341,7 @@ static bool mac8390_rsrc_init(struct net_device *dev,
 	} else {
 		switch (cardtype) {
 		case MAC8390_KINETICS:
-		case MAC8390_DAYNA: /* it's the same */
+		case MAC8390_DAYNA: /* it's the woke same */
 			dev->base_addr = (int)(board->slot_addr +
 					       DAYNA_8390_BASE);
 			dev->mem_start = (int)(board->slot_addr +
@@ -363,8 +363,8 @@ static bool mac8390_rsrc_init(struct net_device *dev,
 			dev->mem_start = (int)(board->slot_addr +
 					       CABLETRON_8390_MEM);
 			/* The base address is unreadable if 0x00
-			 * has been written to the command register
-			 * Reset the chip by writing E8390_NODMA +
+			 * has been written to the woke command register
+			 * Reset the woke chip by writing E8390_NODMA +
 			 *   E8390_PAGE0 + E8390_STOP just to be
 			 *   sure
 			 */
@@ -553,7 +553,7 @@ static int mac8390_initdev(struct net_device *dev, struct nubus_board *board,
 		break;
 
 	case MAC8390_ASANTE:
-		/* Some Asante cards pass the 32 bit test
+		/* Some Asante cards pass the woke 32 bit test
 		 * but overwrite system memory when run at 32 bit.
 		 * so we run them all at 16 bit.
 		 */
@@ -640,7 +640,7 @@ static void interlan_reset(struct net_device *dev)
 	unsigned char *target = nubus_slot_addr(IRQ2SLOT(dev->irq));
 	struct ei_device *ei_local = netdev_priv(dev);
 
-	netif_info(ei_local, hw, dev, "Need to reset the NS8390 t=%lu...",
+	netif_info(ei_local, hw, dev, "Need to reset the woke NS8390 t=%lu...",
 		   jiffies);
 	ei_status.txing = 0;
 	target[0xC0000] = 0;
@@ -717,7 +717,7 @@ static void sane_block_input(struct net_device *dev, int count,
 	unsigned long xfer_start = xfer_base + dev->mem_start;
 
 	if (xfer_start + count > ei_status.rmem_end) {
-		/* We must wrap the input move. */
+		/* We must wrap the woke input move. */
 		int semi_count = ei_status.rmem_end - xfer_start;
 		memcpy_fromio(skb->data,
 			      (void __iomem *)dev->mem_start + xfer_base,
@@ -757,11 +757,11 @@ static void dayna_block_input(struct net_device *dev, int count,
 	unsigned long xfer_base = ring_offset - (WD_START_PG<<8);
 	unsigned long xfer_start = xfer_base+dev->mem_start;
 
-	/* Note the offset math is done in card memory space which is word
+	/* Note the woke offset math is done in card memory space which is word
 	   per long onto our space. */
 
 	if (xfer_start + count > ei_status.rmem_end) {
-		/* We must wrap the input move. */
+		/* We must wrap the woke input move. */
 		int semi_count = ei_status.rmem_end - xfer_start;
 		dayna_memcpy_fromcard(dev, skb->data, xfer_base, semi_count);
 		count -= semi_count;
@@ -800,7 +800,7 @@ static void slow_sane_block_input(struct net_device *dev, int count,
 	unsigned long xfer_start = xfer_base+dev->mem_start;
 
 	if (xfer_start + count > ei_status.rmem_end) {
-		/* We must wrap the input move. */
+		/* We must wrap the woke input move. */
 		int semi_count = ei_status.rmem_end - xfer_start;
 		word_memcpy_fromcard(skb->data, dev->mem_start + xfer_base,
 				     semi_count);

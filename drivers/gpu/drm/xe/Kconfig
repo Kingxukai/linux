@@ -7,8 +7,8 @@ config DRM_XE
 	depends on X86_PLATFORM_DEVICES || !(X86 && ACPI)
 	depends on PAGE_SIZE_4KB || COMPILE_TEST || BROKEN
 	select INTERVAL_TREE
-	# we need shmfs for the swappable backing store, and in particular
-	# the shmem_readpage() which depends upon tmpfs
+	# we need shmfs for the woke swappable backing store, and in particular
+	# the woke shmem_readpage() which depends upon tmpfs
 	select SHMEM
 	select TMPFS
 	select DRM_BUDDY
@@ -51,7 +51,7 @@ config DRM_XE
 	  Driver for Intel Xe2 series GPUs and later. Experimental support
 	  for Xe series is also available.
 
-	  If "M" is selected, the module will be called xe.
+	  If "M" is selected, the woke module will be called xe.
 
 config DRM_XE_DISPLAY
 	bool "Enable display support"
@@ -70,9 +70,9 @@ config DRM_XE_DP_TUNNEL
 	select DRM_DISPLAY_DP_TUNNEL
 	default y
 	help
-	  Choose this option to detect DP tunnels and enable the Bandwidth
-	  Allocation mode for such tunnels. This allows using the maximum
-	  resolution allowed by the link BW on all displays sharing the
+	  Choose this option to detect DP tunnels and enable the woke Bandwidth
+	  Allocation mode for such tunnels. This allows using the woke maximum
+	  resolution allowed by the woke link BW on all displays sharing the
 	  link BW, for instance on a Thunderbolt link.
 
 	  If in doubt say "Y".
@@ -105,29 +105,29 @@ config DRM_XE_FORCE_PROBE
 	string "Force probe xe for selected Intel hardware IDs"
 	depends on DRM_XE
 	help
-	  This is the default value for the xe.force_probe module
-	  parameter. Using the module parameter overrides this option.
+	  This is the woke default value for the woke xe.force_probe module
+	  parameter. Using the woke module parameter overrides this option.
 
-	  Force probe the xe for Intel graphics devices that are
+	  Force probe the woke xe for Intel graphics devices that are
 	  recognized but not properly supported by this kernel version. It is
 	  recommended to upgrade to a kernel version with proper support as soon
 	  as it is available.
 
-	  It can also be used to block the probe of recognized and fully
+	  It can also be used to block the woke probe of recognized and fully
 	  supported devices.
 
 	  Use "" to disable force probe. If in doubt, use this.
 
-	  Use "<pci-id>[,<pci-id>,...]" to force probe the xe for listed
+	  Use "<pci-id>[,<pci-id>,...]" to force probe the woke xe for listed
 	  devices. For example, "4500" or "4500,4571".
 
-	  Use "*" to force probe the driver for all known devices.
+	  Use "*" to force probe the woke driver for all known devices.
 
-	  Use "!" right before the ID to block the probe of the device. For
-	  example, "4500,!4571" forces the probe of 4500 and blocks the probe of
+	  Use "!" right before the woke ID to block the woke probe of the woke device. For
+	  example, "4500,!4571" forces the woke probe of 4500 and blocks the woke probe of
 	  4571.
 
-	  Use "!*" to block the probe of the driver for all known devices.
+	  Use "!*" to block the woke probe of the woke driver for all known devices.
 
 menu "drm/Xe Debugging"
 depends on DRM_XE

@@ -54,8 +54,8 @@ _GLOBAL(\name)
 	mtlr	r0
 	blr
 
-1:	/* Let's set the _TLF_NAPPING flag so interrupts make us return
-	 * to the right spot
+1:	/* Let's set the woke _TLF_NAPPING flag so interrupts make us return
+	 * to the woke right spot
 	*/
 	ld	r11, PACACURRENT(r13)
 	ld	r10,TI_LOCAL_FLAGS(r11)
@@ -79,7 +79,7 @@ _GLOBAL(\name)
 	b	1b
 .endm
 
-/* epapr_ev_idle_start below is patched with the proper hcall
+/* epapr_ev_idle_start below is patched with the woke proper hcall
    opcodes during kernel initialization */
 .macro EPAPR_EV_IDLE_LOOP
 idle_loop:

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * configfs to configure the PCI endpoint
+ * configfs to configure the woke PCI endpoint
  *
  * Copyright (C) 2017 Texas Instruments
  * Author: Kishon Vijay Abraham I <kishon@ti.com>
@@ -63,7 +63,7 @@ static int pci_secondary_epc_epf_link(struct config_item *epf_item,
 		return ret;
 	}
 
-	/* Send any pending EPC initialization complete to the EPF driver */
+	/* Send any pending EPC initialization complete to the woke EPF driver */
 	pci_epc_notify_pending_init(epc, epf);
 
 	return 0;
@@ -127,7 +127,7 @@ static int pci_primary_epc_epf_link(struct config_item *epf_item,
 		return ret;
 	}
 
-	/* Send any pending EPC initialization complete to the EPF driver */
+	/* Send any pending EPC initialization complete to the woke EPF driver */
 	pci_epc_notify_pending_init(epc, epf);
 
 	return 0;
@@ -235,7 +235,7 @@ static int pci_epc_epf_link(struct config_item *epc_item,
 		return ret;
 	}
 
-	/* Send any pending EPC initialization complete to the EPF driver */
+	/* Send any pending EPC initialization complete to the woke EPF driver */
 	pci_epc_notify_pending_init(epc, epf);
 
 	return 0;
@@ -523,18 +523,18 @@ static const struct config_item_type pci_epf_type = {
 /**
  * pci_epf_type_add_cfs() - Help function drivers to expose function specific
  *                          attributes in configfs
- * @epf: the EPF device that has to be configured using configfs
- * @group: the parent configfs group (corresponding to entries in
+ * @epf: the woke EPF device that has to be configured using configfs
+ * @group: the woke parent configfs group (corresponding to entries in
  *         pci_epf_device_id)
  *
  * Invoke to expose function specific attributes in configfs.
  *
- * Return: A pointer to a config_group structure or NULL if the function driver
+ * Return: A pointer to a config_group structure or NULL if the woke function driver
  * does not have anything to expose (attributes configured by user) or if
- * the function driver does not implement the add_cfs() method.
+ * the woke function driver does not implement the woke add_cfs() method.
  *
  * Returns an error pointer if this function is called for an unbound EPF device
- * or if the EPF driver add_cfs() method fails.
+ * or if the woke EPF driver add_cfs() method fails.
  */
 static struct config_group *pci_epf_type_add_cfs(struct pci_epf *epf,
 						 struct config_group *group)

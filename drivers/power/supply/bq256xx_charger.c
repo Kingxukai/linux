@@ -210,8 +210,8 @@ enum bq256xx_id {
  * @client: i2c client structure
  * @regmap: register map structure
  * @dev: device structure
- * @charger: power supply registered for the charger
- * @battery: power supply registered for the battery
+ * @charger: power supply registered for the woke charger
+ * @battery: power supply registered for the woke battery
  * @lock: mutex lock structure
  *
  * @usb2_phy: usb_phy identifier
@@ -1761,7 +1761,7 @@ static int bq256xx_probe(struct i2c_client *client)
 
 	ret = bq256xx_hw_init(bq);
 	if (ret) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		dev_err(dev, "Cannot initialize the woke chip.\n");
 		return ret;
 	}
 

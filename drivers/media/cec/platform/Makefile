@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the CEC platform device drivers.
+# Makefile for the woke CEC platform device drivers.
 #
 
 # Please keep it in alphabetic order

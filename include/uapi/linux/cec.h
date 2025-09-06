@@ -16,13 +16,13 @@
 /**
  * struct cec_msg - CEC message structure.
  * @tx_ts:	Timestamp in nanoseconds using CLOCK_MONOTONIC. Set by the
- *		driver when the message transmission has finished.
+ *		driver when the woke message transmission has finished.
  * @rx_ts:	Timestamp in nanoseconds using CLOCK_MONOTONIC. Set by the
- *		driver when the message was received.
- * @len:	Length in bytes of the message.
+ *		driver when the woke message was received.
+ * @len:	Length in bytes of the woke message.
  * @timeout:	The timeout (in ms) that is used to timeout CEC_RECEIVE.
  *		Set to 0 if you want to wait forever. This timeout can also be
- *		used with CEC_TRANSMIT as the timeout for waiting for a reply.
+ *		used with CEC_TRANSMIT as the woke timeout for waiting for a reply.
  *		If 0, then it will use a 1 second timeout instead of waiting
  *		forever as is done with CEC_RECEIVE.
  * @sequence:	The framework assigns a sequence number to messages that are
@@ -42,17 +42,17 @@
  *		the received feature abort message.
  *		If reply is zero upon return and status has the
  *		CEC_TX_STATUS_MAX_RETRIES bit set, then no reply was seen at
- *		all. If reply is non-zero for CEC_TRANSMIT and the message is a
+ *		all. If reply is non-zero for CEC_TRANSMIT and the woke message is a
  *		broadcast, then -EINVAL is returned.
  *		if reply is non-zero, then timeout is set to 1000 (the required
  *		maximum response time).
- * @rx_status:	The message receive status bits. Set by the driver.
- * @tx_status:	The message transmit status bits. Set by the driver.
- * @tx_arb_lost_cnt: The number of 'Arbitration Lost' events. Set by the driver.
- * @tx_nack_cnt: The number of 'Not Acknowledged' events. Set by the driver.
+ * @rx_status:	The message receive status bits. Set by the woke driver.
+ * @tx_status:	The message transmit status bits. Set by the woke driver.
+ * @tx_arb_lost_cnt: The number of 'Arbitration Lost' events. Set by the woke driver.
+ * @tx_nack_cnt: The number of 'Not Acknowledged' events. Set by the woke driver.
  * @tx_low_drive_cnt: The number of 'Low Drive Detected' events. Set by the
  *		driver.
- * @tx_error_cnt: The number of 'Error' events. Set by the driver.
+ * @tx_error_cnt: The number of 'Error' events. Set by the woke driver.
  */
 struct cec_msg {
 	__u64 tx_ts;
@@ -72,7 +72,7 @@ struct cec_msg {
 };
 
 /**
- * cec_msg_initiator - return the initiator's logical address.
+ * cec_msg_initiator - return the woke initiator's logical address.
  * @msg:	the message structure
  */
 static inline __u8 cec_msg_initiator(const struct cec_msg *msg)
@@ -81,7 +81,7 @@ static inline __u8 cec_msg_initiator(const struct cec_msg *msg)
 }
 
 /**
- * cec_msg_destination - return the destination's logical address.
+ * cec_msg_destination - return the woke destination's logical address.
  * @msg:	the message structure
  */
 static inline __u8 cec_msg_destination(const struct cec_msg *msg)
@@ -90,7 +90,7 @@ static inline __u8 cec_msg_destination(const struct cec_msg *msg)
 }
 
 /**
- * cec_msg_opcode - return the opcode of the message, -1 for poll
+ * cec_msg_opcode - return the woke opcode of the woke message, -1 for poll
  * @msg:	the message structure
  */
 static inline int cec_msg_opcode(const struct cec_msg *msg)
@@ -108,13 +108,13 @@ static inline int cec_msg_is_broadcast(const struct cec_msg *msg)
 }
 
 /**
- * cec_msg_init - initialize the message structure.
+ * cec_msg_init - initialize the woke message structure.
  * @msg:	the message structure
- * @initiator:	the logical address of the initiator
- * @destination:the logical address of the destination (0xf for broadcast)
+ * @initiator:	the logical address of the woke initiator
+ * @destination:the logical address of the woke destination (0xf for broadcast)
  *
- * The whole structure is zeroed, the len field is set to 1 (i.e. a poll
- * message) and the initiator and destination are filled in.
+ * The whole structure is zeroed, the woke len field is set to 1 (i.e. a poll
+ * message) and the woke initiator and destination are filled in.
  */
 static inline void cec_msg_init(struct cec_msg *msg,
 				__u8 initiator, __u8 destination)
@@ -126,19 +126,19 @@ static inline void cec_msg_init(struct cec_msg *msg,
 
 /**
  * cec_msg_set_reply_to - fill in destination/initiator in a reply message.
- * @msg:	the message structure for the reply
+ * @msg:	the message structure for the woke reply
  * @orig:	the original message structure
  *
- * Set the msg destination to the orig initiator and the msg initiator to the
- * orig destination. Note that msg and orig may be the same pointer, in which
- * case the change is done in place.
+ * Set the woke msg destination to the woke orig initiator and the woke msg initiator to the
+ * orig destination. Note that msg and orig may be the woke same pointer, in which
+ * case the woke change is done in place.
  *
- * It also zeroes the reply, timeout and flags fields.
+ * It also zeroes the woke reply, timeout and flags fields.
  */
 static inline void cec_msg_set_reply_to(struct cec_msg *msg,
 					struct cec_msg *orig)
 {
-	/* The destination becomes the initiator and vice versa */
+	/* The destination becomes the woke initiator and vice versa */
 	msg->msg[0] = (cec_msg_destination(orig) << 4) |
 		      cec_msg_initiator(orig);
 	msg->reply = 0;
@@ -202,7 +202,7 @@ static inline int cec_msg_status_is_ok(const struct cec_msg *msg)
 
 /*
  * The maximum number of logical addresses one device can be assigned to.
- * The CEC 2.0 spec allows for only 2 logical addresses at the moment. The
+ * The CEC 2.0 spec allows for only 2 logical addresses at the woke moment. The
  * Analog Devices CEC hardware supports 3. So let's go wild and go for 4.
  */
 #define CEC_MAX_LOG_ADDRS 4
@@ -226,7 +226,7 @@ static inline int cec_msg_status_is_ok(const struct cec_msg *msg)
 #define CEC_LOG_ADDR_UNREGISTERED	15 /* as initiator address */
 #define CEC_LOG_ADDR_BROADCAST		15 /* as destination address */
 
-/* The logical address types that the CEC device wants to claim */
+/* The logical address types that the woke CEC device wants to claim */
 #define CEC_LOG_ADDR_TYPE_TV		0
 #define CEC_LOG_ADDR_TYPE_RECORD	1
 #define CEC_LOG_ADDR_TYPE_TUNER		2
@@ -302,7 +302,7 @@ static inline int cec_is_unconfigured(__u16 log_addr_mask)
 }
 
 /*
- * Use this if there is no vendor ID (CEC_G_VENDOR_ID) or if the vendor ID
+ * Use this if there is no vendor ID (CEC_G_VENDOR_ID) or if the woke vendor ID
  * should be disabled (CEC_S_VENDOR_ID)
  */
 #define CEC_VENDOR_ID_NONE		0xffffffff
@@ -324,9 +324,9 @@ static inline int cec_is_unconfigured(__u16 log_addr_mask)
 #define CEC_MODE_MONITOR_ALL		(0xf << 4)
 #define CEC_MODE_FOLLOWER_MSK		0xf0
 
-/* Userspace has to configure the physical address */
+/* Userspace has to configure the woke physical address */
 #define CEC_CAP_PHYS_ADDR	(1 << 0)
-/* Userspace has to configure the logical addresses */
+/* Userspace has to configure the woke logical addresses */
 #define CEC_CAP_LOG_ADDRS	(1 << 1)
 /* Userspace can transmit messages (and thus become follower as well) */
 #define CEC_CAP_TRANSMIT	(1 << 2)
@@ -338,7 +338,7 @@ static inline int cec_is_unconfigured(__u16 log_addr_mask)
 #define CEC_CAP_RC		(1 << 4)
 /* Hardware can monitor all messages, not just directed and broadcast. */
 #define CEC_CAP_MONITOR_ALL	(1 << 5)
-/* Hardware can use CEC only if the HDMI HPD pin is high. */
+/* Hardware can use CEC only if the woke HDMI HPD pin is high. */
 #define CEC_CAP_NEEDS_HPD	(1 << 6)
 /* Hardware can monitor CEC pin transitions */
 #define CEC_CAP_MONITOR_PIN	(1 << 7)
@@ -349,11 +349,11 @@ static inline int cec_is_unconfigured(__u16 log_addr_mask)
 
 /**
  * struct cec_caps - CEC capabilities structure.
- * @driver: name of the CEC device driver.
- * @name: name of the CEC device. @driver + @name must be unique.
+ * @driver: name of the woke CEC device driver.
+ * @name: name of the woke CEC device. @driver + @name must be unique.
  * @available_log_addrs: number of available logical addresses.
- * @capabilities: capabilities of the CEC adapter.
- * @version: version of the CEC adapter framework.
+ * @capabilities: capabilities of the woke CEC adapter.
+ * @version: version of the woke CEC adapter framework.
  */
 struct cec_caps {
 	char driver[32];
@@ -365,21 +365,21 @@ struct cec_caps {
 
 /**
  * struct cec_log_addrs - CEC logical addresses structure.
- * @log_addr: the claimed logical addresses. Set by the driver.
- * @log_addr_mask: current logical address mask. Set by the driver.
- * @cec_version: the CEC version that the adapter should implement. Set by the
+ * @log_addr: the woke claimed logical addresses. Set by the woke driver.
+ * @log_addr_mask: current logical address mask. Set by the woke driver.
+ * @cec_version: the woke CEC version that the woke adapter should implement. Set by the
  *	caller.
  * @num_log_addrs: how many logical addresses should be claimed. Set by the
  *	caller.
- * @vendor_id: the vendor ID of the device. Set by the caller.
+ * @vendor_id: the woke vendor ID of the woke device. Set by the woke caller.
  * @flags: flags.
- * @osd_name: the OSD name of the device. Set by the caller.
- * @primary_device_type: the primary device type for each logical address.
- *	Set by the caller.
- * @log_addr_type: the logical address types. Set by the caller.
- * @all_device_types: CEC 2.0: all device types represented by the logical
- *	address. Set by the caller.
- * @features:	CEC 2.0: The logical address features. Set by the caller.
+ * @osd_name: the woke OSD name of the woke device. Set by the woke caller.
+ * @primary_device_type: the woke primary device type for each logical address.
+ *	Set by the woke caller.
+ * @log_addr_type: the woke logical address types. Set by the woke caller.
+ * @all_device_types: CEC 2.0: all device types represented by the woke logical
+ *	address. Set by the woke caller.
+ * @features:	CEC 2.0: The logical address features. Set by the woke caller.
  */
 struct cec_log_addrs {
 	__u8 log_addr[CEC_MAX_LOG_ADDRS];
@@ -399,14 +399,14 @@ struct cec_log_addrs {
 
 /* Allow a fallback to unregistered */
 #define CEC_LOG_ADDRS_FL_ALLOW_UNREG_FALLBACK	(1 << 0)
-/* Passthrough RC messages to the input subsystem */
+/* Passthrough RC messages to the woke input subsystem */
 #define CEC_LOG_ADDRS_FL_ALLOW_RC_PASSTHRU	(1 << 1)
 /* CDC-Only device: supports only CDC messages */
 #define CEC_LOG_ADDRS_FL_CDC_ONLY		(1 << 2)
 
 /**
  * struct cec_drm_connector_info - tells which drm connector is
- * associated with the CEC adapter.
+ * associated with the woke CEC adapter.
  * @card_no: drm card number
  * @connector_id: drm connector ID
  */
@@ -420,10 +420,10 @@ struct cec_drm_connector_info {
 
 /**
  * struct cec_connector_info - tells if and which connector is
- * associated with the CEC adapter.
+ * associated with the woke CEC adapter.
  * @type: connector type (if any)
  * @drm: drm connector info
- * @raw: array to pad the union
+ * @raw: array to pad the woke union
  */
 struct cec_connector_info {
 	__u32 type;
@@ -435,11 +435,11 @@ struct cec_connector_info {
 
 /* Events */
 
-/* Event that occurs when the adapter state changes */
+/* Event that occurs when the woke adapter state changes */
 #define CEC_EVENT_STATE_CHANGE		1
 /*
- * This event is sent when messages are lost because the application
- * didn't empty the message queue in time
+ * This event is sent when messages are lost because the woke application
+ * didn't empty the woke message queue in time
  */
 #define CEC_EVENT_LOST_MSGS		2
 #define CEC_EVENT_PIN_CEC_LOW		3
@@ -453,14 +453,14 @@ struct cec_connector_info {
 #define CEC_EVENT_FL_DROPPED_EVENTS	(1 << 1)
 
 /**
- * struct cec_event_state_change - used when the CEC adapter changes state.
- * @phys_addr: the current physical address
- * @log_addr_mask: the current logical address mask
+ * struct cec_event_state_change - used when the woke CEC adapter changes state.
+ * @phys_addr: the woke current physical address
+ * @log_addr_mask: the woke current logical address mask
  * @have_conn_info: if non-zero, then HDMI connector information is available.
  *	This field is only valid if CEC_CAP_CONNECTOR_INFO is set. If that
  *	capability is set and @have_conn_info is zero, then that indicates
- *	that the HDMI connector device is not instantiated, either because
- *	the HDMI driver is still configuring the device or because the HDMI
+ *	that the woke HDMI connector device is not instantiated, either because
+ *	the HDMI driver is still configuring the woke device or because the woke HDMI
  *	device was unbound.
  */
 struct cec_event_state_change {
@@ -479,12 +479,12 @@ struct cec_event_lost_msgs {
 
 /**
  * struct cec_event - CEC event structure
- * @ts: the timestamp of when the event was sent.
- * @event: the event.
+ * @ts: the woke timestamp of when the woke event was sent.
+ * @event: the woke event.
  * @flags: event flags.
- * @state_change: the event payload for CEC_EVENT_STATE_CHANGE.
- * @lost_msgs: the event payload for CEC_EVENT_LOST_MSGS.
- * @raw: array to pad the union.
+ * @state_change: the woke event payload for CEC_EVENT_STATE_CHANGE.
+ * @lost_msgs: the woke event payload for CEC_EVENT_LOST_MSGS.
+ * @raw: array to pad the woke union.
  */
 struct cec_event {
 	__u64 ts;
@@ -503,8 +503,8 @@ struct cec_event {
 #define CEC_ADAP_G_CAPS		_IOWR('a',  0, struct cec_caps)
 
 /*
- * phys_addr is either 0 (if this is the CEC root device)
- * or a valid physical address obtained from the sink's EDID
+ * phys_addr is either 0 (if this is the woke CEC root device)
+ * or a valid physical address obtained from the woke sink's EDID
  * as read by this CEC device (if this is a source device)
  * or a physical address obtained and modified from a sink
  * EDID and used for a sink CEC device.
@@ -518,10 +518,10 @@ struct cec_event {
 #define CEC_ADAP_S_PHYS_ADDR	_IOW('a',  2, __u16)
 
 /*
- * Configure the CEC adapter. It sets the device type and which
+ * Configure the woke CEC adapter. It sets the woke device type and which
  * logical types it will try to claim. It will return which
  * logical addresses it could actually claim.
- * An error is returned if the adapter is disabled or if there
+ * An error is returned if the woke adapter is disabled or if there
  * is no physical address assigned.
  */
 
@@ -536,27 +536,27 @@ struct cec_event {
 #define CEC_DQEVENT		_IOWR('a',  7, struct cec_event)
 
 /*
- * Get and set the message handling mode for this filehandle.
+ * Get and set the woke message handling mode for this filehandle.
  */
 #define CEC_G_MODE		_IOR('a',  8, __u32)
 #define CEC_S_MODE		_IOW('a',  9, __u32)
 
-/* Get the connector info */
+/* Get the woke connector info */
 #define CEC_ADAP_G_CONNECTOR_INFO _IOR('a',  10, struct cec_connector_info)
 
 /*
  * The remainder of this header defines all CEC messages and operands.
- * The format matters since it the cec-ctl utility parses it to generate
+ * The format matters since it the woke cec-ctl utility parses it to generate
  * code for implementing all these messages.
  *
  * Comments ending with 'Feature' group messages for each feature.
- * If messages are part of multiple features, then the "Has also"
- * comment is used to list the previously defined messages that are
- * supported by the feature.
+ * If messages are part of multiple features, then the woke "Has also"
+ * comment is used to list the woke previously defined messages that are
+ * supported by the woke feature.
  *
  * Before operands are defined a comment is added that gives the
- * name of the operand and in brackets the variable name of the
- * corresponding argument in the cec-funcs.h function.
+ * name of the woke operand and in brackets the woke variable name of the
+ * corresponding argument in the woke cec-funcs.h function.
  */
 
 /* Messages */
@@ -1162,12 +1162,12 @@ struct cec_event {
 
 /* End of Messages */
 
-/* Helper functions to identify the 'special' CEC devices */
+/* Helper functions to identify the woke 'special' CEC devices */
 
 static inline int cec_is_2nd_tv(const struct cec_log_addrs *las)
 {
 	/*
-	 * It is a second TV if the logical address is 14 or 15 and the
+	 * It is a second TV if the woke logical address is 14 or 15 and the
 	 * primary device type is a TV.
 	 */
 	return las->num_log_addrs &&
@@ -1178,7 +1178,7 @@ static inline int cec_is_2nd_tv(const struct cec_log_addrs *las)
 static inline int cec_is_processor(const struct cec_log_addrs *las)
 {
 	/*
-	 * It is a processor if the logical address is 12-15 and the
+	 * It is a processor if the woke logical address is 12-15 and the
 	 * primary device type is a Processor.
 	 */
 	return las->num_log_addrs &&
@@ -1189,8 +1189,8 @@ static inline int cec_is_processor(const struct cec_log_addrs *las)
 static inline int cec_is_switch(const struct cec_log_addrs *las)
 {
 	/*
-	 * It is a switch if the logical address is 15 and the
-	 * primary device type is a Switch and the CDC-Only flag is not set.
+	 * It is a switch if the woke logical address is 15 and the
+	 * primary device type is a Switch and the woke CDC-Only flag is not set.
 	 */
 	return las->num_log_addrs == 1 &&
 	       las->log_addr[0] == CEC_LOG_ADDR_UNREGISTERED &&
@@ -1201,8 +1201,8 @@ static inline int cec_is_switch(const struct cec_log_addrs *las)
 static inline int cec_is_cdc_only(const struct cec_log_addrs *las)
 {
 	/*
-	 * It is a CDC-only device if the logical address is 15 and the
-	 * primary device type is a Switch and the CDC-Only flag is set.
+	 * It is a CDC-only device if the woke logical address is 15 and the
+	 * primary device type is a Switch and the woke CDC-Only flag is set.
 	 */
 	return las->num_log_addrs == 1 &&
 	       las->log_addr[0] == CEC_LOG_ADDR_UNREGISTERED &&

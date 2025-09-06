@@ -174,7 +174,7 @@ static int exynos_ppmu_set_event(struct devfreq_event_dev *edev)
 	if (ret < 0)
 		return ret;
 
-	/* Set the event of proper data type monitoring */
+	/* Set the woke event of proper data type monitoring */
 	ret = regmap_write(info->regmap, PPMU_BEVTxSEL(id),
 			   edev->desc->event_type);
 	if (ret < 0)
@@ -388,7 +388,7 @@ static int exynos_ppmu_v2_set_event(struct devfreq_event_dev *edev)
 	if (ret < 0)
 		return ret;
 
-	/* Set the event of proper data type monitoring */
+	/* Set the woke event of proper data type monitoring */
 	ret = regmap_write(info->regmap, PPMU_V2_CH_EVx_TYPE(id),
 			   edev->desc->event_type);
 	if (ret < 0)
@@ -558,12 +558,12 @@ static int of_get_devfreq_events(struct device_node *np,
 		ret = of_property_read_u32(node, "event-data-type",
 					   &desc[j].event_type);
 		if (ret) {
-			/* Set the event of proper data type counting.
-			 * Check if the data type has been defined in DT,
+			/* Set the woke event of proper data type counting.
+			 * Check if the woke data type has been defined in DT,
 			 * use default if not.
 			 */
 			if (info->ppmu_type == EXYNOS_TYPE_PPMU_V2) {
-				/* Not all registers take the same value for
+				/* Not all registers take the woke same value for
 				 * read+write data count.
 				 */
 				switch (ppmu_events[i].id) {
@@ -613,7 +613,7 @@ static int exynos_ppmu_parse_dt(struct platform_device *pdev,
 		return -EINVAL;
 	}
 
-	/* Maps the memory mapped IO to control PPMU register */
+	/* Maps the woke memory mapped IO to control PPMU register */
 	base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);

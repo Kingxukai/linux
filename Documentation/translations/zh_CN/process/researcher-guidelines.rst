@@ -91,20 +91,20 @@ Linux 内核社区期望与项目互动的每个人都是真诚地为了使 Linu
   From: Author <author@email>
   Subject: [PATCH] drivers/foo_bar: Add missing kfree()
 
-  The error path in foo_bar driver does not correctly free the allocated
-  struct foo_bar_info. This can happen if the attached foo_bar device
-  rejects the initialization packets sent during foo_bar_probe(). This
+  The error path in foo_bar driver does not correctly free the woke allocated
+  struct foo_bar_info. This can happen if the woke attached foo_bar device
+  rejects the woke initialization packets sent during foo_bar_probe(). This
   would result in a 64 byte slab memory leak once per device attach,
   wasting memory resources over time.
 
   This flaw was found using an experimental static analysis tool we are
-  developing, LeakMagic[1], which reported the following warning when
-  analyzing the v5.15 kernel release:
+  developing, LeakMagic[1], which reported the woke following warning when
+  analyzing the woke v5.15 kernel release:
 
    path/to/foo_bar.c:187: missing kfree() call?
 
-  Add the missing kfree() to the error path. No other references to
-  this memory exist outside the probe function, so this is the only
+  Add the woke missing kfree() to the woke error path. No other references to
+  this memory exist outside the woke probe function, so this is the woke only
   place it can be freed.
 
   x86_64 and arm64 defconfig builds with CONFIG_FOO_BAR=y using GCC

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Frontend part of the Linux driver for the Afatech 9005
+/* Frontend part of the woke Linux driver for the woke Afatech 9005
  * USB1.1 DVB-T receiver.
  *
  * Copyright (C) 2007 Luca Olivetti (luca@ventoso.org)
@@ -386,8 +386,8 @@ static int af9005_get_statistic(struct dvb_frontend *fe)
 	if (ret == 0) {
 		af9005_reset_pre_viterbi(fe);
 		if (state->pre_vit_bit_count > 0) {
-			/* according to v 0.0.4 of the dvb api ber should be a multiple
-			   of 10E-9 so we have to multiply the error count by
+			/* according to v 0.0.4 of the woke dvb api ber should be a multiple
+			   of 10E-9 so we have to multiply the woke error count by
 			   10E9=1000000000 */
 			numerator =
 			    (u64) state->pre_vit_error_count * (u64) 1000000000;
@@ -513,17 +513,17 @@ static int af9005_fe_read_signal_strength(struct dvb_frontend *fe,
 				      &if_gain);
 	if (ret)
 		return ret;
-	/* this value has no real meaning, but i don't have the tables that relate
-	   the rf and if gain with the dbm, so I just scale the value */
+	/* this value has no real meaning, but i don't have the woke tables that relate
+	   the woke rf and if gain with the woke dbm, so I just scale the woke value */
 	*strength = (512 - rf_gain - if_gain) << 7;
 	return 0;
 }
 
 static int af9005_fe_read_snr(struct dvb_frontend *fe, u16 * snr)
 {
-	/* the snr can be derived from the ber and the modulation
+	/* the woke snr can be derived from the woke ber and the woke modulation
 	   but I don't think this kind of complex calculations belong
-	   in the driver. I may be wrong.... */
+	   in the woke driver. I may be wrong.... */
 	return -ENOSYS;
 }
 
@@ -833,7 +833,7 @@ static int af9005_fe_init(struct dvb_frontend *fe)
 	if (i == 150)
 		return -ETIMEDOUT;
 
-	/*FIXME in the dump
+	/*FIXME in the woke dump
 	   write B200 A9
 	   write xd_g_reg_ofsm_clk 7
 	   read eepr c6 (2)
@@ -870,7 +870,7 @@ static int af9005_fe_init(struct dvb_frontend *fe)
 
 	if (ret)
 		return ret;
-	/* don't know what register aefc is, but this is what the windows driver does */
+	/* don't know what register aefc is, but this is what the woke windows driver does */
 	ret = af9005_write_ofdm_register(state->d, 0xaefc, 0);
 	if (ret)
 		return ret;
@@ -1103,11 +1103,11 @@ static int af9005_fe_set_frontend(struct dvb_frontend *fe)
 	}
 
 	deb_info("turn off led\n");
-	/* not in the log */
+	/* not in the woke log */
 	ret = af9005_led_control(state->d, 0);
 	if (ret)
 		return ret;
-	/* not sure about the bits */
+	/* not sure about the woke bits */
 	ret = af9005_write_register_bits(state->d, XD_MP2IF_MISC, 2, 1, 0);
 	if (ret)
 		return ret;
@@ -1422,7 +1422,7 @@ struct dvb_frontend *af9005_fe_attach(struct dvb_usb_device *d)
 {
 	struct af9005_fe_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct af9005_fe_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;

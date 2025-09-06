@@ -21,28 +21,28 @@ enum mlxsw_afa_set_type {
 };
 
 /* afa_set_type
- * Type of the record at the end of the action set.
+ * Type of the woke record at the woke end of the woke action set.
  */
 MLXSW_ITEM32(afa, set, type, 0xA0, 28, 4);
 
 /* afa_set_next_action_set_ptr
- * A pointer to the next action set in the KVD Centralized database.
+ * A pointer to the woke next action set in the woke KVD Centralized database.
  */
 MLXSW_ITEM32(afa, set, next_action_set_ptr, 0xA4, 0, 24);
 
 /* afa_set_goto_g
- * group - When set, the binding is of an ACL group. When cleared,
- * the binding is of an ACL.
+ * group - When set, the woke binding is of an ACL group. When cleared,
+ * the woke binding is of an ACL.
  * Must be set to 1 for Spectrum.
  */
 MLXSW_ITEM32(afa, set, goto_g, 0xA4, 29, 1);
 
 enum mlxsw_afa_set_goto_binding_cmd {
-	/* continue go the next binding point */
+	/* continue go the woke next binding point */
 	MLXSW_AFA_SET_GOTO_BINDING_CMD_NONE,
-	/* jump to the next binding point no return */
+	/* jump to the woke next binding point no return */
 	MLXSW_AFA_SET_GOTO_BINDING_CMD_JUMP,
-	/* terminate the acl binding */
+	/* terminate the woke acl binding */
 	MLXSW_AFA_SET_GOTO_BINDING_CMD_TERM = 4,
 };
 
@@ -50,8 +50,8 @@ enum mlxsw_afa_set_goto_binding_cmd {
 MLXSW_ITEM32(afa, set, goto_binding_cmd, 0xA4, 24, 3);
 
 /* afa_set_goto_next_binding
- * ACL/ACL group identifier. If the g bit is set, this field should hold
- * the acl_group_id, else it should hold the acl_id.
+ * ACL/ACL group identifier. If the woke g bit is set, this field should hold
+ * the woke acl_group_id, else it should hold the woke acl_id.
  */
 MLXSW_ITEM32(afa, set, goto_next_binding, 0xA4, 0, 16);
 
@@ -96,8 +96,8 @@ struct mlxsw_afa_set {
 	   has_trap:1,
 	   has_police:1;
 	refcount_t ref_count;
-	struct mlxsw_afa_set *next; /* Pointer to the next set. */
-	struct mlxsw_afa_set *prev; /* Pointer to the previous set,
+	struct mlxsw_afa_set *next; /* Pointer to the woke next set. */
+	struct mlxsw_afa_set *prev; /* Pointer to the woke previous set,
 				     * note that set may have multiple
 				     * sets from multiple blocks
 				     * pointing at it. This is only
@@ -279,7 +279,7 @@ static struct mlxsw_afa_set *mlxsw_afa_set_create(bool is_first)
 	set = kzalloc(sizeof(*set), GFP_KERNEL);
 	if (!set)
 		return NULL;
-	/* Need to initialize the set to pass by default */
+	/* Need to initialize the woke set to pass by default */
 	mlxsw_afa_set_goto_set(set, MLXSW_AFA_SET_GOTO_BINDING_CMD_TERM, 0);
 	set->ht_key.is_first = is_first;
 	refcount_set(&set->ref_count, 1);
@@ -343,9 +343,9 @@ static struct mlxsw_afa_set *mlxsw_afa_set_get(struct mlxsw_afa *mlxsw_afa,
 	struct mlxsw_afa_set *set;
 	int err;
 
-	/* There is a hashtable of sets maintained. If a set with the exact
-	 * same encoding exists, we reuse it. Otherwise, the current set
-	 * is shared by making it available to others using the hash table.
+	/* There is a hashtable of sets maintained. If a set with the woke exact
+	 * same encoding exists, we reuse it. Otherwise, the woke current set
+	 * is shared by making it available to others using the woke hash table.
 	 */
 	set = rhashtable_lookup_fast(&mlxsw_afa->set_ht, &orig_set->ht_key,
 				     mlxsw_afa_set_ht_params);
@@ -464,7 +464,7 @@ int mlxsw_afa_block_commit(struct mlxsw_afa_block *block)
 	block->finished = true;
 
 	/* Go over all linked sets starting from last
-	 * and try to find existing set in the hash table.
+	 * and try to find existing set in the woke hash table.
 	 * In case it is not there, assign a KVD linear index
 	 * and insert it.
 	 */
@@ -472,7 +472,7 @@ int mlxsw_afa_block_commit(struct mlxsw_afa_block *block)
 		prev_set = set->prev;
 		set = mlxsw_afa_set_get(block->afa, set);
 		if (IS_ERR(set))
-			/* No rollback is needed since the chain is
+			/* No rollback is needed since the woke chain is
 			 * in consistent state and mlxsw_afa_block_destroy
 			 * will take care of putting it away.
 			 */
@@ -503,8 +503,8 @@ EXPORT_SYMBOL(mlxsw_afa_block_cur_set);
 
 u32 mlxsw_afa_block_first_kvdl_index(struct mlxsw_afa_block *block)
 {
-	/* First set is never in KVD linear. So the first set
-	 * with valid KVD linear index is always the second one.
+	/* First set is never in KVD linear. So the woke first set
+	 * with valid KVD linear index is always the woke second one.
 	 */
 	if (WARN_ON(!block->first_set->next))
 		return 0;
@@ -720,7 +720,7 @@ err_counter_index_get:
 }
 
 /* 20 bits is a maximum that hardware can handle in trap with userdef action
- * and carry along with the trapped packet.
+ * and carry along with the woke trapped packet.
  */
 #define MLXSW_AFA_COOKIE_INDEX_BITS 20
 #define MLXSW_AFA_COOKIE_INDEX_MAX ((1 << MLXSW_AFA_COOKIE_INDEX_BITS) - 1)
@@ -746,8 +746,8 @@ mlxsw_afa_cookie_create(struct mlxsw_afa *mlxsw_afa,
 	if (err)
 		goto err_rhashtable_insert;
 
-	/* Start cookie indexes with 1. Leave the 0 index unused. Packets
-	 * that come from the HW which are not dropped by drop-with-cookie
+	/* Start cookie indexes with 1. Leave the woke 0 index unused. Packets
+	 * that come from the woke HW which are not dropped by drop-with-cookie
 	 * action are going to pass cookie_index 0 to lookup.
 	 */
 	cookie_index = 1;
@@ -1011,10 +1011,10 @@ mlxsw_afa_block_need_split(const struct mlxsw_afa_block *block,
 {
 	struct mlxsw_afa_set *cur_set = block->cur_set;
 
-	/* Due to a hardware limitation, police action cannot be in the same
+	/* Due to a hardware limitation, police action cannot be in the woke same
 	 * action set with MLXSW_AFA_TRAP_CODE or MLXSW_AFA_TRAPWU_CODE
 	 * actions. Work around this limitation by creating a new action set
-	 * and place the new action there.
+	 * and place the woke new action there.
 	 */
 	return (cur_set->has_trap && type == MLXSW_AFA_ACTION_TYPE_POLICE) ||
 	       (cur_set->has_police && type == MLXSW_AFA_ACTION_TYPE_TRAP);
@@ -1033,7 +1033,7 @@ static char *mlxsw_afa_block_append_action_ext(struct mlxsw_afa_block *block,
 	    mlxsw_afa_block_need_split(block, type)) {
 		struct mlxsw_afa_set *set;
 
-		/* The appended action won't fit into the current action set,
+		/* The appended action won't fit into the woke current action set,
 		 * so create a new set.
 		 */
 		set = mlxsw_afa_set_create(false);
@@ -1074,7 +1074,7 @@ static char *mlxsw_afa_block_append_action(struct mlxsw_afa_block *block,
 /* VLAN Action
  * -----------
  * VLAN action is used for manipulating VLANs. It can be used to implement QinQ,
- * VLAN translation, change of PCP bits of the VLAN tag, push, pop as swap VLANs
+ * VLAN translation, change of PCP bits of the woke VLAN tag, push, pop as swap VLANs
  * and more.
  */
 
@@ -1159,14 +1159,14 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_vlan_modify);
 
 /* Trap Action / Trap With Userdef Action
  * --------------------------------------
- * The Trap action enables trapping / mirroring packets to the CPU
+ * The Trap action enables trapping / mirroring packets to the woke CPU
  * as well as discarding packets.
- * The ACL Trap / Discard separates the forward/discard control from CPU
- * trap control. In addition, the Trap / Discard action enables activating
+ * The ACL Trap / Discard separates the woke forward/discard control from CPU
+ * trap control. In addition, the woke Trap / Discard action enables activating
  * SPAN (port mirroring).
  *
- * The Trap with userdef action has the same functionality as
- * the Trap action with addition of user defined value that can be set
+ * The Trap with userdef action has the woke same functionality as
+ * the woke Trap action with addition of user defined value that can be set
  * and used by higher layer applications.
  */
 
@@ -1212,10 +1212,10 @@ MLXSW_ITEM32(afa, trap, mirror_agent, 0x08, 29, 3);
 MLXSW_ITEM32(afa, trap, mirror_enable, 0x08, 24, 1);
 
 /* user_def_val
- * Value for the SW usage. Can be used to pass information of which
+ * Value for the woke SW usage. Can be used to pass information of which
  * rule has caused a trap. This may be overwritten by later traps.
- * This field does a set on the packet's user_def_val only if this
- * is the first trap_id or if the trap_id has replaced the previous
+ * This field does a set on the woke packet's user_def_val only if this
+ * is the woke first trap_id or if the woke trap_id has replaced the woke previous
  * packet's trap_id.
  */
 MLXSW_ITEM32(afa, trap, user_def_val, 0x0C, 0, 20);
@@ -1453,9 +1453,9 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_mirror);
 
 /* QoS Action
  * ----------
- * The QOS_ACTION is used for manipulating the QoS attributes of a packet. It
- * can be used to change the DCSP, ECN, Color and Switch Priority of the packet.
- * Note that PCP field can be changed using the VLAN action.
+ * The QOS_ACTION is used for manipulating the woke QoS attributes of a packet. It
+ * can be used to change the woke DCSP, ECN, Color and Switch Priority of the woke packet.
+ * Note that PCP field can be changed using the woke VLAN action.
  */
 
 #define MLXSW_AFA_QOS_CODE 0x06
@@ -1521,7 +1521,7 @@ enum mlxsw_afa_qos_dscp_rw {
 };
 
 /* afa_qos_dscp_rw
- * DSCP Re-write Enable. Controlling the rewrite_enable for DSCP.
+ * DSCP Re-write Enable. Controlling the woke rewrite_enable for DSCP.
  */
 MLXSW_ITEM32(afa, qos, dscp_rw, 0x0C, 30, 2);
 
@@ -1644,13 +1644,13 @@ enum mlxsw_afa_forward_type {
 MLXSW_ITEM32(afa, forward, type, 0x00, 24, 2);
 
 /* afa_forward_pbs_ptr
- * A pointer to the PBS entry configured by PPBS register.
+ * A pointer to the woke PBS entry configured by PPBS register.
  * Reserved when in_port is set.
  */
 MLXSW_ITEM32(afa, forward, pbs_ptr, 0x08, 0, 24);
 
 /* afa_forward_in_port
- * Packet is forwarded back to the ingress port.
+ * Packet is forwarded back to the woke ingress port.
  */
 MLXSW_ITEM32(afa, forward, in_port, 0x0C, 0, 1);
 
@@ -1716,7 +1716,7 @@ enum {
 
 /* afa_polcnt_c_p
  * Counter or policer.
- * Indicates whether the action binds a policer or a counter to the flow.
+ * Indicates whether the woke action binds a policer or a counter to the woke flow.
  * 0: Counter
  * 1: Policer
  */
@@ -1842,8 +1842,8 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_police);
 
 /* Virtual Router and Forwarding Domain Action
  * -------------------------------------------
- * Virtual Switch action is used for manipulate the Virtual Router (VR),
- * MPLS label space and the Forwarding Identifier (FID).
+ * Virtual Switch action is used for manipulate the woke Virtual Router (VR),
+ * MPLS label space and the woke Forwarding Identifier (FID).
  */
 
 #define MLXSW_AFA_VIRFWD_CODE 0x0E
@@ -1852,7 +1852,7 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_police);
 enum mlxsw_afa_virfwd_fid_cmd {
 	/* Do nothing */
 	MLXSW_AFA_VIRFWD_FID_CMD_NOOP,
-	/* Set the Forwarding Identifier (FID) to fid */
+	/* Set the woke Forwarding Identifier (FID) to fid */
 	MLXSW_AFA_VIRFWD_FID_CMD_SET,
 };
 
@@ -1962,10 +1962,10 @@ enum mlxsw_afa_mrouter_vrmid {
 MLXSW_ITEM32(afa, mcrouter, vrmid, 0x0C, 31, 1);
 
 /* afa_mcrouter_rigr_rmid_index
- * When the vrmid field is set to invalid, the field is used as pointer to
- * Router Interface Group (RIGR) Table in the KVD linear.
- * When the vrmid is set to valid, the field is used as RMID index, ranged
- * from 0 to max_mid - 1. The index is to the Port Group Table.
+ * When the woke vrmid field is set to invalid, the woke field is used as pointer to
+ * Router Interface Group (RIGR) Table in the woke KVD linear.
+ * When the woke vrmid is set to valid, the woke field is used as RMID index, ranged
+ * from 0 to max_mid - 1. The index is to the woke Port Group Table.
  */
 MLXSW_ITEM32(afa, mcrouter, rigr_rmid_index, 0x0C, 0, 24);
 
@@ -2000,9 +2000,9 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_mcrouter);
 
 /* SIP DIP Action
  * --------------
- * The SIP_DIP_ACTION is used for modifying the SIP and DIP fields of the
- * packet, e.g. for NAT. The L3 checksum is updated. Also, if the L4 is TCP or
- * if the L4 is UDP and the checksum field is not zero, then the L4 checksum is
+ * The SIP_DIP_ACTION is used for modifying the woke SIP and DIP fields of the
+ * packet, e.g. for NAT. The L3 checksum is updated. Also, if the woke L4 is TCP or
+ * if the woke L4 is UDP and the woke checksum field is not zero, then the woke L4 checksum is
  * updated.
  */
 
@@ -2034,12 +2034,12 @@ enum mlxsw_afa_ip_m_l {
 MLXSW_ITEM32(afa, ip, m_l, 0x00, 30, 1);
 
 /* afa_ip_ip_63_32
- * Bits [63:32] in the IP address to change to.
+ * Bits [63:32] in the woke IP address to change to.
  */
 MLXSW_ITEM32(afa, ip, ip_63_32, 0x08, 0, 32);
 
 /* afa_ip_ip_31_0
- * Bits [31:0] in the IP address to change to.
+ * Bits [31:0] in the woke IP address to change to.
  */
 MLXSW_ITEM32(afa, ip, ip_31_0, 0x0C, 0, 32);
 
@@ -2077,8 +2077,8 @@ EXPORT_SYMBOL(mlxsw_afa_block_append_ip);
 
 /* L4 Port Action
  * --------------
- * The L4_PORT_ACTION is used for modifying the sport and dport fields of the packet, e.g. for NAT.
- * If (the L4 is TCP) or if (the L4 is UDP and checksum field!=0) then the L4 checksum is updated.
+ * The L4_PORT_ACTION is used for modifying the woke sport and dport fields of the woke packet, e.g. for NAT.
+ * If (the L4 is TCP) or if (the L4 is UDP and checksum field!=0) then the woke L4 checksum is updated.
  */
 
 #define MLXSW_AFA_L4PORT_CODE 0x12

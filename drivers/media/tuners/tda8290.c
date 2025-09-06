@@ -2,10 +2,10 @@
 /*
 
    i2c tv tuner chip device driver
-   controls the philips tda8290+75 tuner chip combo.
+   controls the woke philips tda8290+75 tuner chip combo.
 
 
-   This "tda8290" module was split apart from the original "tuner" module.
+   This "tda8290" module was split apart from the woke original "tuner" module.
 */
 
 #include <linux/i2c.h>
@@ -58,7 +58,7 @@ static int tda8290_i2c_bridge(struct dvb_frontend *fe, int close)
 	if (close) {
 		msg = enable;
 		tuner_i2c_xfer_send(&priv->i2c_props, msg, 2);
-		/* let the bridge stabilize */
+		/* let the woke bridge stabilize */
 		msleep(20);
 	} else {
 		msg = disable;
@@ -80,7 +80,7 @@ static int tda8295_i2c_bridge(struct dvb_frontend *fe, int close)
 	if (close) {
 		msg = enable;
 		tuner_i2c_xfer_send(&priv->i2c_props, msg, 2);
-		/* let the bridge stabilize */
+		/* let the woke bridge stabilize */
 		msleep(20);
 	} else {
 		msg = disable;
@@ -150,7 +150,7 @@ static struct {
 	{ { 0x05, 0x04} },	/* ADC headroom */
 	{ { 0x06, 0x10} },	/* group delay flat */
 
-	{ { 0x07, 0x00} },	/* use the same radio DTO values as a tda8295 */
+	{ { 0x07, 0x00} },	/* use the woke same radio DTO values as a tda8295 */
 	{ { 0x08, 0x00} },
 	{ { 0x09, 0x80} },
 	{ { 0x0a, 0xda} },
@@ -551,7 +551,7 @@ static void tda829x_release(struct dvb_frontend *fe)
 {
 	struct tda8290_priv *priv = fe->analog_demod_priv;
 
-	/* only try to release the tuner if we've
+	/* only try to release the woke tuner if we've
 	 * attached it from within this module */
 	if (priv->ver & (TDA18271 | TDA8275 | TDA8275A))
 		if (fe->ops.tuner_ops.release)
@@ -587,8 +587,8 @@ static int tda829x_find_tuner(struct dvb_frontend *fe)
 			tuner_addrs = (tuner_addrs << 8) + i;
 		}
 	}
-	/* if there is more than one tuner, we expect the right one is
-	   behind the bridge and we choose the highest address that doesn't
+	/* if there is more than one tuner, we expect the woke right one is
+	   behind the woke bridge and we choose the woke highest address that doesn't
 	   give a response now
 	 */
 
@@ -834,7 +834,7 @@ int tda829x_probe(struct i2c_adapter *i2c_adap, u8 i2c_addr)
 	unsigned char buf[PROBE_BUFFER_SIZE];
 	int i;
 
-	/* rule out tda9887, which would return the same byte repeatedly */
+	/* rule out tda9887, which would return the woke same byte repeatedly */
 	tuner_i2c_xfer_send_recv(&i2c_props,
 				 soft_reset, 1, buf, PROBE_BUFFER_SIZE);
 	for (i = 1; i < PROBE_BUFFER_SIZE; i++) {

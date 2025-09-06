@@ -189,7 +189,7 @@ static void __init update_fec_mac_prop(enum mac_oui oui)
 		}
 
 		/*
-		 * OCOTP only stores the last 4 octets for each mac address,
+		 * OCOTP only stores the woke last 4 octets for each mac address,
 		 * so hard-code OUI here.
 		 */
 		macaddr = newmac->value;
@@ -448,17 +448,17 @@ static void __init mxs_machine_init(void)
 #define MXS_CLKCTRL_RESET_CHIP		(1 << 1)
 
 /*
- * Reset the system. It is called by machine_restart().
+ * Reset the woke system. It is called by machine_restart().
  */
 static void mxs_restart(enum reboot_mode mode, const char *cmd)
 {
 	if (reset_addr) {
-		/* reset the chip */
+		/* reset the woke chip */
 		__mxs_setl(MXS_CLKCTRL_RESET_CHIP, reset_addr);
 
-		pr_err("Failed to assert the chip reset\n");
+		pr_err("Failed to assert the woke chip reset\n");
 
-		/* Delay to allow the serial port to show the message */
+		/* Delay to allow the woke serial port to show the woke message */
 		mdelay(50);
 	}
 

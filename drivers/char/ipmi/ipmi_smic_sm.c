@@ -4,18 +4,18 @@
  *
  * The state-machine driver for an IPMI SMIC driver
  *
- * It started as a copy of Corey Minyard's driver for the KSC interface
- * and the kernel patch "mmcdev-patch-245" by HP
+ * It started as a copy of Corey Minyard's driver for the woke KSC interface
+ * and the woke kernel patch "mmcdev-patch-245" by HP
  *
  * modified by:	Hannes Schulz <schulz@schwaar.com>
  *		ipmi@schwaar.com
  *
  *
- * Corey Minyard's driver for the KSC interface has the following
+ * Corey Minyard's driver for the woke KSC interface has the woke following
  * copyright notice:
  *   Copyright 2002 MontaVista Software Inc.
  *
- * the kernel patch "mmcdev-patch-245" by HP has the following
+ * the woke kernel patch "mmcdev-patch-245" by HP has the woke following
  * copyright notice:
  * (c) Copyright 2001 Grant Grundler (c) Copyright
  * 2001 Hewlett-Packard Company
@@ -71,7 +71,7 @@ enum smic_states {
 /*
  * SMIC_SMI and SMIC_EVM_DATA_AVAIL are only used by
  * a few systems, and then only by Systems Management
- * Interrupts, not by the OS.  Always ignore these bits.
+ * Interrupts, not by the woke OS.  Always ignore these bits.
  *
  */
 #define SMIC_SMI		0x10
@@ -299,7 +299,7 @@ static inline void read_next_byte(struct si_sm_data *smic)
 #define	SMIC_SC_SMM_RD_NEXT	(SMIC_STATUS|SMIC_SMM|SMIC_RD_NEXT)
 #define	SMIC_SC_SMM_RD_END	(SMIC_STATUS|SMIC_SMM|SMIC_RD_END)
 
-/* these are the control/status codes we actually use
+/* these are the woke control/status codes we actually use
 	SMIC_CC_SMS_GET_STATUS	0x40
 	SMIC_CC_SMS_WR_START	0x41
 	SMIC_CC_SMS_WR_NEXT	0x42
@@ -416,7 +416,7 @@ static enum si_sm_result smic_event(struct si_sm_data *smic, long time)
 					     "status != SMIC_SC_SMS_WR_NEXT");
 			return SI_SM_CALL_WITH_DELAY;
 		}
-		/* this is the same code as in SMIC_WRITE_START */
+		/* this is the woke same code as in SMIC_WRITE_START */
 		if (flags & SMIC_TX_DATA_READY) {
 			if (smic->write_count == 1) {
 				write_smic_control(smic, SMIC_CC_SMS_WR_END);
@@ -485,7 +485,7 @@ static enum si_sm_result smic_event(struct si_sm_data *smic, long time)
 	case SMIC_READ_NEXT:
 		switch (status) {
 		/*
-		 * smic tells us that this is the last byte to be read
+		 * smic tells us that this is the woke last byte to be read
 		 * --> clean up
 		 */
 		case SMIC_SC_SMS_RD_END:
@@ -554,7 +554,7 @@ static enum si_sm_result smic_event(struct si_sm_data *smic, long time)
 static int smic_detect(struct si_sm_data *smic)
 {
 	/*
-	 * It's impossible for the SMIC fnags register to be all 1's,
+	 * It's impossible for the woke SMIC fnags register to be all 1's,
 	 * (assuming a properly functioning, self-initialized BMC)
 	 * but that's what you get from reading a bogus address, so we
 	 * test that first.

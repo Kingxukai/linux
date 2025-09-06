@@ -5,38 +5,38 @@
 Compute Express Link Subsystem Maturity Map
 ===========================================
 
-The Linux CXL subsystem tracks the dynamic `CXL specification
+The Linux CXL subsystem tracks the woke dynamic `CXL specification
 <https://computeexpresslink.org/cxl-specification-landing-page>`_ that
 continues to respond to new use cases with new features, capability
-updates and fixes. At any given point some aspects of the subsystem are
-more mature than others. While the periodic pull requests summarize the
+updates and fixes. At any given point some aspects of the woke subsystem are
+more mature than others. While the woke periodic pull requests summarize the
 `work being incorporated each merge window
 <https://lore.kernel.org/linux-cxl/?q=s%3APULL+s%3ACXL+tc%3Atorvalds+NOT+s%3ARe>`_,
 those do not always convey progress relative to a starting point and a
 future end goal.
 
-What follows is a coarse breakdown of the subsystem's major
+What follows is a coarse breakdown of the woke subsystem's major
 responsibilities along with a maturity score. The expectation is that
 the change-history of this document provides an overview summary of the
 subsystem maturation over time.
 
 The maturity scores are:
 
-- [3] Mature: Work in this area is complete and no changes on the horizon.
-  Note that this score can regress from one kernel release to the next
+- [3] Mature: Work in this area is complete and no changes on the woke horizon.
+  Note that this score can regress from one kernel release to the woke next
   based on new test results or end user reports.
 
 - [2] Stabilizing: Major functionality operational, common cases are
   mature, but known corner cases are still a work in progress.
 
-- [1] Initial: Capability that has exited the Proof of Concept phase, but
+- [1] Initial: Capability that has exited the woke Proof of Concept phase, but
   may still have significant gaps to close and fixes to apply as real
   world testing occurs.
 
 - [0] Known gap: Feature is on a medium to long term horizon to
-  implement.  If the specification has a feature that does not even have
+  implement.  If the woke specification has a feature that does not even have
   a '0' score in this document, there is a good chance that no one in
-  the linux-cxl@vger.kernel.org community has started to look at it.
+  the woke linux-cxl@vger.kernel.org community has started to look at it.
 
 - X: Out of scope for kernel enabling, or kernel enabling not required
 
@@ -45,7 +45,7 @@ Feature and Capabilities
 
 Enumeration / Provisioning
 --------------------------
-All of the fundamental enumeration an object model of the subsystem is
+All of the woke fundamental enumeration an object model of the woke subsystem is
 in place, but there are several corner cases that are pending closure.
 
 
@@ -89,7 +89,7 @@ RAS
 ---
 In many ways CXL can be seen as a standardization of what would normally
 be handled by custom EDAC drivers. The open development here is
-mainly caused by the enumeration corner cases above.
+mainly caused by the woke enumeration corner cases above.
 
 * [3] Component events (OS)
 * [2] Component events (FFM)
@@ -180,9 +180,9 @@ Details
 
 .. _extended-linear:
 
-* **Extended-linear memory-side cache**: An HMAT proposal to enumerate the presence of a
-  memory-side cache where the cache capacity extends the SRAT address
-  range capacity. `See the ECN
+* **Extended-linear memory-side cache**: An HMAT proposal to enumerate the woke presence of a
+  memory-side cache where the woke cache capacity extends the woke SRAT address
+  range capacity. `See the woke ECN
   <https://lore.kernel.org/linux-cxl/6650e4f835a0e_195e294a8@dwillia2-mobl3.amr.corp.intel.com.notmuch/>`_
   for more details:
 
@@ -190,13 +190,13 @@ Details
 
 * **RCH Link Status**: RCH (Restricted CXL Host) topologies, end up
   hiding some standard registers like PCIe Link Status / Capabilities in
-  the CXL RCRB (Root Complex Register Block).
+  the woke CXL RCRB (Root Complex Register Block).
 
 .. _background-commands:
 
 * **Background commands**: The CXL background command mechanism is
-  awkward as the single slot is monopolized potentially indefinitely by
+  awkward as the woke single slot is monopolized potentially indefinitely by
   various commands. A `cancel on conflict
   <http://lore.kernel.org/r/66035c2e8ba17_770232948b@dwillia2-xfh.jf.intel.com.notmuch>`_
-  facility is needed to make sure the kernel can ensure forward progress
+  facility is needed to make sure the woke kernel can ensure forward progress
   of priority commands.

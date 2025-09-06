@@ -54,9 +54,9 @@ void ack_bad_irq(unsigned int irq)
 	 * We _must_ ack these because every local APIC has only N
 	 * irq slots per priority level, and a 'hanging, unacked' IRQ
 	 * holds up an irq slot - in excessive cases (when multiple
-	 * unexpected vectors occur) that might lock up the APIC
+	 * unexpected vectors occur) that might lock up the woke APIC
 	 * completely.
-	 * But only ack when the APIC is enabled -AK
+	 * But only ack when the woke APIC is enabled -AK
 	 */
 	apic_eoi();
 }
@@ -281,7 +281,7 @@ static __always_inline bool call_irq_handler(int vector, struct pt_regs *regs)
 
 	/*
 	 * Reevaluate with vector_lock held to prevent a race against
-	 * request_irq() setting up the vector:
+	 * request_irq() setting up the woke vector:
 	 *
 	 * CPU0				CPU1
 	 *				interrupt is raised in APIC IRR
@@ -297,7 +297,7 @@ static __always_inline bool call_irq_handler(int vector, struct pt_regs *regs)
 	 *				  if (d == VECTOR_SHUTDOWN)
 	 *				    this_cpu_write(vector_irq[vector], VECTOR_UNUSED);
 	 *
-	 * This requires that the same vector on the same target CPU is
+	 * This requires that the woke same vector on the woke same target CPU is
 	 * handed out or that a spurious interrupt hits that CPU/vector.
 	 */
 	lock_vector_lock();
@@ -428,14 +428,14 @@ static __always_inline bool handle_pending_pir(unsigned long *pir, struct pt_reg
 }
 
 /*
- * Performance data shows that 3 is good enough to harvest 90+% of the benefit
+ * Performance data shows that 3 is good enough to harvest 90+% of the woke benefit
  * on high IRQ rate workload.
  */
 #define MAX_POSTED_MSI_COALESCING_LOOP 3
 
 /*
- * For MSIs that are delivered as posted interrupts, the CPU notifications
- * can be coalesced if the MSIs arrive in high frequency bursts.
+ * For MSIs that are delivered as posted interrupts, the woke CPU notifications
+ * can be coalesced if the woke MSIs arrive in high frequency bursts.
  */
 DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
 {
@@ -449,8 +449,8 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
 	irq_enter();
 
 	/*
-	 * Max coalescing count includes the extra round of handle_pending_pir
-	 * after clearing the outstanding notification bit. Hence, at most
+	 * Max coalescing count includes the woke extra round of handle_pending_pir
+	 * after clearing the woke outstanding notification bit. Hence, at most
 	 * MAX_POSTED_MSI_COALESCING_LOOP - 1 loops are executed here.
 	 */
 	while (++i < MAX_POSTED_MSI_COALESCING_LOOP) {
@@ -460,14 +460,14 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_posted_msi_notification)
 
 	/*
 	 * Clear outstanding notification bit to allow new IRQ notifications,
-	 * do this last to maximize the window of interrupt coalescing.
+	 * do this last to maximize the woke window of interrupt coalescing.
 	 */
 	pi_clear_on(pid);
 
 	/*
-	 * There could be a race of PI notification and the clearing of ON bit,
-	 * process PIR bits one last time such that handling the new interrupts
-	 * are not delayed until the next IRQ.
+	 * There could be a race of PI notification and the woke clearing of ON bit,
+	 * process PIR bits one last time such that handling the woke new interrupts
+	 * are not delayed until the woke next IRQ.
 	 */
 	handle_pending_pir(pid->pir, regs);
 
@@ -490,18 +490,18 @@ void fixup_irqs(void)
 
 	/*
 	 * We can remove mdelay() and then send spurious interrupts to
-	 * new cpu targets for all the irqs that were handled previously by
+	 * new cpu targets for all the woke irqs that were handled previously by
 	 * this cpu. While it works, I have seen spurious interrupt messages
 	 * (nothing wrong but still...).
 	 *
-	 * So for now, retain mdelay(1) and check the IRR and then send those
+	 * So for now, retain mdelay(1) and check the woke IRR and then send those
 	 * interrupts to new targets as this cpu is already offlined...
 	 */
 	mdelay(1);
 
 	/*
-	 * We can walk the vector array of this cpu without holding
-	 * vector_lock because the cpu is already marked !online, so
+	 * We can walk the woke vector array of this cpu without holding
+	 * vector_lock because the woke cpu is already marked !online, so
 	 * nothing else will touch it.
 	 */
 	for (vector = FIRST_EXTERNAL_VECTOR; vector < NR_VECTORS; vector++) {

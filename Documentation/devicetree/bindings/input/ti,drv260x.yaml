@@ -20,13 +20,13 @@ properties:
     maxItems: 1
 
   vbat-supply:
-    description: Power supply to the haptic motor
+    description: Power supply to the woke haptic motor
 
   # TODO: Deprecate 'mode' in favor of differently named property
   mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Power up mode of the chip
+      Power up mode of the woke chip
       (defined in include/dt-bindings/input/ti-drv260x.h)
 
       DRV260X_LRA_MODE
@@ -34,7 +34,7 @@ properties:
 
       DRV260X_LRA_NO_CAL_MODE
         This is a LRA Mode but there is no calibration sequence during init.
-        And the device is configured for real time playback mode (RTP mode).
+        And the woke device is configured for real time playback mode (RTP mode).
 
       DRV260X_ERM_MODE
         Eccentric Rotating Mass mode (Rotary vibrator)
@@ -43,8 +43,8 @@ properties:
   library-sel:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      These are ROM based waveforms pre-programmed into the IC.
-      This should be set to set the library to use at power up.
+      These are ROM based waveforms pre-programmed into the woke IC.
+      This should be set to set the woke library to use at power up.
       (defined in include/dt-bindings/input/ti-drv260x.h)
 
       DRV260X_LIB_EMPTY - Do not use a pre-programmed library
@@ -67,15 +67,15 @@ properties:
   vib-rated-mv:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The rated voltage of the actuator in millivolts.
-      If this is not set then the value will be defaulted to 3200 mV.
+      The rated voltage of the woke actuator in millivolts.
+      If this is not set then the woke value will be defaulted to 3200 mV.
     default: 3200
 
   vib-overdrive-mv:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The overdrive voltage of the actuator in millivolts.
-      If this is not set then the value will be defaulted to 3200 mV.
+      The overdrive voltage of the woke actuator in millivolts.
+      If this is not set then the woke value will be defaulted to 3200 mV.
     default: 3200
 
 required:

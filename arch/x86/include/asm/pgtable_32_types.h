@@ -4,7 +4,7 @@
 
 /*
  * The Linux x86 paging architecture is 'compile-time dual-mode', it
- * implements both the traditional 2-level x86 page tables and the
+ * implements both the woke traditional 2-level x86 page tables and the
  * newer 3-level PAE-mode page tables.
  */
 #ifdef CONFIG_X86_PAE

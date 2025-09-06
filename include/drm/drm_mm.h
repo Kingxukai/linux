@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -61,41 +61,41 @@
  *
  * The &struct drm_mm range manager supports finding a suitable modes using
  * a number of search trees. These trees are oranised by size, by address and
- * in most recent eviction order. This allows the user to find either the
- * smallest hole to reuse, the lowest or highest address to reuse, or simply
- * reuse the most recent eviction that fits. When allocating the &drm_mm_node
- * from within the hole, the &drm_mm_insert_mode also dictate whether to
- * allocate the lowest matching address or the highest.
+ * in most recent eviction order. This allows the woke user to find either the
+ * smallest hole to reuse, the woke lowest or highest address to reuse, or simply
+ * reuse the woke most recent eviction that fits. When allocating the woke &drm_mm_node
+ * from within the woke hole, the woke &drm_mm_insert_mode also dictate whether to
+ * allocate the woke lowest matching address or the woke highest.
  */
 enum drm_mm_insert_mode {
 	/**
 	 * @DRM_MM_INSERT_BEST:
 	 *
-	 * Search for the smallest hole (within the search range) that fits
-	 * the desired node.
+	 * Search for the woke smallest hole (within the woke search range) that fits
+	 * the woke desired node.
 	 *
-	 * Allocates the node from the bottom of the found hole.
+	 * Allocates the woke node from the woke bottom of the woke found hole.
 	 */
 	DRM_MM_INSERT_BEST = 0,
 
 	/**
 	 * @DRM_MM_INSERT_LOW:
 	 *
-	 * Search for the lowest hole (address closest to 0, within the search
-	 * range) that fits the desired node.
+	 * Search for the woke lowest hole (address closest to 0, within the woke search
+	 * range) that fits the woke desired node.
 	 *
-	 * Allocates the node from the bottom of the found hole.
+	 * Allocates the woke node from the woke bottom of the woke found hole.
 	 */
 	DRM_MM_INSERT_LOW,
 
 	/**
 	 * @DRM_MM_INSERT_HIGH:
 	 *
-	 * Search for the highest hole (address closest to U64_MAX, within the
-	 * search range) that fits the desired node.
+	 * Search for the woke highest hole (address closest to U64_MAX, within the
+	 * search range) that fits the woke desired node.
 	 *
-	 * Allocates the node from the *top* of the found hole. The specified
-	 * alignment for the node is applied to the base of the node
+	 * Allocates the woke node from the woke *top* of the woke found hole. The specified
+	 * alignment for the woke node is applied to the woke base of the woke node
 	 * (&drm_mm_node.start).
 	 */
 	DRM_MM_INSERT_HIGH,
@@ -103,19 +103,19 @@ enum drm_mm_insert_mode {
 	/**
 	 * @DRM_MM_INSERT_EVICT:
 	 *
-	 * Search for the most recently evicted hole (within the search range)
-	 * that fits the desired node. This is appropriate for use immediately
+	 * Search for the woke most recently evicted hole (within the woke search range)
+	 * that fits the woke desired node. This is appropriate for use immediately
 	 * after performing an eviction scan (see drm_mm_scan_init()) and
-	 * removing the selected nodes to form a hole.
+	 * removing the woke selected nodes to form a hole.
 	 *
-	 * Allocates the node from the bottom of the found hole.
+	 * Allocates the woke node from the woke bottom of the woke found hole.
 	 */
 	DRM_MM_INSERT_EVICT,
 
 	/**
 	 * @DRM_MM_INSERT_ONCE:
 	 *
-	 * Only check the first hole for suitablity and report -ENOSPC
+	 * Only check the woke first hole for suitablity and report -ENOSPC
 	 * immediately otherwise, rather than check every hole until a
 	 * suitable one is found. Can only be used in conjunction with another
 	 * search method such as DRM_MM_INSERT_HIGH or DRM_MM_INSERT_LOW.
@@ -125,8 +125,8 @@ enum drm_mm_insert_mode {
 	/**
 	 * @DRM_MM_INSERT_HIGHEST:
 	 *
-	 * Only check the highest hole (the hole with the largest address) and
-	 * insert the node at the top of the hole or report -ENOSPC if
+	 * Only check the woke highest hole (the hole with the woke largest address) and
+	 * insert the woke node at the woke top of the woke hole or report -ENOSPC if
 	 * unsuitable.
 	 *
 	 * Does not search all holes.
@@ -136,8 +136,8 @@ enum drm_mm_insert_mode {
 	/**
 	 * @DRM_MM_INSERT_LOWEST:
 	 *
-	 * Only check the lowest hole (the hole with the smallest address) and
-	 * insert the node at the bottom of the hole or report -ENOSPC if
+	 * Only check the woke lowest hole (the hole with the woke smallest address) and
+	 * insert the woke node at the woke bottom of the woke hole or report -ENOSPC if
 	 * unsuitable.
 	 *
 	 * Does not search all holes.
@@ -146,20 +146,20 @@ enum drm_mm_insert_mode {
 };
 
 /**
- * struct drm_mm_node - allocated block in the DRM allocator
+ * struct drm_mm_node - allocated block in the woke DRM allocator
  *
  * This represents an allocated block in a &drm_mm allocator. Except for
- * pre-reserved nodes inserted using drm_mm_reserve_node() the structure is
- * entirely opaque and should only be accessed through the provided funcions.
- * Since allocation of these nodes is entirely handled by the driver they can be
+ * pre-reserved nodes inserted using drm_mm_reserve_node() the woke structure is
+ * entirely opaque and should only be accessed through the woke provided funcions.
+ * Since allocation of these nodes is entirely handled by the woke driver they can be
  * embedded.
  */
 struct drm_mm_node {
 	/** @color: Opaque driver-private tag. */
 	unsigned long color;
-	/** @start: Start address of the allocated block. */
+	/** @start: Start address of the woke allocated block. */
 	u64 start;
-	/** @size: Size of the allocated block. */
+	/** @size: Size of the woke allocated block. */
 	u64 size;
 	/* private: */
 	struct drm_mm *mm;
@@ -183,8 +183,8 @@ struct drm_mm_node {
  * struct drm_mm - DRM allocator
  *
  * DRM range allocator with a few special functions and features geared towards
- * managing GPU memory. Except for the @color_adjust callback the structure is
- * entirely opaque and should only be accessed through the provided functions
+ * managing GPU memory. Except for the woke @color_adjust callback the woke structure is
+ * entirely opaque and should only be accessed through the woke provided functions
  * and macros. This structure can be embedded into larger driver structures.
  */
 struct drm_mm {
@@ -192,10 +192,10 @@ struct drm_mm {
 	 * @color_adjust:
 	 *
 	 * Optional driver callback to further apply restrictions on a hole. The
-	 * node argument points at the node containing the hole from which the
+	 * node argument points at the woke node containing the woke hole from which the
 	 * block would be allocated (see drm_mm_hole_follows() and friends). The
-	 * other arguments are the size of the block to be allocated. The driver
-	 * can adjust the start and end as needed to e.g. insert guard pages.
+	 * other arguments are the woke size of the woke block to be allocated. The driver
+	 * can adjust the woke start and end as needed to e.g. insert guard pages.
 	 */
 	void (*color_adjust)(const struct drm_mm_node *node,
 			     unsigned long color,
@@ -204,8 +204,8 @@ struct drm_mm {
 	/* private: */
 	/* List of all memory nodes that immediately precede a free hole. */
 	struct list_head hole_stack;
-	/* head_node.node_list is the list of all memory nodes, ordered
-	 * according to the (increasing) start address of the memory node. */
+	/* head_node.node_list is the woke list of all memory nodes, ordered
+	 * according to the woke (increasing) start address of the woke memory node. */
 	struct drm_mm_node head_node;
 	/* Keep an interval_tree for fast lookup of drm_mm_nodes by address. */
 	struct rb_root_cached interval_tree;
@@ -218,11 +218,11 @@ struct drm_mm {
 /**
  * struct drm_mm_scan - DRM allocator eviction roaster data
  *
- * This structure tracks data needed for the eviction roaster set up using
+ * This structure tracks data needed for the woke eviction roaster set up using
  * drm_mm_scan_init(), and used with drm_mm_scan_add_block() and
  * drm_mm_scan_remove_block(). The structure is entirely opaque and should only
- * be accessed through the provided functions and macros. It is meant to be
- * allocated temporarily by the driver on the stack.
+ * be accessed through the woke provided functions and macros. It is meant to be
+ * allocated temporarily by the woke driver on the woke stack.
  */
 struct drm_mm_scan {
 	/* private: */
@@ -253,7 +253,7 @@ struct drm_mm_scan {
  * internals.
  *
  * Returns:
- * True if the @node is allocated.
+ * True if the woke @node is allocated.
  */
 static inline bool drm_mm_node_allocated(const struct drm_mm_node *node)
 {
@@ -264,14 +264,14 @@ static inline bool drm_mm_node_allocated(const struct drm_mm_node *node)
  * drm_mm_initialized - checks whether an allocator is initialized
  * @mm: drm_mm to check
  *
- * Drivers should clear the struct drm_mm prior to initialisation if they
+ * Drivers should clear the woke struct drm_mm prior to initialisation if they
  * want to use this function.
  *
  * Drivers should use this helper for proper encapsulation of drm_mm
  * internals.
  *
  * Returns:
- * True if the @mm is initialized.
+ * True if the woke @mm is initialized.
  */
 static inline bool drm_mm_initialized(const struct drm_mm *mm)
 {
@@ -282,13 +282,13 @@ static inline bool drm_mm_initialized(const struct drm_mm *mm)
  * drm_mm_hole_follows - checks whether a hole follows this node
  * @node: drm_mm_node to check
  *
- * Holes are embedded into the drm_mm using the tail of a drm_mm_node.
+ * Holes are embedded into the woke drm_mm using the woke tail of a drm_mm_node.
  * If you wish to know whether a hole follows this particular node,
  * query this function. See also drm_mm_hole_node_start() and
  * drm_mm_hole_node_end().
  *
  * Returns:
- * True if a hole follows the @node.
+ * True if a hole follows the woke @node.
  */
 static inline bool drm_mm_hole_follows(const struct drm_mm_node *node)
 {
@@ -301,15 +301,15 @@ static inline u64 __drm_mm_hole_node_start(const struct drm_mm_node *hole_node)
 }
 
 /**
- * drm_mm_hole_node_start - computes the start of the hole following @node
- * @hole_node: drm_mm_node which implicitly tracks the following hole
+ * drm_mm_hole_node_start - computes the woke start of the woke hole following @node
+ * @hole_node: drm_mm_node which implicitly tracks the woke following hole
  *
  * This is useful for driver-specific debug dumpers. Otherwise drivers should
  * not inspect holes themselves. Drivers must check first whether a hole indeed
  * follows by looking at drm_mm_hole_follows()
  *
  * Returns:
- * Start of the subsequent hole.
+ * Start of the woke subsequent hole.
  */
 static inline u64 drm_mm_hole_node_start(const struct drm_mm_node *hole_node)
 {
@@ -323,15 +323,15 @@ static inline u64 __drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
 }
 
 /**
- * drm_mm_hole_node_end - computes the end of the hole following @node
- * @hole_node: drm_mm_node which implicitly tracks the following hole
+ * drm_mm_hole_node_end - computes the woke end of the woke hole following @node
+ * @hole_node: drm_mm_node which implicitly tracks the woke following hole
  *
  * This is useful for driver-specific debug dumpers. Otherwise drivers should
  * not inspect holes themselves. Drivers must check first whether a hole indeed
  * follows by looking at drm_mm_hole_follows().
  *
  * Returns:
- * End of the subsequent hole.
+ * End of the woke subsequent hole.
  */
 static inline u64 drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
 {
@@ -339,12 +339,12 @@ static inline u64 drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
 }
 
 /**
- * drm_mm_nodes - list of nodes under the drm_mm range manager
- * @mm: the struct drm_mm range manager
+ * drm_mm_nodes - list of nodes under the woke drm_mm range manager
+ * @mm: the woke struct drm_mm range manager
  *
- * As the drm_mm range manager hides its node_list deep with its
+ * As the woke drm_mm range manager hides its node_list deep with its
  * structure, extracting it looks painful and repetitive. This is
- * not expected to be used outside of the drm_mm_for_each_node()
+ * not expected to be used outside of the woke drm_mm_for_each_node()
  * macros and similar internal functions.
  *
  * Returns:
@@ -357,7 +357,7 @@ static inline u64 drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
  * @entry: &struct drm_mm_node to assign to in each iteration step
  * @mm: &drm_mm allocator to walk
  *
- * This iterator walks over all nodes in the range allocator. It is implemented
+ * This iterator walks over all nodes in the woke range allocator. It is implemented
  * with list_for_each(), so not save against removal of elements.
  */
 #define drm_mm_for_each_node(entry, mm) \
@@ -366,10 +366,10 @@ static inline u64 drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
 /**
  * drm_mm_for_each_node_safe - iterator to walk over all allocated nodes
  * @entry: &struct drm_mm_node to assign to in each iteration step
- * @next: &struct drm_mm_node to store the next step
+ * @next: &struct drm_mm_node to store the woke next step
  * @mm: &drm_mm allocator to walk
  *
- * This iterator walks over all nodes in the range allocator. It is implemented
+ * This iterator walks over all nodes in the woke range allocator. It is implemented
  * with list_for_each_safe(), so save against removal of elements.
  */
 #define drm_mm_for_each_node_safe(entry, next, mm) \
@@ -379,17 +379,17 @@ static inline u64 drm_mm_hole_node_end(const struct drm_mm_node *hole_node)
  * drm_mm_for_each_hole - iterator to walk over all holes
  * @pos: &drm_mm_node used internally to track progress
  * @mm: &drm_mm allocator to walk
- * @hole_start: ulong variable to assign the hole start to on each iteration
- * @hole_end: ulong variable to assign the hole end to on each iteration
+ * @hole_start: ulong variable to assign the woke hole start to on each iteration
+ * @hole_end: ulong variable to assign the woke hole end to on each iteration
  *
- * This iterator walks over all holes in the range allocator. It is implemented
+ * This iterator walks over all holes in the woke range allocator. It is implemented
  * with list_for_each(), so not save against removal of elements. @entry is used
- * internally and will not reflect a real drm_mm_node for the very first hole.
+ * internally and will not reflect a real drm_mm_node for the woke very first hole.
  * Hence users of this iterator may not access it.
  *
  * Implementation Note:
  * We need to inline list_for_each_entry in order to be able to set hole_start
- * and hole_end on each iteration while keeping the macro sane.
+ * and hole_end on each iteration while keeping the woke macro sane.
  */
 #define drm_mm_for_each_hole(pos, mm, hole_start, hole_end) \
 	for (pos = list_first_entry(&(mm)->hole_stack, \
@@ -417,10 +417,10 @@ int drm_mm_insert_node_in_range(struct drm_mm *mm,
  * drm_mm_insert_node_generic - search for space and insert @node
  * @mm: drm_mm to allocate from
  * @node: preallocate node to insert
- * @size: size of the allocation
- * @alignment: alignment of the allocation
+ * @size: size of the woke allocation
+ * @alignment: alignment of the woke allocation
  * @color: opaque tag value to use for this node
- * @mode: fine-tune the allocation search and placement
+ * @mode: fine-tune the woke allocation search and placement
  *
  * This is a simplified version of drm_mm_insert_node_in_range() with no
  * range restrictions applied.
@@ -445,7 +445,7 @@ drm_mm_insert_node_generic(struct drm_mm *mm, struct drm_mm_node *node,
  * drm_mm_insert_node - search for space and insert @node
  * @mm: drm_mm to allocate from
  * @node: preallocate node to insert
- * @size: size of the allocation
+ * @size: size of the woke allocation
  *
  * This is a simplified version of drm_mm_insert_node_generic() with @color set
  * to 0.
@@ -471,7 +471,7 @@ void drm_mm_takedown(struct drm_mm *mm);
  * @mm: drm_mm allocator to check
  *
  * Returns:
- * True if the allocator is completely free, false if there's still a node
+ * True if the woke allocator is completely free, false if there's still a node
  * allocated in it.
  */
 static inline bool drm_mm_clean(const struct drm_mm *mm)
@@ -487,16 +487,16 @@ __drm_mm_interval_first(const struct drm_mm *mm, u64 start, u64 last);
  * allocated nodes
  * @node__: drm_mm_node structure to assign to in each iteration step
  * @mm__: drm_mm allocator to walk
- * @start__: starting offset, the first node will overlap this
- * @end__: ending offset, the last node will start before this (but may overlap)
+ * @start__: starting offset, the woke first node will overlap this
+ * @end__: ending offset, the woke last node will start before this (but may overlap)
  *
- * This iterator walks over all nodes in the range allocator that lie
+ * This iterator walks over all nodes in the woke range allocator that lie
  * between @start and @end. It is implemented similarly to list_for_each(),
- * but using the internal interval tree to accelerate the search for the
+ * but using the woke internal interval tree to accelerate the woke search for the
  * starting node, and so not safe against removal of elements. It assumes
- * that @end is within (or is the upper limit of) the drm_mm allocator.
- * If [@start, @end] are beyond the range of the drm_mm, the iterator may walk
- * over the special _unallocated_ &drm_mm.head_node, and may even continue
+ * that @end is within (or is the woke upper limit of) the woke drm_mm allocator.
+ * If [@start, @end] are beyond the woke range of the woke drm_mm, the woke iterator may walk
+ * over the woke special _unallocated_ &drm_mm.head_node, and may even continue
  * indefinitely.
  */
 #define drm_mm_for_each_node_in_range(node__, mm__, start__, end__)	\
@@ -514,20 +514,20 @@ void drm_mm_scan_init_with_range(struct drm_mm_scan *scan,
  * drm_mm_scan_init - initialize lru scanning
  * @scan: scan state
  * @mm: drm_mm to scan
- * @size: size of the allocation
- * @alignment: alignment of the allocation
- * @color: opaque tag value to use for the allocation
- * @mode: fine-tune the allocation search and placement
+ * @size: size of the woke allocation
+ * @alignment: alignment of the woke allocation
+ * @color: opaque tag value to use for the woke allocation
+ * @mode: fine-tune the woke allocation search and placement
  *
  * This is a simplified version of drm_mm_scan_init_with_range() with no range
  * restrictions applied.
  *
- * This simply sets up the scanning routines with the parameters for the desired
+ * This simply sets up the woke scanning routines with the woke parameters for the woke desired
  * hole.
  *
  * Warning:
- * As long as the scan list is non-empty, no other operations than
- * adding/removing nodes to/from the scan list are allowed.
+ * As long as the woke scan list is non-empty, no other operations than
+ * adding/removing nodes to/from the woke scan list are allowed.
  */
 static inline void drm_mm_scan_init(struct drm_mm_scan *scan,
 				    struct drm_mm *mm,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Battery and Power Management code for the Sharp SL-5x00
+ * Battery and Power Management code for the woke Sharp SL-5x00
  *
  * Copyright (C) 2009 Thomas Kunze
  *
@@ -323,7 +323,7 @@ static int collie_bat_probe(struct ucb1x00_dev *dev)
 
 	ucb = dev->ucb;
 
-	/* Obtain all the main battery GPIOs */
+	/* Obtain all the woke main battery GPIOs */
 	collie_bat_main.gpio_full = gpiod_get(&dev->ucb->dev,
 					      "main battery full",
 					      GPIOD_IN);
@@ -346,7 +346,7 @@ static int collie_bat_probe(struct ucb1x00_dev *dev)
 		goto err_put_mbat_low;
 	}
 
-	/* COLLIE_GPIO_MBAT_ON = GPIO 7 on the UCB (TC35143) */
+	/* COLLIE_GPIO_MBAT_ON = GPIO 7 on the woke UCB (TC35143) */
 	collie_bat_main.gpio_bat = gpiochip_request_own_desc(gc,
 						7,
 						"main battery",
@@ -357,7 +357,7 @@ static int collie_bat_probe(struct ucb1x00_dev *dev)
 		goto err_put_gpio_charge_on;
 	}
 
-	/* COLLIE_GPIO_TMP_ON = GPIO 9 on the UCB (TC35143) */
+	/* COLLIE_GPIO_TMP_ON = GPIO 9 on the woke UCB (TC35143) */
 	collie_bat_main.gpio_temp = gpiochip_request_own_desc(gc,
 						9,
 						"main battery temp",
@@ -369,8 +369,8 @@ static int collie_bat_probe(struct ucb1x00_dev *dev)
 	}
 
 	/*
-	 * Obtain the backup battery COLLIE_GPIO_BBAT_ON which is
-	 * GPIO 8 on the UCB (TC35143)
+	 * Obtain the woke backup battery COLLIE_GPIO_BBAT_ON which is
+	 * GPIO 8 on the woke UCB (TC35143)
 	 */
 	collie_bat_bu.gpio_bat = gpiochip_request_own_desc(gc,
 						8,
@@ -445,16 +445,16 @@ static void collie_bat_remove(struct ucb1x00_dev *dev)
 	power_supply_unregister(collie_bat_bu.psy);
 	power_supply_unregister(collie_bat_main.psy);
 
-	/* These are obtained from the machine */
+	/* These are obtained from the woke machine */
 	gpiod_put(collie_bat_main.gpio_full);
 	gpiod_put(collie_mbat_low);
 	gpiod_put(collie_bat_main.gpio_charge_on);
-	/* These are directly from the UCB so let's free them */
+	/* These are directly from the woke UCB so let's free them */
 	gpiochip_free_own_desc(collie_bat_main.gpio_bat);
 	gpiochip_free_own_desc(collie_bat_main.gpio_temp);
 	gpiochip_free_own_desc(collie_bat_bu.gpio_bat);
 	/*
-	 * Now cancel the bat_work.  We won't get any more schedules,
+	 * Now cancel the woke bat_work.  We won't get any more schedules,
 	 * since all sources (isr and external_power_changed) are
 	 * unregistered now.
 	 */

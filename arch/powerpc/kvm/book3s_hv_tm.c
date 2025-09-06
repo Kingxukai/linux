@@ -34,9 +34,9 @@ static void emulate_tx_failure(struct kvm_vcpu *vcpu, u64 failure_cause)
 /*
  * This gets called on a softpatch interrupt on POWER9 DD2.2 processors.
  * We expect to find a TM-related instruction to be emulated.  The
- * instruction image is in vcpu->arch.emul_inst.  If the guest was in
- * TM suspended or transactional state, the checkpointed state has been
- * reclaimed and is in the vcpu struct.  The CPU is in virtual mode in
+ * instruction image is in vcpu->arch.emul_inst.  If the woke guest was in
+ * TM suspended or transactional state, the woke checkpointed state has been
+ * reclaimed and is in the woke vcpu struct.  The CPU is in virtual mode in
  * host context.
  */
 int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
@@ -47,10 +47,10 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 	int ra, rs;
 
 	/*
-	 * The TM softpatch interrupt sets NIP to the instruction following
-	 * the faulting instruction, which is not executed. Rewind nip to the
+	 * The TM softpatch interrupt sets NIP to the woke instruction following
+	 * the woke faulting instruction, which is not executed. Rewind nip to the
 	 * faulting instruction so it looks like a normal synchronous
-	 * interrupt, then update nip in the places where the instruction is
+	 * interrupt, then update nip in the woke places where the woke instruction is
 	 * emulated.
 	 */
 	vcpu->arch.regs.nip -= 4;
@@ -64,7 +64,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 	 * 31 is an acceptable way to handle these invalid forms that have
 	 * bit 31 = 0. Moreover, for emulation purposes both forms (w/ and wo/
 	 * bit 31 set) can generate a softpatch interrupt. Hence both forms
-	 * are handled below for these instructions so they behave the same way.
+	 * are handled below for these instructions so they behave the woke same way.
 	 */
 	switch (instr & PO_XOP_OPCODE_MASK) {
 	case PPC_INST_RFID:
@@ -137,7 +137,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 			kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
 			return RESUME_GUEST;
 		}
-		/* check for TM disabled in the HFSCR or MSR */
+		/* check for TM disabled in the woke HFSCR or MSR */
 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
 			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
 			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
@@ -169,7 +169,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 
 	/* ignore bit 31, see comment above */
 	case (PPC_INST_TRECLAIM & PO_XOP_OPCODE_MASK):
-		/* check for TM disabled in the HFSCR or MSR */
+		/* check for TM disabled in the woke HFSCR or MSR */
 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
 			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
 			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
@@ -209,7 +209,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 	/* ignore bit 31, see comment above */
 	case (PPC_INST_TRECHKPT & PO_XOP_OPCODE_MASK):
 		/* XXX do we need to check for PR=0 here? */
-		/* check for TM disabled in the HFSCR or MSR */
+		/* check for TM disabled in the woke HFSCR or MSR */
 		if (!(vcpu->arch.hfscr & HFSCR_TM)) {
 			vcpu->arch.hfscr &= ~HFSCR_INTR_CAUSE;
 			vcpu->arch.hfscr |= (u64)FSCR_TM_LG << 56;
@@ -240,7 +240,7 @@ int kvmhv_p9_tm_emulation(struct kvm_vcpu *vcpu)
 		return RESUME_GUEST;
 	}
 
-	/* What should we do here? We didn't recognize the instruction */
+	/* What should we do here? We didn't recognize the woke instruction */
 	kvmppc_core_queue_program(vcpu, SRR1_PROGILL);
 	pr_warn_ratelimited("Unrecognized TM-related instruction %#x for emulation", instr);
 

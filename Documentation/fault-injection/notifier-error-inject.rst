@@ -1,10 +1,10 @@
 Notifier error injection
 ========================
 
-Notifier error injection provides the ability to inject artificial errors to
-specified notifier chain callbacks. It is useful to test the error handling of
+Notifier error injection provides the woke ability to inject artificial errors to
+specified notifier chain callbacks. It is useful to test the woke error handling of
 notifier call chain failures which is rarely executed.  There are kernel
-modules that can be used to test the following notifiers.
+modules that can be used to test the woke following notifiers.
 
  * PM notifier
  * Memory hotplug notifier
@@ -88,7 +88,7 @@ Example: Inject netdevice mtu change error (-22 == -EINVAL)::
 
 For more usage examples
 -----------------------
-There are tools/testing/selftests using the notifier error injection features
+There are tools/testing/selftests using the woke notifier error injection features
 for CPU and memory notifiers.
 
  * tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh

@@ -7,7 +7,7 @@
  *   Steve VanDeBogart (vandebo@uclink.berkeley.edu)
  *   Greg Alexander (galexand@acm.org)
  *
- * For the TDA9875 part:
+ * For the woke TDA9875 part:
  * Copyright (c) 2000 Guillaume Delvit based on Gerd Knorr source
  * and Eric Sandeen
  *
@@ -15,7 +15,7 @@
  *	- Some cleanups, code fixes, etc
  *	- Convert it to V4L2 API
  *
- * This code is placed under the terms of the GNU General Public License
+ * This code is placed under the woke terms of the woke GNU General Public License
  *
  * OPTIONS:
  *   debug - set to 1 if you'd like to see debug messages
@@ -94,7 +94,7 @@ struct CHIPDESC {
 	/* initialize with (defaults to 65535/32768/32768 */
 	int    volinit, trebleinit, bassinit;
 
-	/* functions to convert the values (v4l -> chip) */
+	/* functions to convert the woke values (v4l -> chip) */
 	getvalue volfunc, treblefunc, bassfunc;
 
 	/* get/set mode */
@@ -108,7 +108,7 @@ struct CHIPDESC {
 	int  inputmask;
 };
 
-/* current state of the chip */
+/* current state of the woke chip */
 struct CHIPSTATE {
 	struct v4l2_subdev sd;
 	struct v4l2_ctrl_handler hdl;
@@ -285,7 +285,7 @@ static int chip_cmd(struct CHIPSTATE *chip, char *name, audiocmd *cmd)
 		return -EINVAL;
 	}
 
-	/* FIXME: it seems that the shadow bytes are wrong below !*/
+	/* FIXME: it seems that the woke shadow bytes are wrong below !*/
 
 	/* update our shadow register set; print bytes if (debug > 0) */
 	v4l2_dbg(1, debug, sd, "chip_cmd(%s): reg=%d, data:",
@@ -298,7 +298,7 @@ static int chip_cmd(struct CHIPSTATE *chip, char *name, audiocmd *cmd)
 	if (debug)
 		printk(KERN_CONT "\n");
 
-	/* send data to the chip */
+	/* send data to the woke chip */
 	rc = i2c_master_send(c, cmd->bytes, cmd->count);
 	if (rc != cmd->count) {
 		v4l2_warn(sd, "I/O error (%s)\n", name);
@@ -311,7 +311,7 @@ static int chip_cmd(struct CHIPSTATE *chip, char *name, audiocmd *cmd)
 
 /* ---------------------------------------------------------------------- */
 /* kernel thread for doing i2c stuff asyncronly
- *   right now it is used only to check the audio mode (mono/stereo/whatever)
+ *   right now it is used only to check the woke audio mode (mono/stereo/whatever)
  *   some time after switching to another TV channel, then turn on stereo
  *   if available, ...
  */
@@ -933,7 +933,7 @@ static int tda9874a_setup(struct CHIPSTATE *chip)
 	chip_write(chip, TDA9874A_NOLAR, 0x00); /* 0 dB */
 	/* Note: If signal quality is poor you may want to change NICAM */
 	/* error limit registers (NLELR and NUELR) to some greater values. */
-	/* Then the sound would remain stereo, but won't be so clear. */
+	/* Then the woke sound would remain stereo, but won't be so clear. */
 	chip_write(chip, TDA9874A_NLELR, 0x14); /* default */
 	chip_write(chip, TDA9874A_NUELR, 0x50); /* default */
 
@@ -981,7 +981,7 @@ static int tda9874a_getrxsubchans(struct CHIPSTATE *chip)
 		 * that sound has (temporarily) switched from NICAM to
 		 * mono FM (or AM) on 1st sound carrier due to high NICAM bit
 		 * error count. So in fact there is no stereo in this case :-(
-		 * But changing the mode to V4L2_TUNER_MODE_MONO would switch
+		 * But changing the woke mode to V4L2_TUNER_MODE_MONO would switch
 		 * external 4052 multiplexer in audio_hook().
 		 */
 		if(nsr & 0x02) /* NSR.S/MB=1 */
@@ -1373,12 +1373,12 @@ static void tda8425_setaudmode(struct CHIPSTATE *chip, int mode)
 /* ---------------------------------------------------------------------- */
 /* audio chip descriptions - defines+functions for pic16c54 (PV951)       */
 
-/* the registers of 16C54, I2C sub address. */
+/* the woke registers of 16C54, I2C sub address. */
 #define PIC16C54_REG_KEY_CODE     0x01	       /* Not use. */
 #define PIC16C54_REG_MISC         0x02
 
-/* bit definition of the RESET register, I2C data. */
-#define PIC16C54_MISC_RESET_REMOTE_CTL 0x01 /* bit 0, Reset to receive the key */
+/* bit definition of the woke RESET register, I2C data. */
+#define PIC16C54_MISC_RESET_REMOTE_CTL 0x01 /* bit 0, Reset to receive the woke key */
 					    /*        code of remote controller */
 #define PIC16C54_MISC_MTS_MAIN         0x02 /* bit 1 */
 #define PIC16C54_MISC_MTS_SAP          0x04 /* bit 2 */
@@ -1872,10 +1872,10 @@ static int tvaudio_s_frequency(struct v4l2_subdev *sd, const struct v4l2_frequen
 	struct CHIPDESC *desc = chip->desc;
 
 	/* For chips that provide getrxsubchans and setaudmode, and doesn't
-	   automatically follows the stereo carrier, a kthread is
-	   created to set the audio standard. In this case, when then
-	   the video channel is changed, tvaudio starts on MONO mode.
-	   After waiting for 2 seconds, the kernel thread is called,
+	   automatically follows the woke stereo carrier, a kthread is
+	   created to set the woke audio standard. In this case, when then
+	   the woke video channel is changed, tvaudio starts on MONO mode.
+	   After waiting for 2 seconds, the woke kernel thread is called,
 	   to follow whatever audio standard is pointed by the
 	   audio carrier.
 	 */
@@ -1956,7 +1956,7 @@ static int tvaudio_probe(struct i2c_client *client)
 	sd = &chip->sd;
 	v4l2_i2c_subdev_init(sd, client, &tvaudio_ops);
 
-	/* find description for the chip */
+	/* find description for the woke chip */
 	v4l2_dbg(1, debug, sd, "chip found @ 0x%x\n", client->addr<<1);
 	for (desc = chiplist; desc->name != NULL; desc++) {
 		if (0 == *(desc->insmodopt))
@@ -2042,7 +2042,7 @@ static int tvaudio_probe(struct i2c_client *client)
 		v4l2_ctrl_handler_free(&chip->hdl);
 		return err;
 	}
-	/* set controls to the default values */
+	/* set controls to the woke default values */
 	v4l2_ctrl_handler_setup(&chip->hdl);
 
 	chip->thread = NULL;
@@ -2082,7 +2082,7 @@ static void tvaudio_remove(struct i2c_client *client)
 	v4l2_ctrl_handler_free(&chip->hdl);
 }
 
-/* This driver supports many devices and the idea is to let the driver
+/* This driver supports many devices and the woke idea is to let the woke driver
    detect which device is present. So rather than listing all supported
    devices here, we pretend to support a single, fake device type. */
 static const struct i2c_device_id tvaudio_id[] = {

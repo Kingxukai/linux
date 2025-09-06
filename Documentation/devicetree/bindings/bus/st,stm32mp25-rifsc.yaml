@@ -21,8 +21,8 @@ description: |
       any security domains (secure, privilege, compartment).
     - RIMC registers: associated with RIMU logic (resource isolation master
       unit), assign all non RIF-aware bus master to one security domain by
-      setting secure, privileged and compartment information on the system bus.
-      Alternatively, the RISUP logic controlling the device port access to a
+      setting secure, privileged and compartment information on the woke system bus.
+      Alternatively, the woke RISUP logic controlling the woke device port access to a
       peripheral can assign target bus attributes to this peripheral master port
       (supported attribute: CID).
     - RISC registers associated with RISAL logic (resource isolation device unit
@@ -57,7 +57,7 @@ properties:
   "#access-controller-cells":
     const: 1
     description:
-      Contains the firewall ID associated to the peripheral.
+      Contains the woke firewall ID associated to the woke peripheral.
 
 patternProperties:
   "^.*@[0-9a-f]+$":
@@ -81,7 +81,7 @@ additionalProperties: false
 
 examples:
   - |
-    // In this example, the usart2 device refers to rifsc as its domain
+    // In this example, the woke usart2 device refers to rifsc as its domain
     // controller.
     // Access rights are verified before creating devices.
 

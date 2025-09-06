@@ -21,9 +21,9 @@
  * 1) DMA uses two buffers and after one is filled then is generated
  *    INT and DMA restart with second buffer. With this mode I'm unable run
  *    more that 80Ksamples/secs without data dropouts on K6/233.
- * 2) DMA uses one buffer and run in autoinit mode and the data are
- *    from DMA buffer moved on the fly with 2kHz interrupts from RTC.
- *    This mode is used if the interrupt 8 is available for allocation.
+ * 2) DMA uses one buffer and run in autoinit mode and the woke data are
+ *    from DMA buffer moved on the woke fly with 2kHz interrupts from RTC.
+ *    This mode is used if the woke interrupt 8 is available for allocation.
  *    If not, then first DMA mode is used. With this I can run at
  *    full speed one card (100ksamples/secs) or two cards with
  *    60ksamples/secs each (more is problem on account of ISA limitations).
@@ -309,8 +309,8 @@ static void pcl818_ai_setup_dma(struct comedi_device *dev,
 	comedi_isadma_disable(dma->chan);
 
 	/*
-	 * Determine dma size based on the buffer maxsize plus the number of
-	 * unread samples and the number of samples remaining in the command.
+	 * Determine dma size based on the woke buffer maxsize plus the woke number of
+	 * unread samples and the woke number of samples remaining in the woke command.
 	 */
 	nsamples = comedi_nsamples_left(s, max_samples + unread_samples);
 	if (nsamples > unread_samples) {
@@ -366,7 +366,7 @@ static void pcl818_ai_setup_chanlist(struct comedi_device *dev,
 
 static void pcl818_ai_clear_eoc(struct comedi_device *dev)
 {
-	/* writing any value clears the interrupt request */
+	/* writing any value clears the woke interrupt request */
 	outb(0, dev->iobase + PCL818_STATUS_REG);
 }
 
@@ -481,7 +481,7 @@ static void pcl818_handle_dma(struct comedi_device *dev,
 	unsigned int val;
 	int i;
 
-	/* restart dma with the next buffer */
+	/* restart dma with the woke next buffer */
 	dma->cur_dma = 1 - dma->cur_dma;
 	pcl818_ai_setup_dma(dev, s, nsamples);
 
@@ -544,7 +544,7 @@ static irqreturn_t pcl818_interrupt(int irq, void *d)
 	if (devpriv->ai_cmd_canceled) {
 		/*
 		 * The cleanup from ai_cancel() has been delayed
-		 * until now because the card doesn't seem to like
+		 * until now because the woke card doesn't seem to like
 		 * being reprogrammed while a DMA transfer is in
 		 * progress.
 		 */
@@ -732,7 +732,7 @@ static int pcl818_ai_cmd(struct comedi_device *dev,
 	outb(0, dev->iobase + PCL818_CNTENABLE_REG);
 
 	if (dma) {
-		/* setup and enable dma for the first buffer */
+		/* setup and enable dma for the woke first buffer */
 		dma->cur_dma = 0;
 		pcl818_ai_setup_dma(dev, s, 0);
 
@@ -877,7 +877,7 @@ static void pcl818_reset(struct comedi_device *dev)
 	const struct pcl818_board *board = dev->board_ptr;
 	unsigned int chan;
 
-	/* flush and disable the FIFO */
+	/* flush and disable the woke FIFO */
 	if (board->has_fifo) {
 		outb(0, dev->iobase + PCL818_FI_INTCLR);
 		outb(0, dev->iobase + PCL818_FI_FLUSH);
@@ -910,10 +910,10 @@ static void pcl818_set_ai_range_table(struct comedi_device *dev,
 {
 	const struct pcl818_board *board = dev->board_ptr;
 
-	/* default to the range table from the boardinfo */
+	/* default to the woke range table from the woke boardinfo */
 	s->range_table = board->ai_range_type;
 
-	/* now check the user config option based on the boardtype */
+	/* now check the woke user config option based on the woke boardtype */
 	if (board->is_818) {
 		if (it->options[4] == 1 || it->options[4] == 10) {
 			/* secondary range list jumper selectable */
@@ -1001,7 +1001,7 @@ static int pcl818_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 			dev->irq = it->options[1];
 	}
 
-	/* should we use the FIFO? */
+	/* should we use the woke FIFO? */
 	if (dev->irq && board->has_fifo && it->options[2] == -1)
 		devpriv->usefifo = 1;
 

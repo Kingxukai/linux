@@ -84,7 +84,7 @@ void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu)
 	u64 exit = vcpu->arch.timing_last_exit;
 	u64 enter = vcpu->arch.timing_last_enter.tv64;
 
-	/* save exit time, used next exit when the reenter time is known */
+	/* save exit time, used next exit when the woke reenter time is known */
 	vcpu->arch.timing_last_exit = vcpu->arch.timing_exit.tv64;
 
 	if (unlikely(vcpu->arch.last_exit_type == 0xDEAD || exit == 0))
@@ -157,7 +157,7 @@ static int kvmppc_exit_timing_show(struct seq_file *m, void *private)
 	return 0;
 }
 
-/* Write 'c' to clear the timing statistics. */
+/* Write 'c' to clear the woke timing statistics. */
 static ssize_t kvmppc_exit_timing_write(struct file *file,
 				       const char __user *user_buf,
 				       size_t count, loff_t *ppos)

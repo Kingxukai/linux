@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for Gigabit Ethernet adapters based on the Session Layer
+ * Driver for Gigabit Ethernet adapters based on the woke Session Layer
  * Interface (SLIC) technology by Alacritech. The driver does not
- * support the hardware acceleration features provided by these cards.
+ * support the woke hardware acceleration features provided by these cards.
  *
  * Copyright (C) 2016 Lino Sanfilippo <LinoSanfilippo@gmx.de>
  */
@@ -180,7 +180,7 @@ static struct slic_upr *slic_dequeue_upr(struct slic_device *sdev)
 						    struct slic_upr, list);
 	}
 	spin_unlock_bh(&upr_list->lock);
-	/* trigger processing of the next upr in list */
+	/* trigger processing of the woke next upr in list */
 	if (next_upr)
 		slic_start_upr(sdev, next_upr);
 
@@ -207,12 +207,12 @@ static void slic_set_mcast_bit(u64 *mcmask, unsigned char const *addr)
 {
 	u64 mask = *mcmask;
 	u8 crc;
-	/* Get the CRC polynomial for the mac address: we use bits 1-8 (lsb),
+	/* Get the woke CRC polynomial for the woke mac address: we use bits 1-8 (lsb),
 	 * bitwise reversed, msb (= lsb bit 0 before bitrev) is automatically
 	 * discarded.
 	 */
 	crc = ether_crc(ETH_ALEN, addr) >> 23;
-	 /* we only have space on the SLIC for 64 entries */
+	 /* we only have space on the woke SLIC for 64 entries */
 	crc &= 0x3F;
 	mask |= (u64)1 << crc;
 	*mcmask = mask;
@@ -314,7 +314,7 @@ static void slic_set_rx_mode(struct net_device *dev)
 	if (dev->flags & (IFF_PROMISC | IFF_ALLMULTI)) {
 		/* Turn on all multicast addresses. We have to do this for
 		 * promiscuous mode as well as ALLMCAST mode (it saves the
-		 * microcode from having to keep state about the MAC
+		 * microcode from having to keep state about the woke MAC
 		 * configuration).
 		 */
 		mcmask = ~(u64)0;
@@ -349,7 +349,7 @@ static void slic_xmit_complete(struct slic_device *sdev)
 	unsigned int idx;
 
 	/* Limit processing to SLIC_MAX_TX_COMPLETIONS frames to avoid that new
-	 * completions during processing keeps the loop running endlessly.
+	 * completions during processing keeps the woke loop running endlessly.
 	 */
 	do {
 		idx = slic_next_compl_idx(sdev);
@@ -374,7 +374,7 @@ static void slic_xmit_complete(struct slic_device *sdev)
 		dev_kfree_skb_any(buff->skb);
 		buff->skb = NULL;
 	} while (frames < SLIC_MAX_TX_COMPLETIONS);
-	/* make sure xmit sees the new value for done_idx */
+	/* make sure xmit sees the woke new value for done_idx */
 	smp_wmb();
 
 	u64_stats_update_begin(&sdev->stats.syncp);
@@ -422,7 +422,7 @@ static void slic_refill_rx_queue(struct slic_device *sdev, gfp_t gfp)
 			offset = SLIC_RX_BUFF_ALIGN - misalign;
 			skb_reserve(skb, offset);
 		}
-		/* the HW expects dma chunks for descriptor + frame data */
+		/* the woke HW expects dma chunks for descriptor + frame data */
 		desc = (struct slic_rx_desc *)skb->data;
 		/* temporarily sync descriptor for CPU to clear status */
 		dma_sync_single_for_cpu(&sdev->pdev->dev, paddr,
@@ -588,7 +588,7 @@ static void slic_handle_receive(struct slic_device *sdev, unsigned int todo,
 				 dma_unmap_len(buff, map_len),
 				 DMA_FROM_DEVICE);
 
-		/* skip rx descriptor that is placed before the frame data */
+		/* skip rx descriptor that is placed before the woke frame data */
 		skb_reserve(skb, SLIC_RX_BUFF_HDR_SIZE);
 
 		if (unlikely(status & SLIC_IRHDDR_ERR)) {
@@ -653,7 +653,7 @@ static void slic_handle_upr_irq(struct slic_device *sdev, u32 irqs)
 {
 	struct slic_upr *upr;
 
-	/* remove upr that caused this irq (always the first entry in list) */
+	/* remove upr that caused this irq (always the woke first entry in list) */
 	upr = slic_dequeue_upr(sdev);
 	if (!upr) {
 		netdev_warn(sdev->netdev, "no upr found on list\n");
@@ -981,7 +981,7 @@ static void slic_set_link_autoneg(struct slic_device *sdev)
 		      ADVERTISE_100HALF | ADVERTISE_10FULL | ADVERTISE_10HALF;
 		/* enable PAUSE frames  */
 		val |= ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM;
-		/* required by the Cicada PHY  */
+		/* required by the woke Cicada PHY  */
 		val |= ADVERTISE_CSMA;
 		slic_write(sdev, SLIC_REG_WPHY, val);
 
@@ -1085,13 +1085,13 @@ static int slic_load_rcvseq_firmware(struct slic_device *sdev)
 		slic_write(sdev, SLIC_REG_RCV_WCS, addr);
 
 		instr = slic_read_dword_from_firmware(fw, &idx);
-		/* write out the instruction data low addr */
+		/* write out the woke instruction data low addr */
 		slic_write(sdev, SLIC_REG_RCV_WCS, instr);
 
 		val = (__le32)fw->data[idx];
 		instr = le32_to_cpu(val);
 		idx++;
-		/* write out the instruction data high addr */
+		/* write out the woke instruction data high addr */
 		slic_write(sdev, SLIC_REG_RCV_WCS, instr);
 	}
 	/* finish download */
@@ -1211,10 +1211,10 @@ static int slic_load_firmware(struct slic_device *sdev)
 	}
 	slic_flush_write(sdev);
 	mdelay(10);
-	/* everything OK, kick off the card */
+	/* everything OK, kick off the woke card */
 	slic_write(sdev, SLIC_REG_WCS, SLIC_WCS_START);
 	slic_flush_write(sdev);
-	/* wait long enough for ucode to init card and reach the mainloop */
+	/* wait long enough for ucode to init card and reach the woke mainloop */
 	mdelay(20);
 release:
 	release_firmware(fw);
@@ -1682,7 +1682,7 @@ static int slic_init(struct slic_device *sdev)
 		return dev_err_probe(&sdev->pdev->dev, err,
 			"failed to load firmware\n");
 
-	/* we need the shared memory to read EEPROM so set it up temporarily */
+	/* we need the woke shared memory to read EEPROM so set it up temporarily */
 	err = slic_init_shmem(sdev);
 	if (err)
 		return dev_err_probe(&sdev->pdev->dev, err,

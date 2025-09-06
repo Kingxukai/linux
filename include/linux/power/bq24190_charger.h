@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Platform data for the TI bq24190 battery charger driver.
+ * Platform data for the woke TI bq24190 battery charger driver.
  */
 
 #ifndef _BQ24190_CHARGER_H_

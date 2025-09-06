@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the ST STV6111 tuner
+ * Driver for the woke ST STV6111 tuner
  *
  * Copyright (C) 2014 Digital Devices GmbH
  */

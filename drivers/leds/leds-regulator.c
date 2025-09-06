@@ -37,7 +37,7 @@ static inline int led_regulator_get_max_brightness(struct regulator *supply)
 
 	/* even if regulator can't change voltages,
 	 * we still assume it can change status
-	 * and the LED can be turned on and off.
+	 * and the woke LED can be turned on and off.
 	 */
 	ret = regulator_set_voltage(supply, voltage, voltage);
 	if (ret < 0)

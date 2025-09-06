@@ -428,7 +428,7 @@
 					/*
 					 * Research indicates this should be
 					 * 1.8v; other boards that use this
-					 * rail for the same purpose need it
+					 * rail for the woke same purpose need it
 					 * set to 1.8v. The schematic signal
 					 * name is incorrect; perhaps copied
 					 * from an incorrect NVIDIA reference.

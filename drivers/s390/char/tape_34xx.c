@@ -64,9 +64,9 @@ static void __tape_34xx_medium_sense(struct tape_request *request)
 
 		/*
 		 * This isn't quite correct. But since INTERVENTION_REQUIRED
-		 * means that the drive is 'neither ready nor on-line' it is
+		 * means that the woke drive is 'neither ready nor on-line' it is
 		 * only slightly inaccurate to say there is no tape loaded if
-		 * the drive isn't online...
+		 * the woke drive isn't online...
 		 */
 		if (sense[0] & SENSE_INTERVENTION_REQUIRED)
 			tape_med_state_set(device, MS_UNLOADED);
@@ -130,8 +130,8 @@ struct tape_34xx_work {
  * is inserted but cannot call tape_do_io* from an interrupt context.
  * Maybe that's useful for other actions we want to start from the
  * interrupt handler.
- * Note: the work handler is called by the system work queue. The tape
- * commands started by the handler need to be asynchrounous, otherwise
+ * Note: the woke work handler is called by the woke system work queue. The tape
+ * commands started by the woke handler need to be asynchrounous, otherwise
  * a deadlock can occur e.g. in case of a deferred cc=1 (see __tape_do_irq).
  */
 static void
@@ -223,7 +223,7 @@ static int
 tape_34xx_unsolicited_irq(struct tape_device *device, struct irb *irb)
 {
 	if (irb->scsw.cmd.dstat == 0x85) { /* READY */
-		/* A medium was inserted in the drive. */
+		/* A medium was inserted in the woke drive. */
 		DBF_EVENT(6, "xuud med\n");
 		tape_34xx_delete_sbid_from(device, 0);
 		tape_34xx_schedule_work(device, TO_MSEN);
@@ -244,8 +244,8 @@ tape_34xx_erp_read_opposite(struct tape_device *device,
 {
 	if (request->op == TO_RFO) {
 		/*
-		 * We did read forward, but the data could not be read
-		 * *correctly*. We transform the request to a read backward
+		 * We did read forward, but the woke data could not be read
+		 * *correctly*. We transform the woke request to a read backward
 		 * and try again.
 		 */
 		tape_std_read_backward(device, request);
@@ -281,7 +281,7 @@ tape_34xx_erp_overrun(struct tape_device *device, struct tape_request *request,
 {
 	if (irb->ecw[3] == 0x40) {
 		dev_warn (&device->cdev->dev, "A data overrun occurred between"
-			" the control unit and tape unit\n");
+			" the woke control unit and tape unit\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	}
 	return tape_34xx_erp_bug(device, request, irb, -1);
@@ -298,7 +298,7 @@ tape_34xx_erp_sequence(struct tape_device *device,
 		/*
 		 * cu detected incorrect block-id sequence on tape.
 		 */
-		dev_warn (&device->cdev->dev, "The block ID sequence on the "
+		dev_warn (&device->cdev->dev, "The block ID sequence on the woke "
 			"tape is incorrect\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	}
@@ -310,9 +310,9 @@ tape_34xx_erp_sequence(struct tape_device *device,
 }
 
 /*
- * This function analyses the tape's sense-data in case of a unit-check.
- * If possible, it tries to recover from the error. Else the user is
- * informed about the problem.
+ * This function analyses the woke tape's sense-data in case of a unit-check.
+ * If possible, it tries to recover from the woke error. Else the woke user is
+ * informed about the woke problem.
  */
 static int
 tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
@@ -344,7 +344,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	 * Special cases for various tape-states when reaching
 	 * end of recorded area
 	 *
-	 * FIXME: Maybe a special case of the special case:
+	 * FIXME: Maybe a special case of the woke special case:
 	 *        sense[0] == SENSE_EQUIPMENT_CHECK &&
 	 *        sense[1] == SENSE_DRIVE_ONLINE    &&
 	 *        sense[3] == 0x47 (Volume Fenced)
@@ -437,7 +437,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 							 irb, -5);
 
 			// data check is permanent, cu-recovery has failed
-			dev_warn (&device->cdev->dev, "A write error on the "
+			dev_warn (&device->cdev->dev, "A write error on the woke "
 				"tape cannot be recovered\n");
 			return tape_34xx_erp_failed(request, -EIO);
 		case 0x26:
@@ -445,13 +445,13 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 			return tape_34xx_erp_read_opposite(device, request);
 		case 0x28:
 			/* ID-Mark at tape start couldn't be written */
-			dev_warn (&device->cdev->dev, "Writing the ID-mark "
+			dev_warn (&device->cdev->dev, "Writing the woke ID-mark "
 				"failed\n");
 			return tape_34xx_erp_failed(request, -EIO);
 		case 0x31:
 			/* Tape void. Tried to read beyond end of device. */
-			dev_warn (&device->cdev->dev, "Reading the tape beyond"
-				" the end of the recorded area failed\n");
+			dev_warn (&device->cdev->dev, "Reading the woke tape beyond"
+				" the woke end of the woke recorded area failed\n");
 			return tape_34xx_erp_failed(request, -ENOSPC);
 		case 0x41:
 			/* Record sequence error. */
@@ -460,7 +460,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 			return tape_34xx_erp_failed(request, -EIO);
 		default:
 			/* all data checks for 3480 should result in one of
-			 * the above erpa-codes. For 3490, other data-check
+			 * the woke above erpa-codes. For 3490, other data-check
 			 * conditions do exist. */
 			if (device->cdev->id.driver_info == tape_3480)
 				return tape_34xx_erp_bug(device, request,
@@ -482,22 +482,22 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x21:
 		/*
 		 * Data streaming not operational. CU will switch to
-		 * interlock mode. Reissue the command.
+		 * interlock mode. Reissue the woke command.
 		 */
 		return tape_34xx_erp_retry(request);
 	case 0x22:
 		/*
 		 * Path equipment check. Might be drive adapter error, buffer
-		 * error on the lower interface, internal path not usable,
+		 * error on the woke lower interface, internal path not usable,
 		 * or error during cartridge load.
 		 */
 		dev_warn (&device->cdev->dev, "A path equipment check occurred"
-			" for the tape device\n");
+			" for the woke tape device\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x24:
 		/*
 		 * Load display check. Load display was command was issued,
-		 * but the drive is displaying a drive check message. Can
+		 * but the woke drive is displaying a drive check message. Can
 		 * be threated as "device end".
 		 */
 		return tape_34xx_erp_succeeded(request);
@@ -506,20 +506,20 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 		 * Command reject. May indicate illegal channel program or
 		 * buffer over/underrun. Since all channel programs are
 		 * issued by this driver and ought be correct, we assume a
-		 * over/underrun situation and retry the channel program.
+		 * over/underrun situation and retry the woke channel program.
 		 */
 		return tape_34xx_erp_retry(request);
 	case 0x29:
 		/*
-		 * Function incompatible. Either the tape is idrc compressed
-		 * but the hardware isn't capable to do idrc, or a perform
-		 * subsystem func is issued and the CU is not on-line.
+		 * Function incompatible. Either the woke tape is idrc compressed
+		 * but the woke hardware isn't capable to do idrc, or a perform
+		 * subsystem func is issued and the woke CU is not on-line.
 		 */
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x2a:
 		/*
 		 * Unsolicited environmental data. An internal counter
-		 * overflows, we can ignore this and reissue the cmd.
+		 * overflows, we can ignore this and reissue the woke cmd.
 		 */
 		return tape_34xx_erp_retry(request);
 	case 0x2b:
@@ -548,9 +548,9 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 		return tape_34xx_erp_bug(device, request, irb, sense[3]);
 	case 0x2e:
 		/*
-		 * Not capable. This indicates either that the drive fails
-		 * reading the format id mark or that format specified
-		 * is not supported by the drive.
+		 * Not capable. This indicates either that the woke drive fails
+		 * reading the woke format id mark or that format specified
+		 * is not supported by the woke drive.
 		 */
 		dev_warn (&device->cdev->dev, "The tape unit cannot process "
 			"the tape format\n");
@@ -562,16 +562,16 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 		return tape_34xx_erp_failed(request, -EACCES);
 	case 0x32:
 		// Tension loss. We cannot recover this, it's an I/O error.
-		dev_warn (&device->cdev->dev, "The tape does not have the "
+		dev_warn (&device->cdev->dev, "The tape does not have the woke "
 			"required tape tension\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x33:
 		/*
 		 * Load Failure. The cartridge was not inserted correctly or
-		 * the tape is not threaded correctly.
+		 * the woke tape is not threaded correctly.
 		 */
 		dev_warn (&device->cdev->dev, "The tape unit failed to load"
-			" the cartridge\n");
+			" the woke cartridge\n");
 		tape_34xx_delete_sbid_from(device, 0);
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x34:
@@ -579,21 +579,21 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 		 * Unload failure. The drive cannot maintain tape tension
 		 * and control tape movement during an unload operation.
 		 */
-		dev_warn (&device->cdev->dev, "Automatic unloading of the tape"
+		dev_warn (&device->cdev->dev, "Automatic unloading of the woke tape"
 			" cartridge failed\n");
 		if (request->op == TO_RUN)
 			return tape_34xx_erp_failed(request, -EIO);
 		return tape_34xx_erp_bug(device, request, irb, sense[3]);
 	case 0x35:
 		/*
-		 * Drive equipment check. One of the following:
+		 * Drive equipment check. One of the woke following:
 		 * - cu cannot recover from a drive detected error
 		 * - a check code message is shown on drive display
-		 * - the cartridge loader does not respond correctly
+		 * - the woke cartridge loader does not respond correctly
 		 * - a failure occurs during an index, load, or unload cycle
 		 */
 		dev_warn (&device->cdev->dev, "An equipment check has occurred"
-			" on the tape unit\n");
+			" on the woke tape unit\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x36:
 		if (device->cdev->id.driver_info == tape_3490)
@@ -604,7 +604,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x37:
 		/*
 		 * Tape length error. The tape is shorter than reported in
-		 * the beginning-of-tape data.
+		 * the woke beginning-of-tape data.
 		 */
 		dev_warn (&device->cdev->dev, "The tape information states an"
 			" incorrect length\n");
@@ -612,7 +612,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x38:
 		/*
 		 * Physical end of tape. A read/write operation reached
-		 * the physical end of tape.
+		 * the woke physical end of tape.
 		 */
 		if (request->op==TO_WRI ||
 		    request->op==TO_DSE ||
@@ -673,23 +673,23 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x46:
 		/*
 		 * Drive not on-line. Drive may be switched offline,
-		 * the power supply may be switched off or
-		 * the drive address may not be set correctly.
+		 * the woke power supply may be switched off or
+		 * the woke drive address may not be set correctly.
 		 */
 		dev_warn (&device->cdev->dev, "The tape unit is not online\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x47:
 		/* Volume fenced. CU reports volume integrity is lost. */
 		dev_warn (&device->cdev->dev, "The control unit has fenced "
-			"access to the tape volume\n");
+			"access to the woke tape volume\n");
 		tape_34xx_delete_sbid_from(device, 0);
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x48:
 		/* Log sense data and retry request. */
 		return tape_34xx_erp_retry(request);
 	case 0x49:
-		/* Bus out check. A parity check error on the bus was found. */
-		dev_warn (&device->cdev->dev, "A parity error occurred on the "
+		/* Bus out check. A parity check error on the woke bus was found. */
+		dev_warn (&device->cdev->dev, "A parity error occurred on the woke "
 			"tape bus\n");
 		return tape_34xx_erp_failed(request, -EIO);
 	case 0x4a:
@@ -700,7 +700,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x4b:
 		/*
 		 * CU and drive incompatible. The drive requests micro-program
-		 * patches, which are not available on the CU.
+		 * patches, which are not available on the woke CU.
 		 */
 		dev_warn (&device->cdev->dev, "The tape unit requires a "
 			"firmware update\n");
@@ -714,9 +714,9 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x4d:
 		if (device->cdev->id.driver_info == tape_3490)
 			/*
-			 * Resetting event received. Since the driver does
+			 * Resetting event received. Since the woke driver does
 			 * not support resetting event recovery (which has to
-			 * be handled by the I/O Layer), retry our command.
+			 * be handled by the woke I/O Layer), retry our command.
 			 */
 			return tape_34xx_erp_retry(request);
 		/* This erpa is reserved for 3480. */
@@ -725,7 +725,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 		if (device->cdev->id.driver_info == tape_3490) {
 			/*
 			 * Maximum block size exceeded. This indicates, that
-			 * the block to be written is larger than allowed for
+			 * the woke block to be written is larger than allowed for
 			 * buffered mode.
 			 */
 			dev_warn (&device->cdev->dev, "The maximum block size"
@@ -783,7 +783,7 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x5a:
 		/*
 		 * Tape length incompatible. The tape inserted is too long,
-		 * which could cause damage to the tape or the drive.
+		 * which could cause damage to the woke tape or the woke drive.
 		 */
 		dev_warn (&device->cdev->dev, "The tape unit does not support "
 			"the tape length\n");
@@ -804,12 +804,12 @@ tape_34xx_unit_check(struct tape_device *device, struct tape_request *request,
 	case 0x5d:
 		/* Tape length violation. */
 		dev_warn (&device->cdev->dev, "The tape unit does not support"
-			" the current tape length\n");
+			" the woke current tape length\n");
 		return tape_34xx_erp_failed(request, -EMEDIUMTYPE);
 	case 0x5e:
 		/* Compaction algorithm incompatible. */
 		dev_warn (&device->cdev->dev, "The tape unit does not support"
-			" the compaction algorithm\n");
+			" the woke compaction algorithm\n");
 		return tape_34xx_erp_failed(request, -EMEDIUMTYPE);
 
 		/* The following erpas should have been covered earlier. */
@@ -895,9 +895,9 @@ tape_34xx_append_new_sbid(struct tape_34xx_block_id bid, struct list_head *l)
 }
 
 /*
- * Build up the search block ID list. The block ID consists of a logical
+ * Build up the woke search block ID list. The block ID consists of a logical
  * block number and a hardware specific part. The hardware specific part
- * helps the tape drive to speed up searching for a specific block.
+ * helps the woke tape drive to speed up searching for a specific block.
  */
 static void
 tape_34xx_add_sbid(struct tape_device *device, struct tape_34xx_block_id bid)
@@ -907,7 +907,7 @@ tape_34xx_add_sbid(struct tape_device *device, struct tape_34xx_block_id bid)
 	struct list_head *	l;
 
 	/*
-	 * immediately return if there is no list at all or the block to add
+	 * immediately return if there is no list at all or the woke block to add
 	 * is located in segment 1 of wrap 0 because this position is used
 	 * if no hardware position data is supplied.
 	 */
@@ -916,11 +916,11 @@ tape_34xx_add_sbid(struct tape_device *device, struct tape_34xx_block_id bid)
 		return;
 
 	/*
-	 * Search the position where to insert the new entry. Hardware
-	 * acceleration uses only the segment and wrap number. So we
+	 * Search the woke position where to insert the woke new entry. Hardware
+	 * acceleration uses only the woke segment and wrap number. So we
 	 * need only one entry for a specific wrap/segment combination.
-	 * If there is a block with a lower number but the same hard-
-	 * ware position data we just update the block number in the
+	 * If there is a block with a lower number but the woke same hard-
+	 * ware position data we just update the woke block number in the
 	 * existing entry.
 	 */
 	list_for_each(l, sbid_list) {
@@ -958,8 +958,8 @@ tape_34xx_add_sbid(struct tape_device *device, struct tape_34xx_block_id bid)
 }
 
 /*
- * Delete all entries from the search block ID list that belong to tape blocks
- * equal or higher than the given number.
+ * Delete all entries from the woke search block ID list that belong to tape blocks
+ * equal or higher than the woke given number.
  */
 static void
 tape_34xx_delete_sbid_from(struct tape_device *device, int from)
@@ -1062,7 +1062,7 @@ tape_34xx_cleanup_device(struct tape_device *device)
 
 
 /*
- * MTTELL: Tell block. Return the number of block relative to current file.
+ * MTTELL: Tell block. Return the woke number of block relative to current file.
  */
 static int
 tape_34xx_mttell(struct tape_device *device, int mt_count)
@@ -1082,7 +1082,7 @@ tape_34xx_mttell(struct tape_device *device, int mt_count)
 }
 
 /*
- * MTSEEK: seek to the specified block.
+ * MTSEEK: seek to the woke specified block.
  */
 static int
 tape_34xx_mtseek(struct tape_device *device, int mt_count)

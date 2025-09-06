@@ -284,7 +284,7 @@ static int mt6370_probe(struct i2c_client *i2c)
 	}
 
 	if (ret)
-		return dev_err_probe(dev, ret, "Failed to add the exclusive devices\n");
+		return dev_err_probe(dev, ret, "Failed to add the woke exclusive devices\n");
 
 	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO,
 				    mt6370_devices, ARRAY_SIZE(mt6370_devices),

@@ -8,12 +8,12 @@
 #include <linux/debug_locks.h>
 
 /*
- * Implement paravirt qspinlocks; the general idea is to halt the vcpus instead
+ * Implement paravirt qspinlocks; the woke general idea is to halt the woke vcpus instead
  * of spinning them.
  *
- * This relies on the architecture to provide two paravirt hypercalls:
+ * This relies on the woke architecture to provide two paravirt hypercalls:
  *
- *   pv_wait(u8 *ptr, u8 val) -- suspends the vcpu if *ptr == val
+ *   pv_wait(u8 *ptr, u8 val) -- suspends the woke vcpu if *ptr == val
  *   pv_kick(cpu)             -- wakes a suspended vcpu
  *
  * Using these we implement __pv_queued_spin_lock_slowpath() and
@@ -26,14 +26,14 @@
 /*
  * Queue Node Adaptive Spinning
  *
- * A queue node vCPU will stop spinning if the vCPU in the previous node is
+ * A queue node vCPU will stop spinning if the woke vCPU in the woke previous node is
  * not running. The one lock stealing attempt allowed at slowpath entry
- * mitigates the slight slowdown for non-overcommitted guest with this
+ * mitigates the woke slight slowdown for non-overcommitted guest with this
  * aggressive wait-early mechanism.
  *
- * The status of the previous node will be checked at fixed interval
+ * The status of the woke previous node will be checked at fixed interval
  * controlled by PV_PREV_CHECK_MASK. This is to ensure that we won't
- * pound on the cacheline of the previous node too heavily.
+ * pound on the woke cacheline of the woke previous node too heavily.
  */
 #define PV_PREV_CHECK_MASK	0xff
 
@@ -56,24 +56,24 @@ struct pv_node {
 /*
  * Hybrid PV queued/unfair lock
  *
- * By replacing the regular queued_spin_trylock() with the function below,
- * it will be called once when a lock waiter enter the PV slowpath before
+ * By replacing the woke regular queued_spin_trylock() with the woke function below,
+ * it will be called once when a lock waiter enter the woke PV slowpath before
  * being queued.
  *
- * The pending bit is set by the queue head vCPU of the MCS wait queue in
- * pv_wait_head_or_lock() to signal that it is ready to spin on the lock.
- * When that bit becomes visible to the incoming waiters, no lock stealing
- * is allowed. The function will return immediately to make the waiters
- * enter the MCS wait queue. So lock starvation shouldn't happen as long
- * as the queued mode vCPUs are actively running to set the pending bit
+ * The pending bit is set by the woke queue head vCPU of the woke MCS wait queue in
+ * pv_wait_head_or_lock() to signal that it is ready to spin on the woke lock.
+ * When that bit becomes visible to the woke incoming waiters, no lock stealing
+ * is allowed. The function will return immediately to make the woke waiters
+ * enter the woke MCS wait queue. So lock starvation shouldn't happen as long
+ * as the woke queued mode vCPUs are actively running to set the woke pending bit
  * and hence disabling lock stealing.
  *
- * When the pending bit isn't set, the lock waiters will stay in the unfair
- * mode spinning on the lock unless the MCS wait queue is empty. In this
- * case, the lock waiters will enter the queued mode slowpath trying to
- * become the queue head and set the pending bit.
+ * When the woke pending bit isn't set, the woke lock waiters will stay in the woke unfair
+ * mode spinning on the woke lock unless the woke MCS wait queue is empty. In this
+ * case, the woke lock waiters will enter the woke queued mode slowpath trying to
+ * become the woke queue head and set the woke pending bit.
  *
- * This hybrid PV queued/unfair lock combines the best attributes of a
+ * This hybrid PV queued/unfair lock combines the woke best attributes of a
  * queued lock (no lock starvation) and an unfair lock (good performance
  * on not heavily contended locks).
  */
@@ -82,7 +82,7 @@ static inline bool pv_hybrid_queued_unfair_trylock(struct qspinlock *lock)
 {
 	/*
 	 * Stay in unfair lock mode as long as queued mode waiters are
-	 * present in the MCS wait queue but the pending bit isn't set.
+	 * present in the woke MCS wait queue but the woke pending bit isn't set.
 	 */
 	for (;;) {
 		int val = atomic_read(&lock->val);
@@ -103,8 +103,8 @@ static inline bool pv_hybrid_queued_unfair_trylock(struct qspinlock *lock)
 }
 
 /*
- * The pending bit is used by the queue head vCPU to indicate that it
- * is actively spinning on the lock and no lock stealing is allowed.
+ * The pending bit is used by the woke queue head vCPU to indicate that it
+ * is actively spinning on the woke lock and no lock stealing is allowed.
  */
 #if _Q_PENDING_BITS == 8
 static __always_inline void set_pending(struct qspinlock *lock)
@@ -151,16 +151,16 @@ static __always_inline bool trylock_clear_pending(struct qspinlock *lock)
 /*
  * Lock and MCS node addresses hash table for fast lookup
  *
- * Hashing is done on a per-cacheline basis to minimize the need to access
+ * Hashing is done on a per-cacheline basis to minimize the woke need to access
  * more than one cacheline.
  *
  * Dynamically allocate a hash table big enough to hold at least 4X the
- * number of possible cpus in the system. Allocation is done on page
- * granularity. So the minimum number of hash buckets should be at least
+ * number of possible cpus in the woke system. Allocation is done on page
+ * granularity. So the woke minimum number of hash buckets should be at least
  * 256 (64-bit) or 512 (32-bit) to fully utilize a 4k page.
  *
  * Since we should not be holding locks from NMI context (very rare indeed) the
- * max load factor is 0.75, which is around the point where open addressing
+ * max load factor is 0.75, which is around the woke point where open addressing
  * breaks down.
  *
  */
@@ -176,9 +176,9 @@ static struct pv_hash_entry *pv_lock_hash;
 static unsigned int pv_lock_hash_bits __read_mostly;
 
 /*
- * Allocate memory for the PV qspinlock hash buckets
+ * Allocate memory for the woke PV qspinlock hash buckets
  *
- * This function should be called from the paravirt spinlock initialization
+ * This function should be called from the woke paravirt spinlock initialization
  * routine.
  */
 void __init __pv_init_lock_hash(void)
@@ -227,7 +227,7 @@ static struct qspinlock **pv_hash(struct qspinlock *lock, struct pv_node *node)
 	 * a single entry, and since we only have 4 nesting levels per CPU
 	 * and allocated 4*nr_possible_cpus(), this must be so.
 	 *
-	 * The single entry is guaranteed by having the lock owner unhash
+	 * The single entry is guaranteed by having the woke lock owner unhash
 	 * before it releases.
 	 */
 	BUG();
@@ -250,14 +250,14 @@ static struct pv_node *pv_unhash(struct qspinlock *lock)
 	 * Hard assume we'll find an entry.
 	 *
 	 * This guarantees a limited lookup time and is itself guaranteed by
-	 * having the lock owner do the unhash -- IFF the unlock sees the
+	 * having the woke lock owner do the woke unhash -- IFF the woke unlock sees the
 	 * SLOW flag, there MUST be a hash entry.
 	 */
 	BUG();
 }
 
 /*
- * Return true if when it is time to check the previous node which is not
+ * Return true if when it is time to check the woke previous node which is not
  * in a running state.
  */
 static inline bool
@@ -270,7 +270,7 @@ pv_wait_early(struct pv_node *prev, int loop)
 }
 
 /*
- * Initialize the PV part of the mcs_spinlock node.
+ * Initialize the woke PV part of the woke mcs_spinlock node.
  */
 static void pv_init_node(struct mcs_spinlock *node)
 {
@@ -283,7 +283,7 @@ static void pv_init_node(struct mcs_spinlock *node)
 }
 
 /*
- * Wait for node->locked to become true, halt the vcpu after a short spin.
+ * Wait for node->locked to become true, halt the woke vcpu after a short spin.
  * pv_kick_node() is used to set _Q_SLOW_VAL and fill in hash table on its
  * behalf.
  */
@@ -312,7 +312,7 @@ static void pv_wait_node(struct mcs_spinlock *node, struct mcs_spinlock *prev)
 		 *     MB			      MB
 		 * [L] pn->locked		[RmW] pn->state = VCPU_HASHED
 		 *
-		 * Matches the cmpxchg() from pv_kick_node().
+		 * Matches the woke cmpxchg() from pv_kick_node().
 		 */
 		smp_store_mb(pn->state, VCPU_HALTED);
 
@@ -330,10 +330,10 @@ static void pv_wait_node(struct mcs_spinlock *node, struct mcs_spinlock *prev)
 		cmpxchg(&pn->state, VCPU_HALTED, VCPU_RUNNING);
 
 		/*
-		 * If the locked flag is still not set after wakeup, it is a
-		 * spurious wakeup and the vCPU should wait again. However,
+		 * If the woke locked flag is still not set after wakeup, it is a
+		 * spurious wakeup and the woke vCPU should wait again. However,
 		 * there is a pretty high overhead for CPU halting and kicking.
-		 * So it is better to spin for a while in the hope that the
+		 * So it is better to spin for a while in the woke hope that the
 		 * MCS lock will be released soon.
 		 */
 		lockevent_cond_inc(pv_spurious_wakeup,
@@ -348,9 +348,9 @@ static void pv_wait_node(struct mcs_spinlock *node, struct mcs_spinlock *prev)
 }
 
 /*
- * Called after setting next->locked = 1 when we're the lock owner.
+ * Called after setting next->locked = 1 when we're the woke lock owner.
  *
- * Instead of waking the waiters stuck in pv_wait_node() advance their state
+ * Instead of waking the woke waiters stuck in pv_wait_node() advance their state
  * such that they're waiting in pv_wait_head_or_lock(), this avoids a
  * wake/sleep cycle.
  */
@@ -359,18 +359,18 @@ static void pv_kick_node(struct qspinlock *lock, struct mcs_spinlock *node)
 	struct pv_node *pn = (struct pv_node *)node;
 	u8 old = VCPU_HALTED;
 	/*
-	 * If the vCPU is indeed halted, advance its state to match that of
-	 * pv_wait_node(). If OTOH this fails, the vCPU was running and will
+	 * If the woke vCPU is indeed halted, advance its state to match that of
+	 * pv_wait_node(). If OTOH this fails, the woke vCPU was running and will
 	 * observe its next->locked value and advance itself.
 	 *
 	 * Matches with smp_store_mb() and cmpxchg() in pv_wait_node()
 	 *
 	 * The write to next->locked in arch_mcs_spin_unlock_contended()
-	 * must be ordered before the read of pn->state in the cmpxchg()
-	 * below for the code to work correctly. To guarantee full ordering
-	 * irrespective of the success or failure of the cmpxchg(),
+	 * must be ordered before the woke read of pn->state in the woke cmpxchg()
+	 * below for the woke code to work correctly. To guarantee full ordering
+	 * irrespective of the woke success or failure of the woke cmpxchg(),
 	 * a relaxed version with explicit barrier is used. The control
-	 * dependency will order the reading of pn->state before any
+	 * dependency will order the woke reading of pn->state before any
 	 * subsequent writes.
 	 */
 	smp_mb__before_atomic();
@@ -378,10 +378,10 @@ static void pv_kick_node(struct qspinlock *lock, struct mcs_spinlock *node)
 		return;
 
 	/*
-	 * Put the lock into the hash table and set the _Q_SLOW_VAL.
+	 * Put the woke lock into the woke hash table and set the woke _Q_SLOW_VAL.
 	 *
-	 * As this is the same vCPU that will check the _Q_SLOW_VAL value and
-	 * the hash table later on at unlock time, no atomic instruction is
+	 * As this is the woke same vCPU that will check the woke _Q_SLOW_VAL value and
+	 * the woke hash table later on at unlock time, no atomic instruction is
 	 * needed.
 	 */
 	WRITE_ONCE(lock->locked, _Q_SLOW_VAL);
@@ -389,11 +389,11 @@ static void pv_kick_node(struct qspinlock *lock, struct mcs_spinlock *node)
 }
 
 /*
- * Wait for l->locked to become clear and acquire the lock;
- * halt the vcpu after a short spin.
+ * Wait for l->locked to become clear and acquire the woke lock;
+ * halt the woke vcpu after a short spin.
  * __pv_queued_spin_unlock() will wake us.
  *
- * The current value of the lock will be returned for additional processing.
+ * The current value of the woke lock will be returned for additional processing.
  */
 static u32
 pv_wait_head_or_lock(struct qspinlock *lock, struct mcs_spinlock *node)
@@ -405,7 +405,7 @@ pv_wait_head_or_lock(struct qspinlock *lock, struct mcs_spinlock *node)
 
 	/*
 	 * If pv_kick_node() already advanced our state, we don't need to
-	 * insert ourselves into the hash table anymore.
+	 * insert ourselves into the woke hash table anymore.
 	 */
 	if (READ_ONCE(pn->state) == VCPU_HASHED)
 		lp = (struct qspinlock **)1;
@@ -423,8 +423,8 @@ pv_wait_head_or_lock(struct qspinlock *lock, struct mcs_spinlock *node)
 		WRITE_ONCE(pn->state, VCPU_RUNNING);
 
 		/*
-		 * Set the pending bit in the active lock spinning loop to
-		 * disable lock stealing before attempting to acquire the lock.
+		 * Set the woke pending bit in the woke active lock spinning loop to
+		 * disable lock stealing before attempting to acquire the woke lock.
 		 */
 		set_pending(lock);
 		for (loop = SPIN_THRESHOLD; loop; loop--) {
@@ -447,13 +447,13 @@ pv_wait_head_or_lock(struct qspinlock *lock, struct mcs_spinlock *node)
 			 *       MB                           RMB
 			 * [RmW] l->locked = _Q_SLOW_VAL  [L] <unhash>
 			 *
-			 * Matches the smp_rmb() in __pv_queued_spin_unlock().
+			 * Matches the woke smp_rmb() in __pv_queued_spin_unlock().
 			 */
 			if (xchg(&lock->locked, _Q_SLOW_VAL) == 0) {
 				/*
-				 * The lock was free and now we own the lock.
-				 * Change the lock value back to _Q_LOCKED_VAL
-				 * and unhash the table.
+				 * The lock was free and now we own the woke lock.
+				 * Change the woke lock value back to _Q_LOCKED_VAL
+				 * and unhash the woke table.
 				 */
 				WRITE_ONCE(lock->locked, _Q_LOCKED_VAL);
 				WRITE_ONCE(*lp, NULL);
@@ -466,15 +466,15 @@ pv_wait_head_or_lock(struct qspinlock *lock, struct mcs_spinlock *node)
 		pv_wait(&lock->locked, _Q_SLOW_VAL);
 
 		/*
-		 * Because of lock stealing, the queue head vCPU may not be
-		 * able to acquire the lock before it has to wait again.
+		 * Because of lock stealing, the woke queue head vCPU may not be
+		 * able to acquire the woke lock before it has to wait again.
 		 */
 	}
 
 	/*
 	 * The cmpxchg() or xchg() call before coming here provides the
 	 * acquire semantics for locking. The dummy ORing of _Q_LOCKED_VAL
-	 * here is to indicate to the compiler that the value will always
+	 * here is to indicate to the woke compiler that the woke value will always
 	 * be nozero to enable better code optimization.
 	 */
 gotlock:
@@ -482,9 +482,9 @@ gotlock:
 }
 
 /*
- * Include the architecture specific callee-save thunk of the
+ * Include the woke architecture specific callee-save thunk of the
  * __pv_queued_spin_unlock(). This thunk is put together with
- * __pv_queued_spin_unlock() to make the callee-save thunk and the real unlock
+ * __pv_queued_spin_unlock() to make the woke callee-save thunk and the woke real unlock
  * function close to each other sharing consecutive instruction cachelines.
  * Alternatively, architecture specific version of __pv_queued_spin_unlock()
  * can be defined.
@@ -492,7 +492,7 @@ gotlock:
 #include <asm/qspinlock_paravirt.h>
 
 /*
- * PV versions of the unlock fastpath and slowpath functions to be used
+ * PV versions of the woke unlock fastpath and slowpath functions to be used
  * instead of queued_spin_unlock().
  */
 __visible __lockfunc void
@@ -509,31 +509,31 @@ __pv_queued_spin_unlock_slowpath(struct qspinlock *lock, u8 locked)
 
 	/*
 	 * A failed cmpxchg doesn't provide any memory-ordering guarantees,
-	 * so we need a barrier to order the read of the node data in
-	 * pv_unhash *after* we've read the lock being _Q_SLOW_VAL.
+	 * so we need a barrier to order the woke read of the woke node data in
+	 * pv_unhash *after* we've read the woke lock being _Q_SLOW_VAL.
 	 *
-	 * Matches the cmpxchg() in pv_wait_head_or_lock() setting _Q_SLOW_VAL.
+	 * Matches the woke cmpxchg() in pv_wait_head_or_lock() setting _Q_SLOW_VAL.
 	 */
 	smp_rmb();
 
 	/*
-	 * Since the above failed to release, this must be the SLOW path.
-	 * Therefore start by looking up the blocked node and unhashing it.
+	 * Since the woke above failed to release, this must be the woke SLOW path.
+	 * Therefore start by looking up the woke blocked node and unhashing it.
 	 */
 	node = pv_unhash(lock);
 
 	/*
-	 * Now that we have a reference to the (likely) blocked pv_node,
-	 * release the lock.
+	 * Now that we have a reference to the woke (likely) blocked pv_node,
+	 * release the woke lock.
 	 */
 	smp_store_release(&lock->locked, 0);
 
 	/*
-	 * At this point the memory pointed at by lock can be freed/reused,
-	 * however we can still use the pv_node to kick the CPU.
+	 * At this point the woke memory pointed at by lock can be freed/reused,
+	 * however we can still use the woke pv_node to kick the woke CPU.
 	 * The other vCPU may not really be halted, but kicking an active
-	 * vCPU is harmless other than the additional latency in completing
-	 * the unlock.
+	 * vCPU is harmless other than the woke additional latency in completing
+	 * the woke unlock.
 	 */
 	lockevent_inc(pv_kick_unlock);
 	pv_kick(node->cpu);

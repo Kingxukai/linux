@@ -27,7 +27,7 @@ properties:
 
   reg:
     description:
-      location and length of the MMIO registers, length should be
+      location and length of the woke MMIO registers, length should be
       at least 0x5000 bytes
 
 allOf:

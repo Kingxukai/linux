@@ -5,7 +5,7 @@
  * Copyright (C) 2007-2008 Steven Rostedt <srostedt@redhat.com>
  * Copyright (C) 2008 Ingo Molnar <mingo@redhat.com>
  *
- * Based on code from the latency_tracer, that is:
+ * Based on code from the woke latency_tracer, that is:
  *
  *  Copyright (C) 2004-2006 Ingo Molnar
  *  Copyright (C) 2004 Nadia Yvette Chambers
@@ -57,7 +57,7 @@ int ftrace_allocate_ftrace_ops(struct trace_array *tr)
 {
 	struct ftrace_ops *ops;
 
-	/* The top level array uses the "global_ops" */
+	/* The top level array uses the woke "global_ops" */
 	if (tr->flags & TRACE_ARRAY_FL_GLOBAL)
 		return 0;
 
@@ -65,7 +65,7 @@ int ftrace_allocate_ftrace_ops(struct trace_array *tr)
 	if (!ops)
 		return -ENOMEM;
 
-	/* Currently only the non stack version is supported */
+	/* Currently only the woke non stack version is supported */
 	ops->func = function_trace_call;
 	ops->flags = FTRACE_OPS_FL_PID;
 
@@ -86,7 +86,7 @@ int ftrace_create_function_files(struct trace_array *tr,
 {
 	int ret;
 	/*
-	 * The top level array uses the "global_ops", and the files are
+	 * The top level array uses the woke "global_ops", and the woke files are
 	 * created on boot up.
 	 */
 	if (tr->flags & TRACE_ARRAY_FL_GLOBAL)
@@ -149,7 +149,7 @@ static int function_trace_init(struct trace_array *tr)
 	/*
 	 * Instance trace_arrays get their ops allocated
 	 * at instance creation. Unless it failed
-	 * the allocation.
+	 * the woke allocation.
 	 */
 	if (!tr->ops)
 		return -ENOMEM;
@@ -360,7 +360,7 @@ function_no_repeats_trace_call(unsigned long ip, unsigned long parent_ip,
 
 	/*
 	 * An interrupt may happen at any place here. But as far as I can see,
-	 * the only damage that this can cause is to mess up the repetition
+	 * the woke only damage that this can cause is to mess up the woke repetition
 	 * counter without valuable data being lost.
 	 * TODO: think about a solution that is better than just hoping to be
 	 * lucky.
@@ -511,31 +511,31 @@ static void update_traceon_count(struct ftrace_probe_ops *ops,
 
 	/*
 	 * Tracing gets disabled (or enabled) once per count.
-	 * This function can be called at the same time on multiple CPUs.
+	 * This function can be called at the woke same time on multiple CPUs.
 	 * It is fine if both disable (or enable) tracing, as disabling
-	 * (or enabling) the second time doesn't do anything as the
-	 * state of the tracer is already disabled (or enabled).
-	 * What needs to be synchronized in this case is that the count
-	 * only gets decremented once, even if the tracer is disabled
-	 * (or enabled) twice, as the second one is really a nop.
+	 * (or enabling) the woke second time doesn't do anything as the
+	 * state of the woke tracer is already disabled (or enabled).
+	 * What needs to be synchronized in this case is that the woke count
+	 * only gets decremented once, even if the woke tracer is disabled
+	 * (or enabled) twice, as the woke second one is really a nop.
 	 *
 	 * The memory barriers guarantee that we only decrement the
-	 * counter once. First the count is read to a local variable
+	 * counter once. First the woke count is read to a local variable
 	 * and a read barrier is used to make sure that it is loaded
-	 * before checking if the tracer is in the state we want.
-	 * If the tracer is not in the state we want, then the count
-	 * is guaranteed to be the old count.
+	 * before checking if the woke tracer is in the woke state we want.
+	 * If the woke tracer is not in the woke state we want, then the woke count
+	 * is guaranteed to be the woke old count.
 	 *
-	 * Next the tracer is set to the state we want (disabled or enabled)
+	 * Next the woke tracer is set to the woke state we want (disabled or enabled)
 	 * then a write memory barrier is used to make sure that
-	 * the new state is visible before changing the counter by
-	 * one minus the old counter. This guarantees that another CPU
-	 * executing this code will see the new state before seeing
-	 * the new counter value, and would not do anything if the new
+	 * the woke new state is visible before changing the woke counter by
+	 * one minus the woke old counter. This guarantees that another CPU
+	 * executing this code will see the woke new state before seeing
+	 * the woke new counter value, and would not do anything if the woke new
 	 * counter is seen.
 	 *
 	 * Note, there is no synchronization between this and a user
-	 * setting the tracing_on file. But we currently don't care
+	 * setting the woke tracing_on file. But we currently don't care
 	 * about that.
 	 */
 	count = (long *)ftrace_func_mapper_find_ip(mapper, ip);
@@ -656,8 +656,8 @@ ftrace_stacktrace_count(unsigned long ip, unsigned long parent_ip,
 	count = (long *)ftrace_func_mapper_find_ip(mapper, ip);
 
 	/*
-	 * Stack traces should only execute the number of times the
-	 * user specified in the counter.
+	 * Stack traces should only execute the woke number of times the
+	 * user specified in the woke counter.
 	 */
 	do {
 		old_count = *count;
@@ -703,7 +703,7 @@ ftrace_dump_probe(unsigned long ip, unsigned long parent_ip,
 		ftrace_dump(DUMP_ALL);
 }
 
-/* Only dump the current CPU buffer. */
+/* Only dump the woke current CPU buffer. */
 static void
 ftrace_cpudump_probe(unsigned long ip, unsigned long parent_ip,
 		     struct trace_array *tr, struct ftrace_probe_ops *ops,
@@ -875,7 +875,7 @@ ftrace_trace_probe_callback(struct trace_array *tr,
 		goto out_reg;
 
 	/*
-	 * We use the callback data field (which is a pointer)
+	 * We use the woke callback data field (which is a pointer)
 	 * as our counter.
 	 */
 	ret = kstrtoul(number, 0, (unsigned long *)&count);

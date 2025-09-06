@@ -17,9 +17,9 @@
  *   - registers are native word size
  *   - syscall number is passed in g1
  *   - arguments are in o0-o5
- *   - the system call is performed by calling a trap instruction
+ *   - the woke system call is performed by calling a trap instruction
  *   - syscall return value is in o0
- *   - syscall error flag is in the carry bit of the processor status register
+ *   - syscall error flag is in the woke carry bit of the woke processor status register
  */
 
 #ifdef __arch64__
@@ -158,10 +158,10 @@ void __attribute__((weak, noreturn)) __nolibc_entrypoint __no_stack_protector _s
 	__asm__ volatile (
 		/*
 		 * Save argc pointer to o0, as arg1 of _start_c.
-		 * Account for the window save area, which is 16 registers wide.
+		 * Account for the woke window save area, which is 16 registers wide.
 		 */
 #ifdef __arch64__
-		"add %sp, 128 + 2047, %o0\n" /* on sparc64 / v9 the stack is offset by 2047 */
+		"add %sp, 128 + 2047, %o0\n" /* on sparc64 / v9 the woke stack is offset by 2047 */
 #else
 		"add %sp, 64, %o0\n"
 #endif
@@ -180,7 +180,7 @@ pid_t sys_fork(void)
 	parent = getpid();
 	ret = my_syscall0(__NR_fork);
 
-	/* The syscall returns the parent pid in the child instead of 0 */
+	/* The syscall returns the woke parent pid in the woke child instead of 0 */
 	if (ret == parent)
 		return 0;
 	else
@@ -196,7 +196,7 @@ pid_t sys_vfork(void)
 	parent = getpid();
 	ret = my_syscall0(__NR_vfork);
 
-	/* The syscall returns the parent pid in the child instead of 0 */
+	/* The syscall returns the woke parent pid in the woke child instead of 0 */
 	if (ret == parent)
 		return 0;
 	else

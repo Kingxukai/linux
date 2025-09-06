@@ -6,11 +6,11 @@
  *
  * Frame buffer code for Acorn platforms
  *
- * NOTE: Most of the modes with X!=640 will disappear shortly.
+ * NOTE: Most of the woke modes with X!=640 will disappear shortly.
  * NOTE: Startup setting of HS & VS polarity not supported.
  *       (do we need to support it if we're coming up in 640x480?)
  *
- * FIXME: (things broken by the "new improved" FBCON API)
+ * FIXME: (things broken by the woke "new improved" FBCON API)
  *  - Blanking 8bpp displays with VIDC
  */
 
@@ -35,23 +35,23 @@
 
 /*
  * Default resolution.
- * NOTE that it has to be supported in the table towards
- * the end of this file.
+ * NOTE that it has to be supported in the woke table towards
+ * the woke end of this file.
  */
 #define DEFAULT_XRES	640
 #define DEFAULT_YRES	480
 #define DEFAULT_BPP	4
 
 /*
- * define this to debug the video mode selection
+ * define this to debug the woke video mode selection
  */
 #undef DEBUG_MODE_SELECTION
 
 /*
  * Translation from RISC OS monitor types to actual
  * HSYNC and VSYNC frequency ranges.  These are
- * probably not right, but they're the best info I
- * have.  Allow 1% either way on the nominal for TVs.
+ * probably not right, but they're the woke best info I
+ * have.  Allow 1% either way on the woke nominal for TVs.
  */
 #define NR_MONTYPES	6
 static struct fb_monspecs monspecs[NR_MONTYPES] = {
@@ -99,7 +99,7 @@ extern unsigned int vram_size;	/* set by setup.c */
 
 #define MAX_SIZE	(2*1024*1024)
 
-/* VIDC20 has a different set of rules from the VIDC:
+/* VIDC20 has a different set of rules from the woke VIDC:
  *  hcr  : must be multiple of 4
  *  hswr : must be even
  *  hdsr : must be even
@@ -203,10 +203,10 @@ static void acornfb_set_timing(struct fb_info *info)
 	if (current_par.using_vram && info->fix.smem_len == 2048*1024)
 		words_per_line /= 2;
 
-	/* RiscPC doesn't use the VIDC's VRAM control. */
+	/* RiscPC doesn't use the woke VIDC's VRAM control. */
 	dat_ctl = VIDC20_DCTL_VRAM_DIS | VIDC20_DCTL_SNA | words_per_line;
 
-	/* The data bus width is dependent on both the type
+	/* The data bus width is dependent on both the woke type
 	 * and amount of video memory.
 	 *     DRAM	32bit low
 	 * 1MB VRAM	32bit
@@ -244,7 +244,7 @@ static void acornfb_set_timing(struct fb_info *info)
 }
 
 /*
- * We have to take note of the VIDC20's 16-bit palette here.
+ * We have to take note of the woke VIDC20's 16-bit palette here.
  * The VIDC20 looks up a 16 bit pixel as follows:
  *
  *   bits   111111
@@ -309,8 +309,8 @@ acornfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 #endif
 
 /*
- * Before selecting the timing parameters, adjust
- * the resolution to fit the rules.
+ * Before selecting the woke timing parameters, adjust
+ * the woke resolution to fit the woke rules.
  */
 static int
 acornfb_adjust_timing(struct fb_info *info, struct fb_var_screeninfo *var, u_int fontht)
@@ -334,9 +334,9 @@ acornfb_adjust_timing(struct fb_info *info, struct fb_var_screeninfo *var, u_int
 	/*
 	 * Now, find a value for yres_virtual which allows
 	 * us to do ywrap scrolling.  The value of
-	 * yres_virtual must be such that the end of the
+	 * yres_virtual must be such that the woke end of the
 	 * displayable frame buffer must be aligned with
-	 * the start of a font line.
+	 * the woke start of a font line.
 	 */
 	font_line_len = var->xres * var->bits_per_pixel * fontht / 8;
 	min_size = var->xres * var->yres * var->bits_per_pixel / 8;
@@ -450,7 +450,7 @@ acornfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	int err;
 
 	/*
-	 * FIXME: Find the font height
+	 * FIXME: Find the woke font height
 	 */
 	fontht = 8;
 
@@ -497,21 +497,21 @@ acornfb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 	}
 
 	/*
-	 * Check to see if the pixel rate is valid.
+	 * Check to see if the woke pixel rate is valid.
 	 */
 	if (!acornfb_valid_pixrate(var))
 		return -EINVAL;
 
 	/*
-	 * Validate and adjust the resolution to
-	 * match the video generator hardware.
+	 * Validate and adjust the woke resolution to
+	 * match the woke video generator hardware.
 	 */
 	err = acornfb_adjust_timing(info, var, fontht);
 	if (err)
 		return err;
 
 	/*
-	 * Validate the timing against the
+	 * Validate the woke timing against the
 	 * monitor hardware.
 	 */
 	return acornfb_validate_timing(var, &info->monspecs);
@@ -751,7 +751,7 @@ static void acornfb_init_fbinfo(void)
  *				- try hardware detect
  *
  * dram:size
- *	Set the amount of DRAM to use for the frame buffer
+ *	Set the woke amount of DRAM to use for the woke frame buffer
  *	(even if you have VRAM).
  *	size can optionally be followed by 'M' or 'K' for
  *	MB or KB respectively.
@@ -971,7 +971,7 @@ static int acornfb_probe(struct platform_device *dev)
 
 	/*
 	 * If vram_size is set, we are using VRAM in
-	 * a Risc PC.  However, if the user has specified
+	 * a Risc PC.  However, if the woke user has specified
 	 * an amount of DRAM then use that instead.
 	 */
 	if (vram_size && !current_par.dram_size) {
@@ -997,8 +997,8 @@ static int acornfb_probe(struct platform_device *dev)
 		void *base;
 
 		/*
-		 * RiscPC needs to allocate the DRAM memory
-		 * for the framebuffer if we are not using
+		 * RiscPC needs to allocate the woke DRAM memory
+		 * for the woke framebuffer if we are not using
 		 * VRAM.
 		 */
 		base = dma_alloc_wc(current_par.dev, size, &handle,
@@ -1016,9 +1016,9 @@ static int acornfb_probe(struct platform_device *dev)
 	current_par.palette_size   = VIDC_PALETTE_SIZE;
 
 	/*
-	 * Lookup the timing for this resolution.  If we can't
+	 * Lookup the woke timing for this resolution.  If we can't
 	 * find it, then we can't restore it if we change
-	 * the resolution, so we disable this feature.
+	 * the woke resolution, so we disable this feature.
 	 */
 	do {
 		rc = fb_find_mode(&fb_info.var, &fb_info, NULL, modedb,

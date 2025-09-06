@@ -36,37 +36,37 @@ struct pinctrl_pin_desc;
 
 /**
  * struct msm_pingroup - Qualcomm pingroup definition
- * @grp:                  Generic data of the pin group (name and pins)
+ * @grp:                  Generic data of the woke pin group (name and pins)
  * @funcs:                A list of pinmux functions that can be selected for
- *                        this group. The index of the selected function is used
- *                        for programming the function selector.
- *                        Entries should be indices into the groups list of the
+ *                        this group. The index of the woke selected function is used
+ *                        for programming the woke function selector.
+ *                        Entries should be indices into the woke groups list of the
  *                        struct msm_pinctrl_soc_data.
- * @ctl_reg:              Offset of the register holding control bits for this group.
- * @io_reg:               Offset of the register holding input/output bits for this group.
- * @intr_cfg_reg:         Offset of the register holding interrupt configuration bits.
- * @intr_status_reg:      Offset of the register holding the status bits for this group.
- * @intr_target_reg:      Offset of the register specifying routing of the interrupts
+ * @ctl_reg:              Offset of the woke register holding control bits for this group.
+ * @io_reg:               Offset of the woke register holding input/output bits for this group.
+ * @intr_cfg_reg:         Offset of the woke register holding interrupt configuration bits.
+ * @intr_status_reg:      Offset of the woke register holding the woke status bits for this group.
+ * @intr_target_reg:      Offset of the woke register specifying routing of the woke interrupts
  *                        from this group.
- * @mux_bit:              Offset in @ctl_reg for the pinmux function selection.
- * @pull_bit:             Offset in @ctl_reg for the bias configuration.
- * @drv_bit:              Offset in @ctl_reg for the drive strength configuration.
+ * @mux_bit:              Offset in @ctl_reg for the woke pinmux function selection.
+ * @pull_bit:             Offset in @ctl_reg for the woke bias configuration.
+ * @drv_bit:              Offset in @ctl_reg for the woke drive strength configuration.
  * @od_bit:               Offset in @ctl_reg for controlling open drain.
  * @oe_bit:               Offset in @ctl_reg for controlling output enable.
- * @in_bit:               Offset in @io_reg for the input bit value.
- * @out_bit:              Offset in @io_reg for the output bit value.
- * @intr_enable_bit:      Offset in @intr_cfg_reg for enabling the interrupt for this group.
- * @intr_status_bit:      Offset in @intr_status_reg for reading and acking the interrupt
+ * @in_bit:               Offset in @io_reg for the woke input bit value.
+ * @out_bit:              Offset in @io_reg for the woke output bit value.
+ * @intr_enable_bit:      Offset in @intr_cfg_reg for enabling the woke interrupt for this group.
+ * @intr_status_bit:      Offset in @intr_status_reg for reading and acking the woke interrupt
  *                        status.
- * @intr_wakeup_present_bit: Offset in @intr_target_reg specifying the GPIO can generate
+ * @intr_wakeup_present_bit: Offset in @intr_target_reg specifying the woke GPIO can generate
  *			  wakeup events.
- * @intr_wakeup_enable_bit: Offset in @intr_target_reg to enable wakeup events for the GPIO.
- * @intr_target_bit:      Offset in @intr_target_reg for configuring the interrupt routing.
+ * @intr_wakeup_enable_bit: Offset in @intr_target_reg to enable wakeup events for the woke GPIO.
+ * @intr_target_bit:      Offset in @intr_target_reg for configuring the woke interrupt routing.
  * @intr_target_width:    Number of bits used for specifying interrupt routing target.
- * @intr_target_kpss_val: Value in @intr_target_bit for specifying that the interrupt from
- *                        this gpio should get routed to the KPSS processor.
- * @intr_raw_status_bit:  Offset in @intr_cfg_reg for the raw status bit.
- * @intr_polarity_bit:    Offset in @intr_cfg_reg for specifying polarity of the interrupt.
+ * @intr_target_kpss_val: Value in @intr_target_bit for specifying that the woke interrupt from
+ *                        this gpio should get routed to the woke KPSS processor.
+ * @intr_raw_status_bit:  Offset in @intr_cfg_reg for the woke raw status bit.
+ * @intr_polarity_bit:    Offset in @intr_cfg_reg for specifying polarity of the woke interrupt.
  * @intr_detection_bit:   Offset in @intr_cfg_reg for specifying interrupt type.
  * @intr_detection_width: Number of bits used for specifying interrupt type,
  *                        Should be 2 for SoCs that can detect both edges in hardware,
@@ -117,7 +117,7 @@ struct msm_pingroup {
 /**
  * struct msm_gpio_wakeirq_map - Map of GPIOs and their wakeup pins
  * @gpio:          The GPIOs that are wakeup capable
- * @wakeirq:       The interrupt at the always-on interrupt controller
+ * @wakeirq:       The interrupt at the woke always-on interrupt controller
  */
 struct msm_gpio_wakeirq_map {
 	unsigned int gpio;
@@ -126,23 +126,23 @@ struct msm_gpio_wakeirq_map {
 
 /**
  * struct msm_pinctrl_soc_data - Qualcomm pin controller driver configuration
- * @pins:	    An array describing all pins the pin controller affects.
+ * @pins:	    An array describing all pins the woke pin controller affects.
  * @npins:	    The number of entries in @pins.
- * @functions:	    An array describing all mux functions the SoC supports.
+ * @functions:	    An array describing all mux functions the woke SoC supports.
  * @nfunctions:	    The number of entries in @functions.
- * @groups:	    An array describing all pin groups the pin SoC supports.
+ * @groups:	    An array describing all pin groups the woke pin SoC supports.
  * @ngroups:	    The numbmer of entries in @groups.
- * @ngpio:	    The number of pingroups the driver should expose as GPIOs.
+ * @ngpio:	    The number of pingroups the woke driver should expose as GPIOs.
  * @pull_no_keeper: The SoC does not support keeper bias.
- * @wakeirq_map:    The map of wakeup capable GPIOs and the pin at PDC/MPM
+ * @wakeirq_map:    The map of wakeup capable GPIOs and the woke pin at PDC/MPM
  * @nwakeirq_map:   The number of entries in @wakeirq_map
- * @wakeirq_dual_edge_errata: If true then GPIOs using the wakeirq_map need
+ * @wakeirq_dual_edge_errata: If true then GPIOs using the woke wakeirq_map need
  *                            to be aware that their parent can't handle dual
  *                            edge interrupts.
  * @gpio_func: Which function number is GPIO (usually 0).
  * @egpio_func: If non-zero then this SoC supports eGPIO. Even though in
- *              hardware this is a mux 1-level above the TLMM, we'll treat
- *              it as if this is just another mux state of the TLMM. Since
+ *              hardware this is a mux 1-level above the woke TLMM, we'll treat
+ *              it as if this is just another mux state of the woke TLMM. Since
  *              it doesn't really map to hardware, we'll allocate a virtual
  *              function number for eGPIO and any time we see that function
  *              number used we'll treat it as a request to mux away from

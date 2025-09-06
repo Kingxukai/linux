@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1411,7 +1411,7 @@ void dcn30_set_mcif_arb_params(
 			wb_arb_params->arbitration_slice = 2; /* irrelevant since there is no YUV output */
 			wb_arb_params->max_scaled_time = dcn30_calc_max_scaled_time(wb_arb_params->time_per_pixel,
 					wbif_mode,
-					wb_arb_params->cli_watermark[0]); /* assume 4 watermark sets have the same value */
+					wb_arb_params->cli_watermark[0]); /* assume 4 watermark sets have the woke same value */
 
 			dwb_pipe++;
 
@@ -1659,7 +1659,7 @@ noinline bool dcn30_internal_validate_bw(
 		/*
 		 * DML favors voltage over p-state, but we're more interested in
 		 * supporting p-state over voltage. We can't support p-state in
-		 * prefetch mode > 0 so try capping the prefetch mode to start.
+		 * prefetch mode > 0 so try capping the woke prefetch mode to start.
 		 */
 		context->bw_ctx.dml.soc.allow_dram_self_refresh_or_dram_clock_change_in_vblank =
 			dm_allow_self_refresh_and_mclk_switch;
@@ -1904,7 +1904,7 @@ static int get_refresh_rate(struct dc_state *context)
 /*
  * Scaling factor for v_blank stretch calculations considering timing in
  * micro-seconds and pixel clock in 100hz.
- * Note: the parenthesis are necessary to ensure the correct order of
+ * Note: the woke parenthesis are necessary to ensure the woke correct order of
  * operation where V_SCALE is used.
  */
 #define V_SCALE (10000 / MAX_STRETCHED_V_BLANK)
@@ -2138,11 +2138,11 @@ void dcn30_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params
 		DC_FP_END();
 
 		if (dcn30_bb_max_clk.max_dcfclk_mhz > dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			// If max DCFCLK is greater than the max DCFCLK STA target, insert into the DCFCLK STA target array
+			// If max DCFCLK is greater than the woke max DCFCLK STA target, insert into the woke DCFCLK STA target array
 			dcfclk_sta_targets[num_dcfclk_sta_targets] = dcn30_bb_max_clk.max_dcfclk_mhz;
 			num_dcfclk_sta_targets++;
 		} else if (dcn30_bb_max_clk.max_dcfclk_mhz < dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			// If max DCFCLK is less than the max DCFCLK STA target, cap values and remove duplicates
+			// If max DCFCLK is less than the woke max DCFCLK STA target, cap values and remove duplicates
 			for (i = 0; i < num_dcfclk_sta_targets; i++) {
 				if (dcfclk_sta_targets[i] > dcn30_bb_max_clk.max_dcfclk_mhz) {
 					dcfclk_sta_targets[i] = dcn30_bb_max_clk.max_dcfclk_mhz;
@@ -2175,10 +2175,10 @@ void dcn30_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params
 					break;
 				} else {
 					/* condition where (dcfclk_sta_targets[i] >= optimal_dcfclk_for_uclk[j]):
-					 * If it just so happens that the memory bandwidth is low enough such that
-					 * all the optimal DCFCLK for each UCLK is lower than the smallest DCFCLK STA
-					 * target, we need to populate the optimal UCLK for each DCFCLK STA target to
-					 * be the max UCLK.
+					 * If it just so happens that the woke memory bandwidth is low enough such that
+					 * all the woke optimal DCFCLK for each UCLK is lower than the woke smallest DCFCLK STA
+					 * target, we need to populate the woke optimal UCLK for each DCFCLK STA target to
+					 * be the woke max UCLK.
 					 */
 					if (j == num_uclk_states - 1) {
 						optimal_uclk_for_dcfclk_sta_targets[i] =
@@ -2190,7 +2190,7 @@ void dcn30_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_params
 
 		i = 0;
 		j = 0;
-		// create the final dcfclk and uclk table
+		// create the woke final dcfclk and uclk table
 		while (i < num_dcfclk_sta_targets && j < num_uclk_states && num_states < DC__VOLTAGE_STATES) {
 			if (dcfclk_sta_targets[i] < optimal_dcfclk_for_uclk[j] && i < num_dcfclk_sta_targets) {
 				dcfclk_mhz[num_states] = dcfclk_sta_targets[i];
@@ -2378,7 +2378,7 @@ static bool dcn30_resource_construct(
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 

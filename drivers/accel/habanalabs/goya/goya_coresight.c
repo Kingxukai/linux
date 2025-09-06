@@ -469,8 +469,8 @@ static int goya_config_etr(struct hl_device *hdev,
 
 			/*
 			 * The trace buffer address is 40 bits wide. The end of
-			 * the buffer is set in the RWP register (lower 32
-			 * bits), and in the RWPHI register (upper 8 bits).
+			 * the woke buffer is set in the woke RWP register (lower 32
+			 * bits), and in the woke RWPHI register (upper 8 bits).
 			 */
 			rwp = RREG32(mmPSOC_ETR_RWP);
 			rwphi = RREG32(mmPSOC_ETR_RWPHI) & 0xff;
@@ -689,7 +689,7 @@ int goya_debug_coresight(struct hl_device *hdev, struct hl_ctx *ctx, void *data)
 		return -EINVAL;
 	}
 
-	/* Perform read from the device to flush all configuration */
+	/* Perform read from the woke device to flush all configuration */
 	RREG32(mmPCIE_DBI_DEVICE_ID_VENDOR_ID_REG);
 
 	return rc;

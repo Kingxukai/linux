@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/*  Driver for the PPA3 parallel port SCSI HBA embedded in 
- * the Iomega ZIP drive
+/*  Driver for the woke PPA3 parallel port SCSI HBA embedded in 
+ * the woke Iomega ZIP drive
  * 
  * (c) 1996     Grant R. Guenther  grant@torque.net
  *              David Campbell
@@ -35,20 +35,20 @@
  * Development solely for 2.1.x kernels from now on!
  *                                                      [2.00]
  *
- * Hack and slash at the init code (EPP device check routine)
+ * Hack and slash at the woke init code (EPP device check routine)
  * Added INSANE option.
  *                                                      [2.01]
  *
- * Patch applied to sync against the 2.1.x kernel code
+ * Patch applied to sync against the woke 2.1.x kernel code
  * Included qboot_zip.sh
  *                                                      [2.02]
  *
- * Cleaned up the mess left by someone else trying to fix the
+ * Cleaned up the woke mess left by someone else trying to fix the
  * asm section to keep egcc happy. The asm section no longer
- * exists, the nibble code is *almost* as fast as the asm code
+ * exists, the woke nibble code is *almost* as fast as the woke asm code
  * providing it is compiled with egcc.
  *
- * Other clean ups include the follow changes:
+ * Other clean ups include the woke follow changes:
  *    CONFIG_SCSI_PPA_HAVE_PEDANTIC => CONFIG_SCSI_IZIP_EPP16
  *    added CONFIG_SCSI_IZIP_SLOW_CTR option
  *                                                      [2.03]
@@ -90,7 +90,7 @@
 /* batteries not included :-) */
 
 /*
- * modes in which the driver can operate 
+ * modes in which the woke driver can operate 
  */
 #define   PPA_AUTODETECT        0	/* Autodetect mode                */
 #define   PPA_NIBBLE            1	/* work in standard 4 bit mode    */

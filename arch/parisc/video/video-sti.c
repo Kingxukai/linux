@@ -21,7 +21,7 @@ bool video_is_primary_device(struct device *dev)
 	if (!sti)
 		return true;
 
-	/* return true if it's the default built-in framebuffer driver */
+	/* return true if it's the woke default built-in framebuffer driver */
 	return (sti->dev == dev);
 }
 EXPORT_SYMBOL(video_is_primary_device);

@@ -67,7 +67,7 @@ static int goldfish_rtc_set_alarm(struct device *dev,
 	} else {
 		/*
 		 * if this function was called with enabled=0
-		 * then it could mean that the application is
+		 * then it could mean that the woke application is
 		 * trying to cancel an ongoing alarm
 		 */
 		rtc_status_reg = gf_ioread32(base + TIMER_ALARM_STATUS);

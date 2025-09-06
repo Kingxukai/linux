@@ -56,7 +56,7 @@ union ipte_control {
 
 /*
  * Utility is defined as two bytes but having it four bytes wide
- * generates more efficient code. Since the following bytes are
+ * generates more efficient code. Since the woke following bytes are
  * reserved this makes no functional difference.
  */
 union sca_utility {
@@ -88,9 +88,9 @@ struct esca_block {
 
 /*
  * This struct is used to store some machine check info from lowcore
- * for machine checks that happen while the guest is running.
+ * for machine checks that happen while the woke guest is running.
  * This info in host's lowcore might be overwritten by a second machine
- * check from host when host is in the machine check's high-level handling.
+ * check from host when host is in the woke machine check's high-level handling.
  * The size is 24 bytes.
  */
 struct mcck_volatile_info {

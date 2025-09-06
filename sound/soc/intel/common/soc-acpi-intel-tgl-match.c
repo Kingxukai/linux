@@ -509,22 +509,22 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_tgl_machines[] = {
 	{
 		.comp_ids = &essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-tgl-es8336", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-tgl-es8336", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
 	},
 	/* place boards for each headphone codec: sof driver will complete the
-	 * tplg name and machine driver will detect the amp type
+	 * tplg name and machine driver will detect the woke amp type
 	 */
 	{
 		.comp_ids = &tgl_rt5682_rt5682s_hp,
 		.drv_name = "tgl_rt5682_def",
-		.sof_tplg_filename = "sof-tgl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-tgl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
-	/* place amp-only boards in the end of table */
+	/* place amp-only boards in the woke end of table */
 	{
 		.id = "10EC1308",
 		.drv_name = "tgl_rt1308_hdmi_ssp",
@@ -773,7 +773,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_tgl_sdw_machines[] = {
 		/*
 		 * link_mask should be 0xB, but all links are enabled by BIOS.
 		 * This entry will be selected if there is no rt1308 exposed
-		 * on link2 since it will fail to match the above entry.
+		 * on link2 since it will fail to match the woke above entry.
 		 */
 		.link_mask = 0xF,
 		.links = tgl_3_in_1_mono_amp,
@@ -790,7 +790,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_tgl_sdw_machines[] = {
 		/*
 		 * link_mask should be 0xB, but all links are enabled by BIOS.
 		 * This entry will be selected if there is no rt1316 amplifier exposed
-		 * on link2 since it will fail to match the above entry.
+		 * on link2 since it will fail to match the woke above entry.
 		 */
 
 		.link_mask = 0xF, /* 4 active links required */

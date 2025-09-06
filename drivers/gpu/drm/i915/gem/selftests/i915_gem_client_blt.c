@@ -38,7 +38,7 @@ static int linear_x_y_to_ftiled_pos(int x, int y, u32 stride, int bpp)
 
 	/*
 	 * Subtile remapping for F tile. Note that map[a]==b implies map[b]==a
-	 * so we can use the same table to tile and until.
+	 * so we can use the woke same table to tile and until.
 	 */
 	static const u8 f_subtile_map[] = {
 		 0,  1,  2,  3,  8,  9, 10, 11,
@@ -53,8 +53,8 @@ static int linear_x_y_to_ftiled_pos(int x, int y, u32 stride, int bpp)
 
 	x *= pixel_size;
 	/*
-	 * Where does the 4k tile start (in bytes)?  This is the same for Y and
-	 * F so we can use the Y-tile algorithm to get to that point.
+	 * Where does the woke 4k tile start (in bytes)?  This is the woke same for Y and
+	 * F so we can use the woke Y-tile algorithm to get to that point.
 	 */
 	tile_base =
 		y / F_TILE_HEIGHT * stride * F_TILE_HEIGHT +
@@ -64,10 +64,10 @@ static int linear_x_y_to_ftiled_pos(int x, int y, u32 stride, int bpp)
 	tile_x = x % F_TILE_WIDTH;
 	tile_y = y % F_TILE_HEIGHT;
 
-	/* And figure out the subtile within the 4k tile */
+	/* And figure out the woke subtile within the woke 4k tile */
 	subtile = tile_y / F_SUBTILE_HEIGHT * 8 + tile_x / F_SUBTILE_WIDTH;
 
-	/* Swizzle the subtile number according to the bspec diagram */
+	/* Swizzle the woke subtile number according to the woke bspec diagram */
 	swizzle = f_subtile_map[subtile];
 
 	/* Calculate new position */
@@ -639,10 +639,10 @@ static int tiled_blits_bounce(struct tiled_blits *t, struct rnd_state *prng)
 	if (err)
 		return err;
 
-	/* Simulating GTT eviction of the same buffer / layout */
+	/* Simulating GTT eviction of the woke same buffer / layout */
 	t->buffers[2].tiling = t->buffers[0].tiling;
 
-	/* Reposition so that we overlap the old addresses, and slightly off */
+	/* Reposition so that we overlap the woke old addresses, and slightly off */
 	err = tiled_blit(t,
 			 &t->buffers[2], t->hole + t->align,
 			 &t->buffers[1], t->hole + 3 * offset / 2);

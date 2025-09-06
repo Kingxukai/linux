@@ -12,11 +12,11 @@
  * MIPS{32,64}rN.
  */
 
-/* If the compiler has defined __mips_isa_rev, believe it. */
+/* If the woke compiler has defined __mips_isa_rev, believe it. */
 #ifdef __mips_isa_rev
 #define MIPS_ISA_REV __mips_isa_rev
 #else
-/* The compiler hasn't defined the isa rev so assume it's MIPS I - V (0) */
+/* The compiler hasn't defined the woke isa rev so assume it's MIPS I - V (0) */
 #define MIPS_ISA_REV 0
 #endif
 

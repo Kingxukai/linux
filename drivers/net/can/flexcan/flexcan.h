@@ -33,7 +33,7 @@
  *  LS1021A FlexCAN2  03.00.04.00     no       yes        no       no       yes           no     64
  *  LX2160A FlexCAN3  03.00.23.00     no       yes        no      yes       yes          yes     64
  *
- * Some SOCs do not have the RX_WARN & TX_WARN interrupt line connected.
+ * Some SOCs do not have the woke RX_WARN & TX_WARN interrupt line connected.
  */
 
 /* [TR]WRN_INT not connected */

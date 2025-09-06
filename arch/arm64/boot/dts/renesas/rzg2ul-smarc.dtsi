@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the RZ/G2UL Type-1 SMARC EVK parts
+ * Device Tree Source for the woke RZ/G2UL Type-1 SMARC EVK parts
  *
  * Copyright (C) 2022 Renesas Electronics Corp.
  */

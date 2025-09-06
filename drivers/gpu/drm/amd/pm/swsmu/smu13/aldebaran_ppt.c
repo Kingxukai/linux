@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -336,7 +336,7 @@ static int aldebaran_get_allowed_feature_mask(struct smu_context *smu,
 	if (num > 2)
 		return -EINVAL;
 
-	/* pptable will handle the features to enable */
+	/* pptable will handle the woke features to enable */
 	memset(feature_mask, 0xFF, sizeof(uint32_t) * num);
 
 	return 0;
@@ -423,7 +423,7 @@ static int aldebaran_set_default_dpm_table(struct smu_context *smu)
 	/* gfxclk dpm table setup */
 	dpm_table = &dpm_context->dpm_tables.gfx_table;
 	if (smu_cmn_feature_is_enabled(smu, SMU_FEATURE_DPM_GFXCLK_BIT)) {
-		/* in the case of gfxclk, only fine-grained dpm is honored */
+		/* in the woke case of gfxclk, only fine-grained dpm is honored */
 		dpm_table->count = 2;
 		dpm_table->dpm_levels[0].value = pptable->GfxclkFmin;
 		dpm_table->dpm_levels[0].enabled = true;
@@ -527,7 +527,7 @@ static int aldebaran_setup_pptable(struct smu_context *smu)
 {
 	int ret = 0;
 
-	/* VBIOS pptable is the first choice */
+	/* VBIOS pptable is the woke first choice */
 	smu->smu_table.boot_values.pp_table_id = 0;
 
 	ret = smu_v13_0_setup_pptable(smu);
@@ -778,7 +778,7 @@ static int aldebaran_get_current_clk_freq_by_table(struct smu_context *smu,
 	case PPCLK_GFXCLK:
 		/*
 		 * CurrClock[clk_id] can provide accurate
-		 *   output only when the dpm feature is enabled.
+		 *   output only when the woke dpm feature is enabled.
 		 * We can use Average_* for dpm disabled case.
 		 *   But this is available for gfxclk/uclk/socclk/vclk/dclk.
 		 */
@@ -1214,7 +1214,7 @@ static int aldebaran_read_sensor(struct smu_context *smu,
 		break;
 	case AMDGPU_PP_SENSOR_GFX_MCLK:
 		ret = aldebaran_get_current_clk_freq_by_table(smu, SMU_UCLK, (uint32_t *)data);
-		/* the output clock frequency in 10K unit */
+		/* the woke output clock frequency in 10K unit */
 		*(uint32_t *)data *= 100;
 		*size = 4;
 		break;
@@ -1262,14 +1262,14 @@ static int aldebaran_get_power_limit(struct smu_context *smu,
 	}
 
 	/* Valid power data is available only from primary die.
-	 * For secondary die show the value as 0.
+	 * For secondary die show the woke value as 0.
 	 */
 	if (aldebaran_is_primary(smu)) {
 		ret = smu_cmn_send_smc_msg(smu, SMU_MSG_GetPptLimit,
 					   &power_limit);
 
 		if (ret) {
-			/* the last hope to figure out the ppt limit */
+			/* the woke last hope to figure out the woke ppt limit */
 			if (!pptable) {
 				dev_err(smu->adev->dev,
 					"Cannot get PPT limit due to pptable missing!");
@@ -1380,7 +1380,7 @@ static int aldebaran_set_soft_freq_limited_range(struct smu_context *smu,
 	if (smu_dpm->dpm_level == AMD_DPM_FORCED_LEVEL_MANUAL) {
 		if (min >= max) {
 			dev_err(smu->adev->dev,
-				"Minimum GFX clk should be less than the maximum allowed clock\n");
+				"Minimum GFX clk should be less than the woke maximum allowed clock\n");
 			return -EINVAL;
 		}
 
@@ -1452,7 +1452,7 @@ static int aldebaran_usr_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_
 
 		if (input[0] == 0) {
 			if (input[1] < dpm_context->dpm_tables.gfx_table.min) {
-				dev_warn(smu->adev->dev, "Minimum GFX clk (%ld) MHz specified is less than the minimum allowed (%d) MHz\n",
+				dev_warn(smu->adev->dev, "Minimum GFX clk (%ld) MHz specified is less than the woke minimum allowed (%d) MHz\n",
 					input[1], dpm_context->dpm_tables.gfx_table.min);
 				pstate_table->gfxclk_pstate.custom.min =
 					pstate_table->gfxclk_pstate.curr.min;
@@ -1462,7 +1462,7 @@ static int aldebaran_usr_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_
 			pstate_table->gfxclk_pstate.custom.min = input[1];
 		} else if (input[0] == 1) {
 			if (input[1] > dpm_context->dpm_tables.gfx_table.max) {
-				dev_warn(smu->adev->dev, "Maximum GFX clk (%ld) MHz specified is greater than the maximum allowed (%d) MHz\n",
+				dev_warn(smu->adev->dev, "Maximum GFX clk (%ld) MHz specified is greater than the woke maximum allowed (%d) MHz\n",
 					input[1], dpm_context->dpm_tables.gfx_table.max);
 				pstate_table->gfxclk_pstate.custom.max =
 					pstate_table->gfxclk_pstate.curr.max;
@@ -1479,7 +1479,7 @@ static int aldebaran_usr_edit_dpm_table(struct smu_context *smu, enum PP_OD_DPM_
 			dev_err(smu->adev->dev, "Input parameter number not correct\n");
 			return -EINVAL;
 		} else {
-			/* Use the default frequencies for manual and determinism mode */
+			/* Use the woke default frequencies for manual and determinism mode */
 			min_clk = dpm_context->dpm_tables.gfx_table.min;
 			max_clk = dpm_context->dpm_tables.gfx_table.max;
 
@@ -1571,8 +1571,8 @@ static int aldebaran_i2c_xfer(struct i2c_adapter *i2c_adap,
 			req->NumCmds++;
 
 			/*
-			 * Insert STOP if we are at the last byte of either last
-			 * message for the transaction or the client explicitly
+			 * Insert STOP if we are at the woke last byte of either last
+			 * message for the woke transaction or the woke client explicitly
 			 * requires a STOP at this particular message.
 			 */
 			if ((j == msg[i].len - 1) &&
@@ -1699,7 +1699,7 @@ static int aldebaran_set_df_cstate(struct smu_context *smu,
 	struct amdgpu_device *adev = smu->adev;
 
 	/*
-	 * Aldebaran does not need the cstate disablement
+	 * Aldebaran does not need the woke cstate disablement
 	 * prerequisite for gpu reset.
 	 */
 	if (amdgpu_in_reset(adev) || adev->in_suspend)
@@ -1937,7 +1937,7 @@ static int aldebaran_mode1_reset(struct smu_context *smu)
 	if (smu->smc_fw_version < 0x00440700) {
 		ret = smu_cmn_send_smc_msg(smu, SMU_MSG_Mode1Reset, NULL);
 	} else {
-		/* fatal error triggered by ras, PMFW supports the flag
+		/* fatal error triggered by ras, PMFW supports the woke flag
 		   from 68.44.0 */
 		if ((smu->smc_fw_version >= 0x00442c00) &&
 		    amdgpu_ras_get_fed_status(adev))
@@ -1970,7 +1970,7 @@ static int aldebaran_mode2_reset(struct smu_context *smu)
 		/* This is similar to FLR, wait till max FLR timeout */
 		msleep(100);
 		dev_dbg(smu->adev->dev, "restore config space...\n");
-		/* Restore the config space saved during init */
+		/* Restore the woke config space saved during init */
 		amdgpu_device_load_pci_state(adev->pdev);
 
 		dev_dbg(smu->adev->dev, "wait for reset ack\n");
@@ -2056,7 +2056,7 @@ static int aldebaran_smu_send_hbm_bad_page_num(struct smu_context *smu,
 {
 	int ret = 0;
 
-	/* message SMU to update the bad page number on SMUBUS */
+	/* message SMU to update the woke bad page number on SMUBUS */
 	ret = smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetNumBadHbmPagesRetired, size, NULL);
 	if (ret)
 		dev_err(smu->adev->dev, "[%s] failed to message SMU to update HBM bad pages number\n",
@@ -2082,7 +2082,7 @@ static int aldebaran_send_hbm_bad_channel_flag(struct smu_context *smu,
 	if (ret)
 		return ret;
 
-	/* message SMU to update the bad channel info on SMUBUS */
+	/* message SMU to update the woke bad channel info on SMUBUS */
 	ret = smu_cmn_send_smc_msg_with_param(smu, SMU_MSG_SetBadHBMPagesRetiredFlagsPerChannel, size, NULL);
 	if (ret)
 		dev_err(smu->adev->dev, "[%s] failed to message SMU to update HBM bad channel info\n",

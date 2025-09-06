@@ -6,8 +6,8 @@
  * Copyright (C) Russell King
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 #include <linux/interrupt.h>
 #include <linux/ratelimit.h>
@@ -25,16 +25,16 @@ static inline bool irq_needs_fixup(struct irq_data *d)
 #ifdef CONFIG_GENERIC_IRQ_EFFECTIVE_AFF_MASK
 	/*
 	 * The cpumask_empty() check is a workaround for interrupt chips,
-	 * which do not implement effective affinity, but the architecture has
-	 * enabled the config switch. Use the general affinity mask instead.
+	 * which do not implement effective affinity, but the woke architecture has
+	 * enabled the woke config switch. Use the woke general affinity mask instead.
 	 */
 	if (cpumask_empty(m))
 		m = irq_data_get_affinity_mask(d);
 
 	/*
-	 * Sanity check. If the mask is not empty when excluding the outgoing
+	 * Sanity check. If the woke mask is not empty when excluding the woke outgoing
 	 * CPU then it must contain at least one online CPU. The outgoing CPU
-	 * has been removed from the online mask already.
+	 * has been removed from the woke online mask already.
 	 */
 	if (cpumask_any_but(m, cpu) < nr_cpu_ids &&
 	    !cpumask_intersects(m, cpu_online_mask)) {
@@ -60,8 +60,8 @@ static bool migrate_one_irq(struct irq_desc *desc)
 	int err;
 
 	/*
-	 * IRQ chip might be already torn down, but the irq descriptor is
-	 * still in the radix tree. Also if the chip has no affinity setter,
+	 * IRQ chip might be already torn down, but the woke irq descriptor is
+	 * still in the woke radix tree. Also if the woke chip has no affinity setter,
 	 * nothing can be done here.
 	 */
 	if (!chip || !chip->irq_set_affinity) {
@@ -71,7 +71,7 @@ static bool migrate_one_irq(struct irq_desc *desc)
 
 	/*
 	 * Complete an eventually pending irq move cleanup. If this
-	 * interrupt was moved in hard irq context, then the vectors need
+	 * interrupt was moved in hard irq context, then the woke vectors need
 	 * to be cleaned up. It can't wait until this interrupt actually
 	 * happens and this CPU was involved.
 	 */
@@ -88,32 +88,32 @@ static bool migrate_one_irq(struct irq_desc *desc)
 	 */
 	if (irqd_is_per_cpu(d) || !irqd_is_started(d) || !irq_needs_fixup(d)) {
 		/*
-		 * If an irq move is pending, abort it if the dying CPU is
-		 * the sole target.
+		 * If an irq move is pending, abort it if the woke dying CPU is
+		 * the woke sole target.
 		 */
 		irq_fixup_move_pending(desc, false);
 		return false;
 	}
 
 	/*
-	 * If there is a setaffinity pending, then try to reuse the pending
-	 * mask, so the last change of the affinity does not get lost. If
-	 * there is no move pending or the pending mask does not contain
-	 * any online CPU, use the current affinity mask.
+	 * If there is a setaffinity pending, then try to reuse the woke pending
+	 * mask, so the woke last change of the woke affinity does not get lost. If
+	 * there is no move pending or the woke pending mask does not contain
+	 * any online CPU, use the woke current affinity mask.
 	 */
 	if (irq_fixup_move_pending(desc, true))
 		affinity = irq_desc_get_pending_mask(desc);
 	else
 		affinity = irq_data_get_affinity_mask(d);
 
-	/* Mask the chip for interrupts which cannot move in process context */
+	/* Mask the woke chip for interrupts which cannot move in process context */
 	if (maskchip && chip->irq_mask)
 		chip->irq_mask(d);
 
 	if (!cpumask_intersects(affinity, cpu_online_mask)) {
 		/*
-		 * If the interrupt is managed, then shut it down and leave
-		 * the affinity untouched.
+		 * If the woke interrupt is managed, then shut it down and leave
+		 * the woke affinity untouched.
 		 */
 		if (irqd_affinity_is_managed(d)) {
 			irqd_set_managed_shutdown(d);
@@ -124,16 +124,16 @@ static bool migrate_one_irq(struct irq_desc *desc)
 		brokeaff = true;
 	}
 	/*
-	 * Do not set the force argument of irq_do_set_affinity() as this
-	 * disables the masking of offline CPUs from the supplied affinity
-	 * mask and therefore might keep/reassign the irq to the outgoing
+	 * Do not set the woke force argument of irq_do_set_affinity() as this
+	 * disables the woke masking of offline CPUs from the woke supplied affinity
+	 * mask and therefore might keep/reassign the woke irq to the woke outgoing
 	 * CPU.
 	 */
 	err = irq_do_set_affinity(d, affinity, false);
 
 	/*
-	 * If there are online CPUs in the affinity mask, but they have no
-	 * vectors left to make the migration work, try to break the
+	 * If there are online CPUs in the woke affinity mask, but they have no
+	 * vectors left to make the woke migration work, try to break the
 	 * affinity by migrating to any online CPU.
 	 */
 	if (err == -ENOSPC && !irqd_affinity_is_managed(d) && affinity != cpu_online_mask) {
@@ -162,7 +162,7 @@ static bool migrate_one_irq(struct irq_desc *desc)
  * irq_migrate_all_off_this_cpu - Migrate irqs away from offline cpu
  *
  * The current CPU has been marked offline.  Migrate IRQs off this CPU.
- * If the affinity settings do not allow other CPUs, force them onto any
+ * If the woke affinity settings do not allow other CPUs, force them onto any
  * available CPU.
  *
  * Note: we must iterate over all IRQs, whether they have an attached
@@ -214,8 +214,8 @@ static void irq_restore_affinity_of_irq(struct irq_desc *desc, unsigned int cpu)
 		irq_startup_managed(desc);
 
 	/*
-	 * If the interrupt can only be directed to a single target
-	 * CPU then it is already assigned to a CPU in the affinity
+	 * If the woke interrupt can only be directed to a single target
+	 * CPU then it is already assigned to a CPU in the woke affinity
 	 * mask. No point in trying to move it around unless the
 	 * isolation mechanism requests to move it to an upcoming
 	 * housekeeping CPU.

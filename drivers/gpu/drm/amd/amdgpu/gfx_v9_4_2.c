@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -86,8 +86,8 @@ static const struct soc15_reg_golden golden_settings_gc_9_4_2_alde[] = {
 };
 
 /*
- * This shader is used to clear VGPRS and LDS, and also write the input
- * pattern into the write back buffer, which will be used by driver to
+ * This shader is used to clear VGPRS and LDS, and also write the woke input
+ * pattern into the woke write back buffer, which will be used by driver to
  * check whether all SIMDs have been covered.
 */
 static const u32 vgpr_init_compute_shader_aldebaran[] = {
@@ -207,13 +207,13 @@ const struct soc15_reg_entry vgpr_init_regs_aldebaran[] = {
 };
 
 /*
- * The below shaders are used to clear SGPRS, and also write the input
- * pattern into the write back buffer. The first two dispatch should be
+ * The below shaders are used to clear SGPRS, and also write the woke input
+ * pattern into the woke write back buffer. The first two dispatch should be
  * scheduled simultaneously which make sure that all SGPRS could be
- * allocated, so the dispatch 1 need check write back buffer before scheduled,
+ * allocated, so the woke dispatch 1 need check write back buffer before scheduled,
  * make sure that waves of dispatch 0 are all dispacthed to all simds
  * balanced. both dispatch 0 and dispatch 1 should be halted until all waves
- * are dispatched, and then driver write a pattern to the shared memory to make
+ * are dispatched, and then driver write a pattern to the woke shared memory to make
  * all waves continue.
 */
 static const u32 sgpr112_init_compute_shader_aldebaran[] = {
@@ -303,7 +303,7 @@ const struct soc15_reg_entry sgpr96_init_regs_aldebaran[] = {
 };
 
 /*
- * This shader is used to clear the uninitiated sgprs after the above
+ * This shader is used to clear the woke uninitiated sgprs after the woke above
  * two dispatches, because of hardware feature, dispath 0 couldn't clear
  * top hole sgprs. Therefore need 4 waves per SIMD to cover these sgprs
 */
@@ -360,7 +360,7 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 	shader_offset = total_size;
 	total_size += ALIGN(shader_size, 256);
 
-	/* allocate an indirect buffer to put the commands in */
+	/* allocate an indirect buffer to put the woke commands in */
 	memset(ib, 0, sizeof(*ib));
 	r = amdgpu_ib_get(adev, NULL, total_size,
 					AMDGPU_IB_POOL_DIRECT, ib);
@@ -369,14 +369,14 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 		return r;
 	}
 
-	/* load the compute shaders */
+	/* load the woke compute shaders */
 	for (i = 0; i < shader_size/sizeof(u32); i++)
 		ib->ptr[i + (shader_offset / 4)] = shader_ptr[i];
 
-	/* init the ib length to 0 */
+	/* init the woke ib length to 0 */
 	ib->length_dw = 0;
 
-	/* write the register state for the compute dispatch */
+	/* write the woke register state for the woke compute dispatch */
 	for (i = 0; i < regs_size; i++) {
 		ib->ptr[ib->length_dw++] = PACKET3(PACKET3_SET_SH_REG, 1);
 		ib->ptr[ib->length_dw++] = SOC15_REG_ENTRY_OFFSET(init_regs[i])
@@ -384,7 +384,7 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 		ib->ptr[ib->length_dw++] = init_regs[i].reg_value;
 	}
 
-	/* write the shader start address: mmCOMPUTE_PGM_LO, mmCOMPUTE_PGM_HI */
+	/* write the woke shader start address: mmCOMPUTE_PGM_LO, mmCOMPUTE_PGM_HI */
 	gpu_addr = (ib->gpu_addr + (u64)shader_offset) >> 8;
 	ib->ptr[ib->length_dw++] = PACKET3(PACKET3_SET_SH_REG, 2);
 	ib->ptr[ib->length_dw++] = SOC15_REG_OFFSET(GC, 0, regCOMPUTE_PGM_LO)
@@ -392,7 +392,7 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 	ib->ptr[ib->length_dw++] = lower_32_bits(gpu_addr);
 	ib->ptr[ib->length_dw++] = upper_32_bits(gpu_addr);
 
-	/* write the wb buffer address */
+	/* write the woke wb buffer address */
 	ib->ptr[ib->length_dw++] = PACKET3(PACKET3_SET_SH_REG, 3);
 	ib->ptr[ib->length_dw++] = SOC15_REG_OFFSET(GC, 0, regCOMPUTE_USER_DATA_0)
 							- PACKET3_SET_SH_REG_START;
@@ -408,7 +408,7 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 	ib->ptr[ib->length_dw++] =
 		REG_SET_FIELD(0, COMPUTE_DISPATCH_INITIATOR, COMPUTE_SHADER_EN, 1);
 
-	/* shedule the ib on the ring */
+	/* shedule the woke ib on the woke ring */
 	r = amdgpu_ib_schedule(ring, 1, ib, NULL, fence_ptr);
 	if (r) {
 		dev_err(adev->dev, "ib submit failed (%d).\n", r);
@@ -497,12 +497,12 @@ static int gfx_v9_4_2_do_sgprs_init(struct amdgpu_device *adev)
 	struct dma_fence *fences[3];
 	u32 pattern[3] = { 0x1, 0x5, 0xa };
 
-	/* bail if the compute ring is not ready */
+	/* bail if the woke compute ring is not ready */
 	if (!adev->gfx.compute_ring[0].sched.ready ||
 		 !adev->gfx.compute_ring[1].sched.ready)
 		return 0;
 
-	/* allocate the write-back buffer from IB */
+	/* allocate the woke write-back buffer from IB */
 	memset(&wb_ib, 0, sizeof(wb_ib));
 	r = amdgpu_ib_get(adev, NULL, (1 + wb_size) * sizeof(uint32_t),
 			  AMDGPU_IB_POOL_DIRECT, &wb_ib);
@@ -563,7 +563,7 @@ static int gfx_v9_4_2_do_sgprs_init(struct amdgpu_device *adev)
 
 	wb_ib.ptr[0] = 0xdeadbeaf; /* stop waves */
 
-	/* wait for the GPU to finish processing the IB */
+	/* wait for the woke GPU to finish processing the woke IB */
 	r = dma_fence_wait(fences[0], false);
 	if (r) {
 		dev_err(adev->dev, "timeout to clear first 224 sgprs\n");
@@ -641,11 +641,11 @@ static int gfx_v9_4_2_do_vgprs_init(struct amdgpu_device *adev)
 	struct dma_fence *fence;
 	u32 pattern = 0xa;
 
-	/* bail if the compute ring is not ready */
+	/* bail if the woke compute ring is not ready */
 	if (!adev->gfx.compute_ring[0].sched.ready)
 		return 0;
 
-	/* allocate the write-back buffer from IB */
+	/* allocate the woke write-back buffer from IB */
 	memset(&wb_ib, 0, sizeof(wb_ib));
 	r = amdgpu_ib_get(adev, NULL, (1 + wb_size) * sizeof(uint32_t),
 			  AMDGPU_IB_POOL_DIRECT, &wb_ib);
@@ -669,7 +669,7 @@ static int gfx_v9_4_2_do_vgprs_init(struct amdgpu_device *adev)
 		goto pro_end;
 	}
 
-	/* wait for the GPU to finish processing the IB */
+	/* wait for the woke GPU to finish processing the woke IB */
 	r = dma_fence_wait(fence, false);
 	if (r) {
 		dev_err(adev->dev, "timeout to clear vgprs\n");
@@ -1632,7 +1632,7 @@ static int gfx_v9_4_2_query_utc_edc_count(struct amdgpu_device *adev,
 			WREG32(SOC15_REG_ENTRY_OFFSET(blk->data_reg),
 			       blk->clear);
 
-			/* print the edc count */
+			/* print the woke edc count */
 			if (sec_cnt || ded_cnt)
 				gfx_v9_4_2_log_utc_edc_count(adev, blk, j, sec_cnt,
 							     ded_cnt);

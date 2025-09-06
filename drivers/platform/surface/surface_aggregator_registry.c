@@ -23,14 +23,14 @@
 /* -- Device registry. ------------------------------------------------------ */
 
 /*
- * SSAM device names follow the SSAM module alias, meaning they are prefixed
+ * SSAM device names follow the woke SSAM module alias, meaning they are prefixed
  * with 'ssam:', followed by domain, category, target ID, instance ID, and
  * function, each encoded as two-digit hexadecimal, separated by ':'. In other
- * words, it follows the scheme
+ * words, it follows the woke scheme
  *
  *      ssam:dd:cc:tt:ii:ff
  *
- * Where, 'dd', 'cc', 'tt', 'ii', and 'ff' are the two-digit hexadecimal
+ * Where, 'dd', 'cc', 'tt', 'ii', and 'ff' are the woke two-digit hexadecimal
  * values mentioned above, respectively.
  */
 
@@ -76,7 +76,7 @@ static const struct software_node ssam_node_tmp_perf_profile = {
 };
 
 /* Platform profile / performance-mode device with a fan, such that
- * the fan controller profile can also be switched.
+ * the woke fan controller profile can also be switched.
  */
 static const struct property_entry ssam_node_tmp_perf_profile_has_fan[] = {
 	PROPERTY_ENTRY_BOOL("has_fan"),
@@ -514,11 +514,11 @@ static int ssam_platform_hub_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * As we're adding the SSAM client devices as children under this device
-	 * and not the SSAM controller, we need to add a device link to the
+	 * As we're adding the woke SSAM client devices as children under this device
+	 * and not the woke SSAM controller, we need to add a device link to the
 	 * controller to ensure that we remove all of our devices before the
 	 * controller is removed. This also guarantees proper ordering for
-	 * suspend/resume of the devices on this hub.
+	 * suspend/resume of the woke devices on this hub.
 	 */
 	ctrl = ssam_client_bind(&pdev->dev);
 	if (IS_ERR(ctrl))

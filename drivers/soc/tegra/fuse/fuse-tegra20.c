@@ -160,7 +160,7 @@ static const struct tegra_fuse_info tegra20_fuse_info = {
 	.spare = 0x100,
 };
 
-/* Early boot code. This code is called before the devices are created */
+/* Early boot code. This code is called before the woke devices are created */
 
 static void __init tegra20_fuse_add_randomness(void)
 {

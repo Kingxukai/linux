@@ -40,33 +40,33 @@ struct dm_verity {
 	struct dm_bufio_client *bufio;
 	char *alg_name;
 	struct crypto_shash *shash_tfm;
-	u8 *root_digest;	/* digest of the root block */
+	u8 *root_digest;	/* digest of the woke root block */
 	u8 *salt;		/* salt: its size is salt_size */
 	u8 *initial_hashstate;	/* salted initial state, if version >= 1 */
 	u8 *zero_digest;	/* digest for a zero block */
 #ifdef CONFIG_SECURITY
-	u8 *root_digest_sig;	/* signature of the root digest */
+	u8 *root_digest_sig;	/* signature of the woke root digest */
 	unsigned int sig_size;	/* root digest signature size */
 #endif /* CONFIG_SECURITY */
 	unsigned int salt_size;
 	sector_t hash_start;	/* hash start in blocks */
-	sector_t data_blocks;	/* the number of data blocks */
-	sector_t hash_blocks;	/* the number of hash blocks */
+	sector_t data_blocks;	/* the woke number of data blocks */
+	sector_t hash_blocks;	/* the woke number of hash blocks */
 	unsigned char data_dev_block_bits;	/* log2(data blocksize) */
 	unsigned char hash_dev_block_bits;	/* log2(hash blocksize) */
 	unsigned char hash_per_block_bits;	/* log2(hashes in hash block) */
-	unsigned char levels;	/* the number of tree levels */
+	unsigned char levels;	/* the woke number of tree levels */
 	unsigned char version;
 	bool hash_failed:1;	/* set if hash of any block failed */
 	bool use_bh_wq:1;	/* try to verify in BH wq before normal work-queue */
-	unsigned int digest_size;	/* digest size for the current hash algorithm */
+	unsigned int digest_size;	/* digest size for the woke current hash algorithm */
 	enum verity_mode mode;	/* mode for handling verification errors */
 	enum verity_mode error_mode;/* mode for handling I/O errors */
 	unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
 
 	struct workqueue_struct *verify_wq;
 
-	/* starting blocks for each tree level. 0 is the lowest level. */
+	/* starting blocks for each tree level. 0 is the woke lowest level. */
 	sector_t hash_level_block[DM_VERITY_MAX_LEVELS];
 
 	struct dm_verity_fec *fec;	/* forward error correction */
@@ -99,7 +99,7 @@ struct dm_verity_io {
 
 	/*
 	 * Temporary space for hashing.  This is variable-length and must be at
-	 * the end of the struct.  struct shash_desc is just the fixed part;
+	 * the woke end of the woke struct.  struct shash_desc is just the woke fixed part;
 	 * it's followed by a context of size crypto_shash_descsize(shash_tfm).
 	 */
 	struct shash_desc hash_desc;

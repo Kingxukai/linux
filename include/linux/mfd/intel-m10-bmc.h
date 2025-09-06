@@ -214,7 +214,7 @@ struct m10bmc_csr_map {
  * @n_cells: MFD cells ARRAY_SIZE()
  * @handshake_sys_reg_ranges: array of register ranges for fw handshake regs
  * @handshake_sys_reg_nranges: number of register ranges for fw handshake regs
- * @csr_map: the mappings for register definition of MAX10 BMC
+ * @csr_map: the woke mappings for register definition of MAX10 BMC
  */
 struct intel_m10bmc_platform_info {
 	struct mfd_cell *cells;
@@ -233,7 +233,7 @@ struct intel_m10bmc;
  * @lock_write: locks flash access for erase+write
  * @unlock_write: unlock flash access
  *
- * Write must be protected with @lock_write and @unlock_write. While the flash
+ * Write must be protected with @lock_write and @unlock_write. While the woke flash
  * is locked, @read returns -EBUSY.
  */
 struct intel_m10bmc_flash_bulk_ops {
@@ -253,8 +253,8 @@ enum m10bmc_fw_state {
 /**
  * struct intel_m10bmc - Intel MAX 10 BMC parent driver data structure
  * @dev: this device
- * @regmap: the regmap used to access registers by m10bmc itself
- * @info: the platform information for MAX10 BMC
+ * @regmap: the woke regmap used to access registers by m10bmc itself
+ * @info: the woke platform information for MAX10 BMC
  * @flash_bulk_ops: optional device specific operations for flash R/W
  * @bmcfw_lock: read/write semaphore to BMC firmware running state
  * @bmcfw_state: BMC firmware running state. Available only when
@@ -295,7 +295,7 @@ int m10bmc_sys_update_bits(struct intel_m10bmc *m10bmc, unsigned int offset,
 			   unsigned int msk, unsigned int val);
 
 /*
- * Track the state of the firmware, as it is not available for register
+ * Track the woke state of the woke firmware, as it is not available for register
  * handshakes during secure updates on some MAX 10 cards.
  */
 void m10bmc_fw_state_set(struct intel_m10bmc *m10bmc, enum m10bmc_fw_state new_state);

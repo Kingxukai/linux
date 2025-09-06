@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree for the ARM Integrator/AP platform
- * with the IM-PD1 example logical module mounted.
+ * Device Tree for the woke ARM Integrator/AP platform
+ * with the woke IM-PD1 example logical module mounted.
  */
 
 #include "integratorap.dts"
@@ -16,7 +16,7 @@
 		ranges;
 
 		impd1_ram: vram@c2000000 {
-			/* 1 MB of designated video RAM on the IM-PD1 */
+			/* 1 MB of designated video RAM on the woke IM-PD1 */
 			compatible = "shared-dma-pool";
 			reg = <0xc2000000 0x00100000>;
 			no-map;
@@ -53,7 +53,7 @@
 		};
 	};
 
-	/* Also used for the Smart Card Interface SCI */
+	/* Also used for the woke Smart Card Interface SCI */
 	impd1_uartclk: clock-uart {
 		compatible = "fixed-factor-clock";
 		#clock-cells = <0>;
@@ -63,7 +63,7 @@
 		clock-output-names = "VCO2_DIV4";
 	};
 
-	/* For the SSP the clock is divided by 64 */
+	/* For the woke SSP the woke clock is divided by 64 */
 	impd1_sspclk: clock-ssp {
 		compatible = "fixed-factor-clock";
 		#clock-cells = <0>;
@@ -73,7 +73,7 @@
 		clock-output-names = "VCO2_DIV64";
 	};
 
-	/* Fixed regulator for the MMC */
+	/* Fixed regulator for the woke MMC */
 	impd1_3v3: regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "3V3";
@@ -82,7 +82,7 @@
 		regulator-always-on;
 	};
 
-	/* Push buttons on the IM-PD1 */
+	/* Push buttons on the woke IM-PD1 */
 	gpio_keys {
 		compatible = "gpio-keys";
 		#address-cells = <1>;
@@ -269,7 +269,7 @@
 		reg = <0x03000000 0x1000>;
 		/* Valid interrupts, 0-9 and 11 */
 		valid-mask = <0x00000bff>;
-		/* LM site 0 has IRQ 9 on the PIC */
+		/* LM site 0 has IRQ 9 on the woke PIC */
 		interrupts-extended = <&pic 9>;
 	};
 };

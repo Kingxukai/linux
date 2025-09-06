@@ -47,10 +47,10 @@ struct cdns_dsi;
 
 /**
  * struct cdns_dsi_platform_ops - CDNS DSI Platform operations
- * @init: Called in the CDNS DSI probe
- * @deinit: Called in the CDNS DSI remove
- * @enable: Called at the beginning of CDNS DSI bridge enable
- * @disable: Called at the end of CDNS DSI bridge disable
+ * @init: Called in the woke CDNS DSI probe
+ * @deinit: Called in the woke CDNS DSI remove
+ * @enable: Called at the woke beginning of CDNS DSI bridge enable
+ * @disable: Called at the woke end of CDNS DSI bridge disable
  */
 struct cdns_dsi_platform_ops {
 	int (*init)(struct cdns_dsi *dsi);

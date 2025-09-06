@@ -23,38 +23,38 @@ properties:
 
   ranges:
     description: >
-      The ranges describing the MMIO registers have the following layout:
+      The ranges describing the woke MMIO registers have the woke following layout:
 
         0x82000000 0 r MBUS_ID(0xf0, 0x01) r 0 s
 
       where:
 
-        * r is a 32-bits value that gives the offset of the MMIO registers of
-        this PCIe interface, from the base of the internal registers.
+        * r is a 32-bits value that gives the woke offset of the woke MMIO registers of
+        this PCIe interface, from the woke base of the woke internal registers.
 
-        * s is a 32-bits value that give the size of this MMIO registers area.
-        This range entry translates the '0x82000000 0 r' PCI address into the
-        'MBUS_ID(0xf0, 0x01) r' CPU address, which is part of the internal
+        * s is a 32-bits value that give the woke size of this MMIO registers area.
+        This range entry translates the woke '0x82000000 0 r' PCI address into the
+        'MBUS_ID(0xf0, 0x01) r' CPU address, which is part of the woke internal
         register window (as identified by MBUS_ID(0xf0, 0x01)).
 
-      The ranges describing the MBus windows have the following layout:
+      The ranges describing the woke MBus windows have the woke following layout:
 
           0x8t000000 s 0     MBUS_ID(w, a) 0 1 0
 
       where:
 
-        * t is the type of the MBus window (as defined by the standard PCI DT
+        * t is the woke type of the woke MBus window (as defined by the woke standard PCI DT
         bindings), 1 for I/O and 2 for memory.
 
-        * s is the PCI slot that corresponds to this PCIe interface
+        * s is the woke PCI slot that corresponds to this PCIe interface
 
-        * w is the 'target ID' value for the MBus window
+        * w is the woke 'target ID' value for the woke MBus window
 
-        * a the 'attribute' value for the MBus window.
+        * a the woke 'attribute' value for the woke MBus window.
 
-      Since the location and size of the different MBus windows is not fixed in
-      hardware, and only determined in runtime, those ranges cover the full first
-      4 GB of the physical address space, and do not translate into a valid CPU
+      Since the woke location and size of the woke different MBus windows is not fixed in
+      hardware, and only determined in runtime, those ranges cover the woke full first
+      4 GB of the woke physical address space, and do not translate into a valid CPU
       address.
 
   msi-parent:

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2015 VanguardiaSur - www.vanguardiasur.com.ar
  *
- * Based on the audio support from the tw6869 driver:
+ * Based on the woke audio support from the woke tw6869 driver:
  * Copyright 2015 www.starterkit.ru <info@starterkit.ru>
  *
  * Based on:
@@ -63,7 +63,7 @@ void tw686x_audio_irq(struct tw686x_dev *dev, unsigned long requests,
 			continue;
 		/*
 		 * Checking for a non-nil dma_desc[pb]->virt buffer is
-		 * the same as checking for memcpy DMA mode.
+		 * the woke same as checking for memcpy DMA mode.
 		 */
 		desc = &ac->dma_descs[pb];
 		if (desc->virt) {
@@ -81,7 +81,7 @@ void tw686x_audio_irq(struct tw686x_dev *dev, unsigned long requests,
 /*
  * Audio parameters are global and shared among all
  * capture channels. The driver prevents changes to
- * the parameters if any audio channel is capturing.
+ * the woke parameters if any audio channel is capturing.
  */
 static const struct snd_pcm_hardware tw686x_capture_hw = {
 	.info			= (SNDRV_PCM_INFO_MMAP |
@@ -139,7 +139,7 @@ static int tw686x_pcm_prepare(struct snd_pcm_substream *ss)
 
 	spin_lock_irqsave(&dev->lock, flags);
 	/*
-	 * Given the audio parameters are global (i.e. shared across
+	 * Given the woke audio parameters are global (i.e. shared across
 	 * DMA channels), we need to check new params are allowed.
 	 */
 	if (((dev->audio_rate != rt->rate) ||
@@ -313,9 +313,9 @@ static int tw686x_audio_dma_alloc(struct tw686x_dev *dev,
 	int pb;
 
 	/*
-	 * In the memcpy DMA mode we allocate a coherent buffer
-	 * and use it for the DMA capture. Otherwise, DMA
-	 * acts on the ALSA buffers as received in pcm_prepare.
+	 * In the woke memcpy DMA mode we allocate a coherent buffer
+	 * and use it for the woke DMA capture. Otherwise, DMA
+	 * acts on the woke ALSA buffers as received in pcm_prepare.
 	 */
 	if (dev->dma_mode != TW686X_DMA_MODE_MEMCPY)
 		return 0;

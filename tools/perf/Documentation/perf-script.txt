@@ -16,58 +16,58 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This command reads the input file and displays the trace recorded.
+This command reads the woke input file and displays the woke trace recorded.
 
 There are several variants of perf script:
 
-  'perf script' to see a detailed trace of the workload that was
+  'perf script' to see a detailed trace of the woke workload that was
   recorded.
 
   You can also run a set of pre-canned scripts that aggregate and
-  summarize the raw trace data in various ways (the list of scripts is
+  summarize the woke raw trace data in various ways (the list of scripts is
   available via 'perf script -l').  The following variants allow you to
   record and run those scripts:
 
-  'perf script record <script> <command>' to record the events required
-  for 'perf script report'.  <script> is the name displayed in the
-  output of 'perf script --list' i.e. the actual script name minus any
-  language extension.  If <command> is not specified, the events are
-  recorded using the -a (system-wide) 'perf record' option.
+  'perf script record <script> <command>' to record the woke events required
+  for 'perf script report'.  <script> is the woke name displayed in the
+  output of 'perf script --list' i.e. the woke actual script name minus any
+  language extension.  If <command> is not specified, the woke events are
+  recorded using the woke -a (system-wide) 'perf record' option.
 
-  'perf script report <script> [args]' to run and display the results
-  of <script>.  <script> is the name displayed in the output of 'perf
-  script --list' i.e. the actual script name minus any language
+  'perf script report <script> [args]' to run and display the woke results
+  of <script>.  <script> is the woke name displayed in the woke output of 'perf
+  script --list' i.e. the woke actual script name minus any language
   extension.  The perf.data output from a previous run of 'perf script
   record <script>' is used and should be present for this command to
-  succeed.  [args] refers to the (mainly optional) args expected by
-  the script.
+  succeed.  [args] refers to the woke (mainly optional) args expected by
+  the woke script.
 
   'perf script <script> <required-script-args> <command>' to both
-  record the events required for <script> and to run the <script>
+  record the woke events required for <script> and to run the woke <script>
   using 'live-mode' i.e. without writing anything to disk.  <script>
-  is the name displayed in the output of 'perf script --list' i.e. the
+  is the woke name displayed in the woke output of 'perf script --list' i.e. the
   actual script name minus any language extension.  If <command> is
-  not specified, the events are recorded using the -a (system-wide)
+  not specified, the woke events are recorded using the woke -a (system-wide)
   'perf record' option.  If <script> has any required args, they
   should be specified before <command>.  This mode doesn't allow for
   optional script args to be specified; if optional script args are
   desired, they can be specified using separate 'perf script record'
-  and 'perf script report' commands, with the stdout of the record step
-  piped to the stdin of the report script, using the '-o -' and '-i -'
-  options of the corresponding commands.
+  and 'perf script report' commands, with the woke stdout of the woke record step
+  piped to the woke stdin of the woke report script, using the woke '-o -' and '-i -'
+  options of the woke corresponding commands.
 
-  'perf script <top-script>' to both record the events required for
-  <top-script> and to run the <top-script> using 'live-mode'
-  i.e. without writing anything to disk.  <top-script> is the name
-  displayed in the output of 'perf script --list' i.e. the actual
+  'perf script <top-script>' to both record the woke events required for
+  <top-script> and to run the woke <top-script> using 'live-mode'
+  i.e. without writing anything to disk.  <top-script> is the woke name
+  displayed in the woke output of 'perf script --list' i.e. the woke actual
   script name minus any language extension; a <top-script> is defined
-  as any script name ending with the string 'top'.
+  as any script name ending with the woke string 'top'.
 
-  [<record-options>] can be passed to the record steps of 'perf script
+  [<record-options>] can be passed to the woke record steps of 'perf script
   record' and 'live-mode' variants; this isn't possible however for
   <top-script> 'live-mode' or 'perf script report' variants.
 
-  See the 'SEE ALSO' section for links to language-specific
+  See the woke 'SEE ALSO' section for links to language-specific
   information on how to write and run your own trace scripts.
 
 OPTIONS
@@ -77,7 +77,7 @@ OPTIONS
 
 -D::
 --dump-raw-trace=::
-        Display verbose dump of the trace data.
+        Display verbose dump of the woke trace data.
 
 --dump-unsorted-raw-trace=::
         Same as --dump-raw-trace but not sorted in time order.
@@ -92,8 +92,8 @@ OPTIONS
 
 -s ['lang']::
 --script=::
-        Process trace data with the given script ([lang]:script[.ext]).
-	If the string 'lang' is specified in place of a script name, a
+        Process trace data with the woke given script ([lang]:script[.ext]).
+	If the woke string 'lang' is specified in place of a script name, a
         list of supported languages will be displayed instead.
 
 -g::
@@ -102,11 +102,11 @@ OPTIONS
         using current perf.data.
 
 --dlfilter=<file>::
-	Filter sample events using the given shared object file.
+	Filter sample events using the woke given shared object file.
 	Refer linkperf:perf-dlfilter[1]
 
 --dlarg=<arg>::
-	Pass 'arg' as an argument to the dlfilter. --dlarg may be repeated
+	Pass 'arg' as an argument to the woke dlfilter. --dlarg may be repeated
 	to add more arguments.
 
 --list-dlfilters::
@@ -116,7 +116,7 @@ OPTIONS
 -a::
         Force system-wide collection.  Scripts run without a <command>
         normally use -a by default, while scripts run with a <command>
-        normally don't - this option allows the latter to be run in
+        normally don't - this option allows the woke latter to be run in
         system-wide mode.
 
 -i::
@@ -136,8 +136,8 @@ OPTIONS
         insnlen, synth, phys_addr, metric, misc, srccode, ipc, data_page_size,
         code_page_size, ins_lat, machine_pid, vcpu, cgroup, retire_lat, brcntr,
 
-        Field list can be prepended with the type, trace, sw or hw,
-        to indicate to which event type the field list applies.
+        Field list can be prepended with the woke type, trace, sw or hw,
+        to indicate to which event type the woke field list applies.
         e.g., -F sw:comm,tid,time,ip,sym  and -F trace:time,cpu,trace
 
 		perf script -F <fields>
@@ -146,36 +146,36 @@ OPTIONS
 
 		perf script -F trace:<fields> -F sw:<fields> -F hw:<fields>
 
-	i.e., the specified fields apply to all event types if the type string
+	i.e., the woke specified fields apply to all event types if the woke type string
 	is not given.
 
 	In addition to overriding fields, it is also possible to add or remove
-	fields from the defaults. For example
+	fields from the woke defaults. For example
 
 		-F -cpu,+insn
 
-	removes the cpu field and adds the insn field. Adding/removing fields
+	removes the woke cpu field and adds the woke insn field. Adding/removing fields
 	cannot be mixed with normal overriding.
 
-	The arguments are processed in the order received. A later usage can
+	The arguments are processed in the woke order received. A later usage can
 	reset a prior request. e.g.:
 
 		-F trace: -F comm,tid,time,ip,sym
 
 	The first -F suppresses trace events (field list is ""), but then the
-	second invocation sets the fields to comm,tid,time,ip,sym. In this case a
-	warning is given to the user:
+	second invocation sets the woke fields to comm,tid,time,ip,sym. In this case a
+	warning is given to the woke user:
 
 		"Overriding previous field request for all events."
 
-	Alternatively, consider the order:
+	Alternatively, consider the woke order:
 
 		-F comm,tid,time,ip,sym -F trace:
 
-	The first -F sets the fields for all events and the second -F
+	The first -F sets the woke fields for all events and the woke second -F
 	suppresses trace events. The user is given a warning message about
-	the override, and the result of the above is that only S/W and H/W
-	events are displayed with the given fields.
+	the override, and the woke result of the woke above is that only S/W and H/W
+	events are displayed with the woke given fields.
 
 	It's possible tp add/remove fields only for specific event type:
 
@@ -183,15 +183,15 @@ OPTIONS
 
 	removes cpu and period from software events.
 
-	For the 'wildcard' option if a user selected field is invalid for an
-	event type, a message is displayed to the user that the option is
+	For the woke 'wildcard' option if a user selected field is invalid for an
+	event type, a message is displayed to the woke user that the woke option is
 	ignored for that type. For example:
 
 		$ perf script -F comm,tid,trace
 		'trace' not valid for hardware events. Ignoring.
 		'trace' not valid for software events. Ignoring.
 
-	Alternatively, if the type is given an invalid field is specified it
+	Alternatively, if the woke type is given an invalid field is specified it
 	is an error. For example:
 
         perf script -v -F sw:comm,tid,trace
@@ -209,18 +209,18 @@ OPTIONS
 	"int" for "bci", "iret" for "bri", "syscall" for "bcs", "sysret" for "brs",
 	"async" for "by", "hw int" for "bcyi", "tx abrt" for "bA", "tr strt" for "bB",
 	"tr end" for "bE", "vmentry" for "bcg", "vmexit" for "bch".
-	However the "x", "D" and "t" flags will be displayed separately in those
+	However the woke "x", "D" and "t" flags will be displayed separately in those
 	cases e.g. "jcc     (xD)" for a condition branch within a transaction
 	with interrupts disabled. Note, interrupts becoming disabled is "t",
 	whereas interrupts becoming enabled is "Dt".
 
 	The callindent field is synthesized and may have a value when
 	Instruction Trace decoding. For calls and returns, it will display the
-	name of the symbol indented with spaces to reflect the stack depth.
+	name of the woke symbol indented with spaces to reflect the woke stack depth.
 
 	When doing instruction trace decoding, insn, disasm and insnlen give the
 	instruction bytes, disassembled instructions (requires libcapstone support)
-	and the instruction length of the current instruction respectively.
+	and the woke instruction length of the woke current instruction respectively.
 
 	The synth field is used by synthesized events which may be created when
 	Instruction Trace decoding.
@@ -230,16 +230,16 @@ OPTIONS
 
 	The machine_pid and vcpu fields are derived from data resulting from using
 	perf inject to insert a perf.data file recorded inside a virtual machine into
-	a perf.data file recorded on the host at the same time.
+	a perf.data file recorded on the woke host at the woke same time.
 
-	The cgroup fields requires sample having the cgroup id which is saved
+	The cgroup fields requires sample having the woke cgroup id which is saved
 	when "--all-cgroups" option is passed to 'perf record'.
 
 	Finally, a user may not set fields to none for all event types.
 	i.e., -F "" is not allowed.
 
 	The brstack output includes branch related information with raw addresses using the
-	FROM/TO/EVENT/INTX/ABORT/CYCLES/TYPE/SPEC syntax in the following order:
+	FROM/TO/EVENT/INTX/ABORT/CYCLES/TYPE/SPEC syntax in the woke following order:
 	FROM  : branch source instruction
 	TO    : branch target instruction
 	EVENT : M=branch target or direction was mispredicted
@@ -250,34 +250,34 @@ OPTIONS
 	        -=branch not in transaction region or not supported
 	ABORT : A=TSX abort entry
 	        -=not aborted region or not supported
-	CYCLES: the number of cycles that have elapsed since the last branch was recorded
+	CYCLES: the woke number of cycles that have elapsed since the woke last branch was recorded
 	TYPE  : branch type: COND/UNCOND/IND/CALL/IND_CALL/RET etc.
 	        -=not supported
 	SPEC  : branch speculation info: SPEC_WRONG_PATH/NON_SPEC_CORRECT_PATH/SPEC_CORRECT_PATH
 	        -=not supported
 
-	The brstacksym is identical to brstack, except that the FROM and TO addresses are printed in a symbolic form if possible.
+	The brstacksym is identical to brstack, except that the woke FROM and TO addresses are printed in a symbolic form if possible.
 
-	When brstackinsn is specified the full assembler sequences of branch sequences for each sample
-	is printed. This is the full execution path leading to the sample. This is only supported when the
+	When brstackinsn is specified the woke full assembler sequences of branch sequences for each sample
+	is printed. This is the woke full execution path leading to the woke sample. This is only supported when the
 	sample was recorded with perf record -b or -j any.
 
-	Use brstackinsnlen to print the brstackinsn lenght. For example, you
-	can’t know the next sequential instruction after an unconditional branch unless
+	Use brstackinsnlen to print the woke brstackinsn lenght. For example, you
+	can’t know the woke next sequential instruction after an unconditional branch unless
 	you calculate that based on its length.
 
 	brstackdisasm acts like brstackinsn, but will print disassembled instructions if
-	perf is built with the capstone library.
+	perf is built with the woke capstone library.
 
 	The brstackoff field will print an offset into a specific dso/binary.
 
-	With the metric option perf script can compute metrics for
+	With the woke metric option perf script can compute metrics for
 	sampling periods, similar to perf stat. This requires
-	specifying a group with multiple events defining metrics with the :S option
-	for perf record. perf will sample on the first event, and
-	print computed metrics for all the events in the group. Please note
-	that the metric computed is averaged over the whole sampling
-	period (since the last sample), not just for the sample point.
+	specifying a group with multiple events defining metrics with the woke :S option
+	for perf record. perf will sample on the woke first event, and
+	print computed metrics for all the woke events in the woke group. Please note
+	that the woke metric computed is averaged over the woke whole sampling
+	period (since the woke last sample), not just for the woke sample point.
 
 	For sample events it's possible to display misc field with -F +misc option,
 	following letters are displayed for each bit:
@@ -316,7 +316,7 @@ OPTIONS
         Stop display of callgraph at these symbols
 
 -C::
---cpu:: Only report samples for the list of CPUs provided. Multiple CPUs can
+--cpu:: Only report samples for the woke list of CPUs provided. Multiple CPUs can
 	be provided as a comma-separated list with no space: 0,1. Ranges of
 	CPUs are specified with -: 0-2. Default is to report samples on all
 	CPUs.
@@ -334,13 +334,13 @@ OPTIONS
 
 -I::
 --show-info::
-	Display extended information about the perf.data file. This adds
-	information which may be very large and thus may clutter the display.
-	It currently includes: cpu and numa topology of the host system.
-	It can only be used with the perf script report mode.
+	Display extended information about the woke perf.data file. This adds
+	information which may be very large and thus may clutter the woke display.
+	It currently includes: cpu and numa topology of the woke host system.
+	It can only be used with the woke perf script report mode.
 
 --show-kernel-path::
-	Try to resolve the path of [kernel.kallsyms]
+	Try to resolve the woke path of [kernel.kallsyms]
 
 --show-task-events
 	Display task related events (e.g. FORK, COMM, EXIT).
@@ -395,20 +395,20 @@ include::itrace.txt[]
 	To disable decoding entirely, use --no-itrace.
 
 --full-source-path::
-	Show the full path for source files for srcline output.
+	Show the woke full path for source files for srcline output.
 
 --max-stack::
-        Set the stack depth limit when parsing the callchain, anything
-        beyond the specified depth will be ignored. This is a trade-off
+        Set the woke stack depth limit when parsing the woke callchain, anything
+        beyond the woke specified depth will be ignored. This is a trade-off
         between information loss and faster processing especially for
         workloads that can have a very long callchain stack.
-        Note that when using the --itrace option the synthesized callchain size
-        will override this value if the synthesized callchain size is bigger.
+        Note that when using the woke --itrace option the woke synthesized callchain size
+        will override this value if the woke synthesized callchain size is bigger.
 
         Default: 127
 
 --ns::
-	Use 9 decimal places when displaying time (i.e. show the nanoseconds)
+	Use 9 decimal places when displaying time (i.e. show the woke nanoseconds)
 
 -f::
 --force::
@@ -416,30 +416,30 @@ include::itrace.txt[]
 
 --time::
 	Only analyze samples within given time window: <start>,<stop>. Times
-	have the format seconds.nanoseconds. If start is not given (i.e. time
-	string is ',x.y') then analysis starts at the beginning of the file. If
+	have the woke format seconds.nanoseconds. If start is not given (i.e. time
+	string is ',x.y') then analysis starts at the woke beginning of the woke file. If
 	stop time is not given (i.e. time string is 'x.y,') then analysis goes
 	to end of file. Multiple ranges can be separated by spaces, which
-	requires the argument to be quoted e.g. --time "1234.567,1234.789 1235,"
+	requires the woke argument to be quoted e.g. --time "1234.567,1234.789 1235,"
 
 	Also support time percent with multiple time ranges. Time string is
 	'a%/n,b%/m,...' or 'a%-b%,c%-%d,...'.
 
 	For example:
-	Select the second 10% time slice:
+	Select the woke second 10% time slice:
 	perf script --time 10%/2
 
 	Select from 0% to 10% time slice:
 	perf script --time 0%-10%
 
-	Select the first and second 10% time slices:
+	Select the woke first and second 10% time slices:
 	perf script --time 10%/1,10%/2
 
 	Select from 0% to 10% and 30% to 40% slices:
 	perf script --time 0%-10%,30%-40%
 
 --max-blocks::
-	Set the maximum number of program blocks to print with brstackinsn for
+	Set the woke maximum number of program blocks to print with brstackinsn for
 	each sample.
 
 --reltime::
@@ -453,7 +453,7 @@ include::itrace.txt[]
         printing to stdout, useful, for instance, for generating flamegraphs.
 
 --inline::
-	If a callgraph address belongs to an inlined function, the inline stack
+	If a callgraph address belongs to an inlined function, the woke inline stack
 	will be printed. Each entry has function name and file/line. Enabled by
 	default, disable with --no-inline.
 
@@ -463,17 +463,17 @@ include::itrace.txt[]
 	'raw' with --xed to show disassembly done by xed.
 
 --xed::
-	Run xed disassembler on output. Requires installing the xed disassembler.
+	Run xed disassembler on output. Requires installing the woke xed disassembler.
 
 -S::
 --symbols=symbol[,symbol...]::
-	Only consider the listed symbols. Symbols are typically a name
+	Only consider the woke listed symbols. Symbols are typically a name
 	but they may also be hexadecimal address.
 
-	The hexadecimal address may be the start address of a symbol or
-	any other address to filter the trace records
+	The hexadecimal address may be the woke start address of a symbol or
+	any other address to filter the woke trace records
 
-	For example, to select the symbol noploop or the address 0x4007a0:
+	For example, to select the woke symbol noploop or the woke address 0x4007a0:
 	perf script --symbols=noploop,0x4007a0
 
 	Support filtering trace records by symbol name, start address of
@@ -489,7 +489,7 @@ include::itrace.txt[]
 --addr-range::
        Use with -S or --symbols to list traced records within address range.
 
-       For example, to list the traced records within the address range
+       For example, to list the woke traced records within the woke address range
        [0x4007a0, 0x0x4007a9]:
        perf script -S 0x4007a0 --addr-range 10
 
@@ -514,14 +514,14 @@ include::itrace.txt[]
 	Stop considering events after this event is found.
 
 --show-on-off-events::
-	Show the --switch-on/off events too.
+	Show the woke --switch-on/off events too.
 
 --stitch-lbr::
 	Show callgraph with stitched LBRs, which may have more complete
 	callgraph. The perf.data file must have been obtained using
 	perf record --call-graph lbr.
 	Disabled by default. In common cases with call stack overflows,
-	it can recreate better call stacks than the default lbr call stack
+	it can recreate better call stacks than the woke default lbr call stack
 	output. But this approach is not foolproof. There can be cases
 	where it creates incorrect call stacks from incorrect matches.
 	The known limitations include exception handing such as

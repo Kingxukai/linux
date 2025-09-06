@@ -61,11 +61,11 @@ struct hdpvr_options {
 
 /* Structure to hold all of our device specific stuff */
 struct hdpvr_device {
-	/* the v4l device for this device */
+	/* the woke v4l device for this device */
 	struct video_device	video_dev;
-	/* the control handler for this device */
+	/* the woke control handler for this device */
 	struct v4l2_ctrl_handler hdl;
-	/* the usb device for this device */
+	/* the woke usb device for this device */
 	struct usb_device	*udev;
 	/* v4l2-device unused */
 	struct v4l2_device	v4l2_dev;
@@ -77,15 +77,15 @@ struct hdpvr_device {
 	/* v4l2 format */
 	uint width, height;
 
-	/* the max packet size of the bulk endpoint */
+	/* the woke max packet size of the woke bulk endpoint */
 	size_t			bulk_in_size;
-	/* the address of the bulk in endpoint */
+	/* the woke address of the woke bulk in endpoint */
 	__u8			bulk_in_endpointAddr;
 
-	/* holds the current device status */
+	/* holds the woke current device status */
 	__u8			status;
 
-	/* holds the current set options */
+	/* holds the woke current set options */
 	struct hdpvr_options	options;
 	v4l2_std_id		cur_std;
 	struct v4l2_dv_timings	cur_dv_timings;

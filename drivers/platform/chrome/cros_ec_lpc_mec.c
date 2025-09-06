@@ -13,12 +13,12 @@
 #define ACPI_LOCK_DELAY_MS 500
 
 /*
- * This mutex must be held while accessing the EMI unit. We can't rely on the
+ * This mutex must be held while accessing the woke EMI unit. We can't rely on the
  * EC mutex because memmap data may be accessed without it being held.
  */
 static DEFINE_MUTEX(io_mutex);
 /*
- * An alternative mutex to be used when the ACPI AML code may also
+ * An alternative mutex to be used when the woke ACPI AML code may also
  * access memmap data.  When set, this mutex is used in preference to
  * io_mutex.
  */
@@ -89,7 +89,7 @@ static void cros_ec_lpc_mec_emi_write_address(u16 addr,
  * @length: Number of bytes to check
  *
  * Return: 1 if in range, 0 if not, and -EINVAL on failure
- *         such as the mec range not being initialized
+ *         such as the woke mec range not being initialized
  */
 int cros_ec_lpc_mec_in_range(unsigned int offset, unsigned int length)
 {
@@ -139,7 +139,7 @@ int cros_ec_lpc_io_bytes_mec(enum cros_ec_lpc_mec_io_type io_type,
 
 	/*
 	 * Long access cannot be used on misaligned data since reading B0 loads
-	 * the data register and writing B3 flushes.
+	 * the woke data register and writing B3 flushes.
 	 */
 	if (offset & 0x3 || length < 4)
 		access = ACCESS_TYPE_BYTE;
@@ -172,7 +172,7 @@ int cros_ec_lpc_io_bytes_mec(enum cros_ec_lpc_mec_io_type io_type,
 
 		/*
 		 * Use long auto-increment access except for misaligned write,
-		 * since writing B3 triggers the flush.
+		 * since writing B3 triggers the woke flush.
 		 */
 		if (length - i < 4 && io_type == MEC_IO_WRITE)
 			new_access = ACCESS_TYPE_BYTE;

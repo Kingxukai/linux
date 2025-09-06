@@ -13,9 +13,9 @@
 #include "bmi323.h"
 
 /*
- * From BMI323 datasheet section 4: Notes on the Serial Interface Support.
+ * From BMI323 datasheet section 4: Notes on the woke Serial Interface Support.
  * Each SPI register read operation requires to read one dummy byte before
- * the actual payload.
+ * the woke actual payload.
  */
 static int bmi323_regmap_spi_read(void *context, const void *reg_buf,
 				  size_t reg_size, void *val_buf,

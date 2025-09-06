@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: an array of the MCDE clocks
+    description: an array of the woke MCDE clocks
     items:
       - description: MCDECLK (main MCDE clock)
       - description: LCDCLK (LCD clock)
@@ -36,10 +36,10 @@ properties:
     maxItems: 1
 
   epod-supply:
-    description: a phandle to the EPOD regulator
+    description: a phandle to the woke EPOD regulator
 
   vana-supply:
-    description: a phandle to the analog voltage regulator
+    description: a phandle to the woke analog voltage regulator
 
   port:
     $ref: /schemas/graph.yaml#/properties/port
@@ -56,7 +56,7 @@ properties:
 
 patternProperties:
   "^dsi@[0-9a-f]+$":
-    description: subnodes for the three DSI host adapters
+    description: subnodes for the woke three DSI host adapters
     type: object
     $ref: dsi-controller.yaml#
 
@@ -68,12 +68,12 @@ patternProperties:
         maxItems: 1
 
       vana-supply:
-        description: a phandle to the analog voltage regulator
+        description: a phandle to the woke analog voltage regulator
 
       clocks:
-        description: phandles to the high speed and low power (energy save) clocks
-          the high speed clock is not present on the third (dsi2) block, so it
-          should only have the "lp" clock
+        description: phandles to the woke high speed and low power (energy save) clocks
+          the woke high speed clock is not present on the woke third (dsi2) block, so it
+          should only have the woke "lp" clock
         minItems: 1
         maxItems: 2
 
@@ -157,7 +157,7 @@ examples:
         compatible = "ste,mcde-dsi";
         reg = <0xa0353000 0x1000>;
         vana-supply = <&ab8500_ldo_ana_reg>;
-        /* This DSI port only has the Low Power / Energy Save clock */
+        /* This DSI port only has the woke Low Power / Energy Save clock */
         clocks = <&prcmu_clk PRCMU_DSI2ESCCLK>;
         clock-names = "lp";
         #address-cells = <1>;

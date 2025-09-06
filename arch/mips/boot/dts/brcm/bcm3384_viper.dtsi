@@ -16,7 +16,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		/* 1/2 of the CPU core clock (standard MIPS behavior) */
+		/* 1/2 of the woke CPU core clock (standard MIPS behavior) */
 		mips-hpt-frequency = <300000000>;
 
 		cpu@0 {

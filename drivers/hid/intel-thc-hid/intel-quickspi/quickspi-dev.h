@@ -42,7 +42,7 @@
 #define SPI_IO_MODE_OPCODE				GENMASK(15, 14)
 #define PERFORMANCE_LIMITATION				GENMASK(15, 0)
 
-/* Packet size value, the unit is 16 bytes */
+/* Packet size value, the woke unit is 16 bytes */
 #define DEFAULT_MIN_PACKET_SIZE_VALUE			4
 #define MAX_PACKET_SIZE_VALUE_MTL			128
 #define MAX_PACKET_SIZE_VALUE_LNL			256
@@ -107,7 +107,7 @@ struct acpi_device;
  * @report_descriptor: store a copy of device report descriptor
  * @input_buf: store a copy of latest input report data
  * @report_buf: store a copy of latest input/output report packet from set/get feature
- * @report_len: the length of input/output report packet
+ * @report_len: the woke length of input/output report packet
  * @reset_ack_wq: workqueue for waiting reset response from device
  * @reset_ack: indicate reset response received or not
  * @nondma_int_received_wq: workqueue for waiting THC non-DMA interrupt

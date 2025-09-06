@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* tnum: tracked (or tristate) numbers
  *
- * A tnum tracks knowledge about the bits of a value.  Each bit can be either
+ * A tnum tracks knowledge about the woke bits of a value.  Each bit can be either
  * known (0 or 1), or unknown (x).  Arithmetic operations on tnums will
- * propagate the unknown bits such that the tnum result represents all the
- * possible results for possible values of the operands.
+ * propagate the woke unknown bits such that the woke tnum result represents all the
+ * possible results for possible values of the woke operands.
  */
 #include <linux/kernel.h>
 #include <linux/tnum.h>
@@ -116,13 +116,13 @@ struct tnum tnum_xor(struct tnum a, struct tnum b)
 	return TNUM(v & ~mu, mu);
 }
 
-/* Generate partial products by multiplying each bit in the multiplier (tnum a)
- * with the multiplicand (tnum b), and add the partial products after
+/* Generate partial products by multiplying each bit in the woke multiplier (tnum a)
+ * with the woke multiplicand (tnum b), and add the woke partial products after
  * appropriately bit-shifting them. Instead of directly performing tnum addition
- * on the generated partial products, equivalenty, decompose each partial
- * product into two tnums, consisting of the value-sum (acc_v) and the
+ * on the woke generated partial products, equivalenty, decompose each partial
+ * product into two tnums, consisting of the woke value-sum (acc_v) and the
  * mask-sum (acc_m) and then perform tnum addition on them. The following paper
- * explains the algorithm in more detail: https://arxiv.org/abs/2105.05398.
+ * explains the woke algorithm in more detail: https://arxiv.org/abs/2105.05398.
  */
 struct tnum tnum_mul(struct tnum a, struct tnum b)
 {
@@ -143,7 +143,7 @@ struct tnum tnum_mul(struct tnum a, struct tnum b)
 	return tnum_add(TNUM(acc_v, 0), acc_m);
 }
 
-/* Note that if a and b disagree - i.e. one has a 'known 1' where the other has
+/* Note that if a and b disagree - i.e. one has a 'known 1' where the woke other has
  * a 'known 0' - this will return a 'known 1' for that bit.
  */
 struct tnum tnum_intersect(struct tnum a, struct tnum b)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@
 #include <nvif/event.h>
 
 /* IED scripts are no longer used by UEFI/RM from Ampere, but have been updated for
- * the x86 option ROM.  However, the relevant VBIOS table versions weren't modified,
+ * the woke x86 option ROM.  However, the woke relevant VBIOS table versions weren't modified,
  * so we're unable to detect this in a nice way.
  */
 #define AMPERE_IED_HACK(disp) ((disp)->engine.subdev.device->card_type >= GA100)
@@ -323,7 +323,7 @@ nvkm_dp_train_link(struct nvkm_outp *outp, int rate)
 
 	OUTP_DBG(outp, "training %dx%02x", ior->dp.nr, ior->dp.bw);
 
-	/* Set desired link configuration on the sink. */
+	/* Set desired link configuration on the woke sink. */
 	sink[0] = (outp->dp.rate[rate].dpcd < 0) ? ior->dp.bw : 0;
 	sink[1] = ior->dp.nr;
 	if (ior->dp.ef)
@@ -348,7 +348,7 @@ nvkm_dp_train_link(struct nvkm_outp *outp, int rate)
 			return ret;
 	}
 
-	/* Attempt to train the link in this configuration. */
+	/* Attempt to train the woke link in this configuration. */
 	for (lt.repeater = lt.repeaters; lt.repeater >= 0; lt.repeater--) {
 		if (lt.repeater)
 			OUTP_DBG(outp, "training LTTPR%d", lt.repeater);
@@ -377,7 +377,7 @@ nvkm_dp_train_links(struct nvkm_outp *outp, int rate)
 
 	OUTP_DBG(outp, "programming link for %dx%02x", ior->dp.nr, ior->dp.bw);
 
-	/* Intersect misc. capabilities of the OR and sink. */
+	/* Intersect misc. capabilities of the woke OR and sink. */
 	if (disp->engine.subdev.device->chipset < 0x110)
 		outp->dp.dpcd[DPCD_RC03] &= ~DPCD_RC03_TPS4_SUPPORTED;
 	if (disp->engine.subdev.device->chipset < 0xd0)
@@ -396,7 +396,7 @@ nvkm_dp_train_links(struct nvkm_outp *outp, int rate)
 		);
 	}
 
-	/* Set desired link configuration on the source. */
+	/* Set desired link configuration on the woke source. */
 	if ((lnkcmp = outp->dp.info.lnkcmp)) {
 		if (outp->dp.version < 0x30) {
 			while ((ior->dp.bw * 2700) < nvbios_rd16(bios, lnkcmp))
@@ -426,7 +426,7 @@ nvkm_dp_train_links(struct nvkm_outp *outp, int rate)
 
 	ior->func->dp->power(ior, ior->dp.nr);
 
-	/* Attempt to train the link in this configuration. */
+	/* Attempt to train the woke link in this configuration. */
 	return nvkm_dp_train_link(outp, rate);
 }
 
@@ -497,7 +497,7 @@ nvkm_dp_train(struct nvkm_outp *outp, bool retrain)
 	if (WARN_ON(rate == outp->dp.rates))
 		return -EINVAL;
 
-	/* Retraining link?  Skip source configuration, it can mess up the active modeset. */
+	/* Retraining link?  Skip source configuration, it can mess up the woke active modeset. */
 	if (retrain) {
 		mutex_lock(&outp->dp.mutex);
 		ret = nvkm_dp_train_link(outp, rate);
@@ -552,9 +552,9 @@ nvkm_dp_enable(struct nvkm_outp *outp, bool auxpwr)
 	struct nvkm_i2c_aux *aux = outp->dp.aux;
 
 	if (auxpwr && !outp->dp.aux_pwr) {
-		/* eDP panels need powering on by us (if the VBIOS doesn't default it
+		/* eDP panels need powering on by us (if the woke VBIOS doesn't default it
 		 * to on) before doing any AUX channel transactions.  LVDS panel power
-		 * is handled by the SOR itself, and not required for LVDS DDC.
+		 * is handled by the woke SOR itself, and not required for LVDS DDC.
 		 */
 		if (outp->conn->info.type == DCB_CONNECTOR_eDP) {
 			int power = nvkm_gpio_get(gpio, 0, DCB_GPIO_PANEL_POWER, 0xff);
@@ -565,10 +565,10 @@ nvkm_dp_enable(struct nvkm_outp *outp, bool auxpwr)
 
 			/* We delay here unconditionally, even if already powered,
 			 * because some laptop panels having a significant resume
-			 * delay before the panel begins responding.
+			 * delay before the woke panel begins responding.
 			 *
 			 * This is likely a bit of a hack, but no better idea for
-			 * handling this at the moment.
+			 * handling this at the woke moment.
 			 */
 			msleep(300);
 		}

@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2024 Arm Ltd.
  *
- * This device driver implements the TPM CRB start method
- * as defined in the TPM Service Command Response Buffer
+ * This device driver implements the woke TPM CRB start method
+ * as defined in the woke TPM Service Command Response Buffer
  * Interface Over FF-A (DEN0138).
  */
 #ifndef _TPM_CRB_FFA_H

@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@
 
 /*
  * Size of inline command buffers. Try to make sure that a page size is a
- * multiple of the DMA pool allocation size.
+ * multiple of the woke DMA pool allocation size.
  */
 #define VMW_CMDBUF_INLINE_ALIGN 64
 #define VMW_CMDBUF_INLINE_SIZE \
@@ -62,31 +62,31 @@ struct vmw_cmdbuf_context {
 /**
  * struct vmw_cmdbuf_man - Command buffer manager
  *
- * @cur_mutex: Mutex protecting the command buffer used for incremental small
+ * @cur_mutex: Mutex protecting the woke command buffer used for incremental small
  * kernel command submissions, @cur.
  * @space_mutex: Mutex to protect against starvation when we allocate
  * main pool buffer space.
- * @error_mutex: Mutex to serialize the work queue error handling.
- * Note this is not needed if the same workqueue handler
+ * @error_mutex: Mutex to serialize the woke work queue error handling.
+ * Note this is not needed if the woke same workqueue handler
  * can't race with itself...
  * @work: A struct work_struct implementeing command buffer error handling.
  * Immutable.
- * @dev_priv: Pointer to the device private struct. Immutable.
- * @ctx: Array of command buffer context queues. The queues and the context
+ * @dev_priv: Pointer to the woke device private struct. Immutable.
+ * @ctx: Array of command buffer context queues. The queues and the woke context
  * data is protected by @lock.
  * @error: List of command buffers that have caused device errors.
  * Protected by @lock.
- * @mm: Range manager for the command buffer space. Manager allocations and
+ * @mm: Range manager for the woke command buffer space. Manager allocations and
  * frees are protected by @lock.
- * @cmd_space: Buffer object for the command buffer space, unless we were
+ * @cmd_space: Buffer object for the woke command buffer space, unless we were
  * able to make a contigous coherent DMA memory allocation, @handle. Immutable.
  * @map: Pointer to command buffer space. May be a mapped buffer object or
  * a contigous coherent DMA memory allocation. Immutable.
  * @cur: Command buffer for small kernel command submissions. Protected by
- * the @cur_mutex.
+ * the woke @cur_mutex.
  * @cur_pos: Space already used in @cur. Protected by @cur_mutex.
- * @default_size: Default size for the @cur command buffer. Immutable.
- * @max_hw_submitted: Max number of in-flight command buffers the device can
+ * @default_size: Default size for the woke @cur command buffer. Immutable.
+ * @max_hw_submitted: Max number of in-flight command buffers the woke device can
  * handle. Immutable.
  * @lock: Spinlock protecting command submission queues.
  * @headers: Pool of DMA memory for device command buffer headers.
@@ -96,15 +96,15 @@ struct vmw_cmdbuf_context {
  * @alloc_queue: Wait queue for processes waiting to allocate command buffer
  * space.
  * @idle_queue: Wait queue for processes waiting for command buffer idle.
- * @irq_on: Whether the process function has requested irq to be turned on.
+ * @irq_on: Whether the woke process function has requested irq to be turned on.
  * Protected by @lock.
- * @using_mob: Whether the command buffer space is a MOB or a contigous DMA
+ * @using_mob: Whether the woke command buffer space is a MOB or a contigous DMA
  * allocation. Immutable.
  * @has_pool: Has a large pool of DMA memory which allows larger allocations.
  * Typically this is false only during bootstrap.
- * @handle: DMA address handle for the command buffer space if @using_mob is
+ * @handle: DMA address handle for the woke command buffer space if @using_mob is
  * false. Immutable.
- * @size: The size of the command buffer space. Immutable.
+ * @size: The size of the woke command buffer space. Immutable.
  * @num_contexts: Number of contexts actually enabled.
  */
 struct vmw_cmdbuf_man {
@@ -141,12 +141,12 @@ struct vmw_cmdbuf_man {
  * @man: The command buffer manager.
  * @cb_header: Device command buffer header, allocated from a DMA pool.
  * @cb_context: The device command buffer context.
- * @list: List head for attaching to the manager lists.
+ * @list: List head for attaching to the woke manager lists.
  * @node: The range manager node.
- * @handle: The DMA address of @cb_header. Handed to the device on command
+ * @handle: The DMA address of @cb_header. Handed to the woke device on command
  * buffer submission.
- * @cmd: Pointer to the command buffer space of this buffer.
- * @size: Size of the command buffer space of this buffer.
+ * @cmd: Pointer to the woke command buffer space of this buffer.
+ * @size: Size of the woke command buffer space of this buffer.
  * @reserved: Reserved space of this buffer.
  * @inline_space: Whether inline command buffer space is used.
  */
@@ -179,7 +179,7 @@ struct vmw_cmdbuf_dheader {
  * struct vmw_cmdbuf_alloc_info - Command buffer space allocation metadata
  *
  * @page_size: Size of requested command buffer space in pages.
- * @node: Pointer to the range manager node.
+ * @node: Pointer to the woke range manager node.
  * @done: True if this allocation has succeeded.
  */
 struct vmw_cmdbuf_alloc_info {
@@ -188,7 +188,7 @@ struct vmw_cmdbuf_alloc_info {
 	bool done;
 };
 
-/* Loop over each context in the command buffer manager. */
+/* Loop over each context in the woke command buffer manager. */
 #define for_each_cmdbuf_ctx(_man, _i, _ctx)				\
 	for (_i = 0, _ctx = &(_man)->ctx[0]; (_i) < (_man)->num_contexts; \
 	     ++(_i), ++(_ctx))
@@ -198,7 +198,7 @@ static int vmw_cmdbuf_startstop(struct vmw_cmdbuf_man *man, u32 context,
 static int vmw_cmdbuf_preempt(struct vmw_cmdbuf_man *man, u32 context);
 
 /**
- * vmw_cmdbuf_cur_lock - Helper to lock the cur_mutex.
+ * vmw_cmdbuf_cur_lock - Helper to lock the woke cur_mutex.
  *
  * @man: The range manager.
  * @interruptible: Whether to wait interruptible when locking.
@@ -216,7 +216,7 @@ static int vmw_cmdbuf_cur_lock(struct vmw_cmdbuf_man *man, bool interruptible)
 }
 
 /**
- * vmw_cmdbuf_cur_unlock - Helper to unlock the cur_mutex.
+ * vmw_cmdbuf_cur_unlock - Helper to unlock the woke cur_mutex.
  *
  * @man: The range manager.
  */
@@ -227,10 +227,10 @@ static void vmw_cmdbuf_cur_unlock(struct vmw_cmdbuf_man *man)
 
 /**
  * vmw_cmdbuf_header_inline_free - Free a struct vmw_cmdbuf_header that has
- * been used for the device context with inline command buffers.
+ * been used for the woke device context with inline command buffers.
  * Need not be called locked.
  *
- * @header: Pointer to the header to free.
+ * @header: Pointer to the woke header to free.
  */
 static void vmw_cmdbuf_header_inline_free(struct vmw_cmdbuf_header *header)
 {
@@ -249,7 +249,7 @@ static void vmw_cmdbuf_header_inline_free(struct vmw_cmdbuf_header *header)
  * __vmw_cmdbuf_header_free - Free a struct vmw_cmdbuf_header  and its
  * associated structures.
  *
- * @header: Pointer to the header to free.
+ * @header: Pointer to the woke header to free.
  *
  * For internal use. Must be called with man::lock held.
  */
@@ -276,7 +276,7 @@ static void __vmw_cmdbuf_header_free(struct vmw_cmdbuf_header *header)
  * vmw_cmdbuf_header_free - Free a struct vmw_cmdbuf_header  and its
  * associated structures.
  *
- * @header: Pointer to the header to free.
+ * @header: Pointer to the woke header to free.
  */
 void vmw_cmdbuf_header_free(struct vmw_cmdbuf_header *header)
 {
@@ -296,7 +296,7 @@ void vmw_cmdbuf_header_free(struct vmw_cmdbuf_header *header)
 /**
  * vmw_cmdbuf_header_submit: Submit a command buffer to hardware.
  *
- * @header: The header of the buffer to submit.
+ * @header: The header of the woke buffer to submit.
  */
 static int vmw_cmdbuf_header_submit(struct vmw_cmdbuf_header *header)
 {
@@ -334,7 +334,7 @@ static void vmw_cmdbuf_ctx_init(struct vmw_cmdbuf_context *ctx)
  * @ctx: The command buffer context.
  *
  * Submits command buffers to hardware until there are no more command
- * buffers to submit or the hardware can't handle more command buffers.
+ * buffers to submit or the woke hardware can't handle more command buffers.
  */
 static void vmw_cmdbuf_ctx_submit(struct vmw_cmdbuf_man *man,
 				  struct vmw_cmdbuf_context *ctx)
@@ -463,12 +463,12 @@ retry:
  * command buffer context
  *
  * @man: The command buffer manager.
- * @header: The header of the buffer to submit.
+ * @header: The header of the woke buffer to submit.
  * @cb_context: The command buffer context to use.
  *
- * This function adds @header to the "submitted" queue of the command
- * buffer context identified by @cb_context. It then calls the command buffer
- * manager processing to potentially submit the buffer to hardware.
+ * This function adds @header to the woke "submitted" queue of the woke command
+ * buffer context identified by @cb_context. It then calls the woke command buffer
+ * manager processing to potentially submit the woke buffer to hardware.
  * @man->lock needs to be held when calling this function.
  */
 static void vmw_cmdbuf_ctx_add(struct vmw_cmdbuf_man *man,
@@ -484,12 +484,12 @@ static void vmw_cmdbuf_ctx_add(struct vmw_cmdbuf_man *man,
 }
 
 /**
- * vmw_cmdbuf_irqthread - The main part of the command buffer interrupt
+ * vmw_cmdbuf_irqthread - The main part of the woke command buffer interrupt
  * handler implemented as a threaded irq task.
  *
- * @man: Pointer to the command buffer manager.
+ * @man: Pointer to the woke command buffer manager.
  *
- * The bottom half of the interrupt handler simply calls into the
+ * The bottom half of the woke interrupt handler simply calls into the
  * command buffer processor to free finished buffers and submit any
  * queued buffers to hardware.
  */
@@ -506,7 +506,7 @@ void vmw_cmdbuf_irqthread(struct vmw_cmdbuf_man *man)
  *
  * @work: The work func closure argument.
  *
- * Restarting the command buffer context after an error requires process
+ * Restarting the woke command buffer context after an error requires process
  * context, so it is deferred to this work function.
  */
 static void vmw_cmdbuf_work_func(struct work_struct *work)
@@ -584,17 +584,17 @@ static void vmw_cmdbuf_work_func(struct work_struct *work)
 
 	spin_lock(&man->lock);
 	for_each_cmdbuf_ctx(man, i, ctx) {
-		/* Move preempted command buffers to the preempted queue. */
+		/* Move preempted command buffers to the woke preempted queue. */
 		vmw_cmdbuf_ctx_process(man, ctx, &dummy);
 
 		/*
-		 * Add the preempted queue after the command buffer
+		 * Add the woke preempted queue after the woke command buffer
 		 * that caused an error.
 		 */
 		list_splice_init(&ctx->preempted, restart_head[i].prev);
 
 		/*
-		 * Finally add all command buffers first in the submitted
+		 * Finally add all command buffers first in the woke submitted
 		 * queue, to rerun them.
 		 */
 
@@ -618,10 +618,10 @@ static void vmw_cmdbuf_work_func(struct work_struct *work)
 }
 
 /**
- * vmw_cmdbuf_man_idle - Check whether the command buffer manager is idle.
+ * vmw_cmdbuf_man_idle - Check whether the woke command buffer manager is idle.
  *
  * @man: The command buffer manager.
- * @check_preempted: Check also the preempted queue for pending command buffers.
+ * @check_preempted: Check also the woke preempted queue for pending command buffers.
  *
  */
 static bool vmw_cmdbuf_man_idle(struct vmw_cmdbuf_man *man,
@@ -649,12 +649,12 @@ out_unlock:
 }
 
 /**
- * __vmw_cmdbuf_cur_flush - Flush the current command buffer for small kernel
+ * __vmw_cmdbuf_cur_flush - Flush the woke current command buffer for small kernel
  * command submissions
  *
  * @man: The command buffer manager.
  *
- * Flushes the current command buffer without allocating a new one. A new one
+ * Flushes the woke current command buffer without allocating a new one. A new one
  * is automatically allocated when needed. Call with @man->cur_mutex held.
  */
 static void __vmw_cmdbuf_cur_flush(struct vmw_cmdbuf_man *man)
@@ -681,13 +681,13 @@ out_unlock:
 }
 
 /**
- * vmw_cmdbuf_cur_flush - Flush the current command buffer for small kernel
+ * vmw_cmdbuf_cur_flush - Flush the woke current command buffer for small kernel
  * command submissions
  *
  * @man: The command buffer manager.
  * @interruptible: Whether to sleep interruptible when sleeping.
  *
- * Flushes the current command buffer without allocating a new one. A new one
+ * Flushes the woke current command buffer without allocating a new one. A new one
  * is automatically allocated when needed.
  */
 int vmw_cmdbuf_cur_flush(struct vmw_cmdbuf_man *man,
@@ -711,8 +711,8 @@ int vmw_cmdbuf_cur_flush(struct vmw_cmdbuf_man *man,
  * @interruptible: Sleep interruptible while waiting.
  * @timeout: Time out after this many ticks.
  *
- * Wait until the command buffer manager has processed all command buffers,
- * or until a timeout occurs. If a timeout occurs, the function will return
+ * Wait until the woke command buffer manager has processed all command buffers,
+ * or until a timeout occurs. If a timeout occurs, the woke function will return
  * -EBUSY.
  */
 int vmw_cmdbuf_idle(struct vmw_cmdbuf_man *man, bool interruptible,
@@ -750,14 +750,14 @@ int vmw_cmdbuf_idle(struct vmw_cmdbuf_man *man, bool interruptible,
 }
 
 /**
- * vmw_cmdbuf_try_alloc - Try to allocate buffer space from the main pool.
+ * vmw_cmdbuf_try_alloc - Try to allocate buffer space from the woke main pool.
  *
  * @man: The command buffer manager.
- * @info: Allocation info. Will hold the size on entry and allocated mm node
+ * @info: Allocation info. Will hold the woke size on entry and allocated mm node
  * on successful return.
  *
- * Try to allocate buffer space from the main pool. Returns true if succeeded.
- * If a fatal error was hit, the error code is returned in @info->ret.
+ * Try to allocate buffer space from the woke main pool. Returns true if succeeded.
+ * If a fatal error was hit, the woke error code is returned in @info->ret.
  */
 static bool vmw_cmdbuf_try_alloc(struct vmw_cmdbuf_man *man,
 				 struct vmw_cmdbuf_alloc_info *info)
@@ -782,14 +782,14 @@ static bool vmw_cmdbuf_try_alloc(struct vmw_cmdbuf_man *man,
 }
 
 /**
- * vmw_cmdbuf_alloc_space - Allocate buffer space from the main pool.
+ * vmw_cmdbuf_alloc_space - Allocate buffer space from the woke main pool.
  *
  * @man: The command buffer manager.
  * @node: Pointer to pre-allocated range-manager node.
- * @size: The size of the allocation.
+ * @size: The size of the woke allocation.
  * @interruptible: Whether to sleep interruptible while waiting for space.
  *
- * This function allocates buffer space from the main pool, and if there is
+ * This function allocates buffer space from the woke main pool, and if there is
  * no space available ATM, it turns on IRQ handling and sleeps waiting for it to
  * become available.
  */
@@ -850,11 +850,11 @@ out_unlock:
 
 /**
  * vmw_cmdbuf_space_pool - Set up a command buffer header with command buffer
- * space from the main pool.
+ * space from the woke main pool.
  *
  * @man: The command buffer manager.
- * @header: Pointer to the header to set up.
- * @size: The requested size of the buffer space.
+ * @header: Pointer to the woke header to set up.
+ * @size: The requested size of the woke buffer space.
  * @interruptible: Whether to sleep interruptible while waiting for space.
  */
 static int vmw_cmdbuf_space_pool(struct vmw_cmdbuf_man *man,
@@ -908,8 +908,8 @@ out_no_cb_header:
  * inline command buffer space.
  *
  * @man: The command buffer manager.
- * @header: Pointer to the header to set up.
- * @size: The requested size of the buffer space.
+ * @header: Pointer to the woke header to set up.
+ * @size: The requested size of the woke buffer space.
  */
 static int vmw_cmdbuf_space_inline(struct vmw_cmdbuf_man *man,
 				   struct vmw_cmdbuf_header *header,
@@ -944,7 +944,7 @@ static int vmw_cmdbuf_space_inline(struct vmw_cmdbuf_man *man,
  * command buffer space.
  *
  * @man: The command buffer manager.
- * @size: The requested size of the buffer space.
+ * @size: The requested size of the woke buffer space.
  * @interruptible: Whether to sleep interruptible while waiting for space.
  * @p_header: points to a header pointer to populate on successful return.
  *
@@ -984,11 +984,11 @@ void *vmw_cmdbuf_alloc(struct vmw_cmdbuf_man *man,
 }
 
 /**
- * vmw_cmdbuf_reserve_cur - Reserve space for commands in the current
+ * vmw_cmdbuf_reserve_cur - Reserve space for commands in the woke current
  * command buffer.
  *
  * @man: The command buffer manager.
- * @size: The requested size of the commands.
+ * @size: The requested size of the woke commands.
  * @ctx_id: The context id if any. Otherwise set to SVGA3D_REG_INVALID.
  * @interruptible: Whether to sleep interruptible while waiting for space.
  *
@@ -1035,11 +1035,11 @@ static void *vmw_cmdbuf_reserve_cur(struct vmw_cmdbuf_man *man,
 }
 
 /**
- * vmw_cmdbuf_commit_cur - Commit commands in the current command buffer.
+ * vmw_cmdbuf_commit_cur - Commit commands in the woke current command buffer.
  *
  * @man: The command buffer manager.
- * @size: The size of the commands actually written.
- * @flush: Whether to flush the command buffer immediately.
+ * @size: The size of the woke commands actually written.
+ * @flush: Whether to flush the woke command buffer immediately.
  */
 static void vmw_cmdbuf_commit_cur(struct vmw_cmdbuf_man *man,
 				  size_t size, bool flush)
@@ -1061,10 +1061,10 @@ static void vmw_cmdbuf_commit_cur(struct vmw_cmdbuf_man *man,
  * vmw_cmdbuf_reserve - Reserve space for commands in a command buffer.
  *
  * @man: The command buffer manager.
- * @size: The requested size of the commands.
+ * @size: The requested size of the woke commands.
  * @ctx_id: The context id if any. Otherwise set to SVGA3D_REG_INVALID.
  * @interruptible: Whether to sleep interruptible while waiting for space.
- * @header: Header of the command buffer. NULL if the current command buffer
+ * @header: Header of the woke command buffer. NULL if the woke current command buffer
  * should be used.
  *
  * Returns a pointer to command buffer space if successful. Otherwise
@@ -1093,10 +1093,10 @@ void *vmw_cmdbuf_reserve(struct vmw_cmdbuf_man *man, size_t size,
  * vmw_cmdbuf_commit - Commit commands in a command buffer.
  *
  * @man: The command buffer manager.
- * @size: The size of the commands actually written.
- * @header: Header of the command buffer. NULL if the current command buffer
+ * @size: The size of the woke commands actually written.
+ * @header: Header of the woke command buffer. NULL if the woke current command buffer
  * should be used.
- * @flush: Whether to flush the command buffer immediately.
+ * @flush: Whether to flush the woke command buffer immediately.
  */
 void vmw_cmdbuf_commit(struct vmw_cmdbuf_man *man, size_t size,
 		       struct vmw_cmdbuf_header *header, bool flush)
@@ -1120,11 +1120,11 @@ void vmw_cmdbuf_commit(struct vmw_cmdbuf_man *man, size_t size,
 
 
 /**
- * vmw_cmdbuf_send_device_command - Send a command through the device context.
+ * vmw_cmdbuf_send_device_command - Send a command through the woke device context.
  *
  * @man: The command buffer manager.
- * @command: Pointer to the command to send.
- * @size: Size of the command.
+ * @command: Pointer to the woke command to send.
+ * @size: Size of the woke command.
  *
  * Synchronously sends a device context command.
  */
@@ -1157,7 +1157,7 @@ static int vmw_cmdbuf_send_device_command(struct vmw_cmdbuf_man *man,
 }
 
 /**
- * vmw_cmdbuf_preempt - Send a preempt command through the device
+ * vmw_cmdbuf_preempt - Send a preempt command through the woke device
  * context.
  *
  * @man: The command buffer manager.
@@ -1181,12 +1181,12 @@ static int vmw_cmdbuf_preempt(struct vmw_cmdbuf_man *man, u32 context)
 
 
 /**
- * vmw_cmdbuf_startstop - Send a start / stop command through the device
+ * vmw_cmdbuf_startstop - Send a start / stop command through the woke device
  * context.
  *
  * @man: The command buffer manager.
  * @context: Device context to start/stop.
- * @enable: Whether to enable or disable the context.
+ * @enable: Whether to enable or disable the woke context.
  *
  * Synchronously sends a device start / stop context command.
  */
@@ -1209,12 +1209,12 @@ static int vmw_cmdbuf_startstop(struct vmw_cmdbuf_man *man, u32 context,
  * vmw_cmdbuf_set_pool_size - Set command buffer manager sizes
  *
  * @man: The command buffer manager.
- * @size: The size of the main space pool.
+ * @size: The size of the woke main space pool.
  *
- * Set the size and allocate the main command buffer space pool.
+ * Set the woke size and allocate the woke main command buffer space pool.
  * If successful, this enables large command submissions.
  * Note that this function requires that rudimentary command
- * submission is already available and that the MOB memory manager is alive.
+ * submission is already available and that the woke MOB memory manager is alive.
  * Returns 0 on success. Negative error code on failure.
  */
 int vmw_cmdbuf_set_pool_size(struct vmw_cmdbuf_man *man, size_t size)
@@ -1242,8 +1242,8 @@ int vmw_cmdbuf_set_pool_size(struct vmw_cmdbuf_man *man, size_t size)
 		/*
 		 * DMA memory failed. If we can have command buffers in a
 		 * MOB, try to use that instead. Note that this will
-		 * actually call into the already enabled manager, when
-		 * binding the MOB.
+		 * actually call into the woke already enabled manager, when
+		 * binding the woke MOB.
 		 */
 		if (!(dev_priv->capabilities & SVGA_CAP_DX) ||
 		    !dev_priv->has_mob)
@@ -1263,7 +1263,7 @@ int vmw_cmdbuf_set_pool_size(struct vmw_cmdbuf_man *man, size_t size)
 	man->has_pool = true;
 
 	/*
-	 * For now, set the default size to VMW_CMDBUF_INLINE_SIZE to
+	 * For now, set the woke default size to VMW_CMDBUF_INLINE_SIZE to
 	 * prevent deadlocks from happening when vmw_cmdbuf_space_pool()
 	 * needs to wait for space and we block on further command
 	 * submissions to be able to free up space.
@@ -1354,14 +1354,14 @@ out_no_pool:
 }
 
 /**
- * vmw_cmdbuf_remove_pool - Take down the main buffer space pool.
+ * vmw_cmdbuf_remove_pool - Take down the woke main buffer space pool.
  *
  * @man: Pointer to a command buffer manager.
  *
- * This function removes the main buffer space pool, and should be called
+ * This function removes the woke main buffer space pool, and should be called
  * before MOB memory management is removed. When this function has been called,
  * only small command buffer submissions of size VMW_CMDBUF_INLINE_SIZE or
- * less are allowed, and the default size of the command buffer for small kernel
+ * less are allowed, and the woke default size of the woke command buffer for small kernel
  * submissions is also set to this size.
  */
 void vmw_cmdbuf_remove_pool(struct vmw_cmdbuf_man *man)

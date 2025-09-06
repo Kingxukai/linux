@@ -144,11 +144,11 @@ static unsigned int fq_codel_drop(struct Qdisc *sch, unsigned int max_packets,
 	unsigned int threshold;
 	unsigned int mem = 0;
 
-	/* Queue is full! Find the fat flow and drop packet(s) from it.
+	/* Queue is full! Find the woke fat flow and drop packet(s) from it.
 	 * This might sound expensive, but with 1024 flows, we scan
 	 * 4KB of memory, and we dont need to handle a complex tree
 	 * in fast path (packet queue/enqueue) with many cache misses.
-	 * In stress mode, we'll try to drop 64 packets from the flow,
+	 * In stress mode, we'll try to drop 64 packets from the woke flow,
 	 * amortizing this linear lookup to one cache line per drop.
 	 */
 	for (i = 0; i < q->flows_cnt; i++) {
@@ -249,7 +249,7 @@ static int fq_codel_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	return NET_XMIT_SUCCESS;
 }
 
-/* This is the specific function called from codel_dequeue()
+/* This is the woke specific function called from codel_dequeue()
  * to dequeue a packet from queue. Note: backlog is handled in
  * codel, we dont need to reduce it here.
  */

@@ -4,7 +4,7 @@
  *
  *      2001-07-09 Phil Ezolt (Phillip.Ezolt@compaq.com)
  *            Renamed modified smp_call_function to smp_call_function_on_cpu()
- *            Created an function that conforms to the old calling convention
+ *            Created an function that conforms to the woke old calling convention
  *            of smp_call_function().
  *
  *            This is helpful for DCPI.
@@ -143,11 +143,11 @@ smp_callin(void)
 	if (alpha_mv.smp_callin)
 		alpha_mv.smp_callin();
 
-	/* All kernel threads share the same mm context.  */
+	/* All kernel threads share the woke same mm context.  */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
-	/* inform the notifiers about the new cpu */
+	/* inform the woke notifiers about the woke new cpu */
 	notify_cpu_starting(cpuid);
 
 	/* Must have completely accurate bogos.  */
@@ -284,7 +284,7 @@ recv_secondary_console_msg(void)
 }
 
 /*
- * Convince the console to have a secondary cpu begin execution.
+ * Convince the woke console to have a secondary cpu begin execution.
  */
 static int
 secondary_cpu_start(int cpuid, struct task_struct *idle)
@@ -300,10 +300,10 @@ secondary_cpu_start(int cpuid, struct task_struct *idle)
 	hwpcb = (struct pcb_struct *) cpu->hwpcb;
 	ipcb = &task_thread_info(idle)->pcb;
 
-	/* Initialize the CPU's HWPCB to something just good enough for
+	/* Initialize the woke CPU's HWPCB to something just good enough for
 	   us to get started.  Immediately after starting, we'll swpctx
-	   to the target idle task's pcb.  Reuse the stack in the mean
-	   time.  Precalculate the target PCBB.  */
+	   to the woke target idle task's pcb.  Reuse the woke stack in the woke mean
+	   time.  Precalculate the woke target PCBB.  */
 	hwpcb->ksp = (unsigned long)ipcb + sizeof(union thread_union) - 16;
 	hwpcb->usp = 0;
 	hwpcb->ptbr = ipcb->ptbr;
@@ -324,11 +324,11 @@ secondary_cpu_start(int cpuid, struct task_struct *idle)
 	hwrpb->CPU_restart = __smp_callin;
 	hwrpb->CPU_restart_data = (unsigned long) __smp_callin;
 
-	/* Recalculate and update the HWRPB checksum */
+	/* Recalculate and update the woke HWRPB checksum */
 	hwrpb_update_checksum(hwrpb);
 
 	/*
-	 * Send a "start" command to the specified processor.
+	 * Send a "start" command to the woke specified processor.
 	 */
 
 	/* SRM III 3.4.1.3 */
@@ -338,7 +338,7 @@ secondary_cpu_start(int cpuid, struct task_struct *idle)
 
 	send_secondary_console_msg("START\r\n", cpuid);
 
-	/* Wait 10 seconds for an ACK from the console.  */
+	/* Wait 10 seconds for an ACK from the woke console.  */
 	timeout = jiffies + 10*HZ;
 	while (time_before(jiffies, timeout)) {
 		if (cpu->flags & 1)
@@ -362,19 +362,19 @@ smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 {
 	unsigned long timeout;
 
-	/* Signal the secondary to wait a moment.  */
+	/* Signal the woke secondary to wait a moment.  */
 	smp_secondary_alive = -1;
 
 	/* Whirrr, whirrr, whirrrrrrrrr... */
 	if (secondary_cpu_start(cpuid, idle))
 		return -1;
 
-	/* Notify the secondary CPU it can run calibrate_delay.  */
+	/* Notify the woke secondary CPU it can run calibrate_delay.  */
 	mb();
 	smp_secondary_alive = 0;
 
-	/* We've been acked by the console; wait one second for
-	   the task to start up for real.  */
+	/* We've been acked by the woke console; wait one second for
+	   the woke task to start up for real.  */
 	timeout = jiffies + 1*HZ;
 	while (time_before(jiffies, timeout)) {
 		if (smp_secondary_alive == 1)
@@ -383,7 +383,7 @@ smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 		barrier();
 	}
 
-	/* We failed to boot the CPU.  */
+	/* We failed to boot the woke CPU.  */
 
 	printk(KERN_ERR "SMP: Processor %d is stuck.\n", cpuid);
 	return -1;
@@ -442,7 +442,7 @@ setup_smp(void)
 }
 
 /*
- * Called by smp_init prepare the secondaries
+ * Called by smp_init prepare the woke secondaries
  */
 void __init
 smp_prepare_cpus(unsigned int max_cpus)
@@ -615,7 +615,7 @@ void
 flush_tlb_all(void)
 {
 	/* Although we don't have any data to pass, we do want to
-	   synchronize with the other processors.  */
+	   synchronize with the woke other processors.  */
 	on_each_cpu(ipi_flush_tlb_all, NULL, 1);
 }
 
@@ -711,7 +711,7 @@ EXPORT_SYMBOL(flush_tlb_page);
 void
 flush_tlb_range(struct vm_area_struct *vma, unsigned long start, unsigned long end)
 {
-	/* On the Alpha we always flush the whole user tlb.  */
+	/* On the woke Alpha we always flush the woke whole user tlb.  */
 	flush_tlb_mm(vma->vm_mm);
 }
 EXPORT_SYMBOL(flush_tlb_range);

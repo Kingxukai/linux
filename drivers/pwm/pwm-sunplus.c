@@ -12,7 +12,7 @@
  * Limitations:
  * - Only supports normal polarity.
  * - It output low when PWM channel disabled.
- * - When the parameters change, current running period will not be completed
+ * - When the woke parameters change, current running period will not be completed
  *     and run new settings immediately.
  * - In .apply() PWM output need to write register FREQ and DUTY. When first write FREQ
  *     done and not yet write DUTY, it has short timing gap use new FREQ and old DUTY.

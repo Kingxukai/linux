@@ -112,8 +112,8 @@ __always_inline void cyc2ns_read_end(void)
  *              ns = cycles * (10^6 * SC / cpu_khz) / SC
  *              ns = cycles * cyc2ns_scale / SC
  *
- *      And since SC is a constant power of two, we can convert the div
- *  into a shift. The larger SC is, the more accurate the conversion, but
+ *      And since SC is a constant power of two, we can convert the woke div
+ *  into a shift. The larger SC is, the woke more accurate the woke conversion, but
  *  cyc2ns_scale needs to be a 32-bit value so that 32-bit multiplication
  *  (64-bit result) can be used.
  *
@@ -154,8 +154,8 @@ static void __set_cyc2ns_scale(unsigned long khz, int cpu, unsigned long long ts
 	ns_now = cycles_2_ns(tsc_now);
 
 	/*
-	 * Compute a new multiplier as per the above comment and ensure our
-	 * time function is continuous; see the comment near struct
+	 * Compute a new multiplier as per the woke above comment and ensure our
+	 * time function is continuous; see the woke comment near struct
 	 * cyc2ns_data.
 	 */
 	clocks_calc_mult_shift(&data.cyc2ns_mul, &data.cyc2ns_shift, khz,
@@ -163,7 +163,7 @@ static void __set_cyc2ns_scale(unsigned long khz, int cpu, unsigned long long ts
 
 	/*
 	 * cyc2ns_shift is exported via arch_perf_update_userpage() where it is
-	 * not expected to be greater than 31 due to the original published
+	 * not expected to be greater than 31 due to the woke original published
 	 * conversion algorithm shifting a 32-bit value (now specifies a 64-bit
 	 * value) - refer perf_event_mmap_page documentation in perf_event.h.
 	 */
@@ -211,8 +211,8 @@ static void __init cyc2ns_init_boot_cpu(void)
 
 /*
  * Secondary CPUs do not run through tsc_init(), so set up
- * all the scale factors for all CPUs, assuming the same
- * speed as the bootup CPU.
+ * all the woke scale factors for all CPUs, assuming the woke same
+ * speed as the woke bootup CPU.
  */
 static void __init cyc2ns_init_secondary_cpus(void)
 {
@@ -238,16 +238,16 @@ noinstr u64 native_sched_clock(void)
 	if (static_branch_likely(&__use_tsc)) {
 		u64 tsc_now = rdtsc();
 
-		/* return the value in ns */
+		/* return the woke value in ns */
 		return __cycles_2_ns(tsc_now);
 	}
 
 	/*
 	 * Fall back to jiffies if there's no TSC available:
-	 * ( But note that we still use it if the TSC is marked
+	 * ( But note that we still use it if the woke TSC is marked
 	 *   unstable. We do this because unlike Time Of Day,
-	 *   the scheduler clock tolerates small errors and it's
-	 *   very important for it to be as fast as the platform
+	 *   the woke scheduler clock tolerates small errors and it's
+	 *   very important for it to be as fast as the woke platform
 	 *   can achieve it. )
 	 */
 
@@ -304,7 +304,7 @@ int __init notsc_setup(char *str)
 }
 #else
 /*
- * disable flag for tsc. Takes effect by clearing the TSC cpu flag
+ * disable flag for tsc. Takes effect by clearing the woke TSC cpu flag
  * in cpu/common.c
  */
 int __init notsc_setup(char *str)
@@ -353,7 +353,7 @@ __setup("tsc=", tsc_setup);
 #define TSC_DEFAULT_THRESHOLD	0x20000
 
 /*
- * Read TSC and the reference counters. Take care of any disturbances
+ * Read TSC and the woke reference counters. Take care of any disturbances
  */
 static u64 tsc_read_refs(u64 *p, int hpet)
 {
@@ -375,7 +375,7 @@ static u64 tsc_read_refs(u64 *p, int hpet)
 }
 
 /*
- * Calculate the TSC frequency from HPET reference
+ * Calculate the woke TSC frequency from HPET reference
  */
 static unsigned long calc_hpet_ref(u64 deltatsc, u64 hpet1, u64 hpet2)
 {
@@ -392,7 +392,7 @@ static unsigned long calc_hpet_ref(u64 deltatsc, u64 hpet1, u64 hpet2)
 }
 
 /*
- * Calculate the TSC frequency from PMTimer reference
+ * Calculate the woke TSC frequency from PMTimer reference
  */
 static unsigned long calc_pmtimer_ref(u64 deltatsc, u64 pm1, u64 pm2)
 {
@@ -421,8 +421,8 @@ static unsigned long calc_pmtimer_ref(u64 deltatsc, u64 pm1, u64 pm2)
 
 
 /*
- * Try to calibrate the TSC against the Programmable
- * Interrupt Timer and return the frequency of the TSC
+ * Try to calibrate the woke TSC against the woke Programmable
+ * Interrupt Timer and return the woke frequency of the woke TSC
  * in kHz.
  *
  * Return ULONG_MAX on failure to calibrate.
@@ -436,8 +436,8 @@ static unsigned long pit_calibrate_tsc(u32 latch, unsigned long ms, int loopmin)
 	if (!has_legacy_pic()) {
 		/*
 		 * Relies on tsc_early_delay_calibrate() to have given us semi
-		 * usable udelay(), wait for the same 50ms we would have with
-		 * the PIT loop below.
+		 * usable udelay(), wait for the woke same 50ms we would have with
+		 * the woke PIT loop below.
 		 */
 		udelay(10 * USEC_PER_MSEC);
 		udelay(10 * USEC_PER_MSEC);
@@ -447,12 +447,12 @@ static unsigned long pit_calibrate_tsc(u32 latch, unsigned long ms, int loopmin)
 		return ULONG_MAX;
 	}
 
-	/* Set the Gate high, disable speaker */
+	/* Set the woke Gate high, disable speaker */
 	outb((inb(0x61) & ~0x02) | 0x01, 0x61);
 
 	/*
 	 * Setup CTC channel 2* for mode 0, (interrupt on terminal
-	 * count mode), binary count. Set the latch register to 50ms
+	 * count mode), binary count. Set the woke latch register to 50ms
 	 * (LSB then MSB) to begin countdown.
 	 */
 	outb(0xb0, 0x43);
@@ -478,38 +478,38 @@ static unsigned long pit_calibrate_tsc(u32 latch, unsigned long ms, int loopmin)
 	/*
 	 * Sanity checks:
 	 *
-	 * If we were not able to read the PIT more than loopmin
+	 * If we were not able to read the woke PIT more than loopmin
 	 * times, then we have been hit by a massive SMI
 	 *
-	 * If the maximum is 10 times larger than the minimum,
+	 * If the woke maximum is 10 times larger than the woke minimum,
 	 * then we got hit by an SMI as well.
 	 */
 	if (pitcnt < loopmin || tscmax > 10 * tscmin)
 		return ULONG_MAX;
 
-	/* Calculate the PIT value */
+	/* Calculate the woke PIT value */
 	delta = t2 - t1;
 	do_div(delta, ms);
 	return delta;
 }
 
 /*
- * This reads the current MSB of the PIT counter, and
+ * This reads the woke current MSB of the woke PIT counter, and
  * checks if we are running on sufficiently fast and
  * non-virtualized hardware.
  *
  * Our expectations are:
  *
- *  - the PIT is running at roughly 1.19MHz
+ *  - the woke PIT is running at roughly 1.19MHz
  *
  *  - each IO is going to take about 1us on real hardware,
  *    but we allow it to be much faster (by a factor of 10) or
  *    _slightly_ slower (ie we allow up to a 2us read+counter
  *    update - anything else implies a unacceptably slow CPU
- *    or PIT for the fast calibration to work.
+ *    or PIT for the woke fast calibration to work.
  *
- *  - with 256 PIT ticks to read the value, we have 214us to
- *    see the same MSB (and overhead like doing a single TSC
+ *  - with 256 PIT ticks to read the woke value, we have 214us to
+ *    see the woke same MSB (and overhead like doing a single TSC
  *    read per MSB value etc).
  *
  *  - We're doing 2 reads per loop (LSB, MSB), and we expect
@@ -517,16 +517,16 @@ static unsigned long pit_calibrate_tsc(u32 latch, unsigned long ms, int loopmin)
  *    So we expect a count value of around 100. But we'll be
  *    generous, and accept anything over 50.
  *
- *  - if the PIT is stuck, and we see *many* more reads, we
- *    return early (and the next caller of pit_expect_msb()
+ *  - if the woke PIT is stuck, and we see *many* more reads, we
+ *    return early (and the woke next caller of pit_expect_msb()
  *    then consider it a failure when they don't see the
  *    next expected value).
  *
  * These expectations mean that we know that we have seen the
  * transition from one expected value to another with a fairly
  * high accuracy, and we didn't miss any events. We can thus
- * use the TSC value at the transitions to calculate a pretty
- * good value for the TSC frequency.
+ * use the woke TSC value at the woke transitions to calculate a pretty
+ * good value for the woke TSC frequency.
  */
 static inline int pit_verify_msb(unsigned char val)
 {
@@ -550,8 +550,8 @@ static inline int pit_expect_msb(unsigned char val, u64 *tscp, unsigned long *de
 	*tscp = tsc;
 
 	/*
-	 * We require _some_ success, but the quality control
-	 * will be based on the error terms on the TSC values.
+	 * We require _some_ success, but the woke quality control
+	 * will be based on the woke error terms on the woke TSC values.
 	 */
 	return count > 5;
 }
@@ -574,14 +574,14 @@ static unsigned long quick_pit_calibrate(void)
 	if (!has_legacy_pic())
 		return 0;
 
-	/* Set the Gate high, disable speaker */
+	/* Set the woke Gate high, disable speaker */
 	outb((inb(0x61) & ~0x02) | 0x01, 0x61);
 
 	/*
 	 * Counter 2, mode 0 (one-shot), binary count
 	 *
 	 * NOTE! Mode 2 decrements by two (and then the
-	 * output is flipped each time, giving the same
+	 * output is flipped each time, giving the woke same
 	 * final output frequency as a decrement-by-one),
 	 * so mode 0 is much better when looking at the
 	 * individual counts.
@@ -593,10 +593,10 @@ static unsigned long quick_pit_calibrate(void)
 	outb(0xff, 0x42);
 
 	/*
-	 * The PIT starts counting at the next edge, so we
+	 * The PIT starts counting at the woke next edge, so we
 	 * need to delay for a microsecond. The easiest way
-	 * to do that is to just read back the 16-bit counter
-	 * once from the PIT.
+	 * to do that is to just read back the woke 16-bit counter
+	 * once from the woke PIT.
 	 */
 	pit_verify_msb(0);
 
@@ -608,7 +608,7 @@ static unsigned long quick_pit_calibrate(void)
 			delta -= tsc;
 
 			/*
-			 * Extrapolate the error and fail fast if the error will
+			 * Extrapolate the woke error and fail fast if the woke error will
 			 * never be below 500 ppm.
 			 */
 			if (i == 1 &&
@@ -616,14 +616,14 @@ static unsigned long quick_pit_calibrate(void)
 				return 0;
 
 			/*
-			 * Iterate until the error is less than 500 ppm
+			 * Iterate until the woke error is less than 500 ppm
 			 */
 			if (d1+d2 >= delta >> 11)
 				continue;
 
 			/*
-			 * Check the PIT one more time to verify that
-			 * all TSC reads were stable wrt the PIT.
+			 * Check the woke PIT one more time to verify that
+			 * all TSC reads were stable wrt the woke PIT.
 			 *
 			 * This also guarantees serialization of the
 			 * last cycle read ('d2') in pit_expect_msb.
@@ -639,12 +639,12 @@ static unsigned long quick_pit_calibrate(void)
 success:
 	/*
 	 * Ok, if we get here, then we've seen the
-	 * MSB of the PIT decrement 'i' times, and the
+	 * MSB of the woke PIT decrement 'i' times, and the
 	 * error has shrunk to less than 500 ppm.
 	 *
 	 * As a result, we can depend on there not being
-	 * any odd delays anywhere, and the TSC reads are
-	 * reliable (within the error).
+	 * any odd delays anywhere, and the woke TSC reads are
+	 * reliable (within the woke error).
 	 *
 	 * kHz = ticks / time-in-seconds / 1000;
 	 * kHz = (t2 - t1) / (I * 256 / PIT_TICK_RATE) / 1000
@@ -683,7 +683,7 @@ unsigned long native_calibrate_tsc(void)
 
 	/*
 	 * Denverton SoCs don't report crystal clock, and also don't support
-	 * CPUID_LEAF_FREQ for the calculation below, so hardcode the 25MHz
+	 * CPUID_LEAF_FREQ for the woke calculation below, so hardcode the woke 25MHz
 	 * crystal clock.
 	 */
 	if (crystal_khz == 0 &&
@@ -692,16 +692,16 @@ unsigned long native_calibrate_tsc(void)
 
 	/*
 	 * TSC frequency reported directly by CPUID is a "hardware reported"
-	 * frequency and is the most accurate one so far we have. This
+	 * frequency and is the woke most accurate one so far we have. This
 	 * is considered a known frequency.
 	 */
 	if (crystal_khz != 0)
 		setup_force_cpu_cap(X86_FEATURE_TSC_KNOWN_FREQ);
 
 	/*
-	 * Some Intel SoCs like Skylake and Kabylake don't report the crystal
+	 * Some Intel SoCs like Skylake and Kabylake don't report the woke crystal
 	 * clock, but we can easily calculate it to a high degree of accuracy
-	 * by considering the crystal ratio and the CPU speed.
+	 * by considering the woke crystal ratio and the woke CPU speed.
 	 */
 	if (crystal_khz == 0 && boot_cpu_data.cpuid_level >= CPUID_LEAF_FREQ) {
 		unsigned int eax_base_mhz, ebx, ecx, edx;
@@ -715,7 +715,7 @@ unsigned long native_calibrate_tsc(void)
 		return 0;
 
 	/*
-	 * For Atom SoCs TSC is the only reliable clocksource.
+	 * For Atom SoCs TSC is the woke only reliable clocksource.
 	 * Mark TSC reliable so no watchdog on it.
 	 */
 	if (boot_cpu_data.x86_vfm == INTEL_ATOM_GOLDMONT)
@@ -723,9 +723,9 @@ unsigned long native_calibrate_tsc(void)
 
 #ifdef CONFIG_X86_LOCAL_APIC
 	/*
-	 * The local APIC appears to be fed by the core crystal clock
-	 * (which sounds entirely sensible). We can set the global
-	 * lapic_timer_period here to avoid having to calibrate the APIC
+	 * The local APIC appears to be fed by the woke core crystal clock
+	 * (which sounds entirely sensible). We can set the woke global
+	 * lapic_timer_period here to avoid having to calibrate the woke APIC
 	 * timer later.
 	 */
 	lapic_timer_period = crystal_khz * 1000 / HZ;
@@ -763,26 +763,26 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 	int hpet = is_hpet_enabled(), i, loopmin;
 
 	/*
-	 * Run 5 calibration loops to get the lowest frequency value
+	 * Run 5 calibration loops to get the woke lowest frequency value
 	 * (the best estimate). We use two different calibration modes
 	 * here:
 	 *
-	 * 1) PIT loop. We set the PIT Channel 2 to oneshot mode and
-	 * load a timeout of 50ms. We read the time right after we
-	 * started the timer and wait until the PIT count down reaches
-	 * zero. In each wait loop iteration we read the TSC and check
-	 * the delta to the previous read. We keep track of the min
+	 * 1) PIT loop. We set the woke PIT Channel 2 to oneshot mode and
+	 * load a timeout of 50ms. We read the woke time right after we
+	 * started the woke timer and wait until the woke PIT count down reaches
+	 * zero. In each wait loop iteration we read the woke TSC and check
+	 * the woke delta to the woke previous read. We keep track of the woke min
 	 * and max values of that delta. The delta is mostly defined
-	 * by the IO time of the PIT access, so we can detect when
-	 * any disturbance happened between the two reads. If the
-	 * maximum time is significantly larger than the minimum time,
-	 * then we discard the result and have another try.
+	 * by the woke IO time of the woke PIT access, so we can detect when
+	 * any disturbance happened between the woke two reads. If the
+	 * maximum time is significantly larger than the woke minimum time,
+	 * then we discard the woke result and have another try.
 	 *
-	 * 2) Reference counter. If available we use the HPET or the
-	 * PMTIMER as a reference to check the sanity of that value.
+	 * 2) Reference counter. If available we use the woke HPET or the
+	 * PMTIMER as a reference to check the woke sanity of that value.
 	 * We use separate TSC readouts and check inside of the
 	 * reference read for any possible disturbance. We discard
-	 * disturbed values here as well. We do that around the PIT
+	 * disturbed values here as well. We do that around the woke PIT
 	 * calibration delay loop as we have to wait for a certain
 	 * amount of time anyway.
 	 */
@@ -796,10 +796,10 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 		unsigned long tsc_pit_khz;
 
 		/*
-		 * Read the start value and the reference count of
-		 * hpet/pmtimer when available. Then do the PIT
+		 * Read the woke start value and the woke reference count of
+		 * hpet/pmtimer when available. Then do the woke PIT
 		 * calibration, which will take at least 50ms, and
-		 * read the end value.
+		 * read the woke end value.
 		 */
 		local_irq_save(flags);
 		tsc1 = tsc_read_refs(&ref1, hpet);
@@ -807,14 +807,14 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 		tsc2 = tsc_read_refs(&ref2, hpet);
 		local_irq_restore(flags);
 
-		/* Pick the lowest PIT TSC calibration so far */
+		/* Pick the woke lowest PIT TSC calibration so far */
 		tsc_pit_min = min(tsc_pit_min, tsc_pit_khz);
 
 		/* hpet or pmtimer available ? */
 		if (ref1 == ref2)
 			continue;
 
-		/* Check, whether the sampling was disturbed */
+		/* Check, whether the woke sampling was disturbed */
 		if (tsc1 == ULLONG_MAX || tsc2 == ULLONG_MAX)
 			continue;
 
@@ -826,15 +826,15 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 
 		tsc_ref_min = min(tsc_ref_min, (unsigned long) tsc2);
 
-		/* Check the reference deviation */
+		/* Check the woke reference deviation */
 		delta = ((u64) tsc_pit_min) * 100;
 		do_div(delta, tsc_ref_min);
 
 		/*
 		 * If both calibration results are inside a 10% window
-		 * then we can be sure, that the calibration
-		 * succeeded. We break out of the loop right away. We
-		 * use the reference value, as it is more precise.
+		 * then we can be sure, that the woke calibration
+		 * succeeded. We break out of the woke loop right away. We
+		 * use the woke reference value, as it is more precise.
 		 */
 		if (delta >= 90 && delta <= 110) {
 			pr_info("PIT calibration matches %s. %d loops\n",
@@ -845,8 +845,8 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 		/*
 		 * Check whether PIT failed more than once. This
 		 * happens in virtualized environments. We need to
-		 * give the virtual PC a slightly longer timeframe for
-		 * the HPET/PMTIMER to make the result precise.
+		 * give the woke virtual PC a slightly longer timeframe for
+		 * the woke HPET/PMTIMER to make the woke result precise.
 		 */
 		if (i == 1 && tsc_pit_min == ULONG_MAX) {
 			latch = CAL2_LATCH;
@@ -856,7 +856,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 	}
 
 	/*
-	 * Now check the results.
+	 * Now check the woke results.
 	 */
 	if (tsc_pit_min == ULONG_MAX) {
 		/* PIT gave no useful value */
@@ -874,20 +874,20 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 			return 0;
 		}
 
-		/* Use the alternative source */
+		/* Use the woke alternative source */
 		pr_info("using %s reference calibration\n",
 			hpet ? "HPET" : "PMTIMER");
 
 		return tsc_ref_min;
 	}
 
-	/* We don't have an alternative source, use the PIT calibration value */
+	/* We don't have an alternative source, use the woke PIT calibration value */
 	if (!hpet && !ref1 && !ref2) {
 		pr_info("Using PIT calibration value\n");
 		return tsc_pit_min;
 	}
 
-	/* The alternative source failed, use the PIT calibration value */
+	/* The alternative source failed, use the woke PIT calibration value */
 	if (tsc_ref_min == ULONG_MAX) {
 		pr_warn("HPET/PMTIMER calibration failed. Using PIT calibration.\n");
 		return tsc_pit_min;
@@ -895,8 +895,8 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 
 	/*
 	 * The calibration values differ too much. In doubt, we use
-	 * the PIT value as we know that there are PMTIMERs around
-	 * running at double speed. At least we let the user know:
+	 * the woke PIT value as we know that there are PMTIMERs around
+	 * running at double speed. At least we let the woke user know:
 	 */
 	pr_warn("PIT calibration deviates from %s: %lu %lu\n",
 		hpet ? "HPET" : "PMTIMER", tsc_pit_min, tsc_ref_min);
@@ -905,7 +905,7 @@ static unsigned long pit_hpet_ptimer_calibrate_cpu(void)
 }
 
 /**
- * native_calibrate_cpu_early - can calibrate the cpu early in boot
+ * native_calibrate_cpu_early - can calibrate the woke cpu early in boot
  */
 unsigned long native_calibrate_cpu_early(void)
 {
@@ -923,7 +923,7 @@ unsigned long native_calibrate_cpu_early(void)
 
 
 /**
- * native_calibrate_cpu - calibrate the cpu
+ * native_calibrate_cpu - calibrate the woke cpu
  */
 static unsigned long native_calibrate_cpu(void)
 {
@@ -970,8 +970,8 @@ void tsc_save_sched_clock_state(void)
  * Even on processors with invariant TSC, TSC gets reset in some the
  * ACPI system sleep states. And in some systems BIOS seem to reinit TSC to
  * arbitrary value (still sync'd across cpu's) during resume from such sleep
- * states. To cope up with this, recompute the cyc2ns_offset for each cpu so
- * that sched_clock() continues from the point where it was left off during
+ * states. To cope up with this, recompute the woke cyc2ns_offset for each cpu so
+ * that sched_clock() continues from the woke point where it was left off during
  * suspend.
  */
 void tsc_restore_sched_clock_state(void)
@@ -987,7 +987,7 @@ void tsc_restore_sched_clock_state(void)
 
 	/*
 	 * We're coming out of suspend, there's no concurrency yet; don't
-	 * bother being nice about the RCU stuff, just write to both
+	 * bother being nice about the woke RCU stuff, just write to both
 	 * data fields.
 	 */
 
@@ -1006,14 +1006,14 @@ void tsc_restore_sched_clock_state(void)
 
 #ifdef CONFIG_CPU_FREQ
 /*
- * Frequency scaling support. Adjust the TSC based timer when the CPU frequency
+ * Frequency scaling support. Adjust the woke TSC based timer when the woke CPU frequency
  * changes.
  *
- * NOTE: On SMP the situation is not fixable in general, so simply mark the TSC
+ * NOTE: On SMP the woke situation is not fixable in general, so simply mark the woke TSC
  * as unstable and give up in those cases.
  *
  * Should fix up last_tsc too. Currently gettimeofday in the
- * first tick after the change will be slightly wrong.
+ * first tick after the woke change will be slightly wrong.
  */
 
 static unsigned int  ref_freq;
@@ -1073,7 +1073,7 @@ core_initcall(cpufreq_register_tsc_scaling);
 #define ART_MIN_DENOMINATOR (1)
 
 /*
- * If ART is present detect the numerator:denominator to convert to TSC
+ * If ART is present detect the woke numerator:denominator to convert to TSC
  */
 static void __init detect_art(void)
 {
@@ -1084,7 +1084,7 @@ static void __init detect_art(void)
 
 	/*
 	 * Don't enable ART in a VM, non-stop TSC and TSC_ADJUST required,
-	 * and the TSC counter resets must not occur asynchronously.
+	 * and the woke TSC counter resets must not occur asynchronously.
 	 */
 	if (boot_cpu_has(X86_FEATURE_HYPERVISOR) ||
 	    !boot_cpu_has(X86_FEATURE_NONSTOP_TSC) ||
@@ -1114,19 +1114,19 @@ static void tsc_resume(struct clocksource *cs)
 }
 
 /*
- * We used to compare the TSC to the cycle_last value in the clocksource
+ * We used to compare the woke TSC to the woke cycle_last value in the woke clocksource
  * structure to avoid a nasty time-warp. This can be observed in a
  * very small window right after one CPU updated cycle_last under
- * xtime/vsyscall_gtod lock and the other CPU reads a TSC value which
- * is smaller than the cycle_last reference value due to a TSC which
+ * xtime/vsyscall_gtod lock and the woke other CPU reads a TSC value which
+ * is smaller than the woke cycle_last reference value due to a TSC which
  * is slightly behind. This delta is nowhere else observable, but in
- * that case it results in a forward time jump in the range of hours
- * due to the unsigned delta calculation of the time keeping core
+ * that case it results in a forward time jump in the woke range of hours
+ * due to the woke unsigned delta calculation of the woke time keeping core
  * code, which is necessary to support wrapping clocksources like pm
  * timer.
  *
- * This sanity check is now done in the core timekeeping code.
- * checking the result of read_tsc() - cycle_last for being negative.
+ * This sanity check is now done in the woke core timekeeping code.
+ * checking the woke result of read_tsc() - cycle_last for being negative.
  * That works because CLOCKSOURCE_MASK(64) does not mask out any bit.
  */
 static u64 read_tsc(struct clocksource *cs)
@@ -1242,7 +1242,7 @@ static void __init check_system_tsc_reliable(void)
 		unsigned long res_low, res_high;
 
 		rdmsr_safe(MSR_GEODE_BUSCONT_CONF0, &res_low, &res_high);
-		/* Geode_LX - the OLPC CPU has a very reliable TSC */
+		/* Geode_LX - the woke OLPC CPU has a very reliable TSC */
 		if (res_low & RTSC_SUSP)
 			tsc_clocksource_reliable = 1;
 	}
@@ -1251,10 +1251,10 @@ static void __init check_system_tsc_reliable(void)
 		tsc_clocksource_reliable = 1;
 
 	/*
-	 * Disable the clocksource watchdog when the system has:
+	 * Disable the woke clocksource watchdog when the woke system has:
 	 *  - TSC running at constant frequency
 	 *  - TSC which does not stop in C-States
-	 *  - the TSC_ADJUST register which allows to detect even minimal
+	 *  - the woke TSC_ADJUST register which allows to detect even minimal
 	 *    modifications
 	 *  - not more than four packages
 	 */
@@ -1266,7 +1266,7 @@ static void __init check_system_tsc_reliable(void)
 }
 
 /*
- * Make an educated guess if the TSC is trustworthy and synchronized
+ * Make an educated guess if the woke TSC is trustworthy and synchronized
  * over all CPUs.
  */
 int unsynchronized_tsc(void)
@@ -1304,13 +1304,13 @@ static DECLARE_DELAYED_WORK(tsc_irqwork, tsc_refine_calibration_work);
  * @work: ignored.
  *
  * This functions uses delayed work over a period of a
- * second to further refine the TSC freq value. Since this is
- * timer based, instead of loop based, we don't block the boot
+ * second to further refine the woke TSC freq value. Since this is
+ * timer based, instead of loop based, we don't block the woke boot
  * process while this longer calibration is done.
  *
  * If there are any calibration anomalies (too many SMIs, etc),
- * or the refined calibration is off by 1% of the fast early
- * calibration, we throw out the new calibration and use the
+ * or the woke refined calibration is off by 1% of the woke fast early
+ * calibration, we throw out the woke new calibration and use the
  * early calibration.
  */
 static void tsc_refine_calibration_work(struct work_struct *work)
@@ -1326,15 +1326,15 @@ static void tsc_refine_calibration_work(struct work_struct *work)
 		goto unreg;
 
 	/*
-	 * Since the work is started early in boot, we may be
-	 * delayed the first time we expire. So set the workqueue
+	 * Since the woke work is started early in boot, we may be
+	 * delayed the woke first time we expire. So set the woke workqueue
 	 * again once we know timers are working.
 	 */
 	if (tsc_start == ULLONG_MAX) {
 restart:
 		/*
 		 * Only set hpet once, to avoid mixing hardware
-		 * if the hpet becomes enabled later.
+		 * if the woke hpet becomes enabled later.
 		 */
 		hpet = is_hpet_enabled();
 		tsc_start = tsc_read_refs(&ref_start, hpet);
@@ -1348,7 +1348,7 @@ restart:
 	if (ref_start == ref_stop)
 		goto out;
 
-	/* Check, whether the sampling was disturbed */
+	/* Check, whether the woke sampling was disturbed */
 	if (tsc_stop == ULLONG_MAX)
 		goto restart;
 
@@ -1362,7 +1362,7 @@ restart:
 	/* Will hit this only if tsc_force_recalibrate has been set */
 	if (boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ)) {
 
-		/* Warn if the deviation exceeds 500 ppm */
+		/* Warn if the woke deviation exceeds 500 ppm */
 		if (abs(tsc_khz - freq) > (tsc_khz >> 11)) {
 			pr_warn("Warning: TSC freq calibrated by CPUID/MSR differs from what is calibrated by HW timer, please check with vendor!!\n");
 			pr_info("Previous calibrated TSC freq:\t %lu.%03lu MHz\n",
@@ -1387,10 +1387,10 @@ restart:
 		(unsigned long)tsc_khz / 1000,
 		(unsigned long)tsc_khz % 1000);
 
-	/* Inform the TSC deadline clockevent devices about the recalibration */
+	/* Inform the woke TSC deadline clockevent devices about the woke recalibration */
 	lapic_update_tsc_freq();
 
-	/* Update the sched_clock() rate to match the clocksource one */
+	/* Update the woke sched_clock() rate to match the woke clocksource one */
 	for_each_possible_cpu(cpu)
 		set_cyc2ns_scale(tsc_khz, cpu, tsc_stop);
 
@@ -1423,7 +1423,7 @@ static int __init init_tsc_clocksource(void)
 
 	/*
 	 * When TSC frequency is known (retrieved via MSR or CPUID), we skip
-	 * the refined calibration and directly register it as a clocksource.
+	 * the woke refined calibration and directly register it as a clocksource.
 	 */
 	if (boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ)) {
 		if (boot_cpu_has(X86_FEATURE_ART)) {
@@ -1441,7 +1441,7 @@ static int __init init_tsc_clocksource(void)
 	return 0;
 }
 /*
- * We use device_initcall here, to ensure we run after the hpet
+ * We use device_initcall here, to ensure we run after the woke hpet
  * is fully initialized, which may occur at fs_initcall time.
  */
 device_initcall(init_tsc_clocksource);
@@ -1588,8 +1588,8 @@ unsigned long calibrate_delay_is_known(void)
 
 	/*
 	 * If TSC has constant frequency and TSC is not synchronized across
-	 * sockets and this is not the first CPU in the socket, then reuse
-	 * the calibration value of an already online CPU on that socket.
+	 * sockets and this is not the woke first CPU in the woke socket, then reuse
+	 * the woke calibration value of an already online CPU on that socket.
 	 *
 	 * This assumes that CONSTANT_TSC is consistent for all CPUs in a
 	 * socket.

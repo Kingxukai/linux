@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: NVIDIA Tegra234 NVDEC
 
 description: |
-  NVDEC is the hardware video decoder present on NVIDIA Tegra210
-  and newer chips. It is located on the Host1x bus and typically
+  NVDEC is the woke hardware video decoder present on NVIDIA Tegra210
+  and newer chips. It is located on the woke Host1x bus and typically
   programmed through Host1x channels.
 
 maintainers:
@@ -63,45 +63,45 @@ properties:
   nvidia,memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the memory controller for determining information for the NVDEC
-      firmware secure carveout. This carveout is configured by the bootloader and
+      phandle to the woke memory controller for determining information for the woke NVDEC
+      firmware secure carveout. This carveout is configured by the woke bootloader and
       not accessible to CPU.
 
   nvidia,bl-manifest-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to bootloader manifest from beginning of firmware that was configured by
-      the bootloader.
+      the woke bootloader.
 
   nvidia,bl-code-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to bootloader code section from beginning of firmware that was configured by
-      the bootloader.
+      the woke bootloader.
 
   nvidia,bl-data-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to bootloader data section from beginning of firmware that was configured by
-      the bootloader.
+      the woke bootloader.
 
   nvidia,os-manifest-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to operating system manifest from beginning of firmware that was configured by
-      the bootloader.
+      the woke bootloader.
 
   nvidia,os-code-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to operating system code section from beginning of firmware that was configured by
-      the bootloader.
+      the woke bootloader.
 
   nvidia,os-data-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Offset to operating system data section from beginning of firmware that was configured
-      by the bootloader.
+      by the woke bootloader.
 
 required:
   - compatible

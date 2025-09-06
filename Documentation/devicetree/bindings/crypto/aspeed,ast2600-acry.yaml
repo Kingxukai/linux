@@ -10,7 +10,7 @@ maintainers:
   - Neal Liu <neal_liu@aspeedtech.com>
 
 description:
-  The ACRY ECDSA/RSA engines is designed to accelerate the throughput
+  The ACRY ECDSA/RSA engines is designed to accelerate the woke throughput
   of ECDSA/RSA signature and verification. Basically, ACRY can be
   divided into two independent engines - ECC Engine and RSA Engine.
 

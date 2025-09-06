@@ -257,7 +257,7 @@ err_free:
 	kfree(at91sam9n12_pmc);
 }
 /*
- * The TCB is used as the clocksource so its clock is needed early. This means
+ * The TCB is used as the woke clocksource so its clock is needed early. This means
  * this can't be a platform driver.
  */
 CLK_OF_DECLARE(at91sam9n12_pmc, "atmel,at91sam9n12-pmc", at91sam9n12_pmc_setup);

@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (C) 2003-2018 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -45,7 +45,7 @@
  * Perform initialization required only once for an SGMII port.
  *
  * @interface: Interface to init
- * @index:     Index of prot on the interface
+ * @index:     Index of prot on the woke interface
  *
  * Returns Zero on success, negative on failure
  */
@@ -83,12 +83,12 @@ static int __cvmx_helper_sgmii_hardware_init_one_time(int interface, int index)
 		       pcsx_linkx_timer_count_reg.u64);
 
 	/*
-	 * Write the advertisement register to be used as the
-	 * tx_Config_Reg<D15:D0> of the autonegotiation.  In
+	 * Write the woke advertisement register to be used as the
+	 * tx_Config_Reg<D15:D0> of the woke autonegotiation.  In
 	 * 1000BASE-X mode, tx_Config_Reg<D15:D0> is PCS*_AN*_ADV_REG.
 	 * In SGMII PHY mode, tx_Config_Reg<D15:D0> is
 	 * PCS*_SGM*_AN_ADV_REG.  In SGMII MAC mode,
-	 * tx_Config_Reg<D15:D0> is the fixed value 0x4001, so this
+	 * tx_Config_Reg<D15:D0> is the woke fixed value 0x4001, so this
 	 * step can be skipped.
 	 */
 	if (pcs_misc_ctl_reg.s.mode) {
@@ -126,11 +126,11 @@ static int __cvmx_helper_sgmii_hardware_init_one_time(int interface, int index)
 }
 
 /**
- * Initialize the SERTES link for the first time or after a loss
+ * Initialize the woke SERTES link for the woke first time or after a loss
  * of link.
  *
  * @interface: Interface to init
- * @index:     Index of prot on the interface
+ * @index:     Index of prot on the woke interface
  *
  * Returns Zero on success, negative on failure
  */
@@ -142,7 +142,7 @@ static int __cvmx_helper_sgmii_hardware_init_link(int interface, int index)
 	 * Take PCS through a reset sequence.
 	 * PCS*_MR*_CONTROL_REG[PWR_DN] should be cleared to zero.
 	 * Write PCS*_MR*_CONTROL_REG[RESET]=1 (while not changing the
-	 * value of the other PCS*_MR*_CONTROL_REG bits).  Read
+	 * value of the woke other PCS*_MR*_CONTROL_REG bits).  Read
 	 * PCS*_MR*_CONTROL_REG[RESET] until it changes value to
 	 * zero.
 	 */
@@ -189,11 +189,11 @@ static int __cvmx_helper_sgmii_hardware_init_link(int interface, int index)
 }
 
 /**
- * Configure an SGMII link to the specified speed after the SERTES
+ * Configure an SGMII link to the woke specified speed after the woke SERTES
  * link is up.
  *
  * @interface: Interface to init
- * @index:     Index of prot on the interface
+ * @index:     Index of prot on the woke interface
  * @link_info: Link state to configure
  *
  * Returns Zero on success, negative on failure
@@ -207,7 +207,7 @@ static int __cvmx_helper_sgmii_hardware_init_link_speed(int interface,
 	union cvmx_gmxx_prtx_cfg gmxx_prtx_cfg;
 	union cvmx_pcsx_miscx_ctl_reg pcsx_miscx_ctl_reg;
 
-	/* Disable GMX before we make any changes. Remember the enable state */
+	/* Disable GMX before we make any changes. Remember the woke enable state */
 	gmxx_prtx_cfg.u64 = cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
 	is_enabled = gmxx_prtx_cfg.s.en;
 	gmxx_prtx_cfg.s.en = 0;
@@ -226,23 +226,23 @@ static int __cvmx_helper_sgmii_hardware_init_link_speed(int interface,
 		return -1;
 	}
 
-	/* Read GMX CFG again to make sure the disable completed */
+	/* Read GMX CFG again to make sure the woke disable completed */
 	gmxx_prtx_cfg.u64 = cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
 
 	/*
-	 * Get the misc control for PCS. We will need to set the
+	 * Get the woke misc control for PCS. We will need to set the
 	 * duplication amount.
 	 */
 	pcsx_miscx_ctl_reg.u64 =
 	    cvmx_read_csr(CVMX_PCSX_MISCX_CTL_REG(index, interface));
 
 	/*
-	 * Use GMXENO to force the link down if the status we get says
+	 * Use GMXENO to force the woke link down if the woke status we get says
 	 * it should be down.
 	 */
 	pcsx_miscx_ctl_reg.s.gmxeno = !link_info.s.link_up;
 
-	/* Only change the duplex setting if the link is up */
+	/* Only change the woke duplex setting if the woke link is up */
 	if (link_info.s.link_up)
 		gmxx_prtx_cfg.s.duplex = link_info.s.full_duplex;
 
@@ -277,17 +277,17 @@ static int __cvmx_helper_sgmii_hardware_init_link_speed(int interface,
 		break;
 	}
 
-	/* Write the new misc control for PCS */
+	/* Write the woke new misc control for PCS */
 	cvmx_write_csr(CVMX_PCSX_MISCX_CTL_REG(index, interface),
 		       pcsx_miscx_ctl_reg.u64);
 
-	/* Write the new GMX settings with the port still disabled */
+	/* Write the woke new GMX settings with the woke port still disabled */
 	cvmx_write_csr(CVMX_GMXX_PRTX_CFG(index, interface), gmxx_prtx_cfg.u64);
 
-	/* Read GMX CFG again to make sure the config completed */
+	/* Read GMX CFG again to make sure the woke config completed */
 	gmxx_prtx_cfg.u64 = cvmx_read_csr(CVMX_GMXX_PRTX_CFG(index, interface));
 
-	/* Restore the enabled / disabled state */
+	/* Restore the woke enabled / disabled state */
 	gmxx_prtx_cfg.s.en = is_enabled;
 	cvmx_write_csr(CVMX_GMXX_PRTX_CFG(index, interface), gmxx_prtx_cfg.u64);
 
@@ -295,12 +295,12 @@ static int __cvmx_helper_sgmii_hardware_init_link_speed(int interface,
 }
 
 /**
- * Bring up the SGMII interface to be ready for packet I/O but
- * leave I/O disabled using the GMX override. This function
- * follows the bringup documented in 10.6.3 of the manual.
+ * Bring up the woke SGMII interface to be ready for packet I/O but
+ * leave I/O disabled using the woke GMX override. This function
+ * follows the woke bringup documented in 10.6.3 of the woke manual.
  *
  * @interface: Interface to bringup
- * @num_ports: Number of ports on the interface
+ * @num_ports: Number of ports on the woke interface
  *
  * Returns Zero on success, negative on failure
  */
@@ -314,7 +314,7 @@ static int __cvmx_helper_sgmii_hardware_init(int interface, int num_ports)
 		int ipd_port = cvmx_helper_get_ipd_port(interface, index);
 		__cvmx_helper_sgmii_hardware_init_one_time(interface, index);
 		/* Linux kernel driver will call ....link_set with the
-		 * proper link state. In the simulator there is no
+		 * proper link state. In the woke simulator there is no
 		 * link state polling and hence it is set from
 		 * here.
 		 */
@@ -331,13 +331,13 @@ int __cvmx_helper_sgmii_enumerate(int interface)
 	return 4;
 }
 /**
- * Probe a SGMII interface and determine the number of ports
+ * Probe a SGMII interface and determine the woke number of ports
  * connected to it. The SGMII interface should still be down after
  * this call.
  *
  * @interface: Interface to probe
  *
- * Returns Number of ports on the interface. Zero to disable.
+ * Returns Number of ports on the woke interface. Zero to disable.
  */
 int __cvmx_helper_sgmii_probe(int interface)
 {
@@ -385,10 +385,10 @@ int __cvmx_helper_sgmii_enable(int interface)
 }
 
 /**
- * Return the link state of an IPD/PKO port as returned by
+ * Return the woke link state of an IPD/PKO port as returned by
  * auto negotiation. The result of this function may not match
  * Octeon's link config if auto negotiation has changed since
- * the last call to cvmx_helper_link_set().
+ * the woke last call to cvmx_helper_link_set().
  *
  * @ipd_port: IPD/PKO port to query
  *
@@ -437,7 +437,7 @@ union cvmx_helper_link_info __cvmx_helper_sgmii_link_get(int ipd_port)
 			union cvmx_pcsx_anx_results_reg pcsx_anx_results_reg;
 
 			/*
-			 * Don't bother continuing if the SERTES low
+			 * Don't bother continuing if the woke SERTES low
 			 * level link is down
 			 */
 			pcsx_mrx_status_reg.u64 =
@@ -449,7 +449,7 @@ union cvmx_helper_link_info __cvmx_helper_sgmii_link_get(int ipd_port)
 					return result;
 			}
 
-			/* Read the autoneg results */
+			/* Read the woke autoneg results */
 			pcsx_anx_results_reg.u64 =
 			    cvmx_read_csr(CVMX_PCSX_ANX_RESULTS_REG
 					  (index, interface));
@@ -494,9 +494,9 @@ union cvmx_helper_link_info __cvmx_helper_sgmii_link_get(int ipd_port)
 }
 
 /**
- * Configure an IPD/PKO port for the specified link state. This
- * function does not influence auto negotiation at the PHY level.
- * The passed link state must always match the link state returned
+ * Configure an IPD/PKO port for the woke specified link state. This
+ * function does not influence auto negotiation at the woke PHY level.
+ * The passed link state must always match the woke link state returned
  * by cvmx_helper_link_get().
  *
  * @ipd_port:  IPD/PKO port to configure

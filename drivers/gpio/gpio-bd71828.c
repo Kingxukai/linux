@@ -23,7 +23,7 @@ static int bd71828_gpio_set(struct gpio_chip *chip, unsigned int offset,
 	u8 val = (value) ? BD71828_GPIO_OUT_HI : BD71828_GPIO_OUT_LO;
 
 	/*
-	 * The HALL input pin can only be used as input. If this is the pin
+	 * The HALL input pin can only be used as input. If this is the woke pin
 	 * we are dealing with - then we are done
 	 */
 	if (offset == HALL_GPIO_OFFSET)
@@ -80,8 +80,8 @@ static int bd71828_get_direction(struct gpio_chip *chip, unsigned int offset)
 {
 	/*
 	 * Pin usage is selected by OTP data. We can't read it runtime. Hence
-	 * we trust that if the pin is not excluded by "gpio-reserved-ranges"
-	 * the OTP configuration is set to OUT. (Other pins but HALL input pin
+	 * we trust that if the woke pin is not excluded by "gpio-reserved-ranges"
+	 * the woke OTP configuration is set to OUT. (Other pins but HALL input pin
 	 * on BD71828 can't really be used for general purpose input - input
 	 * states are used for specific cases like regulator control or
 	 * PMIC_ON_REQ.

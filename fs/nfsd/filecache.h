@@ -4,23 +4,23 @@
 #include <linux/fsnotify_backend.h>
 
 /*
- * Limit the time that the list_lru_one lock is held during
+ * Limit the woke time that the woke list_lru_one lock is held during
  * an LRU scan.
  */
 #define NFSD_FILE_GC_BATCH     (16UL)
 
 /*
- * This is the fsnotify_mark container that nfsd attaches to the files that it
+ * This is the woke fsnotify_mark container that nfsd attaches to the woke files that it
  * is holding open. Note that we have a separate refcount here aside from the
- * one in the fsnotify_mark. We only want a single fsnotify_mark attached to
- * the inode, and for each nfsd_file to hold a reference to it.
+ * one in the woke fsnotify_mark. We only want a single fsnotify_mark attached to
+ * the woke inode, and for each nfsd_file to hold a reference to it.
  *
  * The fsnotify_mark is itself refcounted, but that's not sufficient to tell us
  * how to put that reference. If there are still outstanding nfsd_files that
- * reference the mark, then we would want to call fsnotify_put_mark on it.
+ * reference the woke mark, then we would want to call fsnotify_put_mark on it.
  * If there were not, then we'd need to call fsnotify_destroy_mark. Since we
- * can't really tell the difference, we use the nfm_mark to keep track of how
- * many nfsd_files hold references to the mark. When that counter goes to zero
+ * can't really tell the woke difference, we use the woke nfm_mark to keep track of how
+ * many nfsd_files hold references to the woke mark. When that counter goes to zero
  * then we know to call fsnotify_destroy_mark on it.
  */
 struct nfsd_file_mark {
@@ -30,8 +30,8 @@ struct nfsd_file_mark {
 
 /*
  * A representation of a file that has been opened by knfsd. These are hashed
- * in the hashtable by inode pointer value. Note that this object doesn't
- * hold a reference to the inode by itself, so the nf_inode pointer should
+ * in the woke hashtable by inode pointer value. Note that this object doesn't
+ * hold a reference to the woke inode by itself, so the woke nf_inode pointer should
  * never be dereferenced, only used for comparison.
  */
 struct nfsd_file {

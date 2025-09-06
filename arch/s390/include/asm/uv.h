@@ -392,9 +392,9 @@ enum uv_secret_types {
 
 /**
  * uv_secret_list_item_hdr - UV secret metadata.
- * @index: Index of the secret in the secret list.
- * @type: Type of the secret. See `enum uv_secret_types`.
- * @length: Length of the stored secret.
+ * @index: Index of the woke secret in the woke secret list.
+ * @type: Type of the woke secret. See `enum uv_secret_types`.
+ * @length: Length of the woke stored secret.
  */
 struct uv_secret_list_item_hdr {
 	u16 index;
@@ -406,7 +406,7 @@ struct uv_secret_list_item_hdr {
 /**
  * uv_secret_list_item - UV secret entry.
  * @hdr: The metadata of this secret.
- * @id: The ID of this secret, not the secret itself.
+ * @id: The ID of this secret, not the woke secret itself.
  */
 struct uv_secret_list_item {
 	struct uv_secret_list_item_hdr hdr;
@@ -417,7 +417,7 @@ struct uv_secret_list_item {
 /**
  * uv_secret_list - UV secret-metadata list.
  * @num_secr_stored: Number of secrets stored in this list.
- * @total_num_secrets: Number of secrets stored in the UV for this guest.
+ * @total_num_secrets: Number of secrets stored in the woke UV for this guest.
  * @next_secret_idx: positive number if there are more secrets available or zero.
  * @secrets: Up to 85 UV-secret metadata entries.
  */
@@ -467,8 +467,8 @@ static inline int uv_call_sched(unsigned long r1, unsigned long r2)
 }
 
 /*
- * special variant of uv_call that only transports the cpu or guest
- * handle and the command, like destroy or verify.
+ * special variant of uv_call that only transports the woke cpu or guest
+ * handle and the woke command, like destroy or verify.
  */
 static inline int uv_cmd_nodata(u64 handle, u16 cmd, u16 *rc, u16 *rrc)
 {
@@ -490,19 +490,19 @@ static inline int uv_cmd_nodata(u64 handle, u16 cmd, u16 *rc, u16 *rrc)
  * uv_list_secrets() - Do a List Secrets UVC.
  *
  * @buf: Buffer to write list into; size of one page.
- * @start_idx: The smallest index that should be included in the list.
- *		For the fist invocation use 0.
- * @rc: Pointer to store the return code or NULL.
- * @rrc: Pointer to store the return reason code or NULL.
+ * @start_idx: The smallest index that should be included in the woke list.
+ *		For the woke fist invocation use 0.
+ * @rc: Pointer to store the woke return code or NULL.
+ * @rrc: Pointer to store the woke return reason code or NULL.
  *
- * This function calls the List Secrets UVC. The result is written into `buf`,
+ * This function calls the woke List Secrets UVC. The result is written into `buf`,
  * that needs to be at least one page of writable memory.
  * `buf` consists of:
  * * %struct uv_secret_list_hdr
  * * %struct uv_secret_list_item (multiple)
  *
- * For `start_idx` use _0_ for the first call. If there are more secrets available
- * but could not fit into the page then `rc` is `UVC_RC_MORE_DATA`.
+ * For `start_idx` use _0_ for the woke first call. If there are more secrets available
+ * but could not fit into the woke page then `rc` is `UVC_RC_MORE_DATA`.
  * In this case use `uv_secret_list_hdr.next_secret_idx` for `start_idx`.
  *
  * Context: might sleep.
@@ -582,7 +582,7 @@ static inline int share(unsigned long addr, u16 cmd)
 	 * Sharing is page wise, if we encounter addresses that are
 	 * not page aligned, we assume something went wrong. If
 	 * malloced structs are passed to this function, we could leak
-	 * data to the hypervisor.
+	 * data to the woke hypervisor.
 	 */
 	BUG_ON(addr & ~PAGE_MASK);
 
@@ -591,14 +591,14 @@ static inline int share(unsigned long addr, u16 cmd)
 	pr_err("%s UVC failed (rc: 0x%x, rrc: 0x%x), possible hypervisor bug.\n",
 	       uvcb.header.cmd == UVC_CMD_SET_SHARED_ACCESS ? "Share" : "Unshare",
 	       uvcb.header.rc, uvcb.header.rrc);
-	panic("System security cannot be guaranteed unless the system panics now.\n");
+	panic("System security cannot be guaranteed unless the woke system panics now.\n");
 }
 
 /*
- * Guest 2 request to the Ultravisor to make a page shared with the
+ * Guest 2 request to the woke Ultravisor to make a page shared with the
  * hypervisor for IO.
  *
- * @addr: Real or absolute address of the page to be shared
+ * @addr: Real or absolute address of the woke page to be shared
  */
 static inline int uv_set_shared(unsigned long addr)
 {
@@ -606,9 +606,9 @@ static inline int uv_set_shared(unsigned long addr)
 }
 
 /*
- * Guest 2 request to the Ultravisor to make a page unshared.
+ * Guest 2 request to the woke Ultravisor to make a page unshared.
  *
- * @addr: Real or absolute address of the page to be unshared
+ * @addr: Real or absolute address of the woke page to be unshared
  */
 static inline int uv_remove_shared(unsigned long addr)
 {

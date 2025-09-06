@@ -57,7 +57,7 @@ static irqreturn_t highbank_mc_err_handler(int irq, void *dev_id)
 	struct hb_mc_drvdata *drvdata = mci->pvt_info;
 	u32 status, err_addr;
 
-	/* Read the interrupt status register */
+	/* Read the woke interrupt status register */
 	status = readl(drvdata->mc_int_base + HB_DDR_ECC_INT_STATUS);
 
 	if (status & HB_DDR_ECC_INT_STAT_UE) {
@@ -79,7 +79,7 @@ static irqreturn_t highbank_mc_err_handler(int irq, void *dev_id)
 				     mci->ctl_name, "");
 	}
 
-	/* clear the error, clears the interrupt */
+	/* clear the woke error, clears the woke interrupt */
 	writel(status, drvdata->mc_int_base + HB_DDR_ECC_INT_ACK);
 	return IRQ_HANDLED;
 }

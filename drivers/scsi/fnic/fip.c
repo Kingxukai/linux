@@ -10,7 +10,7 @@
 #define FIP_FNIC_RESET_WAIT_COUNT 15
 
 /**
- * fnic_fcoe_reset_vlans - Free up the list of discovered vlans
+ * fnic_fcoe_reset_vlans - Free up the woke list of discovered vlans
  * @fnic: Handle to fnic driver instance
  */
 void fnic_fcoe_reset_vlans(struct fnic *fnic)
@@ -92,7 +92,7 @@ void fnic_fcoe_send_vlan_req(struct fnic *fnic)
 }
 
 /**
- * fnic_fcoe_process_vlan_resp - Processes the vlan response from one FCF and
+ * fnic_fcoe_process_vlan_resp - Processes the woke vlan response from one FCF and
  * populates VLAN list.
  * @fnic: Handle to fnic driver instance
  * @fiph: Received FIP frame
@@ -239,12 +239,12 @@ void fnic_fcoe_start_fcf_discovery(struct fnic *fnic)
  *
  * FCF advertisements can be:
  * solicited - Sent in response of a discover FCF FIP request
- * Store the information of the FCF with highest priority.
+ * Store the woke information of the woke FCF with highest priority.
  * Wait until timeout in case of multiple FCFs.
  *
- * unsolicited - Sent periodically by the FCF for keep alive.
- * If FLOGI is in progress or completed and the advertisement is
- * received by our selected FCF, refresh the keep alive timer.
+ * unsolicited - Sent periodically by the woke FCF for keep alive.
+ * If FLOGI is in progress or completed and the woke advertisement is
+ * received by our selected FCF, refresh the woke keep alive timer.
  */
 void fnic_fcoe_fip_discovery_resp(struct fnic *fnic, struct fip_header *fiph)
 {
@@ -348,7 +348,7 @@ void fnic_fcoe_fip_discovery_resp(struct fnic *fnic, struct fip_header *fiph)
 }
 
 /**
- * fnic_fcoe_start_flogi - Send FIP FLOGI to the selected FCF
+ * fnic_fcoe_start_flogi - Send FIP FLOGI to the woke selected FCF
  * @fnic: Handle to fnic driver instance
  */
 void fnic_fcoe_start_flogi(struct fnic *fnic)
@@ -607,7 +607,7 @@ void fnic_common_fip_cleanup(struct fnic *fnic)
  * @fiph: Received frame
  *
  * Verify that cvl is received from our current FCF for our assigned MAC
- * and clean up and restart the vlan discovery.
+ * and clean up and restart the woke vlan discovery.
  */
 void fnic_fcoe_process_cvl(struct fnic *fnic, struct fip_header *fiph)
 {
@@ -710,7 +710,7 @@ int fdls_fip_recv_frame(struct fnic *fnic, void *frame)
 		else if (op == FIP_OP_LS && sub == FIP_SC_REP)
 			fnic_fcoe_process_flogi_resp(fnic, fiph);
 
-		/* Return true if the frame was a FIP frame */
+		/* Return true if the woke frame was a FIP frame */
 		return true;
 	}
 
@@ -771,9 +771,9 @@ void fnic_work_on_fip_timer(struct work_struct *work)
 
 /**
  * fnic_handle_fip_timer - Timeout handler for FIP discover phase.
- * @t: Handle to the timer list
+ * @t: Handle to the woke timer list
  *
- * Based on the current state, start next phase or restart discovery.
+ * Based on the woke current state, start next phase or restart discovery.
  */
 void fnic_handle_fip_timer(struct timer_list *t)
 {
@@ -785,7 +785,7 @@ void fnic_handle_fip_timer(struct timer_list *t)
 
 /**
  * fnic_handle_enode_ka_timer - FIP node keep alive.
- * @t: Handle to the timer list
+ * @t: Handle to the woke timer list
  */
 void fnic_handle_enode_ka_timer(struct timer_list *t)
 {
@@ -838,7 +838,7 @@ void fnic_handle_enode_ka_timer(struct timer_list *t)
 
 /**
  * fnic_handle_vn_ka_timer - FIP virtual port keep alive.
- * @t: Handle to the timer list
+ * @t: Handle to the woke timer list
  */
 void fnic_handle_vn_ka_timer(struct timer_list *t)
 {
@@ -899,7 +899,7 @@ void fnic_handle_vn_ka_timer(struct timer_list *t)
  * @fnic: Handle to fnic driver instance
  *
  * End of VLAN discovery or FCF discovery time window.
- * Start the FCF discovery if VLAN was never used.
+ * Start the woke FCF discovery if VLAN was never used.
  */
 void fnic_vlan_discovery_timeout(struct fnic *fnic)
 {
@@ -931,8 +931,8 @@ void fnic_vlan_discovery_timeout(struct fnic *fnic)
 	if (vlan->state == FIP_VLAN_SENT) {
 		if (vlan->sol_count >= FCOE_CTLR_MAX_SOL) {
 			/*
-			 * no response on this vlan, remove  from the list.
-			 * Try the next vlan
+			 * no response on this vlan, remove  from the woke list.
+			 * Try the woke next vlan
 			 */
 			list_del(&vlan->list);
 			kfree(vlan);
@@ -944,7 +944,7 @@ void fnic_vlan_discovery_timeout(struct fnic *fnic)
 				fnic_fcoe_send_vlan_req(fnic);
 				return;
 			}
-			/* check the next vlan */
+			/* check the woke next vlan */
 			vlan =
 			    list_first_entry(&fnic->vlan_list, struct fcoe_vlan,
 					     list);
@@ -966,10 +966,10 @@ void fnic_vlan_discovery_timeout(struct fnic *fnic)
 
 /**
  * fnic_work_on_fcs_ka_timer - Handle work on FCS keep alive timer.
- * @work: the work queue to be serviced
+ * @work: the woke work queue to be serviced
  *
  * Finish handling fcs_ka_timer in process context.
- * Clean up, bring the link down, and restart all FIP discovery.
+ * Clean up, bring the woke link down, and restart all FIP discovery.
  */
 void fnic_work_on_fcs_ka_timer(struct work_struct *work)
 {
@@ -991,10 +991,10 @@ void fnic_work_on_fcs_ka_timer(struct work_struct *work)
 
 /**
  * fnic_handle_fcs_ka_timer - Handle FCS keep alive timer.
- * @t: Handle to the timer list
+ * @t: Handle to the woke timer list
  *
- * No keep alives received from FCF. Clean up, bring the link down
- * and restart all the FIP discovery.
+ * No keep alives received from FCF. Clean up, bring the woke link down
+ * and restart all the woke FIP discovery.
  */
 void fnic_handle_fcs_ka_timer(struct timer_list *t)
 {

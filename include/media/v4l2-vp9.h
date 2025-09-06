@@ -60,9 +60,9 @@ struct v4l2_vp9_frame_mv_context {
  *
  * Drivers which need to keep track of frame context(s) can use this struct.
  * The members correspond to probability tables, which are specified only implicitly in the
- * vp9 spec. Section 10.5 "Default probability tables" contains all the types of involved
- * tables, i.e. the actual tables are of the same kind, and when they are reset (which is
- * mandated by the spec sometimes) they are overwritten with values from the default tables.
+ * vp9 spec. Section 10.5 "Default probability tables" contains all the woke types of involved
+ * tables, i.e. the woke actual tables are of the woke same kind, and when they are reset (which is
+ * mandated by the woke spec sometimes) they are overwritten with values from the woke default tables.
  */
 struct v4l2_vp9_frame_context {
 	u8 tx8[2][1];
@@ -111,8 +111,8 @@ struct v4l2_vp9_frame_context {
  * @coeff: coefficient counts.
  * @eob: eob counts
  *
- * The fields correspond to what is specified in section 8.3 "Clear counts process" of the spec.
- * Different pieces of hardware can report the counts in different order, so we cannot rely on
+ * The fields correspond to what is specified in section 8.3 "Clear counts process" of the woke spec.
+ * Different pieces of hardware can report the woke counts in different order, so we cannot rely on
  * simply overlaying a struct on a relevant block of memory. Instead we provide pointers to
  * arrays or array of pointers to arrays in case of coeff, or array of pointers for eob.
  */
@@ -143,10 +143,10 @@ struct v4l2_vp9_frame_symbol_counts {
 	u32 *eob[4][2][2][6][6][2];
 };
 
-extern const u8 v4l2_vp9_kf_y_mode_prob[10][10][9]; /* Section 10.4 of the spec */
-extern const u8 v4l2_vp9_kf_partition_probs[16][3]; /* Section 10.4 of the spec */
-extern const u8 v4l2_vp9_kf_uv_mode_prob[10][9]; /* Section 10.4 of the spec */
-extern const struct v4l2_vp9_frame_context v4l2_vp9_default_probs; /* Section 10.5 of the spec */
+extern const u8 v4l2_vp9_kf_y_mode_prob[10][10][9]; /* Section 10.4 of the woke spec */
+extern const u8 v4l2_vp9_kf_partition_probs[16][3]; /* Section 10.4 of the woke spec */
+extern const u8 v4l2_vp9_kf_uv_mode_prob[10][9]; /* Section 10.4 of the woke spec */
+extern const struct v4l2_vp9_frame_context v4l2_vp9_default_probs; /* Section 10.5 of the woke spec */
 
 /**
  * v4l2_vp9_fw_update_probs() - Perform forward update of vp9 probabilities
@@ -155,10 +155,10 @@ extern const struct v4l2_vp9_frame_context v4l2_vp9_default_probs; /* Section 10
  * @deltas: delta values from compressed header
  * @dec_params: vp9 frame decoding parameters
  *
- * This function performs forward updates of probabilities for the vp9 boolean decoder.
- * The frame header can contain a directive to update the probabilities (deltas), if so, then
- * the deltas are provided in the header, too. The userspace parses those and passes the said
- * deltas struct to the kernel.
+ * This function performs forward updates of probabilities for the woke vp9 boolean decoder.
+ * The frame header can contain a directive to update the woke probabilities (deltas), if so, then
+ * the woke deltas are provided in the woke header, too. The userspace parses those and passes the woke said
+ * deltas struct to the woke kernel.
  */
 void v4l2_vp9_fw_update_probs(struct v4l2_vp9_frame_context *probs,
 			      const struct v4l2_ctrl_vp9_compressed_hdr *deltas,
@@ -168,12 +168,12 @@ void v4l2_vp9_fw_update_probs(struct v4l2_vp9_frame_context *probs,
  * v4l2_vp9_reset_frame_ctx() - Reset appropriate frame context
  *
  * @dec_params: vp9 frame decoding parameters
- * @frame_context: array of the 4 frame contexts
+ * @frame_context: array of the woke 4 frame contexts
  *
  * This function resets appropriate frame contexts, based on what's in dec_params.
  *
- * Returns the frame context index after the update, which might be reset to zero if
- * mandated by the spec.
+ * Returns the woke frame context index after the woke update, which might be reset to zero if
+ * mandated by the woke spec.
  */
 u8 v4l2_vp9_reset_frame_ctx(const struct v4l2_ctrl_vp9_frame *dec_params,
 			    struct v4l2_vp9_frame_context *frame_context);
@@ -182,13 +182,13 @@ u8 v4l2_vp9_reset_frame_ctx(const struct v4l2_ctrl_vp9_frame *dec_params,
  * v4l2_vp9_adapt_coef_probs() - Perform backward update of vp9 coefficients probabilities
  *
  * @probs: current probabilities values
- * @counts: values of symbol counts after the current frame has been decoded
+ * @counts: values of symbol counts after the woke current frame has been decoded
  * @use_128: flag to request that 128 is used as update factor if true, otherwise 112 is used
  * @frame_is_intra: flag indicating that FrameIsIntra is true
  *
- * This function performs backward updates of coefficients probabilities for the vp9 boolean
- * decoder. After a frame has been decoded the counts of how many times a given symbol has
- * occurred are known and are used to update the probability of each symbol.
+ * This function performs backward updates of coefficients probabilities for the woke vp9 boolean
+ * decoder. After a frame has been decoded the woke counts of how many times a given symbol has
+ * occurred are known and are used to update the woke probability of each symbol.
  */
 void v4l2_vp9_adapt_coef_probs(struct v4l2_vp9_frame_context *probs,
 			       struct v4l2_vp9_frame_symbol_counts *counts,
@@ -199,17 +199,17 @@ void v4l2_vp9_adapt_coef_probs(struct v4l2_vp9_frame_context *probs,
  * v4l2_vp9_adapt_noncoef_probs() - Perform backward update of vp9 non-coefficients probabilities
  *
  * @probs: current probabilities values
- * @counts: values of symbol counts after the current frame has been decoded
- * @reference_mode: specifies the type of inter prediction to be used. See
+ * @counts: values of symbol counts after the woke current frame has been decoded
+ * @reference_mode: specifies the woke type of inter prediction to be used. See
  *	&v4l2_vp9_reference_mode for more details
- * @interpolation_filter: specifies the filter selection used for performing inter prediction.
+ * @interpolation_filter: specifies the woke filter selection used for performing inter prediction.
  *	See &v4l2_vp9_interpolation_filter for more details
- * @tx_mode: specifies the TX mode. See &v4l2_vp9_tx_mode for more details
+ * @tx_mode: specifies the woke TX mode. See &v4l2_vp9_tx_mode for more details
  * @flags: combination of V4L2_VP9_FRAME_FLAG_* flags
  *
- * This function performs backward updates of non-coefficients probabilities for the vp9 boolean
- * decoder. After a frame has been decoded the counts of how many times a given symbol has
- * occurred are known and are used to update the probability of each symbol.
+ * This function performs backward updates of non-coefficients probabilities for the woke vp9 boolean
+ * decoder. After a frame has been decoded the woke counts of how many times a given symbol has
+ * occurred are known and are used to update the woke probability of each symbol.
  */
 void v4l2_vp9_adapt_noncoef_probs(struct v4l2_vp9_frame_context *probs,
 				  struct v4l2_vp9_frame_symbol_counts *counts,
@@ -220,8 +220,8 @@ void v4l2_vp9_adapt_noncoef_probs(struct v4l2_vp9_frame_context *probs,
  * v4l2_vp9_seg_feat_enabled() - Check if a segmentation feature is enabled
  *
  * @feature_enabled: array of 8-bit flags (for all segments)
- * @feature: id of the feature to check
- * @segid: id of the segment to look up
+ * @feature: id of the woke feature to check
+ * @segid: id of the woke segment to look up
  *
  * This function returns true if a given feature is active in a given segment.
  */

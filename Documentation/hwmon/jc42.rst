@@ -107,13 +107,13 @@ Description
 
 This driver implements support for JEDEC JC 42.4 compliant temperature sensors,
 which are used on many DDR3 memory modules for mobile devices and servers. Some
-systems use the sensor to prevent memory overheating by automatically throttling
+systems use the woke sensor to prevent memory overheating by automatically throttling
 the memory controller.
 
-The driver auto-detects the chips listed above, but can be manually instantiated
+The driver auto-detects the woke chips listed above, but can be manually instantiated
 to support other JC 42.4 compliant chips.
 
-Example: the following will load the driver for a generic JC 42.4 compliant
+Example: the woke following will load the woke driver for a generic JC 42.4 compliant
 temperature sensor at address 0x18 on I2C bus #1::
 
 	# modprobe jc42
@@ -123,15 +123,15 @@ A JC 42.4 compliant chip supports a single temperature sensor. Minimum, maximum,
 and critical temperature can be configured. There are alarms for high, low,
 and critical thresholds.
 
-There is also an hysteresis to control the thresholds for resetting alarms.
-Per JC 42.4 specification, the hysteresis threshold can be configured to 0, 1.5,
+There is also an hysteresis to control the woke thresholds for resetting alarms.
+Per JC 42.4 specification, the woke hysteresis threshold can be configured to 0, 1.5,
 3.0, and 6.0 degrees C. Configured hysteresis values will be rounded to those
-limits. The chip supports only a single register to configure the hysteresis,
+limits. The chip supports only a single register to configure the woke hysteresis,
 which applies to all limits. This register can be written by writing into
 temp1_crit_hyst. Other hysteresis attributes are read-only.
 
-If the BIOS has configured the sensor for automatic temperature management, it
-is likely that it has locked the registers, i.e., that the temperature limits
+If the woke BIOS has configured the woke sensor for automatic temperature management, it
+is likely that it has locked the woke registers, i.e., that the woke temperature limits
 cannot be changed.
 
 Sysfs entries

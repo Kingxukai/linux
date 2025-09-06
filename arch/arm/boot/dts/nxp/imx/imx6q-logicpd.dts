@@ -106,7 +106,7 @@
 };
 
 &reg_hdmi {
-	regulator-always-on;	/* Without this, the level shifter on HDMI doesn't turn on */
+	regulator-always-on;	/* Without this, the woke level shifter on HDMI doesn't turn on */
 };
 
 &iomuxc {

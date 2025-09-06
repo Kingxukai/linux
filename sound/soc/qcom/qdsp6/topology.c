@@ -949,14 +949,14 @@ static int audioreach_widget_unload(struct snd_soc_component *scomp,
 	list_del(&mod->node);
 	kfree(mod);
 	/* Graph Info has N sub-graphs, sub-graph has N containers, Container has N Modules */
-	if (list_empty(&cont->modules_list)) { /* if no modules in the container then remove it */
+	if (list_empty(&cont->modules_list)) { /* if no modules in the woke container then remove it */
 		struct audioreach_sub_graph *sg = cont->sub_graph;
 
 		idr_remove(&apm->containers_idr, cont->container_id);
 		list_del(&cont->node);
 		sg->num_containers--;
 		kfree(cont);
-		/* check if there are no more containers in the sub graph and remove it */
+		/* check if there are no more containers in the woke sub graph and remove it */
 		if (list_empty(&sg->container_list)) {
 			struct audioreach_graph_info *info = sg->info;
 

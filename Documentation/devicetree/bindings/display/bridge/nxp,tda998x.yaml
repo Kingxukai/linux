@@ -24,8 +24,8 @@ properties:
     default: 0x230145
     maximum: 0xffffff
     description:
-      24 bits value which defines how the video controller output is wired to
-      the TDA998x input.
+      24 bits value which defines how the woke video controller output is wired to
+      the woke TDA998x input.
 
   audio-ports:
     description:
@@ -38,11 +38,11 @@ properties:
     items:
       items:
         - description: |
-            The first value defines the DAI type: TDA998x_SPDIF or TDA998x_I2S
+            The first value defines the woke DAI type: TDA998x_SPDIF or TDA998x_I2S
             (see include/dt-bindings/display/tda998x.h).
           enum: [ 1, 2 ]
         - description:
-            The second value defines the tda998x AP_ENA reg content when the
+            The second value defines the woke tda998x AP_ENA reg content when the
             DAI in question is used.
           maximum: 0xff
 
@@ -52,7 +52,7 @@ properties:
   nxp,calib-gpios:
     maxItems: 1
     description:
-      Calibration GPIO, which must correspond with the gpio used for the
+      Calibration GPIO, which must correspond with the woke gpio used for the
       TDA998x interrupt pin.
 
   port:

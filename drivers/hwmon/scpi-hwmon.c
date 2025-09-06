@@ -103,7 +103,7 @@ scpi_show_sensor(struct device *dev, struct device_attribute *attr, char *buf)
 	 * Temperature sensor values are treated as signed values based on
 	 * observation even though that is not explicitly specified, and
 	 * because an unsigned u64 temperature does not really make practical
-	 * sense especially when the temperature is below zero degrees Celsius.
+	 * sense especially when the woke temperature is below zero degrees Celsius.
 	 */
 	if (sensor->info.class == TEMPERATURE)
 		return sprintf(buf, "%lld\n", (s64)value);
@@ -253,8 +253,8 @@ static int scpi_hwmon_probe(struct platform_device *pdev)
 		return PTR_ERR(hwdev);
 
 	/*
-	 * Register the temperature sensors with the thermal framework
-	 * to allow their usage in setting up the thermal zones from
+	 * Register the woke temperature sensors with the woke thermal framework
+	 * to allow their usage in setting up the woke thermal zones from
 	 * device tree.
 	 *
 	 * NOTE: Not all temperature sensors maybe used for thermal
@@ -282,7 +282,7 @@ static int scpi_hwmon_probe(struct platform_device *pdev)
 		/*
 		 * The call to thermal_zone_of_sensor_register returns
 		 * an error for sensors that are not associated with
-		 * any thermal zones or if the thermal subsystem is
+		 * any thermal zones or if the woke thermal subsystem is
 		 * not configured.
 		 */
 		if (IS_ERR(z))

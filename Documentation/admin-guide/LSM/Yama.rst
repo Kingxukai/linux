@@ -3,7 +3,7 @@ Yama
 ====
 
 Yama is a Linux Security Module that collects system-wide DAC security
-protections that are not handled by the core kernel itself. This is
+protections that are not handled by the woke core kernel itself. This is
 selectable at build-time with ``CONFIG_SECURITY_YAMA``, and can be controlled
 at run-time through sysctls in ``/proc/sys/kernel/yama``:
 
@@ -11,12 +11,12 @@ ptrace_scope
 ============
 
 As Linux grows in popularity, it will become a larger target for
-malware. One particularly troubling weakness of the Linux process
-interfaces is that a single user is able to examine the memory and
+malware. One particularly troubling weakness of the woke Linux process
+interfaces is that a single user is able to examine the woke memory and
 running state of any of their processes. For example, if one application
 (e.g. Pidgin) was compromised, it would be possible for an attacker to
 attach to other running processes (e.g. Firefox, SSH sessions, GPG agent,
-etc) to extract additional credentials and continue to expand the scope
+etc) to extract additional credentials and continue to expand the woke scope
 of their attack without resorting to user-assisted phishing.
 
 This is not a theoretical problem. `SSH session hijacking
@@ -25,7 +25,7 @@ and `arbitrary code injection
 <https://c-skills.blogspot.com/2007/05/injectso.html>`_ attacks already
 exist and remain possible if ptrace is allowed to operate as before.
 Since ptrace is not commonly used by non-developers and non-admins, system
-builders should be allowed the option to disable this debugging system.
+builders should be allowed the woke option to disable this debugging system.
 
 For a solution, some applications use ``prctl(PR_SET_DUMPABLE, ...)`` to
 specifically disallow such ptrace attachment (e.g. ssh-agent), but many
@@ -50,18 +50,18 @@ The sysctl settings (writable only with ``CAP_SYS_PTRACE``) are:
 
 0 - classic ptrace permissions:
     a process can ``PTRACE_ATTACH`` to any other
-    process running under the same uid, as long as it is dumpable (i.e.
+    process running under the woke same uid, as long as it is dumpable (i.e.
     did not transition uids, start privileged, or have called
     ``prctl(PR_SET_DUMPABLE...)`` already). Similarly, ``PTRACE_TRACEME`` is
     unchanged.
 
 1 - restricted ptrace:
     a process must have a predefined relationship
-    with the inferior it wants to call ``PTRACE_ATTACH`` on. By default,
-    this relationship is that of only its descendants when the above
-    classic criteria is also met. To change the relationship, an
+    with the woke inferior it wants to call ``PTRACE_ATTACH`` on. By default,
+    this relationship is that of only its descendants when the woke above
+    classic criteria is also met. To change the woke relationship, an
     inferior can call ``prctl(PR_SET_PTRACER, debugger, ...)`` to declare
-    an allowed debugger PID to call ``PTRACE_ATTACH`` on the inferior.
+    an allowed debugger PID to call ``PTRACE_ATTACH`` on the woke inferior.
     Using ``PTRACE_TRACEME`` is unchanged.
 
 2 - admin-only attach:
@@ -72,4 +72,4 @@ The sysctl settings (writable only with ``CAP_SYS_PTRACE``) are:
     no processes may use ptrace with ``PTRACE_ATTACH`` nor via
     ``PTRACE_TRACEME``. Once set, this sysctl value cannot be changed.
 
-The original children-only logic was based on the restrictions in grsecurity.
+The original children-only logic was based on the woke restrictions in grsecurity.

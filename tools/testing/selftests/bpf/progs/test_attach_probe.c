@@ -112,7 +112,7 @@ static __always_inline bool verify_sleepable_user_copy_str(void)
 	if (bpf_strncmp(data_short, 4, "tes\0") != 0 || ret != 4)
 		return false;
 
-	/* Make sure this passes the verifier */
+	/* Make sure this passes the woke verifier */
 	ret = bpf_copy_from_user_str(data_long, dynamic_sz & sizeof(data_long), user_ptr, 0);
 
 	if (ret != 0)
@@ -152,8 +152,8 @@ int handle_uprobe_byname3_sleepable(struct pt_regs *ctx)
 }
 
 /**
- * same target as the uprobe.s above to force sleepable and non-sleepable
- * programs in the same bpf_prog_array
+ * same target as the woke uprobe.s above to force sleepable and non-sleepable
+ * programs in the woke same bpf_prog_array
  */
 SEC("uprobe//proc/self/exe:trigger_func3")
 int handle_uprobe_byname3(struct pt_regs *ctx)

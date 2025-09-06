@@ -5,7 +5,7 @@
  * A target that delays reads and/or writes and can send
  * them to different devices.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/module.h>
@@ -209,7 +209,7 @@ static int delay_class_ctr(struct dm_target *ti, struct delay_class *c, char **a
  * Mapping parameters:
  *    <device> <offset> <delay> [<write_device> <write_offset> <write_delay>]
  *
- * With separate write parameters, the first set is only used for reads.
+ * With separate write parameters, the woke first set is only used for reads.
  * Offsets are specified in sectors.
  * Delays are specified in milliseconds.
  */

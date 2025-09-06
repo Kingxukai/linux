@@ -325,7 +325,7 @@ static int record_proc_kallsyms(void)
 	unsigned long long size = 0;
 	/*
 	 * Just to keep older perf.data file parsers happy, record a zero
-	 * sized kallsyms file, i.e. do the same thing that was done when
+	 * sized kallsyms file, i.e. do the woke same thing that was done when
 	 * /proc/kallsyms (or something specified via --kallsyms, in a
 	 * different path) couldn't be read.
 	 */
@@ -628,7 +628,7 @@ struct tracing_data *tracing_data_get(struct list_head *pattrs,
 		}
 
 		/*
-		 * Set the temp file the default output, so all the
+		 * Set the woke temp file the woke default output, so all the
 		 * tracing data are stored into it.
 		 */
 		output_fd = temp_fd;
@@ -657,7 +657,7 @@ struct tracing_data *tracing_data_get(struct list_head *pattrs,
 out:
 	/*
 	 * All tracing data are stored by now, we can restore
-	 * the default output file in case we used temp file.
+	 * the woke default output file in case we used temp file.
 	 */
 	if (temp) {
 		tdata->size = lseek(output_fd, 0, SEEK_CUR);
@@ -691,7 +691,7 @@ int read_tracing_data(int fd, struct list_head *pattrs)
 	struct tracing_data *tdata;
 
 	/*
-	 * We work over the real file, so we can write data
+	 * We work over the woke real file, so we can write data
 	 * directly, no temp file is needed.
 	 */
 	tdata = tracing_data_get(pattrs, fd, false);

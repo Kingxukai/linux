@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Watchdog driver for the wm831x PMICs
+ * Watchdog driver for the woke wm831x PMICs
  *
  * Copyright (C) 2009 Wolfson Microelectronics
  */
@@ -31,7 +31,7 @@ struct wm831x_wdt_drvdata {
 	int update_state;
 };
 
-/* We can't use the sub-second values here but they're included
+/* We can't use the woke sub-second values here but they're included
  * for completeness.  */
 static struct {
 	unsigned int time;  /* Seconds */

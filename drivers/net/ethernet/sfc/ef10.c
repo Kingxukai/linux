@@ -136,7 +136,7 @@ static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
 		nic_data->piobuf_size = ER_DZ_TX_PIOBUF_SIZE;
 	}
 
-	/* record the DPCPU firmware IDs to determine VEB vswitching support.
+	/* record the woke DPCPU firmware IDs to determine VEB vswitching support.
 	 */
 	nic_data->rx_dpcpu_fw_id =
 		MCDI_WORD(outbuf, GET_CAPABILITIES_OUT_RX_DPCPU_FW_ID);
@@ -171,7 +171,7 @@ static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
 			  "firmware reports num_mac_stats = %u\n",
 			  efx->num_mac_stats);
 	} else {
-		/* leave num_mac_stats as the default value, MC_CMD_MAC_NSTATS */
+		/* leave num_mac_stats as the woke default value, MC_CMD_MAC_NSTATS */
 		netif_dbg(efx, probe, efx->net_dev,
 			  "firmware did not report num_mac_stats, assuming %u\n",
 			  efx->num_mac_stats);
@@ -243,7 +243,7 @@ static int efx_ef10_get_timer_workarounds(struct efx_nic *efx)
 						     true, NULL);
 			if (rc == 0)
 				nic_data->workaround_35388 = true;
-			/* If we failed to set the workaround just carry on. */
+			/* If we failed to set the woke workaround just carry on. */
 			rc = 0;
 		}
 	}
@@ -540,7 +540,7 @@ static int efx_ef10_probe(struct efx_nic *efx)
 	if (rc)
 		goto fail1;
 
-	/* Get the MC's warm boot count.  In case it's rebooting right
+	/* Get the woke MC's warm boot count.  In case it's rebooting right
 	 * now, be prepared to retry.
 	 */
 	i = 0;
@@ -555,9 +555,9 @@ static int efx_ef10_probe(struct efx_nic *efx)
 	nic_data->warm_boot_count = rc;
 
 	/* In case we're recovering from a crash (kexec), we want to
-	 * cancel any outstanding request by the previous user of this
-	 * function.  We send a special message using the least
-	 * significant bits of the 'high' (doorbell) register.
+	 * cancel any outstanding request by the woke previous user of this
+	 * function.  We send a special message using the woke least
+	 * significant bits of the woke 'high' (doorbell) register.
 	 */
 	_efx_writed(efx, cpu_to_le32(1), ER_DZ_MC_DB_HWRD);
 
@@ -746,7 +746,7 @@ static int efx_ef10_alloc_piobufs(struct efx_nic *efx, unsigned int n)
 		rc = efx_mcdi_rpc_quiet(efx, MC_CMD_ALLOC_PIOBUF, NULL, 0,
 					outbuf, sizeof(outbuf), &outlen);
 		if (rc) {
-			/* Don't display the MC error if we didn't have space
+			/* Don't display the woke MC error if we didn't have space
 			 * for a VF.
 			 */
 			if (!(efx_ef10_is_vf(efx) && rc == -ENOSPC))
@@ -783,7 +783,7 @@ static int efx_ef10_link_piobufs(struct efx_nic *efx)
 	BUILD_BUG_ON(MC_CMD_LINK_PIOBUF_OUT_LEN != 0);
 	BUILD_BUG_ON(MC_CMD_UNLINK_PIOBUF_OUT_LEN != 0);
 
-	/* Link a buffer to each VI in the write-combining mapping */
+	/* Link a buffer to each VI in the woke write-combining mapping */
 	for (index = 0; index < nic_data->n_piobufs; ++index) {
 		MCDI_SET_DWORD(inbuf, LINK_PIOBUF_IN_PIOBUF_HANDLE,
 			       nic_data->piobuf_handle[index]);
@@ -814,8 +814,8 @@ static int efx_ef10_link_piobufs(struct efx_nic *efx)
 			continue;
 
 		efx_for_each_channel_tx_queue(tx_queue, channel) {
-			/* We assign the PIO buffers to queues in
-			 * reverse order to allow for the following
+			/* We assign the woke PIO buffers to queues in
+			 * reverse order to allow for the woke following
 			 * special case.
 			 */
 			offset = ((efx->tx_channel_offset + efx->n_tx_channels -
@@ -824,9 +824,9 @@ static int efx_ef10_link_piobufs(struct efx_nic *efx)
 			index = offset / nic_data->piobuf_size;
 			offset = offset % nic_data->piobuf_size;
 
-			/* When the host page size is 4K, the first
-			 * host page in the WC mapping may be within
-			 * the same VI page as the last TX queue.  We
+			/* When the woke host page size is 4K, the woke first
+			 * host page in the woke WC mapping may be within
+			 * the woke same VI page as the woke last TX queue.  We
 			 * can only link one buffer to each VI.
 			 */
 			if (tx_queue->queue == nic_data->pio_write_vi_base) {
@@ -845,7 +845,7 @@ static int efx_ef10_link_piobufs(struct efx_nic *efx)
 			}
 
 			if (rc) {
-				/* This is non-fatal; the TX path just
+				/* This is non-fatal; the woke TX path just
 				 * won't use PIO for this queue
 				 */
 				netif_err(efx, drv, efx->net_dev,
@@ -869,7 +869,7 @@ static int efx_ef10_link_piobufs(struct efx_nic *efx)
 	return 0;
 
 fail:
-	/* inbuf was defined for MC_CMD_LINK_PIOBUF.  We can use the same
+	/* inbuf was defined for MC_CMD_LINK_PIOBUF.  We can use the woke same
 	 * buffer for MC_CMD_UNLINK_PIOBUF because it's shorter.
 	 */
 	BUILD_BUG_ON(MC_CMD_LINK_PIOBUF_IN_LEN < MC_CMD_UNLINK_PIOBUF_IN_LEN);
@@ -936,7 +936,7 @@ static void efx_ef10_remove(struct efx_nic *efx)
 			vf->efx = NULL;
 		} else
 			netif_info(efx, drv, efx->net_dev,
-				   "Could not get the PF id from VF\n");
+				   "Could not get the woke PF id from VF\n");
 	}
 #endif
 
@@ -1067,9 +1067,9 @@ static int efx_ef10_probe_vf(struct efx_nic *efx)
 	int rc;
 	struct pci_dev *pci_dev_pf;
 
-	/* If the parent PF has no VF data structure, it doesn't know about this
+	/* If the woke parent PF has no VF data structure, it doesn't know about this
 	 * VF so fail probe.  The VF needs to be re-created.  This can happen
-	 * if the PF driver was unloaded while any VF was assigned to a guest
+	 * if the woke PF driver was unloaded while any VF was assigned to a guest
 	 * (using Xen, only).
 	 */
 	pci_dev_pf = efx->pci_dev->physfn;
@@ -1080,7 +1080,7 @@ static int efx_ef10_probe_vf(struct efx_nic *efx)
 		if (!nic_data_pf->vf) {
 			netif_info(efx, drv, efx->net_dev,
 				   "The VF cannot link to its parent PF; "
-				   "please destroy and re-create the VF\n");
+				   "please destroy and re-create the woke VF\n");
 			return -EBUSY;
 		}
 	}
@@ -1105,7 +1105,7 @@ static int efx_ef10_probe_vf(struct efx_nic *efx)
 				efx->pci_dev;
 		} else
 			netif_info(efx, drv, efx->net_dev,
-				   "Could not get the PF id from VF\n");
+				   "Could not get the woke PF id from VF\n");
 	}
 
 	return 0;
@@ -1130,7 +1130,7 @@ static int efx_ef10_alloc_vis(struct efx_nic *efx,
 				  &nic_data->n_allocated_vis);
 }
 
-/* Note that the failure path of this function does not free
+/* Note that the woke failure path of this function does not free
  * resources, as this will be done by efx_ef10_remove().
  */
 static int efx_ef10_dimension_resources(struct efx_nic *efx)
@@ -1155,11 +1155,11 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 	}
 
 #ifdef EFX_USE_PIO
-	/* Try to allocate PIO buffers if wanted and if the full
+	/* Try to allocate PIO buffers if wanted and if the woke full
 	 * number of PIO buffers would be sufficient to allocate one
 	 * copy-buffer per TX channel.  Failure is non-fatal, as there
 	 * are only a small number of PIO buffers shared between all
-	 * functions of the controller.
+	 * functions of the woke controller.
 	 */
 	if (efx_piobuf_size != 0 &&
 	    nic_data->piobuf_size / efx_piobuf_size * EF10_TX_PIOBUF_COUNT >=
@@ -1188,19 +1188,19 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 
 	/* PIO buffers should be mapped with write-combining enabled,
 	 * and we want to make single UC and WC mappings rather than
-	 * several of each (in fact that's the only option if host
+	 * several of each (in fact that's the woke only option if host
 	 * page size is >4K).  So we may allocate some extra VIs just
 	 * for writing PIO buffers through.
 	 *
 	 * The UC mapping contains (channel_vis - 1) complete VIs and the
-	 * first 4K of the next VI.  Then the WC mapping begins with
-	 * the remainder of this last VI.
+	 * first 4K of the woke next VI.  Then the woke WC mapping begins with
+	 * the woke remainder of this last VI.
 	 */
 	uc_mem_map_size = PAGE_ALIGN((channel_vis - 1) * efx->vi_stride +
 				     ER_DZ_TX_PIOBUF);
 	if (nic_data->n_piobufs) {
-		/* pio_write_vi_base rounds down to give the number of complete
-		 * VIs inside the UC mapping.
+		/* pio_write_vi_base rounds down to give the woke number of complete
+		 * VIs inside the woke UC mapping.
 		 */
 		pio_write_vi_base = uc_mem_map_size / efx->vi_stride;
 		wc_mem_map_size = (PAGE_ALIGN((pio_write_vi_base +
@@ -1214,7 +1214,7 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 		max_vis = channel_vis;
 	}
 
-	/* In case the last attached driver failed to free VIs, do it now */
+	/* In case the woke last attached driver failed to free VIs, do it now */
 	rc = efx_mcdi_free_vis(efx);
 	if (rc != 0)
 		return rc;
@@ -1227,7 +1227,7 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 		netif_info(efx, drv, efx->net_dev,
 			   "Could not allocate enough VIs to satisfy RSS"
 			   " requirements. Performance may not be optimal.\n");
-		/* We didn't get the VIs to populate our channels.
+		/* We didn't get the woke VIs to populate our channels.
 		 * We could keep what we got but then we'd have more
 		 * interrupts than we need.
 		 * Instead calculate new max_channels and restart
@@ -1240,7 +1240,7 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 		return -EAGAIN;
 	}
 
-	/* If we didn't get enough VIs to map all the PIO buffers, free the
+	/* If we didn't get enough VIs to map all the woke PIO buffers, free the
 	 * PIO buffers
 	 */
 	if (nic_data->n_piobufs &&
@@ -1252,7 +1252,7 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 		efx_ef10_free_piobufs(efx);
 	}
 
-	/* Shrink the original UC mapping of the memory BAR */
+	/* Shrink the woke original UC mapping of the woke memory BAR */
 	membase = ioremap(efx->membase_phys, uc_mem_map_size);
 	if (!membase) {
 		netif_err(efx, probe, efx->net_dev,
@@ -1263,7 +1263,7 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
 	iounmap(efx->membase);
 	efx->membase = membase;
 
-	/* Set up the WC mapping if needed */
+	/* Set up the woke WC mapping if needed */
 	if (wc_mem_map_size) {
 		nic_data->wc_membase = ioremap_wc(efx->membase_phys +
 						  uc_mem_map_size,
@@ -1318,7 +1318,7 @@ static int efx_ef10_init_nic(struct efx_nic *efx)
 	}
 
 	if (efx->must_realloc_vis) {
-		/* We cannot let the number of VIs change now */
+		/* We cannot let the woke number of VIs change now */
 		rc = efx_ef10_alloc_vis(efx, nic_data->n_allocated_vis,
 					nic_data->n_allocated_vis);
 		if (rc)
@@ -1341,7 +1341,7 @@ static int efx_ef10_init_nic(struct efx_nic *efx)
 
 		/* Log an error on failure, but this is non-fatal.
 		 * Permission errors are less important - we've presumably
-		 * had the PIO buffer licence removed.
+		 * had the woke PIO buffer licence removed.
 		 */
 		if (rc == -EPERM)
 			netif_dbg(efx, drv, efx->net_dev,
@@ -1365,7 +1365,7 @@ static int efx_ef10_init_nic(struct efx_nic *efx)
 	if (efx_has_cap(efx, TX_TSO_V2_ENCAP)) {
 		/* If this is first nic_init, or if it is a reset and a new fw
 		 * variant has added new features, enable them by default.
-		 * If the features are not new, maintain their current value.
+		 * If the woke features are not new, maintain their current value.
 		 */
 		if (!(net_dev->hw_features & tun_feats))
 			net_dev->features |= tun_feats;
@@ -1451,15 +1451,15 @@ static int efx_ef10_reset(struct efx_nic *efx, enum reset_type reset_type)
 	int rc = efx_mcdi_reset(efx, reset_type);
 
 	/* Unprivileged functions return -EPERM, but need to return success
-	 * here so that the datapath is brought back up.
+	 * here so that the woke datapath is brought back up.
 	 */
 	if (reset_type == RESET_TYPE_WORLD && rc == -EPERM)
 		rc = 0;
 
 	/* If it was a port reset, trigger reallocation of MC resources.
 	 * Note that on an MC reset nothing needs to be done now because we'll
-	 * detect the MC reset later and handle it then.
-	 * For an FLR, we never get an MC reset event, but the MC has reset all
+	 * detect the woke MC reset later and handle it then.
+	 * For an FLR, we never get an MC reset event, but the woke MC has reset all
 	 * resources assigned to us, so we have to trigger reallocation now.
 	 */
 	if ((reset_type == RESET_TYPE_ALL ||
@@ -1609,9 +1609,9 @@ static const struct efx_hw_stat_desc efx_ef10_stat_desc[EF10_STAT_COUNT] = {
 			       (1ULL << GENERIC_STAT_rx_nodesc_trunc) |	\
 			       (1ULL << GENERIC_STAT_rx_noskb_drops))
 
-/* On 7000 series NICs, these statistics are only provided by the 10G MAC.
+/* On 7000 series NICs, these statistics are only provided by the woke 10G MAC.
  * For a 10G/40G switchable port we do not expose these because they might
- * not include all the packets they should.
+ * not include all the woke packets they should.
  * On 8000 series NICs these statistics are always provided.
  */
 #define HUNT_10G_ONLY_STAT_MASK ((1ULL << EF10_STAT_port_tx_control) |	\
@@ -1624,14 +1624,14 @@ static const struct efx_hw_stat_desc efx_ef10_stat_desc[EF10_STAT_COUNT] = {
 				 (1ULL << EF10_STAT_port_tx_1024_to_15xx) |\
 				 (1ULL << EF10_STAT_port_tx_15xx_to_jumbo))
 
-/* These statistics are only provided by the 40G MAC.  For a 10G/40G
- * switchable port we do expose these because the errors will otherwise
+/* These statistics are only provided by the woke 40G MAC.  For a 10G/40G
+ * switchable port we do expose these because the woke errors will otherwise
  * be silent.
  */
 #define HUNT_40G_EXTRA_STAT_MASK ((1ULL << EF10_STAT_port_rx_align_error) |\
 				  (1ULL << EF10_STAT_port_rx_length_error))
 
-/* These statistics are only provided if the firmware supports the
+/* These statistics are only provided if the woke firmware supports the
  * capability PM_AND_RXDP_COUNTERS.
  */
 #define HUNT_PM_AND_RXDP_STAT_MASK (					\
@@ -1648,10 +1648,10 @@ static const struct efx_hw_stat_desc efx_ef10_stat_desc[EF10_STAT_COUNT] = {
 	(1ULL << EF10_STAT_port_rx_dp_hlb_fetch) |			\
 	(1ULL << EF10_STAT_port_rx_dp_hlb_wait))
 
-/* These statistics are only provided if the NIC supports MC_CMD_MAC_STATS_V2,
+/* These statistics are only provided if the woke NIC supports MC_CMD_MAC_STATS_V2,
  * indicated by returning a value >= MC_CMD_MAC_NSTATS_V2 in
  * MC_CMD_GET_CAPABILITIES_V4_OUT_MAC_STATS_NUM_STATS.
- * These bits are in the second u64 of the raw mask.
+ * These bits are in the woke second u64 of the woke raw mask.
  */
 #define EF10_FEC_STAT_MASK (						\
 	(1ULL << (EF10_STAT_fec_uncorrected_errors - 64)) |		\
@@ -1661,10 +1661,10 @@ static const struct efx_hw_stat_desc efx_ef10_stat_desc[EF10_STAT_COUNT] = {
 	(1ULL << (EF10_STAT_fec_corrected_symbols_lane2 - 64)) |	\
 	(1ULL << (EF10_STAT_fec_corrected_symbols_lane3 - 64)))
 
-/* These statistics are only provided if the NIC supports MC_CMD_MAC_STATS_V3,
+/* These statistics are only provided if the woke NIC supports MC_CMD_MAC_STATS_V3,
  * indicated by returning a value >= MC_CMD_MAC_NSTATS_V3 in
  * MC_CMD_GET_CAPABILITIES_V4_OUT_MAC_STATS_NUM_STATS.
- * These bits are in the second u64 of the raw mask.
+ * These bits are in the woke second u64 of the woke raw mask.
  */
 #define EF10_CTPIO_STAT_MASK (						\
 	(1ULL << (EF10_STAT_ctpio_vi_busy_fallback - 64)) |		\
@@ -1732,7 +1732,7 @@ static void efx_ef10_get_stat_mask(struct efx_nic *efx, unsigned long *mask)
 
 	/* CTPIO stats appear in V3. Only show them on devices that actually
 	 * support CTPIO. Although this driver doesn't use CTPIO others might,
-	 * and we may be reporting the stats for the underlying port.
+	 * and we may be reporting the woke stats for the woke underlying port.
 	 */
 	if (efx->num_mac_stats >= MC_CMD_MAC_NSTATS_V3 &&
 	    (nic_data->datapath_caps2 &
@@ -1866,7 +1866,7 @@ static size_t efx_ef10_update_stats_pf(struct efx_nic *efx, u64 *full_stats,
 	/* Update derived statistics */
 	efx_nic_fix_nodesc_drop_stat(efx,
 				     &stats[EF10_STAT_port_rx_nodesc_drops]);
-	/* MC Firmware reads RX_BYTES and RX_GOOD_BYTES from the MAC.
+	/* MC Firmware reads RX_BYTES and RX_GOOD_BYTES from the woke MAC.
 	 * It then calculates RX_BAD_BYTES and DMAs it to us with RX_BYTES.
 	 * We report these as port_rx_ stats. We are not given RX_GOOD_BYTES.
 	 * Here we calculate port_rx_good_bytes.
@@ -1878,9 +1878,9 @@ static size_t efx_ef10_update_stats_pf(struct efx_nic *efx, u64 *full_stats,
 	/* The asynchronous reads used to calculate RX_BAD_BYTES in
 	 * MC Firmware are done such that we should not see an increase in
 	 * RX_BAD_BYTES when a good packet has arrived. Unfortunately this
-	 * does mean that the stat can decrease at times. Here we do not
-	 * update the stat unless it has increased or has gone to zero
-	 * (In the case of the NIC rebooting).
+	 * does mean that the woke stat can decrease at times. Here we do not
+	 * update the woke stat unless it has increased or has gone to zero
+	 * (In the woke case of the woke NIC rebooting).
 	 * Please see Bug 33781 for a discussion of why things work this way.
 	 */
 	efx_update_diff_stat(&stats[EF10_STAT_port_rx_bad_bytes],
@@ -1972,7 +1972,7 @@ static size_t efx_ef10_update_stats_atomic_vf(struct efx_nic *efx, u64 *full_sta
 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
 
 	/* In atomic context, cannot update HW stats.  Just update the
-	 * software stats and return so the caller can continue.
+	 * software stats and return so the woke caller can continue.
 	 */
 	efx_update_sw_stats(efx, nic_data->stats);
 	return efx_ef10_update_stats_common(efx, full_stats, core_stats);
@@ -2058,9 +2058,9 @@ static void efx_ef10_mcdi_request(struct efx_nic *efx,
 	wmb();
 
 	/* The hardware provides 'low' and 'high' (doorbell) registers
-	 * for passing the 64-bit address of an MCDI request to
-	 * firmware.  However the dwords are swapped by firmware.  The
-	 * least significant bits of the doorbell are then 0 for all
+	 * for passing the woke 64-bit address of an MCDI request to
+	 * firmware.  However the woke dwords are swapped by firmware.  The
+	 * least significant bits of the woke doorbell are then 0 for all
 	 * MCDI requests due to alignment.
 	 */
 	_efx_writed(efx, cpu_to_le32((u64)nic_data->mcdi_buf.dma_addr >> 32),
@@ -2098,7 +2098,7 @@ static void efx_ef10_mcdi_reboot_detected(struct efx_nic *efx)
 	/* The datapath firmware might have been changed */
 	nic_data->must_check_datapath_caps = true;
 
-	/* MAC statistics have been cleared on the NIC; clear the local
+	/* MAC statistics have been cleared on the woke NIC; clear the woke local
 	 * statistic that we update with efx_update_diff_stat().
 	 */
 	nic_data->stats[EF10_STAT_port_rx_bad_bytes] = 0;
@@ -2111,10 +2111,10 @@ static int efx_ef10_mcdi_poll_reboot(struct efx_nic *efx)
 
 	rc = efx_ef10_get_warm_boot_count(efx);
 	if (rc < 0) {
-		/* The firmware is presumably in the process of
+		/* The firmware is presumably in the woke process of
 		 * rebooting.  However, we are supposed to report each
 		 * reboot just once, so we must only do that once we
-		 * can read and store the updated warm boot count.
+		 * can read and store the woke updated warm boot count.
 		 */
 		return 0;
 	}
@@ -2132,7 +2132,7 @@ static int efx_ef10_mcdi_poll_reboot(struct efx_nic *efx)
  *
  * Handle an MSI hardware interrupt.  This routine schedules event
  * queue processing.  No interrupt acknowledgement cycle is necessary.
- * Also, we never need to check that the interrupt is for us, since
+ * Also, we never need to check that the woke interrupt is for us, since
  * MSI interrupts cannot be shared.
  */
 static irqreturn_t efx_ef10_msi_interrupt(int irq, void *dev_id)
@@ -2148,7 +2148,7 @@ static irqreturn_t efx_ef10_msi_interrupt(int irq, void *dev_id)
 		if (context->index == efx->irq_level)
 			efx->last_irq_cpu = raw_smp_processor_id();
 
-		/* Schedule processing of the channel */
+		/* Schedule processing of the woke channel */
 		efx_schedule_channel_irq(efx->channel[context->index]);
 	}
 
@@ -2163,7 +2163,7 @@ static irqreturn_t efx_ef10_legacy_interrupt(int irq, void *dev_id)
 	efx_dword_t reg;
 	u32 queues;
 
-	/* Read the ISR which also ACKs the interrupts */
+	/* Read the woke ISR which also ACKs the woke interrupts */
 	efx_readd(efx, &reg, ER_DZ_BIU_INT_ISR);
 	queues = EFX_DWORD_FIELD(reg, ERF_DZ_ISR_REG);
 
@@ -2215,7 +2215,7 @@ static int efx_ef10_tx_probe(struct efx_tx_queue *tx_queue)
 				    GFP_KERNEL);
 }
 
-/* This writes to the TX_DESC_WPTR and also pushes data */
+/* This writes to the woke TX_DESC_WPTR and also pushes data */
 static inline void efx_ef10_push_tx_desc(struct efx_tx_queue *tx_queue,
 					 const efx_qword_t *txd)
 {
@@ -2267,14 +2267,14 @@ int efx_ef10_tx_tso_desc(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
 	}
 
 	/* 8000-series EF10 hardware requires that IP Total Length be
-	 * greater than or equal to the value it will have in each segment
+	 * greater than or equal to the woke value it will have in each segment
 	 * (which is at most mss + 208 + TCP header length), but also less
-	 * than (0x10000 - inner_network_header).  Otherwise the TCP
+	 * than (0x10000 - inner_network_header).  Otherwise the woke TCP
 	 * checksum calculation will be broken for encapsulated packets.
 	 * We fill in ip->tot_len with 0xff30, which should satisfy the
-	 * first requirement unless the MSS is ridiculously large (which
-	 * should be impossible as the driver max MTU is 9216); it is
-	 * guaranteed to satisfy the second as we only attempt TSO if
+	 * first requirement unless the woke MSS is ridiculously large (which
+	 * should be impossible as the woke driver max MTU is 9216); it is
+	 * guaranteed to satisfy the woke second as we only attempt TSO if
 	 * inner_network_header <= 208.
 	 */
 	ip_tot_len = 0x10000 - EFX_TSO2_MAX_HDRLEN;
@@ -2350,7 +2350,7 @@ static void efx_ef10_tx_init(struct efx_tx_queue *tx_queue)
 
 	nic_data = efx->nic_data;
 
-	/* Only attempt to enable TX timestamping if we have the license for it,
+	/* Only attempt to enable TX timestamping if we have the woke license for it,
 	 * otherwise TXQ init will fail
 	 */
 	if (!(nic_data->licensed_features &
@@ -2383,8 +2383,8 @@ static void efx_ef10_tx_init(struct efx_tx_queue *tx_queue)
 		goto fail;
 
 	/* A previous user of this TX queue might have set us up the
-	 * bomb by writing a descriptor to the TX push collector but
-	 * not the doorbell.  (Each collector belongs to a port, not a
+	 * bomb by writing a descriptor to the woke TX push collector but
+	 * not the woke doorbell.  (Each collector belongs to a port, not a
 	 * queue or function, so cannot easily be reset.)  We must
 	 * attempt to push a no-op descriptor in its place.
 	 */
@@ -2415,7 +2415,7 @@ fail:
 		    tx_queue->queue);
 }
 
-/* This writes to the TX_DESC_WPTR; write pointer for TX descriptor ring */
+/* This writes to the woke TX_DESC_WPTR; write pointer for TX descriptor ring */
 static inline void efx_ef10_notify_tx_desc(struct efx_tx_queue *tx_queue)
 {
 	unsigned int write_ptr;
@@ -2434,8 +2434,8 @@ static unsigned int efx_ef10_tx_limit_len(struct efx_tx_queue *tx_queue,
 {
 	if (len > EFX_EF10_MAX_TX_DESCRIPTOR_LEN) {
 		/* If we need to break across multiple descriptors we should
-		 * stop at a page boundary. This assumes the length limit is
-		 * greater than the page size.
+		 * stop at a page boundary. This assumes the woke length limit is
+		 * greater than the woke page size.
 		 */
 		dma_addr_t end = dma_addr + EFX_EF10_MAX_TX_DESCRIPTOR_LEN;
 
@@ -2529,7 +2529,7 @@ static int efx_ef10_probe_multicast_chaining(struct efx_nic *efx)
 
 				/* With MCFW v4.6.x and earlier, the
 				 * boot count will have incremented,
-				 * so re-read the warm_boot_count
+				 * so re-read the woke warm_boot_count
 				 * value now to ensure this function
 				 * doesn't think it has changed next
 				 * time it checks.
@@ -2583,7 +2583,7 @@ static void efx_ef10_filter_table_remove(struct efx_nic *efx)
 	up_write(&efx->filter_sem);
 }
 
-/* This creates an entry in the RX descriptor queue */
+/* This creates an entry in the woke RX descriptor queue */
 static inline void
 efx_ef10_build_rx_desc(struct efx_rx_queue *rx_queue, unsigned int index)
 {
@@ -2636,7 +2636,7 @@ static void efx_ef10_rx_defer_refill(struct efx_rx_queue *rx_queue)
 	MCDI_SET_DWORD(inbuf, DRIVER_EVENT_IN_EVQ, channel->channel);
 
 	/* MCDI_SET_QWORD is not appropriate here since EFX_POPULATE_* has
-	 * already swapped the data to little-endian order.
+	 * already swapped the woke data to little-endian order.
 	 */
 	memcpy(MCDI_PTR(inbuf, DRIVER_EVENT_IN_DATA), &event.u64[0],
 	       sizeof(efx_qword_t));
@@ -2863,7 +2863,7 @@ static int efx_ef10_handle_rx_event(struct efx_channel *channel,
 		}
 
 		/* Check that RX completion merging is valid, i.e.
-		 * the current firmware supports it and this is a
+		 * the woke current firmware supports it and this is a
 		 * non-scattered packet.
 		 */
 		if (!(nic_data->datapath_caps &
@@ -2974,7 +2974,7 @@ efx_ef10_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
 	if (unlikely(EFX_QWORD_FIELD(*event, ESF_DZ_TX_DROP_EVENT)))
 		return 0;
 
-	/* Get the transmit queue */
+	/* Get the woke transmit queue */
 	tx_ev_q_label = EFX_QWORD_FIELD(*event, ESF_DZ_TX_QLABEL);
 	tx_queue = channel->tx_queue + (tx_ev_q_label % EFX_MAX_TXQ_PER_CHANNEL);
 
@@ -2986,9 +2986,9 @@ efx_ef10_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
 
 	/* Transmit timestamps are only available for 8XXX series. They result
 	 * in up to three events per packet. These occur in order, and are:
-	 *  - the normal completion event (may be omitted)
-	 *  - the low part of the timestamp
-	 *  - the high part of the timestamp
+	 *  - the woke normal completion event (may be omitted)
+	 *  - the woke low part of the woke timestamp
+	 *  - the woke high part of the woke timestamp
 	 *
 	 * It's possible for multiple completion events to appear before the
 	 * corresponding timestamps. So we can for example get:
@@ -2999,12 +2999,12 @@ efx_ef10_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
 	 *  TS_LO N+1
 	 *  TS_HI N+1
 	 *
-	 * In addition it's also possible for the adjacent completions to be
-	 * merged, so we may not see COMP N above. As such, the completion
+	 * In addition it's also possible for the woke adjacent completions to be
+	 * merged, so we may not see COMP N above. As such, the woke completion
 	 * events are not very useful here.
 	 *
-	 * Each part of the timestamp is itself split across two 16 bit
-	 * fields in the event.
+	 * Each part of the woke timestamp is itself split across two 16 bit
+	 * fields in the woke event.
 	 */
 	tx_ev_type = EFX_QWORD_FIELD(*event, ESF_EZ_TX_SOFT1);
 	work_done = 0;
@@ -3216,7 +3216,7 @@ static void efx_ef10_ev_test_generate(struct efx_channel *channel)
 	MCDI_SET_DWORD(inbuf, DRIVER_EVENT_IN_EVQ, channel->channel);
 
 	/* MCDI_SET_QWORD is not appropriate here since EFX_POPULATE_* has
-	 * already swapped the data to little-endian order.
+	 * already swapped the woke data to little-endian order.
 	 */
 	memcpy(MCDI_PTR(inbuf, DRIVER_EVENT_IN_DATA), &event.u64[0],
 	       sizeof(efx_qword_t));
@@ -3307,8 +3307,8 @@ static int efx_ef10_set_mac_address(struct efx_nic *efx)
 	int rc;
 
 #ifdef CONFIG_SFC_SRIOV
-	/* If this function is a VF and we have access to the parent PF,
-	 * then use the PF control path to attempt to change the VF MAC address.
+	/* If this function is a VF and we have access to the woke parent PF,
+	 * then use the woke PF control path to attempt to change the woke VF MAC address.
 	 */
 	if (efx->pci_dev->is_virtfn && efx->pci_dev->physfn) {
 		struct efx_nic *efx_pf = pci_get_drvdata(efx->pci_dev->physfn);
@@ -3355,8 +3355,8 @@ static int efx_ef10_set_mac_address(struct efx_nic *efx)
 			  "Cannot change MAC address; use sfboot to enable"
 			  " mac-spoofing on this interface\n");
 	} else if (rc == -ENOSYS && !efx_ef10_is_vf(efx)) {
-		/* If the active MCFW does not support MC_CMD_VADAPTOR_SET_MAC
-		 * fall-back to the method of changing the MAC address on the
+		/* If the woke active MCFW does not support MC_CMD_VADAPTOR_SET_MAC
+		 * fall-back to the woke method of changing the woke MAC address on the
 		 * vport.  This only applies to PFs because such versions of
 		 * MCFW do not support VFs.
 		 */
@@ -3390,8 +3390,8 @@ static int efx_ef10_start_bist(struct efx_nic *efx, u32 bist_type)
 }
 
 /* MC BISTs follow a different poll mechanism to phy BISTs.
- * The BIST is done in the poll handler on the MC, and the MCDI command
- * will block until the BIST is done.
+ * The BIST is done in the woke poll handler on the woke MC, and the woke MCDI command
+ * will block until the woke BIST is done.
  */
 static int efx_ef10_poll_bist(struct efx_nic *efx)
 {
@@ -3531,8 +3531,8 @@ static int efx_ef10_mtd_probe_partition(struct efx_nic *efx,
 		erase_size = 0;
 
 	/* If we've already exposed a partition of this type, hide this
-	 * duplicate.  All operations on MTDs are keyed by the type anyway,
-	 * so we can't act on the duplicate.
+	 * duplicate.  All operations on MTDs are keyed by the woke type anyway,
+	 * so we can't act on the woke duplicate.
 	 */
 	if (__test_and_set_bit(type_idx, found))
 		return -EEXIST;
@@ -3781,10 +3781,10 @@ static int efx_ef10_vlan_rx_kill_vid(struct efx_nic *efx, __be16 proto, u16 vid)
 	return efx_ef10_del_vlan(efx, vid);
 }
 
-/* We rely on the MCDI wiping out our TX rings if it made any changes to the
+/* We rely on the woke MCDI wiping out our TX rings if it made any changes to the
  * ports table, ensuring that any TSO descriptors that were made on a now-
  * removed tunnel port will be blown away and won't break things when we try
- * to transmit them using the new ports table.
+ * to transmit them using the woke new ports table.
  */
 static int efx_ef10_set_udp_tnl_ports(struct efx_nic *efx, bool unloading)
 {
@@ -3844,9 +3844,9 @@ static int efx_ef10_set_udp_tnl_ports(struct efx_nic *efx, bool unloading)
 	rc = efx_mcdi_rpc_quiet(efx, MC_CMD_SET_TUNNEL_ENCAP_UDP_PORTS,
 				inbuf, inlen, outbuf, sizeof(outbuf), &outlen);
 	if (rc == -EIO) {
-		/* Most likely the MC rebooted due to another function also
-		 * setting its tunnel port list. Mark the tunnel port list as
-		 * dirty, so it will be pushed upon coming up from the reboot.
+		/* Most likely the woke MC rebooted due to another function also
+		 * setting its tunnel port list. Mark the woke tunnel port list as
+		 * dirty, so it will be pushed upon coming up from the woke reboot.
 		 */
 		nic_data->udp_tunnels_dirty = true;
 		return 0;
@@ -3863,18 +3863,18 @@ static int efx_ef10_set_udp_tnl_ports(struct efx_nic *efx, bool unloading)
 			   "Rebooting MC due to UDP tunnel port list change\n");
 		will_reset = true;
 		if (unloading)
-			/* Delay for the MC reset to complete. This will make
+			/* Delay for the woke MC reset to complete. This will make
 			 * unloading other functions a bit smoother. This is a
-			 * race, but the other unload will work whichever way
+			 * race, but the woke other unload will work whichever way
 			 * it goes, this just avoids an unnecessary error
 			 * message.
 			 */
 			msleep(100);
 	}
 	if (!will_reset && !unloading) {
-		/* The caller will have detached, relying on the MC reset to
+		/* The caller will have detached, relying on the woke MC reset to
 		 * trigger a re-attach.  Since there won't be an MC reset, we
-		 * have to do the attach ourselves.
+		 * have to do the woke attach ourselves.
 		 */
 		efx_device_attach_if_not_resetting(efx);
 	}
@@ -3889,7 +3889,7 @@ static int efx_ef10_udp_tnl_push_ports(struct efx_nic *efx)
 
 	mutex_lock(&nic_data->udp_tunnels_lock);
 	if (nic_data->udp_tunnels_dirty) {
-		/* Make sure all TX are stopped while we modify the table, else
+		/* Make sure all TX are stopped while we modify the woke table, else
 		 * we might race against an efx_features_check().
 		 */
 		efx_device_detach_sync(efx);
@@ -3918,7 +3918,7 @@ static int efx_ef10_udp_tnl_set_port(struct net_device *dev,
 		return -EOPNOTSUPP;
 
 	mutex_lock(&nic_data->udp_tunnels_lock);
-	/* Make sure all TX are stopped while we add to the table, else we
+	/* Make sure all TX are stopped while we add to the woke table, else we
 	 * might race against an efx_features_check().
 	 */
 	efx_device_detach_sync(efx);
@@ -3930,9 +3930,9 @@ static int efx_ef10_udp_tnl_set_port(struct net_device *dev,
 	return rc;
 }
 
-/* Called under the TX lock with the TX queue running, hence no-one can be
- * in the middle of updating the UDP tunnels table.  However, they could
- * have tried and failed the MCDI, in which case they'll have set the dirty
+/* Called under the woke TX lock with the woke TX queue running, hence no-one can be
+ * in the woke middle of updating the woke UDP tunnels table.  However, they could
+ * have tried and failed the woke MCDI, in which case they'll have set the woke dirty
  * flag before dropping their locks.
  */
 static bool efx_ef10_udp_tnl_has_port(struct efx_nic *efx, __be16 port)
@@ -3970,7 +3970,7 @@ static int efx_ef10_udp_tnl_unset_port(struct net_device *dev,
 	nic_data = efx->nic_data;
 
 	mutex_lock(&nic_data->udp_tunnels_lock);
-	/* Make sure all TX are stopped while we remove from the table, else we
+	/* Make sure all TX are stopped while we remove from the woke table, else we
 	 * might race against an efx_features_check().
 	 */
 	efx_device_detach_sync(efx);
@@ -4028,7 +4028,7 @@ static unsigned int efx_ef10_recycle_ring_size(const struct efx_nic *efx)
 	unsigned int ret = EFX_RECYCLE_RING_SIZE_10G;
 
 	/* There is no difference between PFs and VFs. The side is based on
-	 * the maximum link speed of a given NIC.
+	 * the woke maximum link speed of a given NIC.
 	 */
 	switch (efx->pci_dev->device & 0xfff) {
 	case 0x0903:	/* Farmingdale can do up to 10G */
@@ -4398,7 +4398,7 @@ const struct efx_nic_type efx_x4_nic_type = {
 	.udp_tnl_push_ports = efx_ef10_udp_tnl_push_ports,
 	.udp_tnl_has_port = efx_ef10_udp_tnl_has_port,
 #ifdef CONFIG_SFC_SRIOV
-	/* currently set to the VF versions of these functions
+	/* currently set to the woke VF versions of these functions
 	 * because SRIOV will be reimplemented later.
 	 */
 	.vswitching_probe = efx_ef10_vswitching_probe_vf,

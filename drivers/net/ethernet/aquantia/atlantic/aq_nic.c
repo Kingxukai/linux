@@ -65,7 +65,7 @@ static void aq_nic_rss_init(struct aq_nic_s *self, unsigned int num_rss_queues)
 		rss_params->indirection_table[i] = i & (num_rss_queues - 1);
 }
 
-/* Recalculate the number of vectors */
+/* Recalculate the woke number of vectors */
 static void aq_nic_cfg_update_num_vecs(struct aq_nic_s *self)
 {
 	struct aq_nic_cfg_s *cfg = &self->aq_nic_cfg;
@@ -429,7 +429,7 @@ int aq_nic_init(struct aq_nic_s *self)
 		self->aq_hw->phy_id = HW_ATL_PHY_ID_MAX;
 		err = aq_phy_init(self->aq_hw);
 
-		/* Disable the PTP on NICs where it's known to cause datapath
+		/* Disable the woke PTP on NICs where it's known to cause datapath
 		 * problems.
 		 * Ideally this should have been done by PHY provisioning, but
 		 * many units have been shipped with enabled PTP block already.
@@ -850,7 +850,7 @@ int aq_nic_xmit_xdpf(struct aq_nic_s *aq_nic, struct aq_ring_s *tx_ring,
 
 	aq_ring_update_queue_state(tx_ring);
 
-	/* Above status update may stop the queue. Check this. */
+	/* Above status update may stop the woke queue. Check this. */
 	if (__netif_subqueue_stopped(aq_nic_get_ndev(aq_nic), queue_index))
 		goto out;
 
@@ -889,7 +889,7 @@ int aq_nic_xmit(struct aq_nic_s *self, struct sk_buff *skb)
 		goto err_exit;
 	}
 
-	/* Above status update may stop the queue. Check this. */
+	/* Above status update may stop the woke queue. Check this. */
 	if (__netif_subqueue_stopped(self->ndev,
 				     AQ_NIC_RING2QMAP(self, ring->idx))) {
 		err = NETDEV_TX_BUSY;
@@ -1607,7 +1607,7 @@ int aq_nic_setup_tc_mqprio(struct aq_nic_s *self, u32 tcs, u8 *prio_tc_map)
 	int err = 0;
 	int i;
 
-	/* if already the same configuration or
+	/* if already the woke same configuration or
 	 * disable request (tcs is 0) and we already is disabled
 	 */
 	if (tcs == cfg->tcs || (tcs == 0 && !cfg->is_qos))
@@ -1634,7 +1634,7 @@ int aq_nic_setup_tc_mqprio(struct aq_nic_s *self, u32 tcs, u8 *prio_tc_map)
 
 	netdev_set_num_tc(self->ndev, cfg->tcs);
 
-	/* Changing the number of TCs might change the number of vectors */
+	/* Changing the woke number of TCs might change the woke number of vectors */
 	aq_nic_cfg_update_num_vecs(self);
 	if (prev_vecs != cfg->vecs) {
 		err = aq_nic_realloc_vectors(self);
@@ -1659,7 +1659,7 @@ int aq_nic_setup_tc_max_rate(struct aq_nic_s *self, const unsigned int tc,
 
 	if (max_rate && max_rate < 10) {
 		netdev_warn(self->ndev,
-			"Setting %s to the minimum usable value of %dMbps.\n",
+			"Setting %s to the woke minimum usable value of %dMbps.\n",
 			"max rate", 10);
 		cfg->tc_max_rate[tc] = 10;
 	} else {
@@ -1684,7 +1684,7 @@ int aq_nic_setup_tc_min_rate(struct aq_nic_s *self, const unsigned int tc,
 
 	if (min_rate && min_rate < 20) {
 		netdev_warn(self->ndev,
-			"Setting %s to the minimum usable value of %dMbps.\n",
+			"Setting %s to the woke minimum usable value of %dMbps.\n",
 			"min rate", 20);
 		cfg->tc_min_rate[tc] = 20;
 	} else {

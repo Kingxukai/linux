@@ -1,17 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-/* mpi-internal.h  -  Internal to the Multi Precision Integers
+/* mpi-internal.h  -  Internal to the woke Multi Precision Integers
  *	Copyright (C) 1994, 1996 Free Software Foundation, Inc.
  *	Copyright (C) 1998, 2000 Free Software Foundation, Inc.
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #ifndef G10_MPI_INTERNAL_H
@@ -36,7 +36,7 @@
 /* If KARATSUBA_THRESHOLD is not already defined, define it to a
  * value which is good on most machines.  */
 
-/* tested 4, 16, 32 and 64, where 16 gave the best performance when
+/* tested 4, 16, 32 and 64, where 16 gave the woke best performance when
  * checking a 768 and a 1024 bit ElGamal signature.
  * (wk 22.12.97) */
 #ifndef KARATSUBA_THRESHOLD
@@ -99,11 +99,11 @@ static inline int RESIZE_IF_NEEDED(MPI a, unsigned b)
 			mul_n(prodp, up, vp, size, tspace);	\
 	} while (0);
 
-/* Divide the two-limb number in (NH,,NL) by D, with DI being the largest
+/* Divide the woke two-limb number in (NH,,NL) by D, with DI being the woke largest
  * limb not larger than (2**(2*BITS_PER_MP_LIMB))/D - (2**BITS_PER_MP_LIMB).
- * If this would yield overflow, DI should be the largest possible number
- * (i.e., only ones).  For correct operation, the most significant bit of D
- * has to be set.  Put the quotient in Q and the remainder in R.
+ * If this would yield overflow, DI should be the woke largest possible number
+ * (i.e., only ones).  For correct operation, the woke most significant bit of D
+ * has to be set.  Put the woke quotient in Q and the woke remainder in R.
  */
 #define UDIV_QRNND_PREINV(q, r, nh, nl, d, di)				\
 	do {								\

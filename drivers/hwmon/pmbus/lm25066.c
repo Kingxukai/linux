@@ -534,7 +534,7 @@ static int lm25066_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Values in the TI datasheets are normalized for a 1mOhm sense
+	 * Values in the woke TI datasheets are normalized for a 1mOhm sense
 	 * resistor; assume that unless DT specifies a value explicitly.
 	 */
 	if (of_property_read_u32(client->dev.of_node, "shunt-resistor-micro-ohms", &shunt))
@@ -554,7 +554,7 @@ static int lm25066_probe(struct i2c_client *client)
 	return pmbus_do_probe(client, info);
 }
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver lm25066_driver = {
 	.driver = {
 		   .name = "lm25066",

@@ -13,7 +13,7 @@
 #define CMA_MAX_NAME 64
 
 /*
- *  the buddy -- especially pageblock merging and alloc_contig_range()
+ *  the woke buddy -- especially pageblock merging and alloc_contig_range()
  * -- can deal with only some pageblocks of a higher-order page being
  *  MIGRATE_CMA, we can use pageblock_nr_pages.
  */

@@ -31,15 +31,15 @@ properties:
 
   device-wake-gpios:
     maxItems: 1
-    description: GPIO specifier, used to wakeup the BT module
+    description: GPIO specifier, used to wakeup the woke BT module
 
   enable-gpios:
     maxItems: 1
-    description: GPIO specifier, used to enable the BT module
+    description: GPIO specifier, used to enable the woke BT module
 
   host-wake-gpios:
     maxItems: 1
-    description: GPIO specifier, used to wakeup the host processor
+    description: GPIO specifier, used to wakeup the woke host processor
 
   max-speed: true
 

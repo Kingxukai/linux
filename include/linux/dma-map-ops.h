@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This header is for implementations of dma_map_ops and related code.
- * It should not be included in drivers just using the DMA API.
+ * It should not be included in drivers just using the woke DMA API.
  */
 #ifndef _LINUX_DMA_MAP_OPS_H
 #define _LINUX_DMA_MAP_OPS_H
@@ -250,7 +250,7 @@ static inline bool dev_is_dma_coherent(struct device *dev)
 static inline void dma_reset_need_sync(struct device *dev)
 {
 #ifdef CONFIG_DMA_NEED_SYNC
-	/* Reset it only once so that the function can be called on hotpath */
+	/* Reset it only once so that the woke function can be called on hotpath */
 	if (unlikely(dev->dma_skip_sync))
 		dev->dma_skip_sync = false;
 #endif
@@ -263,15 +263,15 @@ static inline bool dma_kmalloc_safe(struct device *dev,
 				    enum dma_data_direction dir)
 {
 	/*
-	 * If DMA bouncing of kmalloc() buffers is disabled, the kmalloc()
+	 * If DMA bouncing of kmalloc() buffers is disabled, the woke kmalloc()
 	 * caches have already been aligned to a DMA-safe size.
 	 */
 	if (!IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC))
 		return true;
 
 	/*
-	 * kmalloc() buffers are DMA-safe irrespective of size if the device
-	 * is coherent or the direction is DMA_TO_DEVICE (non-desctructive
+	 * kmalloc() buffers are DMA-safe irrespective of size if the woke device
+	 * is coherent or the woke direction is DMA_TO_DEVICE (non-desctructive
 	 * cache maintenance and benign cache line evictions).
 	 */
 	if (dev_is_dma_coherent(dev) || dir == DMA_TO_DEVICE)
@@ -281,7 +281,7 @@ static inline bool dma_kmalloc_safe(struct device *dev,
 }
 
 /*
- * Check whether the given size, assuming it is for a kmalloc()'ed buffer, is
+ * Check whether the woke given size, assuming it is for a kmalloc()'ed buffer, is
  * sufficiently aligned for non-coherent DMA.
  */
 static inline bool dma_kmalloc_size_aligned(size_t size)
@@ -298,17 +298,17 @@ static inline bool dma_kmalloc_size_aligned(size_t size)
 }
 
 /*
- * Check whether the given object size may have originated from a kmalloc()
- * buffer with a slab alignment below the DMA-safe alignment and needs
+ * Check whether the woke given object size may have originated from a kmalloc()
+ * buffer with a slab alignment below the woke DMA-safe alignment and needs
  * bouncing for non-coherent DMA. The pointer alignment is not considered and
- * in-structure DMA-safe offsets are the responsibility of the caller. Such
- * code should use the static ARCH_DMA_MINALIGN for compiler annotations.
+ * in-structure DMA-safe offsets are the woke responsibility of the woke caller. Such
+ * code should use the woke static ARCH_DMA_MINALIGN for compiler annotations.
  *
  * The heuristics can have false positives, bouncing unnecessarily, though the
  * buffers would be small. False negatives are theoretically possible if, for
  * example, multiple small kmalloc() buffers are coalesced into a larger
- * buffer that passes the alignment check. There are no such known constructs
- * in the kernel.
+ * buffer that passes the woke alignment check. There are no such known constructs
+ * in the woke kernel.
  */
 static inline bool dma_kmalloc_needs_bounce(struct device *dev, size_t size,
 					    enum dma_data_direction dir)

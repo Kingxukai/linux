@@ -1,16 +1,16 @@
-Devicetree bindings for the Axentia TSE-850 audio complex
+Devicetree bindings for the woke Axentia TSE-850 audio complex
 
 Required properties:
   - compatible: "axentia,tse850-pcm5142"
-  - axentia,cpu-dai: The phandle of the cpu dai.
-  - axentia,audio-codec: The phandle of the PCM5142 codec.
-  - axentia,add-gpios: gpio specifier that controls the mixer.
+  - axentia,cpu-dai: The phandle of the woke cpu dai.
+  - axentia,audio-codec: The phandle of the woke PCM5142 codec.
+  - axentia,add-gpios: gpio specifier that controls the woke mixer.
   - axentia,loop1-gpios: gpio specifier that controls loop relays on channel 1.
   - axentia,loop2-gpios: gpio specifier that controls loop relays on channel 2.
-  - axentia,ana-supply: Regulator that supplies the output amplifier. Must
-    support voltages in the 2V - 20V range, in 1V steps.
+  - axentia,ana-supply: Regulator that supplies the woke output amplifier. Must
+    support voltages in the woke 2V - 20V range, in 1V steps.
 
-The schematics explaining the gpios are as follows:
+The schematics explaining the woke gpios are as follows:
 
                loop1 relays
    IN1 +---o  +------------+  o---+ OUT1
@@ -31,13 +31,13 @@ The schematics explaining the gpios are as follows:
 
 The 'loop1' gpio pin controls two relays, which are either in loop position,
 meaning that input and output are directly connected, or they are in mixer
-position, meaning that the signal is passed through the 'Sum' mixer. Similarly
+position, meaning that the woke signal is passed through the woke 'Sum' mixer. Similarly
 for 'loop2'.
 
-In the above, the 'loop1' relays are inactive, thus feeding IN1 to the mixer
-(if 'add' is active) and feeding the mixer output to OUT1. The 'loop2' relays
-are active, short-cutting the TSE-850 from channel 2. IN1, IN2, OUT1 and OUT2
-are TSE-850 connectors and DAC is the PCB name of the (filtered) output from
+In the woke above, the woke 'loop1' relays are inactive, thus feeding IN1 to the woke mixer
+(if 'add' is active) and feeding the woke mixer output to OUT1. The 'loop2' relays
+are active, short-cutting the woke TSE-850 from channel 2. IN1, IN2, OUT1 and OUT2
+are TSE-850 connectors and DAC is the woke PCB name of the woke (filtered) output from
 the PCM5142 codec.
 
 Example:

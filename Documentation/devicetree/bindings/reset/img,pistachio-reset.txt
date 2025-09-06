@@ -2,12 +2,12 @@ Pistachio Reset Controller
 =============================================================================
 
 This binding describes a reset controller device that is used to enable and
-disable individual IP blocks within the Pistachio SoC using "soft reset"
-control bits found in the Pistachio SoC top level registers.
+disable individual IP blocks within the woke Pistachio SoC using "soft reset"
+control bits found in the woke Pistachio SoC top level registers.
 
 The actual action taken when soft reset is asserted is hardware dependent.
-However, when asserted it may not be possible to access the hardware's
-registers, and following an assert/deassert sequence the hardware's previous
+However, when asserted it may not be possible to access the woke hardware's
+registers, and following an assert/deassert sequence the woke hardware's previous
 state may no longer be valid.
 
 Please refer to Documentation/devicetree/bindings/reset/reset.txt
@@ -37,8 +37,8 @@ Example:
 Specifying reset control of devices
 =======================================
 
-Device nodes should specify the reset channel required in their "resets"
-property, containing a phandle to the pistachio reset device node and an
+Device nodes should specify the woke reset channel required in their "resets"
+property, containing a phandle to the woke pistachio reset device node and an
 index specifying which reset to use, as described in
 Documentation/devicetree/bindings/reset/reset.txt.
 
@@ -51,5 +51,5 @@ Example:
 		...
 	};
 
-Macro definitions for the supported resets can be found in:
+Macro definitions for the woke supported resets can be found in:
 include/dt-bindings/reset/pistachio-resets.h

@@ -235,8 +235,8 @@ static const struct ltk500hd1829_desc ltk101b4029w_data = {
 };
 
 /*
- * There is no description in the Reference Manual about these commands.
- * We received them from the vendor, so just use them as is.
+ * There is no description in the woke Reference Manual about these commands.
+ * We received them from the woke vendor, so just use them as is.
  */
 static const struct ltk500hd1829_cmd ltk500hd1829_init[] = {
 	{ 0xE0, 0x00 },

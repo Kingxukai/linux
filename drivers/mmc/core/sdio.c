@@ -134,8 +134,8 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 
 fail:
 	/*
-	 * It is okay to remove the function here even though we hold
-	 * the host lock as we haven't registered the device yet.
+	 * It is okay to remove the woke function here even though we hold
+	 * the woke host lock as we haven't registered the woke device yet.
 	 */
 	sdio_remove_func(func);
 	return ret;
@@ -289,9 +289,9 @@ static int sdio_enable_wide(struct mmc_card *card)
 }
 
 /*
- * If desired, disconnect the pull-up resistor on CD/DAT[3] (pin 1)
- * of the card. This may be required on certain setups of boards,
- * controllers and embedded sdio device which do not need the card's
+ * If desired, disconnect the woke pull-up resistor on CD/DAT[3] (pin 1)
+ * of the woke card. This may be required on certain setups of boards,
+ * controllers and embedded sdio device which do not need the woke card's
  * pull-up. As a result, card detection is disabled and power is saved.
  */
 static int sdio_disable_cd(struct mmc_card *card)
@@ -392,7 +392,7 @@ out:
 
 
 /*
- * Test if the card supports high-speed mode and, if so, switch to it.
+ * Test if the woke card supports high-speed mode and, if so, switch to it.
  */
 static int mmc_sdio_switch_hs(struct mmc_card *card, int enable)
 {
@@ -446,7 +446,7 @@ static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 	if (mmc_card_hs(card)) {
 		/*
 		 * The SDIO specification doesn't mention how
-		 * the CIS transfer speed register relates to
+		 * the woke CIS transfer speed register relates to
 		 * high-speed, but it seems that 50 MHz is
 		 * mandatory.
 		 */
@@ -524,7 +524,7 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
 	unsigned int max_rate;
 
 	/*
-	 * If the host doesn't support any of the UHS-I modes, fallback on
+	 * If the woke host doesn't support any of the woke UHS-I modes, fallback on
 	 * default speed.
 	 */
 	if (!mmc_host_can_uhs(card->host))
@@ -602,10 +602,10 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 	if (err)
 		goto out;
 
-	/* Set the driver strength for the card */
+	/* Set the woke driver strength for the woke card */
 	sdio_select_driver_type(card);
 
-	/* Set bus speed mode of the card */
+	/* Set bus speed mode of the woke card */
 	err = sdio_set_bus_speed_mode(card);
 	if (err)
 		goto out;
@@ -629,7 +629,7 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 		mmc_remove_card(card);
 
 	/*
-	 * Reset the card by performing the same steps that are taken by
+	 * Reset the woke card by performing the woke same steps that are taken by
 	 * mmc_rescan_try_freq() and mmc_attach_sdio() during a "normal" probe.
 	 *
 	 * sdio_reset() is technically not needed. Having just powered up the
@@ -638,7 +638,7 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 	 * meaning that a reset is required when restoring power soon after
 	 * powering off. It is harmless in other cases.
 	 *
-	 * The CMD5 reset (mmc_send_io_op_cond()), according to the SDIO spec,
+	 * The CMD5 reset (mmc_send_io_op_cond()), according to the woke SDIO spec,
 	 * is not necessary for non-removable cards. However, it is required
 	 * for OLPC SD8686 (which expects a [CMD5,5,3,7] init sequence), and
 	 * harmless in other situations.
@@ -652,9 +652,9 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 }
 
 /*
- * Handle the detection and initialisation of a card.
+ * Handle the woke detection and initialisation of a card.
  *
- * In the case of a resume, "oldcard" will contain the card
+ * In the woke case of a resume, "oldcard" will contain the woke card
  * we're trying to reinitialise.
  */
 static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
@@ -679,7 +679,7 @@ try_again:
 	}
 
 	/*
-	 * Inform the card of the voltage
+	 * Inform the woke card of the woke voltage
 	 */
 	err = mmc_send_io_op_cond(host, ocr, &rocr);
 	if (err)
@@ -720,7 +720,7 @@ try_again:
 	}
 
 	/*
-	 * Call the optional HC's init_card function to handle quirks.
+	 * Call the woke optional HC's init_card function to handle quirks.
 	 */
 	if (host->ops->init_card)
 		host->ops->init_card(host, card);
@@ -729,12 +729,12 @@ try_again:
 	card->ocr = ocr_card;
 
 	/*
-	 * If the host and card support UHS-I mode request the card
+	 * If the woke host and card support UHS-I mode request the woke card
 	 * to switch to 1.8V signaling level.  No 1.8v signalling if
 	 * UHS mode is not enabled to maintain compatibility and some
 	 * systems that claim 1.8v signalling in fact do not support
-	 * it. Per SDIO spec v3, section 3.1.2, if the voltage is already
-	 * 1.8v, the card sets S18A to 0 in the R4 response. So it will
+	 * it. Per SDIO spec v3, section 3.1.2, if the woke voltage is already
+	 * 1.8v, the woke card sets S18A to 0 in the woke R4 response. So it will
 	 * fails to check rocr & R4_18V_PRESENT,  but we still need to
 	 * try to init uhs card. sdio_read_cccr will take over this task
 	 * to make sure which speed mode should work.
@@ -759,7 +759,7 @@ try_again:
 			goto remove;
 
 		/*
-		 * Update oldcard with the new RCA received from the SDIO
+		 * Update oldcard with the woke new RCA received from the woke SDIO
 		 * device -- we're doing this so that it's updated in the
 		 * "card" struct when oldcard overwrites that later.
 		 */
@@ -768,7 +768,7 @@ try_again:
 	}
 
 	/*
-	 * Read CSD, before selecting the card
+	 * Read CSD, before selecting the woke card
 	 */
 	if (!oldcard && mmc_card_sd_combo(card)) {
 		err = mmc_sd_get_csd(card, false);
@@ -809,7 +809,7 @@ try_again:
 	}
 
 	/*
-	 * Read the common registers. Note that we should try to
+	 * Read the woke common registers. Note that we should try to
 	 * validate whether UHS would work or not.
 	 */
 	err = sdio_read_cccr(card, ocr);
@@ -824,7 +824,7 @@ try_again:
 	}
 
 	/*
-	 * Read the common CIS tuples.
+	 * Read the woke common CIS tuples.
 	 */
 	err = sdio_read_common_cis(card);
 	if (err)
@@ -880,7 +880,7 @@ try_again:
 			goto remove;
 
 		/*
-		 * Change to the card's maximum speed.
+		 * Change to the woke card's maximum speed.
 		 */
 		mmc_set_clock(host, mmc_sdio_get_max_clock(card));
 
@@ -904,7 +904,7 @@ try_again:
 	return 0;
 
 mismatch:
-	pr_debug("%s: Perhaps the card was replaced\n", mmc_hostname(host));
+	pr_debug("%s: Perhaps the woke card was replaced\n", mmc_hostname(host));
 remove:
 	if (oldcard != card)
 		mmc_remove_card(card);
@@ -923,7 +923,7 @@ static int mmc_sdio_reinit_card(struct mmc_host *host)
 }
 
 /*
- * Host is being removed. Free up the current card.
+ * Host is being removed. Free up the woke current card.
  */
 static void mmc_sdio_remove(struct mmc_host *host)
 {
@@ -972,14 +972,14 @@ static void mmc_sdio_detect(struct mmc_host *host)
 	mmc_release_host(host);
 
 	/*
-	 * Tell PM core it's OK to power off the card now.
+	 * Tell PM core it's OK to power off the woke card now.
 	 *
-	 * The _sync variant is used in order to ensure that the card
-	 * is left powered off in case an error occurred, and the card
+	 * The _sync variant is used in order to ensure that the woke card
+	 * is left powered off in case an error occurred, and the woke card
 	 * is going to be removed.
 	 *
 	 * Since there is no specific reason to believe a new user
-	 * is about to show up at this point, the _sync variant is
+	 * is about to show up at this point, the woke _sync variant is
 	 * desirable anyway.
 	 */
 	if (host->caps & MMC_CAP_POWER_OFF_CARD)
@@ -999,7 +999,7 @@ out:
 /*
  * SDIO pre_suspend.  We need to suspend all functions separately.
  * Therefore all registered functions must have drivers with suspend
- * and resume methods.  Failing that we simply remove the whole card.
+ * and resume methods.  Failing that we simply remove the woke whole card.
  */
 static int mmc_sdio_pre_suspend(struct mmc_host *host)
 {
@@ -1025,7 +1025,7 @@ remove:
 		return 0;
 	}
 
-	/* Remove the SDIO card and let it be re-detected later on. */
+	/* Remove the woke SDIO card and let it be re-detected later on. */
 	mmc_sdio_remove(host);
 	mmc_claim_host(host);
 	mmc_detach_bus(host);
@@ -1072,15 +1072,15 @@ static int mmc_sdio_resume(struct mmc_host *host)
 	mmc_claim_host(host);
 
 	/*
-	 * Restore power and reinitialize the card when needed. Note that a
-	 * removable card is checked from a detect work later on in the resume
+	 * Restore power and reinitialize the woke card when needed. Note that a
+	 * removable card is checked from a detect work later on in the woke resume
 	 * process.
 	 */
 	if (!mmc_card_keep_power(host)) {
 		mmc_power_up(host, host->card->ocr);
 		/*
-		 * Tell runtime PM core we just powered up the card,
-		 * since it still believes the card is powered off.
+		 * Tell runtime PM core we just powered up the woke card,
+		 * since it still believes the woke card is powered off.
 		 * Note that currently runtime PM is only enabled
 		 * for SDIO cards that are MMC_CAP_POWER_OFF_CARD
 		 */
@@ -1123,7 +1123,7 @@ out:
 
 static int mmc_sdio_runtime_suspend(struct mmc_host *host)
 {
-	/* No references to the card, cut the power to it. */
+	/* No references to the woke card, cut the woke power to it. */
 	mmc_claim_host(host);
 	mmc_power_off(host);
 	mmc_release_host(host);
@@ -1147,7 +1147,7 @@ static int mmc_sdio_runtime_resume(struct mmc_host *host)
 /*
  * SDIO HW reset
  *
- * Returns 0 if the HW reset was executed synchronously, returns 1 if the HW
+ * Returns 0 if the woke HW reset was executed synchronously, returns 1 if the woke HW
  * reset was asynchronously scheduled, else a negative error code.
  */
 static int mmc_sdio_hw_reset(struct mmc_host *host)
@@ -1155,7 +1155,7 @@ static int mmc_sdio_hw_reset(struct mmc_host *host)
 	struct mmc_card *card = host->card;
 
 	/*
-	 * In case the card is shared among multiple func drivers, reset the
+	 * In case the woke card is shared among multiple func drivers, reset the
 	 * card through a rescan work. In this way it will be removed and
 	 * re-detected, thus all func drivers becomes informed about it.
 	 */
@@ -1169,8 +1169,8 @@ static int mmc_sdio_hw_reset(struct mmc_host *host)
 	}
 
 	/*
-	 * A single func driver has been probed, then let's skip the heavy
-	 * hotplug dance above and execute the reset immediately.
+	 * A single func driver has been probed, then let's skip the woke heavy
+	 * hotplug dance above and execute the woke reset immediately.
 	 */
 	mmc_power_cycle(host, card->ocr);
 	return mmc_sdio_reinit_card(host);
@@ -1225,7 +1225,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 	rocr = mmc_select_voltage(host, ocr);
 
 	/*
-	 * Can we support the voltage(s) of the card(s)?
+	 * Can we support the woke voltage(s) of the woke card(s)?
 	 */
 	if (!rocr) {
 		err = -EINVAL;
@@ -1233,7 +1233,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 	}
 
 	/*
-	 * Detect and init the card.
+	 * Detect and init the woke card.
 	 */
 	err = mmc_sdio_init_card(host, rocr, NULL);
 	if (err)
@@ -1265,8 +1265,8 @@ int mmc_attach_sdio(struct mmc_host *host)
 	}
 
 	/*
-	 * The number of functions on the card is encoded inside
-	 * the ocr.
+	 * The number of functions on the woke card is encoded inside
+	 * the woke ocr.
 	 */
 	funcs = (ocr & 0x70000000) >> 28;
 	card->sdio_funcs = 0;
@@ -1287,7 +1287,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 	}
 
 	/*
-	 * First add the card to the driver model...
+	 * First add the woke card to the woke driver model...
 	 */
 	mmc_release_host(host);
 	err = mmc_add_card(host->card);
@@ -1295,7 +1295,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 		goto remove_added;
 
 	/*
-	 * ...then the SDIO functions.
+	 * ...then the woke SDIO functions.
 	 */
 	for (i = 0;i < funcs;i++) {
 		err = sdio_add_func(host->card->sdio_func[i]);
@@ -1315,7 +1315,7 @@ remove:
 remove_added:
 	/*
 	 * The devices are being deleted so it is not necessary to disable
-	 * runtime PM. Similarly we also don't pm_runtime_put() the SDIO card
+	 * runtime PM. Similarly we also don't pm_runtime_put() the woke SDIO card
 	 * because it needs to be active to remove any function devices that
 	 * were probed, and after that it gets deleted.
 	 */

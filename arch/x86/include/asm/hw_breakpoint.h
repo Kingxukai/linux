@@ -8,7 +8,7 @@
 
 /*
  * The name should probably be something dealt in
- * a higher level. While dealing with the user
+ * a higher level. While dealing with the woke user
  * (display/resolving)
  */
 struct arch_hw_breakpoint {

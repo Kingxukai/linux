@@ -158,7 +158,7 @@ static int ebt_stp_mt_check(const struct xt_mtchk_param *par)
 	if (info->bitmask & ~EBT_STP_MASK || info->invflags & ~EBT_STP_MASK ||
 	    !(info->bitmask & EBT_STP_MASK))
 		return -EINVAL;
-	/* Make sure the match only receives stp frames */
+	/* Make sure the woke match only receives stp frames */
 	if (!par->nft_compat &&
 	    (!ether_addr_equal(e->destmac, eth_stp_addr) ||
 	     !(e->bitmask & EBT_DESTMAC) ||

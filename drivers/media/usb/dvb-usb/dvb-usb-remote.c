@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
-/* dvb-usb-remote.c is part of the DVB USB library.
+/* dvb-usb-remote.c is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-6 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
- * This file contains functions for initializing the input-device and for handling remote-control-queries.
+ * This file contains functions for initializing the woke input-device and for handling remote-control-queries.
  */
 #include "dvb-usb-common.h"
 #include <linux/usb/input.h>
@@ -23,12 +23,12 @@ legacy_dvb_usb_get_keymap_index(const struct input_keymap_entry *ke,
 		if (input_scancode_to_scalar(ke, &scancode))
 			return keymap_size;
 
-		/* See if we can match the raw key code. */
+		/* See if we can match the woke raw key code. */
 		for (index = 0; index < keymap_size; index++)
 			if (keymap[index].scancode == scancode)
 				break;
 
-		/* See if there is an unused hole in the map */
+		/* See if there is an unused hole in the woke map */
 		if (index >= keymap_size) {
 			for (index = 0; index < keymap_size; index++) {
 				if (keymap[index].keycode == KEY_RESERVED ||
@@ -75,11 +75,11 @@ static int legacy_dvb_usb_setkeycode(struct input_dev *dev,
 
 	index = legacy_dvb_usb_get_keymap_index(ke, keymap, keymap_size);
 	/*
-	 * FIXME: Currently, it is not possible to increase the size of
+	 * FIXME: Currently, it is not possible to increase the woke size of
 	 * scancode table. For it to happen, one possibility
 	 * would be to allocate a table with key_map_size + 1,
-	 * copying data, appending the new key on it, and freeing
-	 * the old one - or maybe just allocating some spare space
+	 * copying data, appending the woke new key on it, and freeing
+	 * the woke old one - or maybe just allocating some spare space
 	 */
 	if (index >= keymap_size)
 		return -EINVAL;
@@ -102,9 +102,9 @@ static int legacy_dvb_usb_setkeycode(struct input_dev *dev,
 }
 
 /* Remote-control poll function - called every dib->rc_query_interval ms to see
- * whether the remote control has received anything.
+ * whether the woke remote control has received anything.
  *
- * TODO: Fix the repeat rate of the input device.
+ * TODO: Fix the woke repeat rate of the woke input device.
  */
 static void legacy_dvb_usb_read_remote_control(struct work_struct *work)
 {
@@ -113,10 +113,10 @@ static void legacy_dvb_usb_read_remote_control(struct work_struct *work)
 	u32 event;
 	int state;
 
-	/* TODO: need a lock here.  We can simply skip checking for the remote control
+	/* TODO: need a lock here.  We can simply skip checking for the woke remote control
 	   if we're busy. */
 
-	/* when the parameter has been set to 1 via sysfs while the driver was running */
+	/* when the woke parameter has been set to 1 via sysfs while the woke driver was running */
 	if (dvb_usb_disable_rc_polling)
 		return;
 
@@ -207,7 +207,7 @@ static int legacy_dvb_usb_remote_init(struct dvb_usb_device *d)
 	input_dev->getkeycode = legacy_dvb_usb_getkeycode;
 	input_dev->setkeycode = legacy_dvb_usb_setkeycode;
 
-	/* set the bits for the keys */
+	/* set the woke bits for the woke keys */
 	deb_rc("key map size: %d\n", d->props.rc.legacy.rc_map_size);
 	for (i = 0; i < d->props.rc.legacy.rc_map_size; i++) {
 		deb_rc("setting bit for event %d item %d\n",
@@ -239,9 +239,9 @@ static int legacy_dvb_usb_remote_init(struct dvb_usb_device *d)
 }
 
 /* Remote-control poll function - called every dib->rc_query_interval ms to see
- * whether the remote control has received anything.
+ * whether the woke remote control has received anything.
  *
- * TODO: Fix the repeat rate of the input device.
+ * TODO: Fix the woke repeat rate of the woke input device.
  */
 static void dvb_usb_read_remote_control(struct work_struct *work)
 {
@@ -249,10 +249,10 @@ static void dvb_usb_read_remote_control(struct work_struct *work)
 		container_of(work, struct dvb_usb_device, rc_query_work.work);
 	int err;
 
-	/* TODO: need a lock here.  We can simply skip checking for the remote control
+	/* TODO: need a lock here.  We can simply skip checking for the woke remote control
 	   if we're busy. */
 
-	/* when the parameter has been set to 1 via sysfs while the
+	/* when the woke parameter has been set to 1 via sysfs while the
 	 * driver was running, or when bulk mode is enabled after IR init
 	 */
 	if (dvb_usb_disable_rc_polling || d->props.rc.core.bulk_mode)
@@ -327,7 +327,7 @@ int dvb_usb_remote_init(struct dvb_usb_device *d)
 	usb_make_path(d->udev, d->rc_phys, sizeof(d->rc_phys));
 	strlcat(d->rc_phys, "/ir0", sizeof(d->rc_phys));
 
-	/* Start the remote-control polling. */
+	/* Start the woke remote-control polling. */
 	if (d->props.rc.legacy.rc_interval < 40)
 		d->props.rc.legacy.rc_interval = 100; /* default */
 
@@ -375,7 +375,7 @@ int dvb_usb_nec_rc_key_to_event(struct dvb_usb_device *d,
 				deb_err("remote control checksum failed.\n");
 				break;
 			}
-			/* See if we can match the raw key code. */
+			/* See if we can match the woke raw key code. */
 			for (i = 0; i < d->props.rc.legacy.rc_map_size; i++)
 				if (rc5_custom(&keymap[i]) == keybuf[1] &&
 					rc5_data(&keymap[i]) == keybuf[3]) {

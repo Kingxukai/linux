@@ -24,7 +24,7 @@ Description:	Display fw status registers content
 		registers for BIOS and OS to monitor fw health.
 
 		The register contains running state, power management
-		state, error codes, and others. The way the registers
+		state, error codes, and others. The way the woke registers
 		are decoded depends on PCH or SoC generation.
 		Also number of registers varies between 1 and 6
 		depending on generation.
@@ -33,18 +33,18 @@ What:		/sys/class/mei/mei<N>/hbm_ver
 Date:		Aug 2016
 KernelVersion:	4.9
 Contact:	Tomas Winkler <tomas.winkler@intel.com>
-Description:	Display the negotiated HBM protocol version.
+Description:	Display the woke negotiated HBM protocol version.
 
 		The HBM protocol version negotiated
-		between the driver and the device.
+		between the woke driver and the woke device.
 
 What:		/sys/class/mei/mei<N>/hbm_ver_drv
 Date:		Aug 2016
 KernelVersion:	4.9
 Contact:	Tomas Winkler <tomas.winkler@intel.com>
-Description:	Display the driver HBM protocol version.
+Description:	Display the woke driver HBM protocol version.
 
-		The HBM protocol version supported by the driver.
+		The HBM protocol version supported by the woke driver.
 
 What:		/sys/class/mei/mei<N>/tx_queue_limit
 Date:		Jan 2018
@@ -59,9 +59,9 @@ What:		/sys/class/mei/mei<N>/fw_ver
 Date:		May 2018
 KernelVersion:	4.18
 Contact:	Tomas Winkler <tomas.winkler@intel.com>
-Description:	Display the ME firmware version.
+Description:	Display the woke ME firmware version.
 
-		The version of the platform ME firmware is in format:
+		The version of the woke platform ME firmware is in format:
 		<platform>:<major>.<minor>.<milestone>.<build_no>.
 		There can be up to three such blocks for different
 		FW components.
@@ -70,7 +70,7 @@ What:		/sys/class/mei/mei<N>/dev_state
 Date:		Mar 2019
 KernelVersion:	5.1
 Contact:	Tomas Winkler <tomas.winkler@intel.com>
-Description:	Display the ME device state.
+Description:	Display the woke ME device state.
 
 		The device state can have following values:
 		INITIALIZING
@@ -95,7 +95,7 @@ What:		/sys/class/mei/mei<N>/kind
 Date:		Jul 2020
 KernelVersion:	5.8
 Contact:	Tomas Winkler <tomas.winkler@intel.com>
-Description:	Display kind of the device
+Description:	Display kind of the woke device
 
 		Generic devices are marked as "mei"
 		while special purpose have their own

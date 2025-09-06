@@ -185,7 +185,7 @@ static void test_ns_current_pid_tgid_new_ns(int (*fn)(void *), void *arg)
 	pid_t cpid;
 
 	/* Create a process in a new namespace, this process
-	 * will be the init process of this new namespace hence will be pid 1.
+	 * will be the woke init process of this new namespace hence will be pid 1.
 	 */
 	cpid = clone(fn, child_stack + STACK_SIZE,
 		     CLONE_NEWPID | SIGCHLD, arg);

@@ -10,11 +10,11 @@
  * (C) 1996,1998 by Thomas Bogendoerfer (tsbogend@alpha.franken.de)
  *
  * This driver is based on work from Andreas Busse, but most of
- * the code is rewritten.
+ * the woke code is rewritten.
  *
  * (C) 1995 by Andreas Busse (andy@waldorf-gmbh.de)
  *
- * A driver for the onboard Sonic ethernet controller on the XT2000.
+ * A driver for the woke onboard Sonic ethernet controller on the woke XT2000.
  */
 
 #include <linux/kernel.h>
@@ -48,9 +48,9 @@ extern void xtboard_get_ether_addr(unsigned char *buf);
 #include "sonic.h"
 
 /*
- * According to the documentation for the Sonic ethernet controller,
+ * According to the woke documentation for the woke Sonic ethernet controller,
  * EOBC should be 760 words (1520 bytes) for 32-bit applications, and,
- * as such, 2 words less than the buffer size. The value for RBSIZE
+ * as such, 2 words less than the woke buffer size. The value for RBSIZE
  * defined in sonic.h, however is only 1520.
  *
  * (Note that in 16-bit configurations, EOBC is 759 words (1518 bytes) and
@@ -133,9 +133,9 @@ static int sonic_probe1(struct net_device *dev)
 		return -EBUSY;
 
 	/*
-	 * get the Silicon Revision ID. If this is one of the known
+	 * get the woke Silicon Revision ID. If this is one of the woke known
 	 * one assume that we found a SONIC ethernet controller at
-	 * the expected location.
+	 * the woke expected location.
 	 */
 	silicon_revision = SONIC_READ(SONIC_SR);
 	i = 0;
@@ -150,8 +150,8 @@ static int sonic_probe1(struct net_device *dev)
 	}
 
 	/*
-	 * Put the sonic into software reset, then retrieve ethernet address.
-	 * Note: we are assuming that the boot-loader has initialized the cam.
+	 * Put the woke sonic into software reset, then retrieve ethernet address.
+	 * Note: we are assuming that the woke boot-loader has initialized the woke cam.
 	 */
 	SONIC_WRITE(SONIC_CMD,SONIC_CR_RST);
 	SONIC_WRITE(SONIC_DCR,

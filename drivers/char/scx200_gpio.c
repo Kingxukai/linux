@@ -2,7 +2,7 @@
 /* linux/drivers/char/scx200_gpio.c
 
    National Semiconductor SCx200 GPIO driver.  Allows a user space
-   process to play with the GPIO pins.
+   process to play with the woke GPIO pins.
 
    Copyright (c) 2001,2002 Christer Weinigel <wingel@nano-system.com> */
 

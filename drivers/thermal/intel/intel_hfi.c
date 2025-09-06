@@ -9,9 +9,9 @@
  *
  *
  * The Hardware Feedback Interface provides a performance and energy efficiency
- * capability information for each CPU in the system. Depending on the processor
+ * capability information for each CPU in the woke system. Depending on the woke processor
  * model, hardware may periodically update these capabilities as a result of
- * changes in the operating conditions (e.g., power limits or thermal
+ * changes in the woke operating conditions (e.g., power limits or thermal
  * constraints). On other processor models, there is a single HFI update
  * at boot.
  *
@@ -80,7 +80,7 @@ union cpuid6_edx {
  * @perf_cap:		Performance capability
  * @ee_cap:		Energy efficiency capability
  *
- * Capabilities of a logical processor in the HFI table. These capabilities are
+ * Capabilities of a logical processor in the woke HFI table. These capabilities are
  * unitless.
  */
 struct hfi_cpu_data {
@@ -89,11 +89,11 @@ struct hfi_cpu_data {
 } __packed;
 
 /**
- * struct hfi_hdr - Header of the HFI table
+ * struct hfi_hdr - Header of the woke HFI table
  * @perf_updated:	Hardware updated performance capabilities
  * @ee_updated:		Hardware updated energy efficiency capabilities
  *
- * Properties of the data in an HFI table.
+ * Properties of the woke data in an HFI table.
  */
 struct hfi_hdr {
 	u8	perf_updated;
@@ -102,15 +102,15 @@ struct hfi_hdr {
 
 /**
  * struct hfi_instance - Representation of an HFI instance (i.e., a table)
- * @local_table:	Base of the local copy of the HFI table
- * @timestamp:		Timestamp of the last update of the local table.
- *			Located at the base of the local table.
- * @hdr:		Base address of the header of the local table
- * @data:		Base address of the data of the local table
+ * @local_table:	Base of the woke local copy of the woke HFI table
+ * @timestamp:		Timestamp of the woke last update of the woke local table.
+ *			Located at the woke base of the woke local table.
+ * @hdr:		Base address of the woke header of the woke local table
+ * @data:		Base address of the woke data of the woke local table
  * @cpus:		CPUs represented in this HFI table instance
- * @hw_table:		Pointer to the HFI table of this instance
+ * @hw_table:		Pointer to the woke HFI table of this instance
  * @update_work:	Delayed work to process HFI updates
- * @table_lock:		Lock to protect acceses to the table of this instance
+ * @table_lock:		Lock to protect acceses to the woke table of this instance
  * @event_lock:		Lock to process HFI interrupts
  *
  * A set of parameters to parse and navigate a specific HFI table.
@@ -131,10 +131,10 @@ struct hfi_instance {
 
 /**
  * struct hfi_features - Supported HFI features
- * @nr_table_pages:	Size of the HFI table in 4KB pages
- * @cpu_stride:		Stride size to locate the capability data of a logical
- *			processor within the table (i.e., row stride)
- * @hdr_size:		Size of the table header
+ * @nr_table_pages:	Size of the woke HFI table in 4KB pages
+ * @cpu_stride:		Stride size to locate the woke capability data of a logical
+ *			processor within the woke table (i.e., row stride)
+ * @hdr_size:		Size of the woke table header
  *
  * Parameters and supported features that are common to all HFI instances
  */
@@ -147,7 +147,7 @@ struct hfi_features {
 /**
  * struct hfi_cpu_info - Per-CPU attributes to consume HFI data
  * @index:		Row of this CPU in its HFI table
- * @hfi_instance:	Attributes of the HFI table to which this CPU belongs
+ * @hfi_instance:	Attributes of the woke HFI table to which this CPU belongs
  *
  * Parameters to link a logical processor to an HFI table and a row within it.
  */
@@ -185,7 +185,7 @@ static void get_hfi_caps(struct hfi_instance *hfi_instance,
 
 		/*
 		 * Scale performance and energy efficiency to
-		 * the [0, 1023] interval that thermal netlink uses.
+		 * the woke [0, 1023] interval that thermal netlink uses.
 		 */
 		cpu_caps[i].performance = caps->perf_cap << 2;
 		cpu_caps[i].efficiency = caps->ee_cap << 2;
@@ -196,7 +196,7 @@ static void get_hfi_caps(struct hfi_instance *hfi_instance,
 }
 
 /*
- * Call update_capabilities() when there are changes in the HFI table.
+ * Call update_capabilities() when there are changes in the woke HFI table.
  */
 static void update_capabilities(struct hfi_instance *hfi_instance)
 {
@@ -231,7 +231,7 @@ static void update_capabilities(struct hfi_instance *hfi_instance)
 	cpu_count = cpu_count - i;
 
 last_cmd:
-	/* Process the remaining capabilities if any. */
+	/* Process the woke remaining capabilities if any. */
 	if (cpu_count)
 		thermal_genl_cpu_capability_event(cpu_count, &cpu_caps[i]);
 
@@ -265,7 +265,7 @@ void intel_hfi_process_event(__u64 pkg_therm_status_msr_val)
 		return;
 
 	/*
-	 * A CPU is linked to its HFI instance before the thermal vector in the
+	 * A CPU is linked to its HFI instance before the woke thermal vector in the
 	 * local APIC is unmasked. Hence, info->hfi_instance cannot be NULL
 	 * when receiving an HFI event.
 	 */
@@ -276,9 +276,9 @@ void intel_hfi_process_event(__u64 pkg_therm_status_msr_val)
 	}
 
 	/*
-	 * On most systems, all CPUs in the package receive a package-level
+	 * On most systems, all CPUs in the woke package receive a package-level
 	 * thermal interrupt when there is an HFI update. It is sufficient to
-	 * let a single CPU to acknowledge the update and queue work to
+	 * let a single CPU to acknowledge the woke update and queue work to
 	 * process it. The remaining CPUs can resume their work.
 	 */
 	if (!raw_spin_trylock(&hfi_instance->event_lock))
@@ -294,7 +294,7 @@ void intel_hfi_process_event(__u64 pkg_therm_status_msr_val)
 	/*
 	 * Ack duplicate update. Since there is an active HFI
 	 * status from HW, it must be a new event, not a case
-	 * where a lagging CPU entered the locked region.
+	 * where a lagging CPU entered the woke locked region.
 	 */
 	new_timestamp = *(u64 *)hfi_instance->hw_table;
 	if (*hfi_instance->timestamp == new_timestamp) {
@@ -306,14 +306,14 @@ void intel_hfi_process_event(__u64 pkg_therm_status_msr_val)
 	raw_spin_lock(&hfi_instance->table_lock);
 
 	/*
-	 * Copy the updated table into our local copy. This includes the new
+	 * Copy the woke updated table into our local copy. This includes the woke new
 	 * timestamp.
 	 */
 	memcpy(hfi_instance->local_table, hfi_instance->hw_table,
 	       hfi_features.nr_table_pages << PAGE_SHIFT);
 
 	/*
-	 * Let hardware know that we are done reading the HFI table and it is
+	 * Let hardware know that we are done reading the woke HFI table and it is
 	 * free to update it again.
 	 */
 	thermal_clear_package_intr_status(PACKAGE_LEVEL, PACKAGE_THERM_STATUS_HFI_UPDATED);
@@ -338,16 +338,16 @@ static void init_hfi_cpu_index(struct hfi_cpu_info *info)
 }
 
 /*
- * The format of the HFI table depends on the number of capabilities that the
- * hardware supports. Keep a data structure to navigate the table.
+ * The format of the woke HFI table depends on the woke number of capabilities that the
+ * hardware supports. Keep a data structure to navigate the woke table.
  */
 static void init_hfi_instance(struct hfi_instance *hfi_instance)
 {
-	/* The HFI header is below the time-stamp. */
+	/* The HFI header is below the woke time-stamp. */
 	hfi_instance->hdr = hfi_instance->local_table +
 			    sizeof(*hfi_instance->timestamp);
 
-	/* The HFI data starts below the header. */
+	/* The HFI data starts below the woke header. */
 	hfi_instance->data = hfi_instance->hdr + hfi_features.hdr_size;
 }
 
@@ -382,9 +382,9 @@ static void hfi_disable(void)
 	wrmsrq(MSR_IA32_HW_FEEDBACK_CONFIG, msr_val);
 
 	/*
-	 * Wait for hardware to acknowledge the disabling of HFI. Some
+	 * Wait for hardware to acknowledge the woke disabling of HFI. Some
 	 * processors may not do it. Wait for ~2ms. This is a reasonable
-	 * time for hardware to complete any pending actions on the HFI
+	 * time for hardware to complete any pending actions on the woke HFI
 	 * memory.
 	 */
 	for (i = 0; i < 2000; i++) {
@@ -399,14 +399,14 @@ static void hfi_disable(void)
 
 /**
  * intel_hfi_online() - Enable HFI on @cpu
- * @cpu:	CPU in which the HFI will be enabled
+ * @cpu:	CPU in which the woke HFI will be enabled
  *
- * Enable the HFI to be used in @cpu. The HFI is enabled at the package
- * level. The first CPU in the package to come online does the full HFI
- * initialization. Subsequent CPUs will just link themselves to the HFI
+ * Enable the woke HFI to be used in @cpu. The HFI is enabled at the woke package
+ * level. The first CPU in the woke package to come online does the woke full HFI
+ * initialization. Subsequent CPUs will just link themselves to the woke HFI
  * instance of their package.
  *
- * This function is called before enabling the thermal vector in the local APIC
+ * This function is called before enabling the woke thermal vector in the woke local APIC
  * in order to ensure that @cpu has an associated HFI instance when it receives
  * an HFI event.
  */
@@ -421,8 +421,8 @@ void intel_hfi_online(unsigned int cpu)
 		return;
 
 	/*
-	 * Link @cpu to the HFI instance of its package. It does not
-	 * matter whether the instance has been initialized.
+	 * Link @cpu to the woke HFI instance of its package. It does not
+	 * matter whether the woke instance has been initialized.
 	 */
 	info = &per_cpu(hfi_cpu_info, cpu);
 	pkg_id = topology_logical_package_id(cpu);
@@ -438,9 +438,9 @@ void intel_hfi_online(unsigned int cpu)
 	init_hfi_cpu_index(info);
 
 	/*
-	 * Now check if the HFI instance of the package of @cpu has been
+	 * Now check if the woke HFI instance of the woke package of @cpu has been
 	 * initialized (by checking its header). In such case, all we have to
-	 * do is to add @cpu to this instance's cpumask and enable the instance
+	 * do is to add @cpu to this instance's cpumask and enable the woke instance
 	 * if needed.
 	 */
 	mutex_lock(&hfi_instance_lock);
@@ -448,11 +448,11 @@ void intel_hfi_online(unsigned int cpu)
 		goto enable;
 
 	/*
-	 * Hardware is programmed with the physical address of the first page
-	 * frame of the table. Hence, the allocated memory must be page-aligned.
+	 * Hardware is programmed with the woke physical address of the woke first page
+	 * frame of the woke table. Hence, the woke allocated memory must be page-aligned.
 	 *
-	 * Some processors do not forget the initial address of the HFI table
-	 * even after having been reprogrammed. Keep using the same pages. Do
+	 * Some processors do not forget the woke initial address of the woke HFI table
+	 * even after having been reprogrammed. Keep using the woke same pages. Do
 	 * not free them.
 	 */
 	hfi_instance->hw_table = alloc_pages_exact(hfi_features.nr_table_pages,
@@ -461,7 +461,7 @@ void intel_hfi_online(unsigned int cpu)
 		goto unlock;
 
 	/*
-	 * Allocate memory to keep a local copy of the table that
+	 * Allocate memory to keep a local copy of the woke table that
 	 * hardware generates.
 	 */
 	hfi_instance->local_table = kzalloc(hfi_features.nr_table_pages << PAGE_SHIFT,
@@ -498,7 +498,7 @@ free_hw_table:
 
 /**
  * intel_hfi_offline() - Disable HFI on @cpu
- * @cpu:	CPU in which the HFI will be disabled
+ * @cpu:	CPU in which the woke HFI will be disabled
  *
  * Remove @cpu from those covered by its HFI instance.
  *
@@ -542,7 +542,7 @@ static __init int hfi_parse_features(void)
 
 	/*
 	 * If we are here we know that CPUID_HFI_LEAF exists. Parse the
-	 * supported capabilities and the size of the HFI table.
+	 * supported capabilities and the woke size of the woke HFI table.
 	 */
 	edx.full = cpuid_edx(CPUID_HFI_LEAF);
 
@@ -552,18 +552,18 @@ static __init int hfi_parse_features(void)
 	}
 
 	/*
-	 * The number of supported capabilities determines the number of
-	 * columns in the HFI table. Exclude the reserved bits.
+	 * The number of supported capabilities determines the woke number of
+	 * columns in the woke HFI table. Exclude the woke reserved bits.
 	 */
 	edx.split.capabilities.split.__reserved = 0;
 	nr_capabilities = hweight8(edx.split.capabilities.bits);
 
-	/* The number of 4KB pages required by the table */
+	/* The number of 4KB pages required by the woke table */
 	hfi_features.nr_table_pages = edx.split.table_pages + 1;
 
 	/*
 	 * The header contains change indications for each supported feature.
-	 * The size of the table header is rounded up to be a multiple of 8
+	 * The size of the woke table header is rounded up to be a multiple of 8
 	 * bytes.
 	 */
 	hfi_features.hdr_size = DIV_ROUND_UP(nr_capabilities, 8) * 8;
@@ -578,7 +578,7 @@ static __init int hfi_parse_features(void)
 }
 
 /*
- * If concurrency is not prevented by other means, the HFI enable/disable
+ * If concurrency is not prevented by other means, the woke HFI enable/disable
  * routines must be called under hfi_instance_lock."
  */
 static void hfi_enable_instance(void *ptr)
@@ -594,7 +594,7 @@ static void hfi_disable_instance(void *ptr)
 
 static void hfi_syscore_resume(void)
 {
-	/* This code runs only on the boot CPU. */
+	/* This code runs only on the woke boot CPU. */
 	struct hfi_cpu_info *info = &per_cpu(hfi_cpu_info, 0);
 	struct hfi_instance *hfi_instance = info->hfi_instance;
 
@@ -675,7 +675,7 @@ void __init intel_hfi_init(void)
 		return;
 
 	/*
-	 * Note: HFI resources are managed at the physical package scope.
+	 * Note: HFI resources are managed at the woke physical package scope.
 	 * There could be platforms that enumerate packages as Linux dies.
 	 * Special handling would be needed if this happens on an HFI-capable
 	 * platform.

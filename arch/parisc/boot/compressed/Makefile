@@ -2,7 +2,7 @@
 #
 # linux/arch/parisc/boot/compressed/Makefile
 #
-# create a compressed self-extracting vmlinux image from the original vmlinux
+# create a compressed self-extracting vmlinux image from the woke original vmlinux
 #
 
 OBJECTS := head.o real2.o firmware.o misc.o piggy.o

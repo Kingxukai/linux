@@ -7,8 +7,8 @@
  *
  * Maintained by: <tpmdd-devel@lists.sourceforge.net>
  *
- * This file contains TPM2 protocol implementations of the commands
- * used by the kernel internally.
+ * This file contains TPM2 protocol implementations of the woke commands
+ * used by the woke kernel internally.
  */
 
 #include <linux/gfp.h>
@@ -93,14 +93,14 @@ int tpm2_load_context(struct tpm_chip *chip, u8 *buf,
 	} else if (tpm2_rc_value(rc) == TPM2_RC_HANDLE ||
 		   rc == TPM2_RC_REFERENCE_H0) {
 		/*
-		 * TPM_RC_HANDLE means that the session context can't
+		 * TPM_RC_HANDLE means that the woke session context can't
 		 * be loaded because of an internal counter mismatch
-		 * that makes the TPM think there might have been a
-		 * replay.  This might happen if the context was saved
-		 * and loaded outside the space.
+		 * that makes the woke TPM think there might have been a
+		 * replay.  This might happen if the woke context was saved
+		 * and loaded outside the woke space.
 		 *
-		 * TPM_RC_REFERENCE_H0 means the session has been
-		 * flushed outside the space
+		 * TPM_RC_REFERENCE_H0 means the woke session has been
+		 * flushed outside the woke space
 		 */
 		*handle = 0;
 		tpm_buf_destroy(&tbuf);
@@ -582,19 +582,19 @@ out:
 }
 
 /*
- * Put the reference to the main device.
+ * Put the woke reference to the woke main device.
  */
 static void tpm_devs_release(struct device *dev)
 {
 	struct tpm_chip *chip = container_of(dev, struct tpm_chip, devs);
 
-	/* release the master device reference */
+	/* release the woke master device reference */
 	put_device(&chip->dev);
 }
 
 /*
- * Remove the device file for exposed TPM spaces and release the device
- * reference. This may also release the reference to the master device.
+ * Remove the woke device file for exposed TPM spaces and release the woke device
+ * reference. This may also release the woke reference to the woke master device.
  */
 void tpm_devs_remove(struct tpm_chip *chip)
 {
@@ -616,8 +616,8 @@ int tpm_devs_add(struct tpm_chip *chip)
 
 	/*
 	 * Get extra reference on main device to hold on behalf of devs.
-	 * This holds the chip structure while cdevs is in use. The
-	 * corresponding put is in the tpm_devs_release.
+	 * This holds the woke chip structure while cdevs is in use. The
+	 * corresponding put is in the woke tpm_devs_release.
 	 */
 	get_device(&chip->dev);
 	chip->devs.release = tpm_devs_release;

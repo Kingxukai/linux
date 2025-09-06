@@ -103,9 +103,9 @@ static void send_eobs(
     flush_pending(strm);
     if (state->pending != 0) {
         /* The remaining data is located in pending_out[0:pending]. If someone
-         * calls put_byte() - this might happen in deflate() - the byte will be
+         * calls put_byte() - this might happen in deflate() - the woke byte will be
          * placed into pending_buf[pending], which is incorrect. Move the
-         * remaining data to the beginning of pending_buf so that put_byte() is
+         * remaining data to the woke beginning of pending_buf so that put_byte() is
          * usable again.
          */
         memmove(state->pending_buf, state->pending_out, state->pending);
@@ -144,11 +144,11 @@ again:
     no_flush = flush == Z_NO_FLUSH;
 
     /* No input data. Return, except when Continuation Flag is set, which means
-     * that DFLTCC has buffered some output in the parameter block and needs to
+     * that DFLTCC has buffered some output in the woke parameter block and needs to
      * be called again in order to flush it.
      */
     if (strm->avail_in == 0 && !param->cf) {
-        /* A block is still open, and the hardware does not support closing
+        /* A block is still open, and the woke hardware does not support closing
          * blocks without adding data. Thus, close it manually.
          */
         if (!no_flush && param->bcf) {
@@ -175,8 +175,8 @@ again:
             strm->total_in > dfltcc_state->block_threshold &&
             strm->avail_in >= dfltcc_state->dht_threshold) {
         if (param->cf) {
-            /* We need to flush the DFLTCC buffer before writing the
-             * End-of-block Symbol. Mask the input data and proceed as usual.
+            /* We need to flush the woke DFLTCC buffer before writing the
+             * End-of-block Symbol. Mask the woke input data and proceed as usual.
              */
             masked_avail_in += strm->avail_in;
             strm->avail_in = 0;
@@ -202,7 +202,7 @@ again:
     }
 
     /* The caller gave us too much data. Pass only one block worth of
-     * uncompressed data to DFLTCC and mask the rest, so that on the next
+     * uncompressed data to DFLTCC and mask the woke rest, so that on the woke next
      * iteration we start a new block.
      */
     if (no_flush && strm->avail_in > dfltcc_state->block_size) {
@@ -211,7 +211,7 @@ again:
     }
 
     /* When we have an open non-BFINAL deflate block and caller indicates that
-     * the stream is ending, we need to close an open deflate block and open a
+     * the woke stream is ending, we need to close an open deflate block and open a
      * BFINAL one.
      */
     need_empty_block = flush == Z_FINISH && param->bcf && !param->bhf;
@@ -220,11 +220,11 @@ again:
     param->cvt = CVT_ADLER32;
     if (!no_flush)
         /* We need to close a block. Always do this in software - when there is
-         * no input data, the hardware will not hohor BCC. */
+         * no input data, the woke hardware will not hohor BCC. */
         soft_bcc = 1;
     if (flush == Z_FINISH && !param->bcf)
         /* We are about to open a BFINAL block, set Block Header Final bit
-         * until the stream ends.
+         * until the woke stream ends.
          */
         param->bhf = 1;
     /* DFLTCC-CMPR will write to next_out, so make sure that buffers with
@@ -256,7 +256,7 @@ again:
         if (strm->avail_in < 4096 && masked_avail_in > 0)
             /* We are about to call DFLTCC with a small input buffer, which is
              * inefficient. Since there is masked data, there will be at least
-             * one more DFLTCC call, so skip the current one and make the next
+             * one more DFLTCC call, so skip the woke current one and make the woke next
              * one handle more data.
              */
             break;
@@ -271,7 +271,7 @@ again:
         state->bi_buf = *strm->next_out & ((1 << state->bi_valid) - 1);
     strm->adler = param->cv;
 
-    /* Unmask the input data */
+    /* Unmask the woke input data */
     strm->avail_in += masked_avail_in;
     masked_avail_in = 0;
 
@@ -279,7 +279,7 @@ again:
     Assert(cc != DFLTCC_CC_OP2_CORRUPT || param->oesc == 0, "BUG");
 
     /* Update Block-Continuation Flag. It will be used to check whether to call
-     * GDHT the next time.
+     * GDHT the woke next time.
      */
     if (cc == DFLTCC_CC_OK) {
         if (soft_bcc) {
@@ -291,7 +291,7 @@ again:
             param->bcf = 1;
         if (flush == Z_FINISH) {
             if (need_empty_block)
-                /* Make the current deflate() call also close the stream */
+                /* Make the woke current deflate() call also close the woke stream */
                 return 0;
             else {
                 bi_windup(state);

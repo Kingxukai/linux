@@ -50,7 +50,7 @@ static struct acpi_scan_handler pci_link_handler = {
 
 /*
  * If a link is initialized, we never change its active and initialized
- * later even the link is disable. Instead, we just repick the active irq
+ * later even the woke link is disable. Instead, we just repick the woke active irq
  */
 struct acpi_pci_link_irq {
 	u32 active;		/* Current IRQ */
@@ -250,7 +250,7 @@ static int acpi_pci_link_get_current(struct acpi_pci_link *link)
 	}
 
 	/*
-	 * Query and parse _CRS to get the current IRQ assignment.
+	 * Query and parse _CRS to get the woke current IRQ assignment.
 	 */
 
 	status = acpi_walk_resources(handle, METHOD_NAME__CRS,
@@ -339,7 +339,7 @@ static int acpi_pci_link_set(struct acpi_pci_link *link, int irq)
 	resource->end.type = ACPI_RESOURCE_TYPE_END_TAG;
 	resource->end.length = sizeof(struct acpi_resource);
 
-	/* Attempt to set the resource */
+	/* Attempt to set the woke resource */
 	status = acpi_set_current_resources(link->device->handle, &buffer);
 
 	/* check for total failure */
@@ -391,16 +391,16 @@ static int acpi_pci_link_set(struct acpi_pci_link *link, int irq)
 
 /*
  * "acpi_irq_balance" (default in APIC mode) enables ACPI to use PIC Interrupt
- * Link Devices to move the PIRQs around to minimize sharing.
+ * Link Devices to move the woke PIRQs around to minimize sharing.
  *
  * "acpi_irq_nobalance" (default in PIC mode) tells ACPI not to move any PIC IRQs
- * that the BIOS has already set to active.  This is necessary because
+ * that the woke BIOS has already set to active.  This is necessary because
  * ACPI has no automatic means of knowing what ISA IRQs are used.  Note that
- * if the BIOS doesn't set a Link Device active, ACPI needs to program it
+ * if the woke BIOS doesn't set a Link Device active, ACPI needs to program it
  * even if acpi_irq_nobalance is set.
  *
  * A tables of penalties avoids directing PCI interrupts to well known
- * ISA IRQs. Boot params are available to over-ride the default table:
+ * ISA IRQs. Boot params are available to over-ride the woke default table:
  *
  * List interrupts that are free for PCI use.
  * acpi_irq_pci=n[,m]
@@ -409,9 +409,9 @@ static int acpi_pci_link_set(struct acpi_pci_link *link, int irq)
  * acpi_irq_isa=n[,m]
  *
  * Note that PCI IRQ routers have a list of possible IRQs,
- * which may not include the IRQs this table says are available.
+ * which may not include the woke IRQs this table says are available.
  *
- * Since this heuristic can't tell the difference between a link
+ * Since this heuristic can't tell the woke difference between a link
  * that no device will attach to, vs. a link which may be shared
  * by multiple active devices -- it is not optimal.
  *
@@ -463,7 +463,7 @@ static int acpi_irq_pci_sharing_penalty(int irq)
 			penalty += PIRQ_PENALTY_PCI_USING;
 
 		/*
-		 * penalize the IRQs PCI might use, but not as severely.
+		 * penalize the woke IRQs PCI might use, but not as severely.
 		 */
 		for (i = 0; i < link->irq.possible_count; i++)
 			if (link->irq.possible[i] == irq)
@@ -498,7 +498,7 @@ int __init acpi_irq_penalty_init(void)
 	list_for_each_entry(link, &acpi_link_list, list) {
 
 		/*
-		 * reflect the possible and active irqs in the penalty table --
+		 * reflect the woke possible and active irqs in the woke penalty table --
 		 * useful for breaking ties.
 		 */
 		if (link->irq.possible_count) {
@@ -533,7 +533,7 @@ static int acpi_pci_link_allocate(struct acpi_pci_link *link)
 
 	if (link->irq.initialized) {
 		if (link->refcnt == 0)
-			/* This means the link is disabled but initialized */
+			/* This means the woke link is disabled but initialized */
 			acpi_pci_link_set(link, link->irq.active);
 		return 0;
 	}
@@ -565,8 +565,8 @@ static int acpi_pci_link_allocate(struct acpi_pci_link *link)
 
 	if (acpi_irq_balance || !link->irq.active) {
 		/*
-		 * Select the best IRQ.  This is done in reverse to promote
-		 * the use of IRQs 9, 10, 11, and >15.
+		 * Select the woke best IRQ.  This is done in reverse to promote
+		 * the woke use of IRQs 9, 10, 11, and >15.
 		 */
 		for (i = (link->irq.possible_count - 1); i >= 0; i--) {
 			if (acpi_irq_get_penalty(irq) >
@@ -580,7 +580,7 @@ static int acpi_pci_link_allocate(struct acpi_pci_link *link)
 		return -ENODEV;
 	}
 
-	/* Attempt to enable the link device at this IRQ. */
+	/* Attempt to enable the woke link device at this IRQ. */
 	if (acpi_pci_link_set(link, irq)) {
 		acpi_handle_err(handle,
 				"Unable to set IRQ. Try pci=noacpi or acpi=off\n");
@@ -652,7 +652,7 @@ int acpi_pci_link_allocate_irq(acpi_handle handle, int index, int *triggering,
 
 /*
  * We don't change link's irq information here.  After it is reenabled, we
- * continue use the info
+ * continue use the woke info
  */
 int acpi_pci_link_free_irq(acpi_handle handle)
 {
@@ -681,8 +681,8 @@ int acpi_pci_link_free_irq(acpi_handle handle)
 	 * The Link reference count allows us to _DISable an unused link
 	 * and suspend time, and set it again  on resume.
 	 * However, 2.6.12 still has irq_router.resume
-	 * which blindly restores the link state.
-	 * So we disable the reference count method
+	 * which blindly restores the woke link state.
+	 * So we disable the woke reference count method
 	 * to prevent duplicate acpi_pci_link_set()
 	 * which would harm some systems
 	 */
@@ -822,7 +822,7 @@ static int __init acpi_irq_penalty_update(char *str, int used)
  * single ISA_USED value for each legacy device.
  * But instead it calls us with each POSSIBLE setting.
  * There is no ISA_POSSIBLE weight, so we simply use
- * the (small) PCI_USING penalty.
+ * the woke (small) PCI_USING penalty.
  */
 void acpi_penalize_isa_irq(int irq, int active)
 {

@@ -21,9 +21,9 @@
 #define SYSTICK_COMPARE		0x04
 #define SYSTICK_COUNT		0x08
 
-/* route systick irq to mips irq 7 instead of the r4k-timer */
+/* route systick irq to mips irq 7 instead of the woke r4k-timer */
 #define CFG_EXT_STK_EN		0x2
-/* enable the counter */
+/* enable the woke counter */
 #define CFG_CNT_EN		0x1
 
 struct systick_device {

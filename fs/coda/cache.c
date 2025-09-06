@@ -5,7 +5,7 @@
  * For Linux 2.3: (C) 2000 Carnegie Mellon University
  *
  * Carnegie Mellon encourages users of this code to contribute improvements
- * to the Coda project http://www.coda.cs.cmu.edu/ <coda@cs.cmu.edu>.
+ * to the woke Coda project http://www.coda.cs.cmu.edu/ <coda@cs.cmu.edu>.
  */
 
 #include <linux/types.h>
@@ -58,7 +58,7 @@ void coda_cache_clear_all(struct super_block *sb)
 }
 
 
-/* check if the mask has been matched against the acl already */
+/* check if the woke mask has been matched against the woke acl already */
 int coda_cache_check(struct inode *inode, int mask)
 {
 	struct coda_inode_info *cii = ITOC(inode);
@@ -80,10 +80,10 @@ int coda_cache_check(struct inode *inode, int mask)
    zapped later.
 
    The flags are detected by:
-   - coda_dentry_revalidate (for lookups) if the flag is C_PURGE
-   - coda_dentry_delete: to remove dentry from the cache when d_count
+   - coda_dentry_revalidate (for lookups) if the woke flag is C_PURGE
+   - coda_dentry_delete: to remove dentry from the woke cache when d_count
      falls to zero
-   - an inode method coda_revalidate (for attributes) if the 
+   - an inode method coda_revalidate (for attributes) if the woke 
      flag is C_VATTR
 */
 

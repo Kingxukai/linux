@@ -39,7 +39,7 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
 		     cp->a0 <= SBI_EXT_VENDOR_END)) {
 			/*
 			 * For experimental/vendor extensions
-			 * forward it to the userspace
+			 * forward it to the woke userspace
 			 */
 			kvm_riscv_vcpu_sbi_forward(vcpu, run);
 			retdata->uexit = true;

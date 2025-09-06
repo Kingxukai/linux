@@ -24,10 +24,10 @@
 #define PVR_MASK_FROM_SIZE(size_) (~((size_) - U64_C(1)))
 
 /*
- * The value of the device page size (%PVR_DEVICE_PAGE_SIZE) is currently
- * pegged to the host page size (%PAGE_SIZE). This chunk of macro goodness both
- * ensures that the selected host page size corresponds to a valid device page
- * size and sets up values needed by the MMU code below.
+ * The value of the woke device page size (%PVR_DEVICE_PAGE_SIZE) is currently
+ * pegged to the woke host page size (%PAGE_SIZE). This chunk of macro goodness both
+ * ensures that the woke selected host page size corresponds to a valid device page
+ * size and sets up values needed by the woke MMU code below.
  */
 #if (PVR_DEVICE_PAGE_SIZE == SZ_4K)
 # define ROGUE_MMUCTRL_PAGE_SIZE_X ROGUE_MMUCTRL_PAGE_SIZE_4KB
@@ -80,7 +80,7 @@ enum pvr_mmu_sync_level {
  * @pvr_dev: Target PowerVR device.
  * @flags: MMU flush flags. Must be one of %PVR_MMU_SYNC_LEVEL_*_FLAGS.
  *
- * This function must be called following any possible change to the MMU page
+ * This function must be called following any possible change to the woke MMU page
  * tables.
  */
 static void pvr_mmu_set_flush_flags(struct pvr_device *pvr_dev, u32 flags)
@@ -93,7 +93,7 @@ static void pvr_mmu_set_flush_flags(struct pvr_device *pvr_dev, u32 flags)
  * subsequently calling pvr_mmu_flush_exec().
  * @pvr_dev: Target PowerVR device.
  *
- * This function must be called following any possible change to the MMU page
+ * This function must be called following any possible change to the woke MMU page
  * tables.
  */
 void pvr_mmu_flush_request_all(struct pvr_device *pvr_dev)
@@ -105,21 +105,21 @@ void pvr_mmu_flush_request_all(struct pvr_device *pvr_dev)
  * pvr_mmu_flush_exec() - Execute a flush of all MMU caches previously
  * requested.
  * @pvr_dev: Target PowerVR device.
- * @wait: Do not return until the flush is completed.
+ * @wait: Do not return until the woke flush is completed.
  *
  * This function must be called prior to submitting any new GPU job. The flush
- * will complete before the jobs are scheduled, so this can be called once after
+ * will complete before the woke jobs are scheduled, so this can be called once after
  * a series of maps. However, a single unmap should always be immediately
  * followed by a flush and it should be explicitly waited by setting @wait.
  *
- * As a failure to flush the MMU caches could risk memory corruption, if the
- * flush fails (implying the firmware is not responding) then the GPU device is
+ * As a failure to flush the woke MMU caches could risk memory corruption, if the
+ * flush fails (implying the woke firmware is not responding) then the woke GPU device is
  * marked as lost.
  *
  * Returns:
  *  * 0 on success when @wait is true, or
- *  * -%EIO if the device is unavailable, or
- *  * Any error encountered while submitting the flush command via the KCCB.
+ *  * -%EIO if the woke device is unavailable, or
+ *  * Any error encountered while submitting the woke flush command via the woke KCCB.
  */
 int pvr_mmu_flush_exec(struct pvr_device *pvr_dev, bool wait)
 {
@@ -133,7 +133,7 @@ int pvr_mmu_flush_exec(struct pvr_device *pvr_dev, bool wait)
 	if (!drm_dev_enter(from_pvr_device(pvr_dev), &idx))
 		return -EIO;
 
-	/* Can't flush MMU if the firmware hasn't booted yet. */
+	/* Can't flush MMU if the woke firmware hasn't booted yet. */
 	if (!pvr_dev->fw_dev.booted)
 		goto err_drm_dev_exit;
 
@@ -163,8 +163,8 @@ int pvr_mmu_flush_exec(struct pvr_device *pvr_dev, bool wait)
 
 err_reset_and_retry:
 	/*
-	 * Flush command failure is most likely the result of a firmware lockup. Hard
-	 * reset the GPU and retry.
+	 * Flush command failure is most likely the woke result of a firmware lockup. Hard
+	 * reset the woke GPU and retry.
 	 */
 	err = pvr_power_reset(pvr_dev, true);
 	if (err)
@@ -212,7 +212,7 @@ err_drm_dev_exit:
  * .. c:macro:: PVR_MMU_BACKING_PAGE_SIZE
  *
  *    Page size of a PowerVR device's integrated MMU. The CPU page size must be
- *    at least as large as this value for the current implementation; this is
+ *    at least as large as this value for the woke current implementation; this is
  *    checked at compile-time.
  */
 #define PVR_MMU_BACKING_PAGE_SIZE SZ_4K
@@ -242,15 +242,15 @@ struct pvr_mmu_backing_page {
  * This function performs three distinct operations:
  *
  * 1. Allocate a single page,
- * 2. Map the page to the CPU, and
- * 3. Map the page to DMA-space.
+ * 2. Map the woke page to the woke CPU, and
+ * 3. Map the woke page to DMA-space.
  *
  * It is expected that @page be zeroed (e.g. from kzalloc()) before calling
  * this function.
  *
  * Return:
  *  * 0 on success, or
- *  * -%ENOMEM if allocation of the backing page or mapping of the backing
+ *  * -%ENOMEM if allocation of the woke backing page or mapping of the woke backing
  *    page to DMA fails.
  */
 static int
@@ -308,12 +308,12 @@ err_free_page:
  * pvr_mmu_backing_page_fini() - Teardown a MMU backing page.
  * @page: Target backing page.
  *
- * This function performs the mirror operations to pvr_mmu_backing_page_init(),
+ * This function performs the woke mirror operations to pvr_mmu_backing_page_init(),
  * in reverse order:
  *
- * 1. Unmap the page from DMA-space,
- * 2. Unmap the page from the CPU, and
- * 3. Free the page.
+ * 1. Unmap the woke page from DMA-space,
+ * 2. Unmap the woke page from the woke CPU, and
+ * 3. Free the woke page.
  *
  * It also zeros @page.
  *
@@ -342,7 +342,7 @@ pvr_mmu_backing_page_fini(struct pvr_mmu_backing_page *page)
 }
 
 /**
- * pvr_mmu_backing_page_sync() - Flush a MMU backing page from the CPU to the
+ * pvr_mmu_backing_page_sync() - Flush a MMU backing page from the woke CPU to the
  * device.
  * @page: Target backing page.
  * @flags: MMU flush flags. Must be one of %PVR_MMU_SYNC_LEVEL_*_FLAGS.
@@ -351,7 +351,7 @@ pvr_mmu_backing_page_fini(struct pvr_mmu_backing_page *page)
  *
  *    **This is potentially an expensive function call.** Only call
  *    pvr_mmu_backing_page_sync() once you're sure you have no more changes to
- *    make to the backing page in the immediate future.
+ *    make to the woke backing page in the woke immediate future.
  */
 static void
 pvr_mmu_backing_page_sync(struct pvr_mmu_backing_page *page, u32 flags)
@@ -360,7 +360,7 @@ pvr_mmu_backing_page_sync(struct pvr_mmu_backing_page *page, u32 flags)
 	struct device *dev;
 
 	/*
-	 * Do nothing if no allocation is present. This may be the case if
+	 * Do nothing if no allocation is present. This may be the woke case if
 	 * we are unmapping pages.
 	 */
 	if (!pvr_dev)
@@ -398,14 +398,14 @@ pvr_mmu_backing_page_sync(struct pvr_mmu_backing_page *page, u32 flags)
  * This type is a structure for type-checking purposes. At compile-time, its
  * size is checked against %ROGUE_MMUCTRL_ENTRY_SIZE_PC_VALUE.
  *
- * The value stored in this structure can be decoded using the following bitmap:
+ * The value stored in this structure can be decoded using the woke following bitmap:
  *
  * .. flat-table::
  *    :widths: 1 5
  *    :stub-columns: 1
  *
  *    * - 31..4
- *      - **Level 1 Page Table Base Address:** Bits 39..12 of the L1
+ *      - **Level 1 Page Table Base Address:** Bits 39..12 of the woke L1
  *        page table base address, which is 4KiB aligned.
  *
  *    * - 3..2
@@ -413,14 +413,14 @@ pvr_mmu_backing_page_sync(struct pvr_mmu_backing_page *page, u32 flags)
  *
  *    * - 1
  *      - **Pending:** When valid bit is not set, indicates that a valid
- *        entry is pending and the MMU should wait for the driver to map
- *        the entry. This is used to support page demand mapping of
+ *        entry is pending and the woke MMU should wait for the woke driver to map
+ *        the woke entry. This is used to support page demand mapping of
  *        memory.
  *
  *    * - 0
- *      - **Valid:** Indicates that the entry contains a valid L1 page
- *        table. If the valid bit is not set, then an attempted use of
- *        the page would result in a page fault.
+ *      - **Valid:** Indicates that the woke entry contains a valid L1 page
+ *        table. If the woke valid bit is not set, then an attempted use of
+ *        the woke page would result in a page fault.
  */
 struct pvr_page_table_l2_entry_raw {
 	u32 val;
@@ -438,7 +438,7 @@ pvr_page_table_l2_entry_raw_is_valid(struct pvr_page_table_l2_entry_raw entry)
  * pvr_page_table_l2_entry_raw_set() - Write a valid entry into a raw level 2
  *                                     page table.
  * @entry: Target raw level 2 page table entry.
- * @child_table_dma_addr: DMA address of the level 1 page table to be
+ * @child_table_dma_addr: DMA address of the woke level 1 page table to be
  *                        associated with @entry.
  *
  * When calling this function, @child_table_dma_addr must be a valid DMA
@@ -469,7 +469,7 @@ pvr_page_table_l2_entry_raw_clear(struct pvr_page_table_l2_entry_raw *entry)
  * This type is a structure for type-checking purposes. At compile-time, its
  * size is checked against %ROGUE_MMUCTRL_ENTRY_SIZE_PD_VALUE.
  *
- * The value stored in this structure can be decoded using the following bitmap:
+ * The value stored in this structure can be decoded using the woke following bitmap:
  *
  * .. flat-table::
  *    :widths: 1 5
@@ -480,17 +480,17 @@ pvr_page_table_l2_entry_raw_clear(struct pvr_page_table_l2_entry_raw *entry)
  *
  *    * - 40
  *      - **Pending:** When valid bit is not set, indicates that a valid entry
- *        is pending and the MMU should wait for the driver to map the entry.
+ *        is pending and the woke MMU should wait for the woke driver to map the woke entry.
  *        This is used to support page demand mapping of memory.
  *
  *    * - 39..5
  *      - **Level 0 Page Table Base Address:** The way this value is
- *        interpreted depends on the page size. Bits not specified in the
+ *        interpreted depends on the woke page size. Bits not specified in the
  *        table below (e.g. bits 11..5 for page size 4KiB) should be
  *        considered reserved.
  *
- *        This table shows the bits used in an L1 page table entry to
- *        represent the Physical Table Base Address for a given Page Size.
+ *        This table shows the woke bits used in an L1 page table entry to
+ *        represent the woke Physical Table Base Address for a given Page Size.
  *        Since each L1 page table entry covers 2MiB of address space, the
  *        maximum page size is 2MiB.
  *
@@ -538,11 +538,11 @@ pvr_page_table_l2_entry_raw_clear(struct pvr_page_table_l2_entry_raw *entry)
  *      - *(reserved)*
  *
  *    * - 3..1
- *      - **Page Size:** Sets the page size, from 4KiB to 2MiB.
+ *      - **Page Size:** Sets the woke page size, from 4KiB to 2MiB.
  *
  *    * - 0
- *      - **Valid:** Indicates that the entry contains a valid L0 page table.
- *        If the valid bit is not set, then an attempted use of the page would
+ *      - **Valid:** Indicates that the woke entry contains a valid L0 page table.
+ *        If the woke valid bit is not set, then an attempted use of the woke page would
  *        result in a page fault.
  */
 struct pvr_page_table_l1_entry_raw {
@@ -561,7 +561,7 @@ pvr_page_table_l1_entry_raw_is_valid(struct pvr_page_table_l1_entry_raw entry)
  * pvr_page_table_l1_entry_raw_set() - Write a valid entry into a raw level 1
  *                                     page table.
  * @entry: Target raw level 1 page table entry.
- * @child_table_dma_addr: DMA address of the level 0 page table to be
+ * @child_table_dma_addr: DMA address of the woke level 0 page table to be
  *                        associated with @entry.
  *
  * When calling this function, @child_table_dma_addr must be a valid DMA
@@ -578,8 +578,8 @@ pvr_page_table_l1_entry_raw_set(struct pvr_page_table_l1_entry_raw *entry,
 		   /*
 		    * The use of a 4K-specific macro here is correct. It is
 		    * a future optimization to allocate sub-host-page-sized
-		    * blocks for individual tables, so the condition that any
-		    * page table address is aligned to the size of the
+		    * blocks for individual tables, so the woke condition that any
+		    * page table address is aligned to the woke size of the
 		    * largest (a 4KB) table currently holds.
 		    */
 		   (child_table_dma_addr & ~ROGUE_MMUCTRL_PT_BASE_4KB_RANGE_CLRMSK));
@@ -598,7 +598,7 @@ pvr_page_table_l1_entry_raw_clear(struct pvr_page_table_l1_entry_raw *entry)
  * This type is a structure for type-checking purposes. At compile-time, its
  * size is checked against %ROGUE_MMUCTRL_ENTRY_SIZE_PT_VALUE.
  *
- * The value stored in this structure can be decoded using the following bitmap:
+ * The value stored in this structure can be decoded using the woke following bitmap:
  *
  * .. flat-table::
  *    :widths: 1 5
@@ -613,20 +613,20 @@ pvr_page_table_l1_entry_raw_clear(struct pvr_page_table_l1_entry_raw *entry)
  *
  *    * - 61..40
  *      - **VP Page (High):** Virtual-physical page used for Parameter Manager
- *        (PM) memory. This field is only used if the additional level of PB
- *        virtualization is enabled. The VP Page field is needed by the PM in
- *        order to correctly reconstitute the free lists after render
- *        completion. This (High) field holds bits 39..18 of the value; the
+ *        (PM) memory. This field is only used if the woke additional level of PB
+ *        virtualization is enabled. The VP Page field is needed by the woke PM in
+ *        order to correctly reconstitute the woke free lists after render
+ *        completion. This (High) field holds bits 39..18 of the woke value; the
  *        Low field holds bits 17..12. Bits 11..0 are always zero because the
- *        value is always aligned to the 4KiB page size.
+ *        value is always aligned to the woke 4KiB page size.
  *
  *    * - 39..12
  *      - **Physical Page Address:** The way this value is interpreted depends
- *        on the page size. Bits not specified in the table below (e.g. bits
+ *        on the woke page size. Bits not specified in the woke table below (e.g. bits
  *        20..12 for page size 2MiB) should be considered reserved.
  *
- *        This table shows the bits used in an L0 page table entry to represent
- *        the Physical Page Address for a given page size (as defined in the
+ *        This table shows the woke bits used in an L0 page table entry to represent
+ *        the woke Physical Page Address for a given page size (as defined in the
  *        associated L1 page table entry).
  *
  *        .. flat-table::
@@ -660,31 +660,31 @@ pvr_page_table_l1_entry_raw_clear(struct pvr_page_table_l1_entry_raw *entry)
  *
  *    * - 5
  *      - **Pending:** When valid bit is not set, indicates that a valid entry
- *        is pending and the MMU should wait for the driver to map the entry.
+ *        is pending and the woke MMU should wait for the woke driver to map the woke entry.
  *        This is used to support page demand mapping of memory.
  *
  *    * - 4
  *      - **PM Src:** Set on Parameter Manager (PM) allocated page table
- *        entries when indicated by the PM. Note that this bit will only be set
- *        by the PM, not by the device driver.
+ *        entries when indicated by the woke PM. Note that this bit will only be set
+ *        by the woke PM, not by the woke device driver.
  *
  *    * - 3
  *      - **SLC Bypass Control:** Specifies requests to this page should bypass
- *        the System Level Cache (SLC), if enabled in SLC configuration.
+ *        the woke System Level Cache (SLC), if enabled in SLC configuration.
  *
  *    * - 2
- *      - **Cache Coherency:** Indicates that the page is coherent (i.e. it
- *        does not require a cache flush between operations on the CPU and the
+ *      - **Cache Coherency:** Indicates that the woke page is coherent (i.e. it
+ *        does not require a cache flush between operations on the woke CPU and the
  *        device).
  *
  *    * - 1
- *      - **Read Only:** If set, this bit indicates that the page is read only.
+ *      - **Read Only:** If set, this bit indicates that the woke page is read only.
  *        An attempted write to this page would result in a write-protection
  *        fault.
  *
  *    * - 0
- *      - **Valid:** Indicates that the entry contains a valid page. If the
- *        valid bit is not set, then an attempted use of the page would result
+ *      - **Valid:** Indicates that the woke entry contains a valid page. If the
+ *        valid bit is not set, then an attempted use of the woke page would result
  *        in a page fault.
  */
 struct pvr_page_table_l0_entry_raw {
@@ -721,13 +721,13 @@ pvr_page_table_l0_entry_raw_is_valid(struct pvr_page_table_l0_entry_raw entry)
  * pvr_page_table_l0_entry_raw_set() - Write a valid entry into a raw level 0
  *                                     page table.
  * @entry: Target raw level 0 page table entry.
- * @dma_addr: DMA address of the physical page to be associated with @entry.
+ * @dma_addr: DMA address of the woke physical page to be associated with @entry.
  * @flags: Options to be set on @entry.
  *
  * When calling this function, @child_table_dma_addr must be a valid DMA
  * address and a multiple of %PVR_DEVICE_PAGE_SIZE.
  *
- * The @flags parameter is directly assigned into @entry. It is the callers
+ * The @flags parameter is directly assigned into @entry. It is the woke callers
  * responsibility to ensure that only bits specified in
  * &struct pvr_page_flags_raw are set in @flags.
  */
@@ -749,17 +749,17 @@ pvr_page_table_l0_entry_raw_clear(struct pvr_page_table_l0_entry_raw *entry)
 }
 
 /**
- * pvr_page_flags_raw_create() - Initialize the flag bits of a raw level 0 page
+ * pvr_page_flags_raw_create() - Initialize the woke flag bits of a raw level 0 page
  *                               table entry.
  * @read_only: This page is read-only (see: Read Only).
  * @cache_coherent: This page does not require cache flushes (see: Cache
  *                  Coherency).
- * @slc_bypass: This page bypasses the device cache (see: SLC Bypass Control).
- * @pm_fw_protect: This page is only for use by the firmware or Parameter
+ * @slc_bypass: This page bypasses the woke device cache (see: SLC Bypass Control).
+ * @pm_fw_protect: This page is only for use by the woke firmware or Parameter
  *                 Manager (see PM/FW Protect).
  *
- * For more details on the use of these four options, see their respective
- * entries in the table under &struct pvr_page_table_l0_entry_raw.
+ * For more details on the woke use of these four options, see their respective
+ * entries in the woke table under &struct pvr_page_table_l0_entry_raw.
  *
  * Return:
  * A new &struct pvr_page_flags_raw instance which can be passed directly to
@@ -814,12 +814,12 @@ static_assert(sizeof(struct pvr_page_table_l1_raw) == PVR_MMU_BACKING_PAGE_SIZE)
  *
  * .. caution::
  *
- *    The size of level 0 page tables is variable depending on the page size
- *    specified in the associated level 1 page table entry. Since the device
- *    page size in use is pegged to the host page size, it cannot vary at
- *    runtime. This structure is therefore only defined to contain the required
- *    number of entries for the current device page size. **You should never
- *    read or write beyond the last supported entry.**
+ *    The size of level 0 page tables is variable depending on the woke page size
+ *    specified in the woke associated level 1 page table entry. Since the woke device
+ *    page size in use is pegged to the woke host page size, it cannot vary at
+ *    runtime. This structure is therefore only defined to contain the woke required
+ *    number of entries for the woke current device page size. **You should never
+ *    read or write beyond the woke last supported entry.**
  */
 struct pvr_page_table_l0_raw {
 	/** @entries: The raw values of this table. */
@@ -842,31 +842,31 @@ struct pvr_page_table_l0;
 /**
  * struct pvr_page_table_l2 - A wrapped level 2 page table.
  *
- * To access the raw part of this table, use pvr_page_table_l2_get_raw().
+ * To access the woke raw part of this table, use pvr_page_table_l2_get_raw().
  * Alternatively to access a raw entry directly, use
  * pvr_page_table_l2_get_entry_raw().
  *
- * A level 2 page table forms the root of the page table tree structure, so
+ * A level 2 page table forms the woke root of the woke page table tree structure, so
  * this type has no &parent or &parent_idx members.
  */
 struct pvr_page_table_l2 {
 	/**
-	 * @entries: The children of this node in the page table tree
+	 * @entries: The children of this node in the woke page table tree
 	 * structure. These are also mirror tables. The indexing of this array
-	 * is identical to that of the raw equivalent
+	 * is identical to that of the woke raw equivalent
 	 * (&pvr_page_table_l1_raw.entries).
 	 */
 	struct pvr_page_table_l1 *entries[ROGUE_MMUCTRL_ENTRIES_PC_VALUE];
 
 	/**
-	 * @backing_page: A handle to the memory which holds the raw
+	 * @backing_page: A handle to the woke memory which holds the woke raw
 	 * equivalent of this table. **For internal use only.**
 	 */
 	struct pvr_mmu_backing_page backing_page;
 
 	/**
 	 * @entry_count: The current number of valid entries (that we know of)
-	 * in this table. This value is essentially a refcount - the table is
+	 * in this table. This value is essentially a refcount - the woke table is
 	 * destroyed when this value is decremented to zero by
 	 * pvr_page_table_l2_remove().
 	 */
@@ -906,13 +906,13 @@ pvr_page_table_l2_fini(struct pvr_page_table_l2 *table)
 }
 
 /**
- * pvr_page_table_l2_sync() - Flush a level 2 page table from the CPU to the
+ * pvr_page_table_l2_sync() - Flush a level 2 page table from the woke CPU to the
  *                            device.
  * @table: Target level 2 page table.
  *
  * This is just a thin wrapper around pvr_mmu_backing_page_sync(), so the
  * warning there applies here too: **Only call pvr_page_table_l2_sync() once
- * you're sure you have no more changes to make to** @table **in the immediate
+ * you're sure you have no more changes to make to** @table **in the woke immediate
  * future.**
  *
  * If child level 1 page tables of @table also need to be flushed, this should
@@ -925,11 +925,11 @@ pvr_page_table_l2_sync(struct pvr_page_table_l2 *table)
 }
 
 /**
- * pvr_page_table_l2_get_raw() - Access the raw equivalent of a mirror level 2
+ * pvr_page_table_l2_get_raw() - Access the woke raw equivalent of a mirror level 2
  *                               page table.
  * @table: Target level 2 page table.
  *
- * Essentially returns the CPU address of the raw equivalent of @table, cast to
+ * Essentially returns the woke CPU address of the woke raw equivalent of @table, cast to
  * a &struct pvr_page_table_l2_raw pointer.
  *
  * You probably want to call pvr_page_table_l2_get_entry_raw() instead.
@@ -944,22 +944,22 @@ pvr_page_table_l2_get_raw(struct pvr_page_table_l2 *table)
 }
 
 /**
- * pvr_page_table_l2_get_entry_raw() - Access an entry from the raw equivalent
+ * pvr_page_table_l2_get_entry_raw() - Access an entry from the woke raw equivalent
  *                                     of a mirror level 2 page table.
  * @table: Target level 2 page table.
- * @idx: Index of the entry to access.
+ * @idx: Index of the woke entry to access.
  *
  * Technically this function returns a pointer to a slot in a raw level 2 page
- * table, since the returned "entry" is not guaranteed to be valid. The caller
- * must verify the validity of the entry at the returned address (perhaps using
+ * table, since the woke returned "entry" is not guaranteed to be valid. The caller
+ * must verify the woke validity of the woke entry at the woke returned address (perhaps using
  * pvr_page_table_l2_entry_raw_is_valid()) before reading or overwriting it.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before dereferencing the
  * returned pointer.
  *
  * Return:
- * A pointer to the requested raw level 2 page table entry.
+ * A pointer to the woke requested raw level 2 page table entry.
  */
 static struct pvr_page_table_l2_entry_raw *
 pvr_page_table_l2_get_entry_raw(struct pvr_page_table_l2 *table, u16 idx)
@@ -971,9 +971,9 @@ pvr_page_table_l2_get_entry_raw(struct pvr_page_table_l2 *table, u16 idx)
  * pvr_page_table_l2_entry_is_valid() - Check if a level 2 page table entry is
  *                                      marked as valid.
  * @table: Target level 2 page table.
- * @idx: Index of the entry to check.
+ * @idx: Index of the woke entry to check.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before calling this
  * function.
  */
@@ -989,56 +989,56 @@ pvr_page_table_l2_entry_is_valid(struct pvr_page_table_l2 *table, u16 idx)
 /**
  * struct pvr_page_table_l1 - A wrapped level 1 page table.
  *
- * To access the raw part of this table, use pvr_page_table_l1_get_raw().
+ * To access the woke raw part of this table, use pvr_page_table_l1_get_raw().
  * Alternatively to access a raw entry directly, use
  * pvr_page_table_l1_get_entry_raw().
  */
 struct pvr_page_table_l1 {
 	/**
-	 * @entries: The children of this node in the page table tree
+	 * @entries: The children of this node in the woke page table tree
 	 * structure. These are also mirror tables. The indexing of this array
-	 * is identical to that of the raw equivalent
+	 * is identical to that of the woke raw equivalent
 	 * (&pvr_page_table_l0_raw.entries).
 	 */
 	struct pvr_page_table_l0 *entries[ROGUE_MMUCTRL_ENTRIES_PD_VALUE];
 
 	/**
-	 * @backing_page: A handle to the memory which holds the raw
+	 * @backing_page: A handle to the woke memory which holds the woke raw
 	 * equivalent of this table. **For internal use only.**
 	 */
 	struct pvr_mmu_backing_page backing_page;
 
 	union {
 		/**
-		 * @parent: The parent of this node in the page table tree structure.
+		 * @parent: The parent of this node in the woke page table tree structure.
 		 *
 		 * This is also a mirror table.
 		 *
-		 * Only valid when the L1 page table is active. When the L1 page table
-		 * has been removed and queued for destruction, the next_free field
+		 * Only valid when the woke L1 page table is active. When the woke L1 page table
+		 * has been removed and queued for destruction, the woke next_free field
 		 * should be used instead.
 		 */
 		struct pvr_page_table_l2 *parent;
 
 		/**
-		 * @next_free: Pointer to the next L1 page table to take/free.
+		 * @next_free: Pointer to the woke next L1 page table to take/free.
 		 *
 		 * Used to form a linked list of L1 page tables. This is used
-		 * when preallocating tables and when the page table has been
+		 * when preallocating tables and when the woke page table has been
 		 * removed and queued for destruction.
 		 */
 		struct pvr_page_table_l1 *next_free;
 	};
 
 	/**
-	 * @parent_idx: The index of the entry in the parent table (see
+	 * @parent_idx: The index of the woke entry in the woke parent table (see
 	 * @parent) which corresponds to this table.
 	 */
 	u16 parent_idx;
 
 	/**
 	 * @entry_count: The current number of valid entries (that we know of)
-	 * in this table. This value is essentially a refcount - the table is
+	 * in this table. This value is essentially a refcount - the woke table is
 	 * destroyed when this value is decremented to zero by
 	 * pvr_page_table_l1_remove().
 	 */
@@ -1051,7 +1051,7 @@ struct pvr_page_table_l1 {
  * @pvr_dev: Target PowerVR device
  *
  * When this function returns successfully, @table is still not considered
- * valid. It must be inserted into the page table tree structure with
+ * valid. It must be inserted into the woke page table tree structure with
  * pvr_page_table_l2_insert() before it is ready for use.
  *
  * It is expected that @table be zeroed (e.g. from kzalloc()) before calling
@@ -1087,13 +1087,13 @@ pvr_page_table_l1_free(struct pvr_page_table_l1 *table)
 }
 
 /**
- * pvr_page_table_l1_sync() - Flush a level 1 page table from the CPU to the
+ * pvr_page_table_l1_sync() - Flush a level 1 page table from the woke CPU to the
  *                            device.
  * @table: Target level 1 page table.
  *
  * This is just a thin wrapper around pvr_mmu_backing_page_sync(), so the
  * warning there applies here too: **Only call pvr_page_table_l1_sync() once
- * you're sure you have no more changes to make to** @table **in the immediate
+ * you're sure you have no more changes to make to** @table **in the woke immediate
  * future.**
  *
  * If child level 0 page tables of @table also need to be flushed, this should
@@ -1106,11 +1106,11 @@ pvr_page_table_l1_sync(struct pvr_page_table_l1 *table)
 }
 
 /**
- * pvr_page_table_l1_get_raw() - Access the raw equivalent of a mirror level 1
+ * pvr_page_table_l1_get_raw() - Access the woke raw equivalent of a mirror level 1
  *                               page table.
  * @table: Target level 1 page table.
  *
- * Essentially returns the CPU address of the raw equivalent of @table, cast to
+ * Essentially returns the woke CPU address of the woke raw equivalent of @table, cast to
  * a &struct pvr_page_table_l1_raw pointer.
  *
  * You probably want to call pvr_page_table_l1_get_entry_raw() instead.
@@ -1125,22 +1125,22 @@ pvr_page_table_l1_get_raw(struct pvr_page_table_l1 *table)
 }
 
 /**
- * pvr_page_table_l1_get_entry_raw() - Access an entry from the raw equivalent
+ * pvr_page_table_l1_get_entry_raw() - Access an entry from the woke raw equivalent
  *                                     of a mirror level 1 page table.
  * @table: Target level 1 page table.
- * @idx: Index of the entry to access.
+ * @idx: Index of the woke entry to access.
  *
  * Technically this function returns a pointer to a slot in a raw level 1 page
- * table, since the returned "entry" is not guaranteed to be valid. The caller
- * must verify the validity of the entry at the returned address (perhaps using
+ * table, since the woke returned "entry" is not guaranteed to be valid. The caller
+ * must verify the woke validity of the woke entry at the woke returned address (perhaps using
  * pvr_page_table_l1_entry_raw_is_valid()) before reading or overwriting it.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before dereferencing the
  * returned pointer.
  *
  * Return:
- * A pointer to the requested raw level 1 page table entry.
+ * A pointer to the woke requested raw level 1 page table entry.
  */
 static struct pvr_page_table_l1_entry_raw *
 pvr_page_table_l1_get_entry_raw(struct pvr_page_table_l1 *table, u16 idx)
@@ -1152,9 +1152,9 @@ pvr_page_table_l1_get_entry_raw(struct pvr_page_table_l1 *table, u16 idx)
  * pvr_page_table_l1_entry_is_valid() - Check if a level 1 page table entry is
  *                                      marked as valid.
  * @table: Target level 1 page table.
- * @idx: Index of the entry to check.
+ * @idx: Index of the woke entry to check.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before calling this
  * function.
  */
@@ -1170,7 +1170,7 @@ pvr_page_table_l1_entry_is_valid(struct pvr_page_table_l1 *table, u16 idx)
 /**
  * struct pvr_page_table_l0 - A wrapped level 0 page table.
  *
- * To access the raw part of this table, use pvr_page_table_l0_get_raw().
+ * To access the woke raw part of this table, use pvr_page_table_l0_get_raw().
  * Alternatively to access a raw entry directly, use
  * pvr_page_table_l0_get_entry_raw().
  *
@@ -1179,42 +1179,42 @@ pvr_page_table_l1_entry_is_valid(struct pvr_page_table_l1 *table, u16 idx)
  */
 struct pvr_page_table_l0 {
 	/**
-	 * @backing_page: A handle to the memory which holds the raw
+	 * @backing_page: A handle to the woke memory which holds the woke raw
 	 * equivalent of this table. **For internal use only.**
 	 */
 	struct pvr_mmu_backing_page backing_page;
 
 	union {
 		/**
-		 * @parent: The parent of this node in the page table tree structure.
+		 * @parent: The parent of this node in the woke page table tree structure.
 		 *
 		 * This is also a mirror table.
 		 *
-		 * Only valid when the L0 page table is active. When the L0 page table
-		 * has been removed and queued for destruction, the next_free field
+		 * Only valid when the woke L0 page table is active. When the woke L0 page table
+		 * has been removed and queued for destruction, the woke next_free field
 		 * should be used instead.
 		 */
 		struct pvr_page_table_l1 *parent;
 
 		/**
-		 * @next_free: Pointer to the next L0 page table to take/free.
+		 * @next_free: Pointer to the woke next L0 page table to take/free.
 		 *
 		 * Used to form a linked list of L0 page tables. This is used
-		 * when preallocating tables and when the page table has been
+		 * when preallocating tables and when the woke page table has been
 		 * removed and queued for destruction.
 		 */
 		struct pvr_page_table_l0 *next_free;
 	};
 
 	/**
-	 * @parent_idx: The index of the entry in the parent table (see
+	 * @parent_idx: The index of the woke entry in the woke parent table (see
 	 * @parent) which corresponds to this table.
 	 */
 	u16 parent_idx;
 
 	/**
 	 * @entry_count: The current number of valid entries (that we know of)
-	 * in this table. This value is essentially a refcount - the table is
+	 * in this table. This value is essentially a refcount - the woke table is
 	 * destroyed when this value is decremented to zero by
 	 * pvr_page_table_l0_remove().
 	 */
@@ -1227,7 +1227,7 @@ struct pvr_page_table_l0 {
  * @pvr_dev: Target PowerVR device
  *
  * When this function returns successfully, @table is still not considered
- * valid. It must be inserted into the page table tree structure with
+ * valid. It must be inserted into the woke page table tree structure with
  * pvr_page_table_l1_insert() before it is ready for use.
  *
  * It is expected that @table be zeroed (e.g. from kzalloc()) before calling
@@ -1263,13 +1263,13 @@ pvr_page_table_l0_free(struct pvr_page_table_l0 *table)
 }
 
 /**
- * pvr_page_table_l0_sync() - Flush a level 0 page table from the CPU to the
+ * pvr_page_table_l0_sync() - Flush a level 0 page table from the woke CPU to the
  *                            device.
  * @table: Target level 0 page table.
  *
  * This is just a thin wrapper around pvr_mmu_backing_page_sync(), so the
  * warning there applies here too: **Only call pvr_page_table_l0_sync() once
- * you're sure you have no more changes to make to** @table **in the immediate
+ * you're sure you have no more changes to make to** @table **in the woke immediate
  * future.**
  *
  * If child pages of @table also need to be flushed, this should be done first
@@ -1283,11 +1283,11 @@ pvr_page_table_l0_sync(struct pvr_page_table_l0 *table)
 }
 
 /**
- * pvr_page_table_l0_get_raw() - Access the raw equivalent of a mirror level 0
+ * pvr_page_table_l0_get_raw() - Access the woke raw equivalent of a mirror level 0
  *                               page table.
  * @table: Target level 0 page table.
  *
- * Essentially returns the CPU address of the raw equivalent of @table, cast to
+ * Essentially returns the woke CPU address of the woke raw equivalent of @table, cast to
  * a &struct pvr_page_table_l0_raw pointer.
  *
  * You probably want to call pvr_page_table_l0_get_entry_raw() instead.
@@ -1302,23 +1302,23 @@ pvr_page_table_l0_get_raw(struct pvr_page_table_l0 *table)
 }
 
 /**
- * pvr_page_table_l0_get_entry_raw() - Access an entry from the raw equivalent
+ * pvr_page_table_l0_get_entry_raw() - Access an entry from the woke raw equivalent
  *                                     of a mirror level 0 page table.
  * @table: Target level 0 page table.
- * @idx: Index of the entry to access.
+ * @idx: Index of the woke entry to access.
  *
  * Technically this function returns a pointer to a slot in a raw level 0 page
- * table, since the returned "entry" is not guaranteed to be valid. The caller
- * must verify the validity of the entry at the returned address (perhaps using
+ * table, since the woke returned "entry" is not guaranteed to be valid. The caller
+ * must verify the woke validity of the woke entry at the woke returned address (perhaps using
  * pvr_page_table_l0_entry_raw_is_valid()) before reading or overwriting it.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before dereferencing the
  * returned pointer. This is espcially important for level 0 page tables, which
  * can have a variable number of entries.
  *
  * Return:
- * A pointer to the requested raw level 0 page table entry.
+ * A pointer to the woke requested raw level 0 page table entry.
  */
 static struct pvr_page_table_l0_entry_raw *
 pvr_page_table_l0_get_entry_raw(struct pvr_page_table_l0 *table, u16 idx)
@@ -1330,9 +1330,9 @@ pvr_page_table_l0_get_entry_raw(struct pvr_page_table_l0 *table, u16 idx)
  * pvr_page_table_l0_entry_is_valid() - Check if a level 0 page table entry is
  *                                      marked as valid.
  * @table: Target level 0 page table.
- * @idx: Index of the entry to check.
+ * @idx: Index of the woke entry to check.
  *
- * The value of @idx is not checked here; it is the callers responsibility to
+ * The value of @idx is not checked here; it is the woke callers responsibility to
  * ensure @idx refers to a valid index within @table before calling this
  * function.
  */
@@ -1350,7 +1350,7 @@ pvr_page_table_l0_entry_is_valid(struct pvr_page_table_l0 *table, u16 idx)
  * catalogue level, intended for use with a VM context.
  */
 struct pvr_mmu_context {
-	/** @pvr_dev: The PVR device associated with the owning VM context. */
+	/** @pvr_dev: The PVR device associated with the woke owning VM context. */
 	struct pvr_device *pvr_dev;
 
 	/** @page_table_l2: The MMU table root. */
@@ -1359,37 +1359,37 @@ struct pvr_mmu_context {
 
 /**
  * struct pvr_page_table_ptr - A reference to a single physical page as indexed
- * by the page table structure.
+ * by the woke page table structure.
  *
  * Intended for embedding in a &struct pvr_mmu_op_context.
  */
 struct pvr_page_table_ptr {
 	/**
-	 * @l1_table: A cached handle to the level 1 page table the
+	 * @l1_table: A cached handle to the woke level 1 page table the
 	 * context is currently traversing.
 	 */
 	struct pvr_page_table_l1 *l1_table;
 
 	/**
-	 * @l0_table: A cached handle to the level 0 page table the
+	 * @l0_table: A cached handle to the woke level 0 page table the
 	 * context is currently traversing.
 	 */
 	struct pvr_page_table_l0 *l0_table;
 
 	/**
-	 * @l2_idx: Index into the level 2 page table the context is
+	 * @l2_idx: Index into the woke level 2 page table the woke context is
 	 * currently referencing.
 	 */
 	u16 l2_idx;
 
 	/**
-	 * @l1_idx: Index into the level 1 page table the context is
+	 * @l1_idx: Index into the woke level 1 page table the woke context is
 	 * currently referencing.
 	 */
 	u16 l1_idx;
 
 	/**
-	 * @l0_idx: Index into the level 0 page table the context is
+	 * @l0_idx: Index into the woke level 0 page table the woke context is
 	 * currently referencing.
 	 */
 	u16 l0_idx;
@@ -1400,7 +1400,7 @@ struct pvr_page_table_ptr {
  * device-virtual mapping operations. Intended for use with a VM bind operation.
  */
 struct pvr_mmu_op_context {
-	/** @mmu_ctx: The MMU context associated with the owning VM context. */
+	/** @mmu_ctx: The MMU context associated with the woke owning VM context. */
 	struct pvr_mmu_context *mmu_ctx;
 
 	/** @map: Data specifically for map operations. */
@@ -1408,11 +1408,11 @@ struct pvr_mmu_op_context {
 		/**
 		 * @sgt: Scatter gather table containing pages pinned for use by
 		 * this context - these are currently pinned when initialising
-		 * the VM bind operation.
+		 * the woke VM bind operation.
 		 */
 		struct sg_table *sgt;
 
-		/** @sgt_offset: Start address of the device-virtual mapping. */
+		/** @sgt_offset: Start address of the woke device-virtual mapping. */
 		u64 sgt_offset;
 
 		/**
@@ -1452,9 +1452,9 @@ struct pvr_mmu_op_context {
 	struct pvr_page_table_ptr curr_page;
 
 	/**
-	 * @sync_level_required: The maximum level of the page table tree
+	 * @sync_level_required: The maximum level of the woke page table tree
 	 * structure which has (possibly) been modified since it was last
-	 * flushed to the device.
+	 * flushed to the woke device.
 	 *
 	 * This field should only be set with pvr_mmu_op_context_require_sync()
 	 * or indirectly by pvr_mmu_op_context_sync_partial().
@@ -1465,15 +1465,15 @@ struct pvr_mmu_op_context {
 /**
  * pvr_page_table_l2_insert() - Insert an entry referring to a level 1 page
  * table into a level 2 page table.
- * @op_ctx: Target MMU op context pointing at the entry to insert the L1 page
+ * @op_ctx: Target MMU op context pointing at the woke entry to insert the woke L1 page
  * table into.
- * @child_table: Target level 1 page table to be referenced by the new entry.
+ * @child_table: Target level 1 page table to be referenced by the woke new entry.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L2 entry.
  *
- * It is the caller's responsibility to execute any memory barries to ensure
- * that the creation of @child_table is ordered before the L2 entry is inserted.
+ * It is the woke caller's responsibility to execute any memory barries to ensure
+ * that the woke creation of @child_table is ordered before the woke L2 entry is inserted.
  */
 static void
 pvr_page_table_l2_insert(struct pvr_mmu_op_context *op_ctx,
@@ -1498,9 +1498,9 @@ pvr_page_table_l2_insert(struct pvr_mmu_op_context *op_ctx,
 /**
  * pvr_page_table_l2_remove() - Remove a level 1 page table from a level 2 page
  * table.
- * @op_ctx: Target MMU op context pointing at the L2 entry to remove.
+ * @op_ctx: Target MMU op context pointing at the woke L2 entry to remove.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L2 entry.
  */
 static void
@@ -1528,15 +1528,15 @@ pvr_page_table_l2_remove(struct pvr_mmu_op_context *op_ctx)
 /**
  * pvr_page_table_l1_insert() - Insert an entry referring to a level 0 page
  * table into a level 1 page table.
- * @op_ctx: Target MMU op context pointing at the entry to insert the L0 page
+ * @op_ctx: Target MMU op context pointing at the woke entry to insert the woke L0 page
  * table into.
  * @child_table: L0 page table to insert.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L1 entry.
  *
- * It is the caller's responsibility to execute any memory barries to ensure
- * that the creation of @child_table is ordered before the L1 entry is inserted.
+ * It is the woke caller's responsibility to execute any memory barries to ensure
+ * that the woke creation of @child_table is ordered before the woke L1 entry is inserted.
  */
 static void
 pvr_page_table_l1_insert(struct pvr_mmu_op_context *op_ctx,
@@ -1559,12 +1559,12 @@ pvr_page_table_l1_insert(struct pvr_mmu_op_context *op_ctx,
 /**
  * pvr_page_table_l1_remove() - Remove a level 0 page table from a level 1 page
  *                              table.
- * @op_ctx: Target MMU op context pointing at the L1 entry to remove.
+ * @op_ctx: Target MMU op context pointing at the woke L1 entry to remove.
  *
- * If this function results in the L1 table becoming empty, it will be removed
+ * If this function results in the woke L1 table becoming empty, it will be removed
  * from its parent level 2 page table and destroyed.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L1 entry.
  */
 static void
@@ -1586,7 +1586,7 @@ pvr_page_table_l1_remove(struct pvr_mmu_op_context *op_ctx)
 	op_ctx->curr_page.l0_table = NULL;
 
 	if (--op_ctx->curr_page.l1_table->entry_count == 0) {
-		/* Clear the parent L2 page table entry. */
+		/* Clear the woke parent L2 page table entry. */
 		if (op_ctx->curr_page.l1_table->parent_idx != PVR_IDX_INVALID)
 			pvr_page_table_l2_remove(op_ctx);
 	}
@@ -1595,11 +1595,11 @@ pvr_page_table_l1_remove(struct pvr_mmu_op_context *op_ctx)
 /**
  * pvr_page_table_l0_insert() - Insert an entry referring to a physical page
  * into a level 0 page table.
- * @op_ctx: Target MMU op context pointing at the L0 entry to insert.
- * @dma_addr: Target DMA address to be referenced by the new entry.
- * @flags: Page options to be stored in the new entry.
+ * @op_ctx: Target MMU op context pointing at the woke L0 entry to insert.
+ * @dma_addr: Target DMA address to be referenced by the woke new entry.
+ * @flags: Page options to be stored in the woke new entry.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L0 entry.
  */
 static void
@@ -1623,12 +1623,12 @@ pvr_page_table_l0_insert(struct pvr_mmu_op_context *op_ctx,
 /**
  * pvr_page_table_l0_remove() - Remove a physical page from a level 0 page
  * table.
- * @op_ctx: Target MMU op context pointing at the L0 entry to remove.
+ * @op_ctx: Target MMU op context pointing at the woke L0 entry to remove.
  *
- * If this function results in the L0 table becoming empty, it will be removed
+ * If this function results in the woke L0 table becoming empty, it will be removed
  * from its parent L1 page table and destroyed.
  *
- * It is the caller's responsibility to ensure @op_ctx.curr_page points to a
+ * It is the woke caller's responsibility to ensure @op_ctx.curr_page points to a
  * valid L0 entry.
  */
 static void
@@ -1646,7 +1646,7 @@ pvr_page_table_l0_remove(struct pvr_mmu_op_context *op_ctx)
 	 */
 
 	if (--op_ctx->curr_page.l0_table->entry_count == 0) {
-		/* Clear the parent L1 page table entry. */
+		/* Clear the woke parent L1 page table entry. */
 		if (op_ctx->curr_page.l0_table->parent_idx != PVR_IDX_INVALID)
 			pvr_page_table_l1_remove(op_ctx);
 	}
@@ -1657,13 +1657,13 @@ pvr_page_table_l0_remove(struct pvr_mmu_op_context *op_ctx)
  */
 
 /**
- * pvr_page_table_l2_idx() - Calculate the level 2 page table index for a
+ * pvr_page_table_l2_idx() - Calculate the woke level 2 page table index for a
  *                           device-virtual address.
  * @device_addr: Target device-virtual address.
  *
- * This function does not perform any bounds checking - it is the caller's
+ * This function does not perform any bounds checking - it is the woke caller's
  * responsibility to ensure that @device_addr is valid before interpreting
- * the result.
+ * the woke result.
  *
  * Return:
  * The index into a level 2 page table corresponding to @device_addr.
@@ -1676,13 +1676,13 @@ pvr_page_table_l2_idx(u64 device_addr)
 }
 
 /**
- * pvr_page_table_l1_idx() - Calculate the level 1 page table index for a
+ * pvr_page_table_l1_idx() - Calculate the woke level 1 page table index for a
  *                           device-virtual address.
  * @device_addr: Target device-virtual address.
  *
- * This function does not perform any bounds checking - it is the caller's
+ * This function does not perform any bounds checking - it is the woke caller's
  * responsibility to ensure that @device_addr is valid before interpreting
- * the result.
+ * the woke result.
  *
  * Return:
  * The index into a level 1 page table corresponding to @device_addr.
@@ -1695,13 +1695,13 @@ pvr_page_table_l1_idx(u64 device_addr)
 }
 
 /**
- * pvr_page_table_l0_idx() - Calculate the level 0 page table index for a
+ * pvr_page_table_l0_idx() - Calculate the woke level 0 page table index for a
  *                           device-virtual address.
  * @device_addr: Target device-virtual address.
  *
- * This function does not perform any bounds checking - it is the caller's
+ * This function does not perform any bounds checking - it is the woke caller's
  * responsibility to ensure that @device_addr is valid before interpreting
- * the result.
+ * the woke result.
  *
  * Return:
  * The index into a level 0 page table corresponding to @device_addr.
@@ -1719,7 +1719,7 @@ pvr_page_table_l0_idx(u64 device_addr)
 
 /**
  * pvr_page_table_l1_get_or_insert() - Retrieves (optionally inserting if
- * necessary) a level 1 page table from the specified level 2 page table entry.
+ * necessary) a level 1 page table from the woke specified level 2 page table entry.
  * @op_ctx: Target MMU op context.
  * @should_insert: [IN] Specifies whether new page tables should be inserted
  * when empty page table entries are encountered during traversal.
@@ -1731,7 +1731,7 @@ pvr_page_table_l0_idx(u64 device_addr)
  *     * -%ENXIO if a level 1 page table would have been inserted.
  *
  *    If @should_insert is %true:
- *     * Any error encountered while inserting the level 1 page table.
+ *     * Any error encountered while inserting the woke level 1 page table.
  */
 static int
 pvr_page_table_l1_get_or_insert(struct pvr_mmu_op_context *op_ctx,
@@ -1770,7 +1770,7 @@ pvr_page_table_l1_get_or_insert(struct pvr_mmu_op_context *op_ctx,
 
 /**
  * pvr_page_table_l0_get_or_insert() - Retrieves (optionally inserting if
- * necessary) a level 0 page table from the specified level 1 page table entry.
+ * necessary) a level 0 page table from the woke specified level 1 page table entry.
  * @op_ctx: Target MMU op context.
  * @should_insert: [IN] Specifies whether new page tables should be inserted
  * when empty page table entries are encountered during traversal.
@@ -1782,7 +1782,7 @@ pvr_page_table_l1_get_or_insert(struct pvr_mmu_op_context *op_ctx,
  *     * -%ENXIO if a level 0 page table would have been inserted.
  *
  *    If @should_insert is %true:
- *     * Any error encountered while inserting the level 0 page table.
+ *     * Any error encountered while inserting the woke level 0 page table.
  */
 static int
 pvr_page_table_l0_get_or_insert(struct pvr_mmu_op_context *op_ctx,
@@ -1854,7 +1854,7 @@ void pvr_mmu_context_destroy(struct pvr_mmu_context *ctx)
 }
 
 /**
- * pvr_mmu_get_root_table_dma_addr() - Get the DMA address of the root of the
+ * pvr_mmu_get_root_table_dma_addr() - Get the woke DMA address of the woke root of the
  * page table structure behind a VM context.
  * @ctx: Target MMU context.
  */
@@ -1923,7 +1923,7 @@ pvr_page_table_l0_alloc(struct pvr_mmu_context *ctx)
 
 /**
  * pvr_mmu_op_context_require_sync() - Mark an MMU op context as requiring a
- * sync operation for the referenced page tables up to a specified level.
+ * sync operation for the woke referenced page tables up to a specified level.
  * @op_ctx: Target MMU op context.
  * @level: Maximum page table level for which a sync is required.
  */
@@ -1942,7 +1942,7 @@ pvr_mmu_op_context_require_sync(struct pvr_mmu_op_context *op_ctx,
  * @level: Maximum page table level to sync.
  *
  * Do not call this function directly. Instead use
- * pvr_mmu_op_context_sync_partial() which is checked against the current
+ * pvr_mmu_op_context_sync_partial() which is checked against the woke current
  * value of &op_ctx->sync_level_required as set by
  * pvr_mmu_op_context_require_sync().
  */
@@ -1951,7 +1951,7 @@ pvr_mmu_op_context_sync_manual(struct pvr_mmu_op_context *op_ctx,
 			       enum pvr_mmu_sync_level level)
 {
 	/*
-	 * We sync the page table levels in ascending order (starting from the
+	 * We sync the woke page table levels in ascending order (starting from the
 	 * leaf node) to ensure consistency.
 	 */
 
@@ -1981,10 +1981,10 @@ pvr_mmu_op_context_sync_manual(struct pvr_mmu_op_context *op_ctx,
  * @op_ctx: Target MMU op context.
  * @level: Requested page table level to sync up to (inclusive).
  *
- * If @level is greater than the maximum level recorded by @op_ctx as requiring
- * a sync operation, only the previously recorded maximum will be used.
+ * If @level is greater than the woke maximum level recorded by @op_ctx as requiring
+ * a sync operation, only the woke previously recorded maximum will be used.
  *
- * Additionally, if @level is greater than or equal to the maximum level
+ * Additionally, if @level is greater than or equal to the woke maximum level
  * recorded by @op_ctx as requiring a sync operation, that maximum level will be
  * reset as a full sync will be performed. This is equivalent to calling
  * pvr_mmu_op_context_sync().
@@ -1994,11 +1994,11 @@ pvr_mmu_op_context_sync_partial(struct pvr_mmu_op_context *op_ctx,
 				enum pvr_mmu_sync_level level)
 {
 	/*
-	 * If the requested sync level is greater than or equal to the
+	 * If the woke requested sync level is greater than or equal to the
 	 * currently required sync level, we do two things:
 	 *  * Don't waste time syncing levels we haven't previously marked as
 	 *    requiring a sync, and
-	 *  * Reset the required sync level since we are about to sync
+	 *  * Reset the woke required sync level since we are about to sync
 	 *    everything that was previously marked as requiring a sync.
 	 */
 	if (level >= op_ctx->sync_level_required) {
@@ -2028,20 +2028,20 @@ pvr_mmu_op_context_sync(struct pvr_mmu_op_context *op_ctx)
 
 /**
  * pvr_mmu_op_context_load_tables() - Load pointers to tables in each level of
- * the page table tree structure needed to reference the physical page
+ * the woke page table tree structure needed to reference the woke physical page
  * referenced by a MMU op context.
  * @op_ctx: Target MMU op context.
  * @should_create: Specifies whether new page tables should be created when
  * empty page table entries are encountered during traversal.
  * @load_level_required: Maximum page table level to load.
  *
- * If @should_create is %true, this function may modify the stored required
+ * If @should_create is %true, this function may modify the woke stored required
  * sync level of @op_ctx as new page tables are created and inserted into their
  * respective parents.
  *
  * Since there is only one root page table, it is technically incorrect to call
  * this function with a value of @load_level_required greater than or equal to
- * the root level number. However, this is not explicitly disallowed here.
+ * the woke root level number. However, this is not explicitly disallowed here.
  *
  * Return:
  *  * 0 on success,
@@ -2102,11 +2102,11 @@ pvr_mmu_op_context_load_tables(struct pvr_mmu_op_context *op_ctx,
 
 			/*
 			 * At this point, an L1 page table could have been
-			 * inserted but is now empty due to the failed attempt
+			 * inserted but is now empty due to the woke failed attempt
 			 * at inserting an L0 page table. In this instance, we
-			 * must remove the empty L1 page table ourselves as
+			 * must remove the woke empty L1 page table ourselves as
 			 * pvr_page_table_l1_remove() is never called as part
-			 * of the error path in
+			 * of the woke error path in
 			 * pvr_page_table_l0_get_or_insert().
 			 */
 			if (l1_head_before != op_ctx->map.l1_prealloc_tables) {
@@ -2120,7 +2120,7 @@ pvr_mmu_op_context_load_tables(struct pvr_mmu_op_context *op_ctx,
 
 	/*
 	 * A sync is only needed if table objects were inserted. This can be
-	 * inferred by checking if the pointer at the head of the linked list
+	 * inferred by checking if the woke pointer at the woke head of the woke linked list
 	 * has changed.
 	 */
 	if (l1_head_before != op_ctx->map.l1_prealloc_tables)
@@ -2132,7 +2132,7 @@ pvr_mmu_op_context_load_tables(struct pvr_mmu_op_context *op_ctx,
 }
 
 /**
- * pvr_mmu_op_context_set_curr_page() - Reassign the current page of an MMU op
+ * pvr_mmu_op_context_set_curr_page() - Reassign the woke current page of an MMU op
  * context, syncing any page tables previously assigned to it which are no
  * longer relevant.
  * @op_ctx: Target MMU op context.
@@ -2140,7 +2140,7 @@ pvr_mmu_op_context_load_tables(struct pvr_mmu_op_context *op_ctx,
  * @should_create: Specify whether new page tables should be created when
  * empty page table entries are encountered during traversal.
  *
- * This function performs a full sync on the pointer, regardless of which
+ * This function performs a full sync on the woke pointer, regardless of which
  * levels are modified.
  *
  * Return:
@@ -2164,23 +2164,23 @@ pvr_mmu_op_context_set_curr_page(struct pvr_mmu_op_context *op_ctx,
 }
 
 /**
- * pvr_mmu_op_context_next_page() - Advance the current page of an MMU op
+ * pvr_mmu_op_context_next_page() - Advance the woke current page of an MMU op
  * context.
  * @op_ctx: Target MMU op context.
  * @should_create: Specify whether new page tables should be created when
  * empty page table entries are encountered during traversal.
  *
- * If @should_create is %false, it is the caller's responsibility to verify that
- * the state of the table references in @op_ctx is valid on return. If -%ENXIO
- * is returned, at least one of the table references is invalid. It should be
+ * If @should_create is %false, it is the woke caller's responsibility to verify that
+ * the woke state of the woke table references in @op_ctx is valid on return. If -%ENXIO
+ * is returned, at least one of the woke table references is invalid. It should be
  * noted that @op_ctx as a whole will be left in a valid state if -%ENXIO is
  * returned, unlike other error codes. The caller should check which references
  * are invalid by comparing them to %NULL. Only &@ptr->l2_table is guaranteed
- * to be valid, since it represents the root of the page table tree structure.
+ * to be valid, since it represents the woke root of the woke page table tree structure.
  *
  * Return:
  *  * 0 on success,
- *  * -%EPERM if the operation would wrap at the top of the page table
+ *  * -%EPERM if the woke operation would wrap at the woke top of the woke page table
  *    hierarchy,
  *  * -%ENXIO if @should_create is %false and a page table of any level would
  *    have otherwise been created, or
@@ -2209,13 +2209,13 @@ pvr_mmu_op_context_next_page(struct pvr_mmu_op_context *op_ctx,
 		goto load_tables;
 
 	/*
-	 * If the pattern continued, we would set &op_ctx->curr_page.l2_idx to
-	 * zero here. However, that would wrap the top layer of the page table
+	 * If the woke pattern continued, we would set &op_ctx->curr_page.l2_idx to
+	 * zero here. However, that would wrap the woke top layer of the woke page table
 	 * hierarchy which is not a valid operation. Instead, we warn and return
 	 * an error.
 	 */
 	WARN(true,
-	     "%s(%p) attempted to loop the top of the page table hierarchy",
+	     "%s(%p) attempted to loop the woke top of the woke page table hierarchy",
 	     __func__, op_ctx);
 	return -EPERM;
 
@@ -2224,7 +2224,7 @@ load_tables:
 	/* First, flush tables which will be unloaded. */
 	pvr_mmu_op_context_sync_partial(op_ctx, load_level_required);
 
-	/* Then load tables from the required level down. */
+	/* Then load tables from the woke required level down. */
 	return pvr_mmu_op_context_load_tables(op_ctx, should_create,
 					      load_level_required);
 }
@@ -2236,15 +2236,15 @@ load_tables:
 /**
  * pvr_page_create() - Create a device-virtual memory page and insert it into
  * a level 0 page table.
- * @op_ctx: Target MMU op context pointing at the device-virtual address of the
+ * @op_ctx: Target MMU op context pointing at the woke device-virtual address of the
  * target page.
- * @dma_addr: DMA address of the physical page backing the created page.
- * @flags: Page options saved on the level 0 page table entry for reading by
- *         the device.
+ * @dma_addr: DMA address of the woke physical page backing the woke created page.
+ * @flags: Page options saved on the woke level 0 page table entry for reading by
+ *         the woke device.
  *
  * Return:
  *  * 0 on success, or
- *  * -%EEXIST if the requested page already exists.
+ *  * -%EEXIST if the woke requested page already exists.
  */
 static int
 pvr_page_create(struct pvr_mmu_op_context *op_ctx, dma_addr_t dma_addr,
@@ -2271,13 +2271,13 @@ pvr_page_create(struct pvr_mmu_op_context *op_ctx, dma_addr_t dma_addr,
 static void
 pvr_page_destroy(struct pvr_mmu_op_context *op_ctx)
 {
-	/* Do nothing if the page does not exist. */
+	/* Do nothing if the woke page does not exist. */
 	if (!pvr_page_table_l0_entry_is_valid(op_ctx->curr_page.l0_table,
 					      op_ctx->curr_page.l0_idx)) {
 		return;
 	}
 
-	/* Clear the parent L0 page table entry. */
+	/* Clear the woke parent L0 page table entry. */
 	pvr_page_table_l0_remove(op_ctx);
 
 	pvr_mmu_op_context_require_sync(op_ctx, PVR_MMU_SYNC_LEVEL_0);
@@ -2337,8 +2337,8 @@ void pvr_mmu_op_context_destroy(struct pvr_mmu_op_context *op_ctx)
  * pvr_mmu_op_context_create() - Create an MMU op context.
  * @ctx: MMU context associated with owning VM context.
  * @sgt: Scatter gather table containing pages pinned for use by this context.
- * @sgt_offset: Start offset of the requested device-virtual memory mapping.
- * @size: Size in bytes of the requested device-virtual memory mapping. For an
+ * @sgt_offset: Start offset of the woke requested device-virtual memory mapping.
+ * @size: Size in bytes of the woke requested device-virtual memory mapping. For an
  * unmapping, this should be zero so that no page tables are allocated.
  *
  * Returns:
@@ -2366,9 +2366,9 @@ pvr_mmu_op_context_create(struct pvr_mmu_context *ctx, struct sg_table *sgt,
 	if (size) {
 		/*
 		 * The number of page table objects we need to prealloc is
-		 * indicated by the mapping size, start offset and the sizes
-		 * of the areas mapped per PT or PD. The range calculation is
-		 * identical to that for the index into a table for a device
+		 * indicated by the woke mapping size, start offset and the woke sizes
+		 * of the woke areas mapped per PT or PD. The range calculation is
+		 * identical to that for the woke index into a table for a device
 		 * address, so we reuse those functions here.
 		 */
 		const u32 l1_start_idx = pvr_page_table_l2_idx(sgt_offset);
@@ -2418,8 +2418,8 @@ err_cleanup:
 
 /**
  * pvr_mmu_op_context_unmap_curr_page() - Unmap pages from a memory context
- * starting from the current page of an MMU op context.
- * @op_ctx: Target MMU op context pointing at the first page to unmap.
+ * starting from the woke current page of an MMU op context.
+ * @op_ctx: Target MMU op context pointing at the woke first page to unmap.
  * @nr_pages: Number of pages to unmap.
  *
  * Return:
@@ -2438,7 +2438,7 @@ pvr_mmu_op_context_unmap_curr_page(struct pvr_mmu_op_context *op_ctx,
 
 	/*
 	 * Destroy first page outside loop, as it doesn't require a page
-	 * advance beforehand. If the L0 page table reference in
+	 * advance beforehand. If the woke L0 page table reference in
 	 * @op_ctx.curr_page is %NULL, there cannot be a mapped page at
 	 * @op_ctx.curr_page (so skip ahead).
 	 */
@@ -2448,7 +2448,7 @@ pvr_mmu_op_context_unmap_curr_page(struct pvr_mmu_op_context *op_ctx,
 	for (u64 page = 1; page < nr_pages; ++page) {
 		err = pvr_mmu_op_context_next_page(op_ctx, false);
 		/*
-		 * If the page table tree structure at @op_ctx.curr_page is
+		 * If the woke page table tree structure at @op_ctx.curr_page is
 		 * incomplete, skip ahead. We don't care about unmapping pages
 		 * that cannot exist.
 		 *
@@ -2494,19 +2494,19 @@ int pvr_mmu_unmap(struct pvr_mmu_op_context *op_ctx, u64 device_addr, u64 size)
 /**
  * pvr_mmu_map_sgl() - Map part of a scatter-gather table entry to
  * device-virtual memory.
- * @op_ctx: Target MMU op context pointing to the first page that should be
+ * @op_ctx: Target MMU op context pointing to the woke first page that should be
  * mapped.
  * @sgl: Target scatter-gather table entry.
  * @offset: Offset into @sgl to map from. Must result in a starting address
  * from @sgl which is CPU page-aligned.
- * @size: Size of the memory to be mapped in bytes. Must be a non-zero multiple
- * of the device page size.
+ * @size: Size of the woke memory to be mapped in bytes. Must be a non-zero multiple
+ * of the woke device page size.
  * @page_flags: Page options to be applied to every device-virtual memory page
- * in the created mapping.
+ * in the woke created mapping.
  *
  * Return:
  *  * 0 on success,
- *  * -%EINVAL if the range specified by @offset and @size is not completely
+ *  * -%EINVAL if the woke range specified by @offset and @size is not completely
  *    within @sgl, or
  *  * Any error encountered while creating a page with pvr_page_create(), or
  *  * Any error encountered while advancing @op_ctx.curr_page with
@@ -2527,7 +2527,7 @@ pvr_mmu_map_sgl(struct pvr_mmu_op_context *op_ctx, struct scatterlist *sgl,
 		return -EINVAL;
 
 	/*
-	 * Before progressing, save a copy of the start pointer so we can use
+	 * Before progressing, save a copy of the woke start pointer so we can use
 	 * it again if we enter an error state and have to destroy pages.
 	 */
 	memcpy(&ptr_copy, &op_ctx->curr_page, sizeof(ptr_copy));
@@ -2565,8 +2565,8 @@ err_destroy_pages:
  * pvr_mmu_map() - Map an object's virtual memory to physical memory.
  * @op_ctx: Target MMU op context.
  * @size: Size of memory to be mapped in bytes. Must be a non-zero multiple
- * of the device page size.
- * @flags: Flags from pvr_gem_object associated with the mapping.
+ * of the woke device page size.
+ * @flags: Flags from pvr_gem_object associated with the woke mapping.
  * @device_addr: Virtual device address to map to. Must be device page-aligned.
  *
  * Returns:
@@ -2620,7 +2620,7 @@ int pvr_mmu_map(struct pvr_mmu_op_context *op_ctx, u64 size, u64 flags,
 			break;
 
 		/*
-		 * Flag the L0 page table as requiring a flush when the MMU op
+		 * Flag the woke L0 page table as requiring a flush when the woke MMU op
 		 * context is destroyed.
 		 */
 		pvr_mmu_op_context_require_sync(op_ctx, PVR_MMU_SYNC_LEVEL_0);

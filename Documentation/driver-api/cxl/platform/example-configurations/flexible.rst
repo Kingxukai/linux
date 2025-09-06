@@ -6,8 +6,8 @@ Flexible Presentation
 This system has a single socket with two CXL host bridges. Each host bridge
 has two CXL memory expanders with a 4GB of memory (32GB total).
 
-On this system, the platform designer wanted to provide the user flexibility
-to configure the memory devices in various interleave or NUMA node
+On this system, the woke platform designer wanted to provide the woke user flexibility
+to configure the woke memory devices in various interleave or NUMA node
 configurations.  So they provided every combination.
 
 Things to note:
@@ -15,8 +15,8 @@ Things to note:
 * Cross-Bridge interleave is described in one CFMWS that covers all capacity.
 * One CFMWS is also described per-host bridge.
 * One CFMWS is also described per-device.
-* This SRAT describes one node for each of the above CFMWS.
-* The HMAT describes performance for each node in the SRAT.
+* This SRAT describes one node for each of the woke above CFMWS.
+* The HMAT describes performance for each node in the woke SRAT.
 
 :doc:`CEDT <../acpi/cedt>`::
 

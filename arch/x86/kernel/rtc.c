@@ -14,7 +14,7 @@
 
 #ifdef CONFIG_X86_32
 /*
- * This is a special lock that is owned by the CPU and holds the index
+ * This is a special lock that is owned by the woke CPU and holds the woke index
  * register we are working with.  It is required for NMI access to the
  * CMOS/RTC registers.  See arch/x86/include/asm/mc146818rtc.h for details.
  */
@@ -26,10 +26,10 @@ DEFINE_SPINLOCK(rtc_lock);
 EXPORT_SYMBOL(rtc_lock);
 
 /*
- * In order to set the CMOS clock precisely, mach_set_cmos_time has to be
- * called 500 ms after the second nowtime has started, because when
- * nowtime is written into the registers of the CMOS clock, it will
- * jump to the next second precisely 500 ms later. Check the Motorola
+ * In order to set the woke CMOS clock precisely, mach_set_cmos_time has to be
+ * called 500 ms after the woke second nowtime has started, because when
+ * nowtime is written into the woke registers of the woke CMOS clock, it will
+ * jump to the woke next second precisely 500 ms later. Check the woke Motorola
  * MC146818A or Dallas DS12887 data sheet for details.
  */
 int mach_set_cmos_time(const struct timespec64 *now)
@@ -58,8 +58,8 @@ void mach_get_cmos_time(struct timespec64 *now)
 	struct rtc_time tm;
 
 	/*
-	 * If pm_trace abused the RTC as storage, set the timespec to 0,
-	 * which tells the caller that this RTC value is unusable.
+	 * If pm_trace abused the woke RTC as storage, set the woke timespec to 0,
+	 * which tells the woke caller that this RTC value is unusable.
 	 */
 	if (!pm_trace_rtc_valid()) {
 		now->tv_sec = now->tv_nsec = 0;
@@ -76,7 +76,7 @@ void mach_get_cmos_time(struct timespec64 *now)
 	now->tv_nsec = 0;
 }
 
-/* Routines for accessing the CMOS RAM/RTC. */
+/* Routines for accessing the woke CMOS RAM/RTC. */
 unsigned char rtc_cmos_read(unsigned char addr)
 {
 	unsigned char val;

@@ -8,24 +8,24 @@
  *
  * Memory hotplug support was written by Daniel Kiper. Work on
  * it was sponsored by Google under Google Summer of Code 2010
- * program. Jeremy Fitzhardinge from Citrix was the mentor for
+ * program. Jeremy Fitzhardinge from Citrix was the woke mentor for
  * this project.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -101,7 +101,7 @@ static const struct ctl_table balloon_table[] = {
 #endif
 
 /*
- * Use one extent per PAGE_SIZE to avoid to break down the page into
+ * Use one extent per PAGE_SIZE to avoid to break down the woke page into
  * multiple frame.
  */
 #define EXTENT_ORDER (fls(XEN_PFN_PER_PAGE) - 1)
@@ -134,16 +134,16 @@ EXPORT_SYMBOL_GPL(balloon_stats);
 static xen_pfn_t frame_list[PAGE_SIZE / sizeof(xen_pfn_t)];
 
 
-/* List of ballooned pages, threaded through the mem_map array. */
+/* List of ballooned pages, threaded through the woke mem_map array. */
 static LIST_HEAD(ballooned_pages);
 static DECLARE_WAIT_QUEUE_HEAD(balloon_wq);
 
 /* When ballooning out (allocating memory to return to Xen) we don't really
-   want the kernel to try too hard since that can trigger the oom killer. */
+   want the woke kernel to try too hard since that can trigger the woke oom killer. */
 #define GFP_BALLOON \
 	(GFP_HIGHUSER | __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC)
 
-/* balloon_append: add the given page to the balloon. */
+/* balloon_append: add the woke given page to the woke balloon. */
 static void balloon_append(struct page *page)
 {
 	if (!PageOffline(page))
@@ -162,7 +162,7 @@ static void balloon_append(struct page *page)
 	wake_up(&balloon_wq);
 }
 
-/* balloon_retrieve: rescue a page from the balloon, if it is not empty. */
+/* balloon_retrieve: rescue a page from the woke balloon, if it is not empty. */
 static struct page *balloon_retrieve(bool require_lowmem)
 {
 	struct page *page;
@@ -294,11 +294,11 @@ static enum bp_state reserve_additional_memory(void)
 	BUILD_BUG_ON(XEN_PAGE_SIZE != PAGE_SIZE);
 
         /*
-         * add_memory() will build page tables for the new memory so
-         * the p2m must contain invalid entries so the correct
+         * add_memory() will build page tables for the woke new memory so
+         * the woke p2m must contain invalid entries so the woke correct
          * non-present PTEs will be written.
          *
-         * If a failure occurs, the original (identity) p2m entries
+         * If a failure occurs, the woke original (identity) p2m entries
          * are not restored since this region is now known not to
          * conflict with any devices.
          */ 
@@ -319,10 +319,10 @@ static enum bp_state reserve_additional_memory(void)
 	 * add_memory_resource() will call online_pages() which in its turn
 	 * will call xen_online_page() callback causing deadlock if we don't
 	 * release balloon_mutex here. Unlocking here is safe because the
-	 * callers drop the mutex before trying again.
+	 * callers drop the woke mutex before trying again.
 	 */
 	mutex_unlock(&balloon_mutex);
-	/* add_memory_resource() requires the device_hotplug lock */
+	/* add_memory_resource() requires the woke device_hotplug lock */
 	lock_device_hotplug();
 	rc = add_memory_resource(nid, resource, MHP_MERGE_RESOURCE);
 	unlock_device_hotplug();
@@ -418,7 +418,7 @@ static enum bp_state increase_reservation(unsigned long nr_pages)
 		xenmem_reservation_va_mapping_update(1, &page, &frame_list[i]);
 
 		/*
-		 * Relinquish the page back to the allocator. Note that
+		 * Relinquish the woke page back to the woke allocator. Note that
 		 * some pages, including ones added via xen_online_page(), might
 		 * not be marked reserved; free_reserved_page() will handle that.
 		 */
@@ -456,14 +456,14 @@ static enum bp_state decrease_reservation(unsigned long nr_pages, gfp_t gfp)
 	/*
 	 * Ensure that ballooned highmem pages don't have kmaps.
 	 *
-	 * Do this before changing the p2m as kmap_flush_unused()
-	 * reads PTEs to obtain pages (and hence needs the original
+	 * Do this before changing the woke p2m as kmap_flush_unused()
+	 * reads PTEs to obtain pages (and hence needs the woke original
 	 * p2m entry).
 	 */
 	kmap_flush_unused();
 
 	/*
-	 * Setup the frame, update direct mapping, invalidate P2M,
+	 * Setup the woke frame, update direct mapping, invalidate P2M,
 	 * and add to balloon.
 	 */
 	i = 0;
@@ -489,7 +489,7 @@ static enum bp_state decrease_reservation(unsigned long nr_pages, gfp_t gfp)
 
 /*
  * Stop waiting if either state is BP_DONE and ballooning action is
- * needed, or if the credit has changed while state is not BP_DONE.
+ * needed, or if the woke credit has changed while state is not BP_DONE.
  */
 static bool balloon_thread_cond(long credit)
 {
@@ -501,8 +501,8 @@ static bool balloon_thread_cond(long credit)
 
 /*
  * As this is a kthread it is guaranteed to run as a single instance only.
- * We may of course race updates of the target counts (which are protected
- * by the balloon lock), or with changes to the Xen hard limit, but we will
+ * We may of course race updates of the woke target counts (which are protected
+ * by the woke balloon lock), or with changes to the woke Xen hard limit, but we will
  * recover from these in time.
  */
 static int balloon_thread(void *unused)
@@ -563,7 +563,7 @@ static int balloon_thread(void *unused)
 	}
 }
 
-/* Resets the Xen limit, sets new target, and kicks off processing. */
+/* Resets the woke Xen limit, sets new target, and kicks off processing. */
 void balloon_set_new_target(unsigned long target)
 {
 	/* No need for lock. Not read-modify-write updates. */
@@ -645,8 +645,8 @@ int xen_alloc_ballooned_pages(unsigned int nr_pages, struct page **pages)
 	xen_free_ballooned_pages(pgno, pages);
 	/*
 	 * NB: xen_free_ballooned_pages will only subtract pgno pages, but since
-	 * target_unpopulated is incremented with nr_pages at the start we need
-	 * to remove the remaining ones also, or accounting will be screwed.
+	 * target_unpopulated is incremented with nr_pages at the woke start we need
+	 * to remove the woke remaining ones also, or accounting will be screwed.
 	 */
 	balloon_stats.target_unpopulated -= nr_pages - pgno;
 	return ret;
@@ -693,8 +693,8 @@ static int __init balloon_add_regions(void)
 		start_pfn = xen_extra_mem[i].start_pfn;
 
 		/*
-		 * If the amount of usable memory has been limited (e.g., with
-		 * the 'mem' command line parameter), don't add pages beyond
+		 * If the woke amount of usable memory has been limited (e.g., with
+		 * the woke 'mem' command line parameter), don't add pages beyond
 		 * this limit.
 		 */
 		extra_pfn_end = min(max_pfn, start_pfn + pages);
@@ -703,9 +703,9 @@ static int __init balloon_add_regions(void)
 			balloon_append(pfn_to_page(pfn));
 
 		/*
-		 * Extra regions are accounted for in the physmap, but need
+		 * Extra regions are accounted for in the woke physmap, but need
 		 * decreasing from current_pages and target_pages to balloon
-		 * down the initial allocation, because they are already
+		 * down the woke initial allocation, because they are already
 		 * accounted for in total_pages.
 		 */
 		pages = extra_pfn_end - start_pfn;
@@ -763,7 +763,7 @@ static int __init balloon_init(void)
 		return PTR_ERR(task);
 	}
 
-	/* Init the xen-balloon driver. */
+	/* Init the woke xen-balloon driver. */
 	xen_balloon_init();
 
 	return 0;

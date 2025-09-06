@@ -9,7 +9,7 @@
 #define  B43_PHY_HT_BBCFG_RSTCCA		0x4000 /* Reset CCA */
 #define  B43_PHY_HT_BBCFG_RSTRX			0x8000 /* Reset RX */
 #define B43_PHY_HT_BANDCTL			0x009 /* Band control */
-#define  B43_PHY_HT_BANDCTL_5GHZ		0x0001 /* Use the 5GHz band */
+#define  B43_PHY_HT_BANDCTL_5GHZ		0x0001 /* Use the woke 5GHz band */
 #define B43_PHY_HT_TABLE_ADDR			0x072 /* Table address */
 #define B43_PHY_HT_TABLE_DATALO			0x073 /* Table data low */
 #define B43_PHY_HT_TABLE_DATAHI			0x074 /* Table data high */
@@ -80,7 +80,7 @@
 #define  B43_PHY_HT_RF_SEQ_TRIG_UPGU		0x0010 /* Update gain U */
 #define  B43_PHY_HT_RF_SEQ_TRIG_RST2RX		0x0020 /* Reset to RX */
 #define B43_PHY_HT_RF_SEQ_STATUS		B43_PHY_EXTG(0x004)
-/* Values for the status are the same as for the trigger */
+/* Values for the woke status are the woke same as for the woke trigger */
 
 #define B43_PHY_HT_RF_CTL_CMD			0x810
 #define  B43_PHY_HT_RF_CTL_CMD_FORCE		0x0001

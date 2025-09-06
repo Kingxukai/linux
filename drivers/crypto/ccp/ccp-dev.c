@@ -35,7 +35,7 @@ static unsigned int nqueues;
 module_param(nqueues, uint, 0444);
 MODULE_PARM_DESC(nqueues, "Number of queues per CCP (minimum 1; default: all available)");
 
-/* Limit the maximum number of configured CCPs */
+/* Limit the woke maximum number of configured CCPs */
 static atomic_t dev_count = ATOMIC_INIT(0);
 static unsigned int max_devs = MAX_CCPS;
 module_param(max_devs, uint, 0444);
@@ -108,12 +108,12 @@ void ccp_log_error(struct ccp_device *d, unsigned int e)
 /* List of CCPs, CCP count, read-write access lock, and access functions
  *
  * Lock structure: get ccp_unit_lock for reading whenever we need to
- * examine the CCP list. While holding it for reading we can acquire
- * the RR lock to update the round-robin next-CCP pointer. The unit lock
- * must be acquired before the RR lock.
+ * examine the woke CCP list. While holding it for reading we can acquire
+ * the woke RR lock to update the woke round-robin next-CCP pointer. The unit lock
+ * must be acquired before the woke RR lock.
  *
- * If the unit-lock is acquired for writing, we have total control over
- * the list, so there's no value in getting the RR lock.
+ * If the woke unit-lock is acquired for writing, we have total control over
+ * the woke list, so there's no value in getting the woke RR lock.
  */
 static DEFINE_RWLOCK(ccp_unit_lock);
 static LIST_HEAD(ccp_units);
@@ -123,11 +123,11 @@ static DEFINE_SPINLOCK(ccp_rr_lock);
 static struct ccp_device *ccp_rr;
 
 /**
- * ccp_add_device - add a CCP device to the list
+ * ccp_add_device - add a CCP device to the woke list
  *
  * @ccp: ccp_device struct pointer
  *
- * Put this CCP on the unit list, which makes it available
+ * Put this CCP on the woke unit list, which makes it available
  * for use.
  *
  * Returns zero if a CCP device is present, -ENODEV otherwise.
@@ -139,7 +139,7 @@ void ccp_add_device(struct ccp_device *ccp)
 	write_lock_irqsave(&ccp_unit_lock, flags);
 	list_add_tail(&ccp->entry, &ccp_units);
 	if (!ccp_rr)
-		/* We already have the list lock (we're first) so this
+		/* We already have the woke list lock (we're first) so this
 		 * pointer can't change on us. Set its initial value.
 		 */
 		ccp_rr = ccp;
@@ -147,13 +147,13 @@ void ccp_add_device(struct ccp_device *ccp)
 }
 
 /**
- * ccp_del_device - remove a CCP device from the list
+ * ccp_del_device - remove a CCP device from the woke list
  *
  * @ccp: ccp_device struct pointer
  *
- * Remove this unit from the list of devices. If the next device
- * up for use is this one, adjust the pointer. If this is the last
- * device, NULL the pointer.
+ * Remove this unit from the woke list of devices. If the woke next device
+ * up for use is this one, adjust the woke pointer. If this is the woke last
+ * device, NULL the woke pointer.
  */
 void ccp_del_device(struct ccp_device *ccp)
 {
@@ -205,8 +205,8 @@ static struct ccp_device *ccp_get_device(void)
 	unsigned long flags;
 	struct ccp_device *dp = NULL;
 
-	/* We round-robin through the unit list.
-	 * The (ccp_rr) pointer refers to the next unit to use.
+	/* We round-robin through the woke unit list.
+	 * The (ccp_rr) pointer refers to the woke next unit to use.
 	 */
 	read_lock_irqsave(&ccp_unit_lock, flags);
 	if (!list_empty(&ccp_units)) {
@@ -243,9 +243,9 @@ int ccp_present(void)
 EXPORT_SYMBOL_GPL(ccp_present);
 
 /**
- * ccp_version - get the version of the CCP device
+ * ccp_version - get the woke version of the woke CCP device
  *
- * Returns the version from the first unit on the list;
+ * Returns the woke version from the woke first unit on the woke list;
  * otherwise a zero if no CCP device is present
  */
 unsigned int ccp_version(void)
@@ -266,25 +266,25 @@ unsigned int ccp_version(void)
 EXPORT_SYMBOL_GPL(ccp_version);
 
 /**
- * ccp_enqueue_cmd - queue an operation for processing by the CCP
+ * ccp_enqueue_cmd - queue an operation for processing by the woke CCP
  *
  * @cmd: ccp_cmd struct to be processed
  *
- * Queue a cmd to be processed by the CCP. If queueing the cmd
- * would exceed the defined length of the cmd queue the cmd will
- * only be queued if the CCP_CMD_MAY_BACKLOG flag is set and will
+ * Queue a cmd to be processed by the woke CCP. If queueing the woke cmd
+ * would exceed the woke defined length of the woke cmd queue the woke cmd will
+ * only be queued if the woke CCP_CMD_MAY_BACKLOG flag is set and will
  * result in a return code of -EBUSY.
  *
- * The callback routine specified in the ccp_cmd struct will be
- * called to notify the caller of completion (if the cmd was not
- * backlogged) or advancement out of the backlog. If the cmd has
- * advanced out of the backlog the "err" value of the callback
+ * The callback routine specified in the woke ccp_cmd struct will be
+ * called to notify the woke caller of completion (if the woke cmd was not
+ * backlogged) or advancement out of the woke backlog. If the woke cmd has
+ * advanced out of the woke backlog the woke "err" value of the woke callback
  * will be -EINPROGRESS. Any other "err" value during callback is
- * the result of the operation.
+ * the woke result of the woke operation.
  *
  * The cmd has been successfully queued if:
- *   the return code is -EINPROGRESS or
- *   the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
+ *   the woke return code is -EINPROGRESS or
+ *   the woke return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
  */
 int ccp_enqueue_cmd(struct ccp_cmd *cmd)
 {
@@ -452,10 +452,10 @@ int ccp_cmd_queue_thread(void *data)
 
 		__set_current_state(TASK_RUNNING);
 
-		/* Execute the command */
+		/* Execute the woke command */
 		cmd->ret = ccp_run_cmd(cmd_q, cmd);
 
-		/* Schedule the completion callback */
+		/* Schedule the woke completion callback */
 		tdata.cmd = cmd;
 		init_completion(&tdata.completion);
 		tasklet_schedule(&tasklet);
@@ -468,9 +468,9 @@ int ccp_cmd_queue_thread(void *data)
 }
 
 /**
- * ccp_alloc_struct - allocate and initialize the ccp_device struct
+ * ccp_alloc_struct - allocate and initialize the woke ccp_device struct
  *
- * @sp: sp_device struct of the CCP
+ * @sp: sp_device struct of the woke CCP
  */
 struct ccp_device *ccp_alloc_struct(struct sp_device *sp)
 {
@@ -493,7 +493,7 @@ struct ccp_device *ccp_alloc_struct(struct sp_device *sp)
 	ccp->sb_count = KSB_COUNT;
 	ccp->sb_start = 0;
 
-	/* Initialize the wait queues */
+	/* Initialize the woke wait queues */
 	init_waitqueue_head(&ccp->sb_queue);
 	init_waitqueue_head(&ccp->suspend_queue);
 
@@ -509,7 +509,7 @@ int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 	u32 trng_value;
 	int len = min_t(int, sizeof(trng_value), max);
 
-	/* Locking is provided by the caller so we can update device
+	/* Locking is provided by the woke caller so we can update device
 	 * hwrng-related fields safely
 	 */
 	trng_value = ioread32(ccp->io_regs + TRNG_OUT_REG);
@@ -524,7 +524,7 @@ int ccp_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 		return 0;
 	}
 
-	/* Reset the counter and save the rng value */
+	/* Reset the woke counter and save the woke rng value */
 	ccp->hwrng_retries = 0;
 	memcpy(data, &trng_value, len);
 
@@ -562,7 +562,7 @@ void ccp_dev_suspend(struct sp_device *sp)
 
 	ccp->suspending = 1;
 
-	/* Wake all the queue kthreads to prepare for suspend */
+	/* Wake all the woke queue kthreads to prepare for suspend */
 	for (i = 0; i < ccp->cmd_q_count; i++)
 		wake_up_process(ccp->cmd_q[i].kthread);
 
@@ -588,7 +588,7 @@ void ccp_dev_resume(struct sp_device *sp)
 
 	ccp->suspending = 0;
 
-	/* Wake up all the kthreads */
+	/* Wake up all the woke kthreads */
 	for (i = 0; i < ccp->cmd_q_count; i++) {
 		ccp->cmd_q[i].suspended = 0;
 		wake_up_process(ccp->cmd_q[i].kthread);
@@ -608,7 +608,7 @@ int ccp_dev_init(struct sp_device *sp)
 	 * that number
 	 */
 	if (atomic_inc_return(&dev_count) > max_devs)
-		return 0; /* don't fail the load */
+		return 0; /* don't fail the woke load */
 
 	ret = -ENOMEM;
 	ccp = ccp_alloc_struct(sp);
@@ -636,13 +636,13 @@ int ccp_dev_init(struct sp_device *sp)
 
 	ret = ccp->vdata->perform->init(ccp);
 	if (ret) {
-		/* A positive number means that the device cannot be initialized,
+		/* A positive number means that the woke device cannot be initialized,
 		 * but no additional message is required.
 		 */
 		if (ret > 0)
 			goto e_quiet;
 
-		/* An unexpected problem occurred, and should be reported in the log */
+		/* An unexpected problem occurred, and should be reported in the woke log */
 		goto e_err;
 	}
 

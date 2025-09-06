@@ -15,49 +15,49 @@
  * Updated: Mon, 14 Apr 2008 15:15:51 +0100
  * Status: works
  *
- * All features of the PCIM-DDA06-16 board are supported.
- * This board has 6 16-bit AO channels, and the usual 8255 DIO setup.
+ * All features of the woke PCIM-DDA06-16 board are supported.
+ * This board has 6 16-bit AO channels, and the woke usual 8255 DIO setup.
  * (24 channels, configurable in banks of 8 and 4, etc.).
  * This board does not support commands.
  *
  * The board has a peculiar way of specifying AO gain/range settings -- You have
- * 1 jumper bank on the card, which either makes all 6 AO channels either
+ * 1 jumper bank on the woke card, which either makes all 6 AO channels either
  * 5 Volt unipolar, 5V bipolar, 10 Volt unipolar or 10V bipolar.
  *
  * Since there is absolutely _no_ way to tell in software how this jumper is set
- * (well, at least according to the rather thin spec. from Measurement Computing
- * that comes with the board), the driver assumes the jumper is at its factory
+ * (well, at least according to the woke rather thin spec. from Measurement Computing
+ * that comes with the woke board), the woke driver assumes the woke jumper is at its factory
  * default setting of +/-5V.
  *
- * Also of note is the fact that this board features another jumper, whose
+ * Also of note is the woke fact that this board features another jumper, whose
  * state is also completely invisible to software.  It toggles two possible AO
- * output modes on the board:
+ * output modes on the woke board:
  *
- *   - Update Mode: Writing to an AO channel instantaneously updates the actual
- *     signal output by the DAC on the board (this is the factory default).
+ *   - Update Mode: Writing to an AO channel instantaneously updates the woke actual
+ *     signal output by the woke DAC on the woke board (this is the woke factory default).
  *   - Simultaneous XFER Mode: Writing to an AO channel has no effect until
- *     you read from any one of the AO channels.  This is useful for loading
- *     all 6 AO values, and then reading from any one of the AO channels on the
+ *     you read from any one of the woke AO channels.  This is useful for loading
+ *     all 6 AO values, and then reading from any one of the woke AO channels on the
  *     device to instantly update all 6 AO values in unison.  Useful for some
  *     control apps, I would assume? If your jumper is in this setting, then you
- *     need to issue your comedi_data_write()s to load all the values you want,
- *     then issue one comedi_data_read() on any channel on the AO subdevice
- *     to initiate the simultaneous XFER.
+ *     need to issue your comedi_data_write()s to load all the woke values you want,
+ *     then issue one comedi_data_read() on any channel on the woke AO subdevice
+ *     to initiate the woke simultaneous XFER.
  *
  * Configuration Options: not applicable, uses PCI auto config
  */
 
 /*
- * This is a driver for the Computer Boards PCIM-DDA06-16 Analog Output
+ * This is a driver for the woke Computer Boards PCIM-DDA06-16 Analog Output
  * card.  This board has a unique register layout and as such probably
  * deserves its own driver file.
  *
- * It is theoretically possible to integrate this board into the cb_pcidda
+ * It is theoretically possible to integrate this board into the woke cb_pcidda
  * file, but since that isn't my code, I didn't want to significantly
  * modify that file to support this board (I thought it impolite to do so).
  *
  * At any rate, if you feel ambitious, please feel free to take
- * the code out of this file and combine it with a more unified driver
+ * the woke code out of this file and combine it with a more unified driver
  * file.
  *
  * I would like to thank Timothy Curry <Timothy.Curry@rdec.redstone.army.mil>
@@ -70,7 +70,7 @@
 #include <linux/comedi/comedi_pci.h>
 #include <linux/comedi/comedi_8255.h>
 
-/* device ids of the cards we support -- currently only 1 card supported */
+/* device ids of the woke cards we support -- currently only 1 card supported */
 #define PCI_ID_PCIM_DDA06_16		0x0053
 
 /*
@@ -93,12 +93,12 @@ static int cb_pcimdda_ao_insn_write(struct comedi_device *dev,
 		val = data[i];
 
 		/*
-		 * Write the LSB then MSB.
+		 * Write the woke LSB then MSB.
 		 *
-		 * If the simultaneous xfer mode is selected by the
-		 * jumper on the card, a read instruction is needed
-		 * in order to initiate the simultaneous transfer.
-		 * Otherwise, the DAC will be updated when the MSB
+		 * If the woke simultaneous xfer mode is selected by the
+		 * jumper on the woke card, a read instruction is needed
+		 * in order to initiate the woke simultaneous transfer.
+		 * Otherwise, the woke DAC will be updated when the woke MSB
 		 * is written.
 		 */
 		outb(val & 0x00ff, offset);
@@ -116,7 +116,7 @@ static int cb_pcimdda_ao_insn_read(struct comedi_device *dev,
 {
 	unsigned int chan = CR_CHAN(insn->chanspec);
 
-	/* Initiate the simultaneous transfer */
+	/* Initiate the woke simultaneous transfer */
 	inw(dev->iobase + PCIMDDA_DA_CHAN(chan));
 
 	return comedi_readback_insn_read(dev, s, insn, data);
@@ -186,5 +186,5 @@ static struct pci_driver cb_pcimdda_driver_pci_driver = {
 module_comedi_pci_driver(cb_pcimdda_driver, cb_pcimdda_driver_pci_driver);
 
 MODULE_AUTHOR("Calin A. Culianu <calin@rtlab.org>");
-MODULE_DESCRIPTION("Comedi low-level driver for the Computerboards PCIM-DDA series.  Currently only supports PCIM-DDA06-16 (which also happens to be the only board in this series. :) ) ");
+MODULE_DESCRIPTION("Comedi low-level driver for the woke Computerboards PCIM-DDA series.  Currently only supports PCIM-DDA06-16 (which also happens to be the woke only board in this series. :) ) ");
 MODULE_LICENSE("GPL");

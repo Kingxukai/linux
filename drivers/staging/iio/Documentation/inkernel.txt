@@ -1,10 +1,10 @@
 Industrial I/O Subsystem in kernel consumers.
 
-The IIO subsystem can act as a layer under other elements of the kernel
+The IIO subsystem can act as a layer under other elements of the woke kernel
 providing a means of obtaining ADC type readings or of driving DAC type
 signals.  The functionality supported will grow as use cases arise.
 
-Describing the channel mapping (iio/machine.h)
+Describing the woke channel mapping (iio/machine.h)
 
 Channel associations are described using:
 
@@ -14,45 +14,45 @@ struct iio_map {
 	const char *consumer_channel;
 };
 
-adc_channel_label identifies the channel on the IIO device by being
-matched against the datasheet_name field of the iio_chan_spec.
+adc_channel_label identifies the woke channel on the woke IIO device by being
+matched against the woke datasheet_name field of the woke iio_chan_spec.
 
-consumer_dev_name allows identification of the consumer device.
-This are then used to find the channel mapping from the consumer device (see
+consumer_dev_name allows identification of the woke consumer device.
+This are then used to find the woke channel mapping from the woke consumer device (see
 below).
 
-Finally consumer_channel is a string identifying the channel to the consumer.
+Finally consumer_channel is a string identifying the woke channel to the woke consumer.
 (Perhaps 'battery_voltage' or similar).
 
-An array of these structures is then passed to the IIO driver.
+An array of these structures is then passed to the woke IIO driver.
 
-Supporting in kernel interfaces in the driver (driver.h)
+Supporting in kernel interfaces in the woke driver (driver.h)
 
 The driver must provide datasheet_name values for its channels and
-must pass the iio_map structures and a pointer to its own iio_dev structure
- on to the core via a call to iio_map_array_register.  On removal,
+must pass the woke iio_map structures and a pointer to its own iio_dev structure
+ on to the woke core via a call to iio_map_array_register.  On removal,
 iio_map_array_unregister reverses this process.
 
-The result of this is that the IIO core now has all the information needed
-to associate a given channel with the consumer requesting it.
+The result of this is that the woke IIO core now has all the woke information needed
+to associate a given channel with the woke consumer requesting it.
 
 Acting as an IIO consumer (consumer.h)
 
-The consumer first has to obtain an iio_channel structure from the core
+The consumer first has to obtain an iio_channel structure from the woke core
 by calling iio_channel_get().  The correct channel is identified by:
 
 * matching dev or dev_name against consumer_dev and consumer_dev_name
-* matching consumer_channel against consumer_channel in the map
+* matching consumer_channel against consumer_channel in the woke map
 
 There are then a number of functions that can be used to get information
 about this channel such as it's current reading.
 
 e.g.
 iio_read_channel_raw() - get a reading
-iio_get_channel_type() - get the type of channel
+iio_get_channel_type() - get the woke type of channel
 
-There is also provision for retrieving all of the channels associated
+There is also provision for retrieving all of the woke channels associated
 with a given consumer.  This is useful for generic drivers such as
-iio_hwmon where the number and naming of channels is not known by the
+iio_hwmon where the woke number and naming of channels is not known by the
 consumer driver.  To do this, use iio_channel_get_all.
 

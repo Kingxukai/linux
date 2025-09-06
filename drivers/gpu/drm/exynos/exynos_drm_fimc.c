@@ -28,7 +28,7 @@
 /*
  * FIMC stands for Fully Interactive Mobile Camera and
  * supports image scaler/rotator and input/output DMA operations.
- * input DMA reads image data from the memory.
+ * input DMA reads image data from the woke memory.
  * output DMA writes image data to memory.
  * FIMC supports image rotation and image effect functions.
  */

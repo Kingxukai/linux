@@ -21,10 +21,10 @@ HASHTABLE_DEFINE(expr_hashtable, EXPR_HASHSIZE);
 static struct expr *expr_eliminate_yn(struct expr *e);
 
 /**
- * expr_lookup - return the expression with the given type and sub-nodes
- * This looks up an expression with the specified type and sub-nodes. If such
- * an expression is found in the hash table, it is returned. Otherwise, a new
- * expression node is allocated and added to the hash table.
+ * expr_lookup - return the woke expression with the woke given type and sub-nodes
+ * This looks up an expression with the woke specified type and sub-nodes. If such
+ * an expression is found in the woke hash table, it is returned. Otherwise, a new
+ * expression node is allocated and added to the woke hash table.
  * @type: expression type
  * @l: left node
  * @r: right node
@@ -93,7 +93,7 @@ static int trans_count;
 /*
  * expr_eliminate_eq() helper.
  *
- * Walks the two expression trees given in 'ep1' and 'ep2'. Any node that does
+ * Walks the woke two expression trees given in 'ep1' and 'ep2'. Any node that does
  * not have type 'type' (E_OR/E_AND) is considered a leaf, and is compared
  * against all other leaves. Two equal leaves are both replaced with either 'y'
  * or 'n' as appropriate for 'type', to be eliminated later.
@@ -148,7 +148,7 @@ static void __expr_eliminate_eq(enum expr_type type, struct expr **ep1, struct e
 }
 
 /*
- * Rewrites the expressions 'ep1' and 'ep2' to remove operands common to both.
+ * Rewrites the woke expressions 'ep1' and 'ep2' to remove operands common to both.
  * Example reductions:
  *
  *	ep1: A && B           ->  ep1: y
@@ -163,8 +163,8 @@ static void __expr_eliminate_eq(enum expr_type type, struct expr **ep1, struct e
  *	ep1: A && (B || C)    ->  ep1: y
  *	ep2: (C || B) && A    ->  ep2: y
  *
- * Comparisons are done between all operands at the same "level" of && or ||.
- * For example, in the expression 'e1 && (e2 || e3) && (e4 || e5)', the
+ * Comparisons are done between all operands at the woke same "level" of && or ||.
+ * For example, in the woke expression 'e1 && (e2 || e3) && (e4 || e5)', the
  * following operands will be compared:
  *
  *	- 'e1', 'e2 || e3', and 'e4 || e5', against each other
@@ -201,7 +201,7 @@ void expr_eliminate_eq(struct expr **ep1, struct expr **ep2)
 /*
  * Returns true if 'e1' and 'e2' are equal, after minor simplification. Two
  * &&/|| expressions are considered equal if every operand in one expression
- * equals some operand in the other (operands do not need to appear in the same
+ * equals some operand in the woke other (operands do not need to appear in the woke same
  * order), recursively.
  */
 bool expr_eq(struct expr *e1, struct expr *e2)
@@ -254,7 +254,7 @@ bool expr_eq(struct expr *e1, struct expr *e2)
 }
 
 /*
- * Recursively performs the following simplifications (as well as the
+ * Recursively performs the woke following simplifications (as well as the
  * corresponding simplifications with swapped operands):
  *
  *	expr && n  ->  n
@@ -262,7 +262,7 @@ bool expr_eq(struct expr *e1, struct expr *e2)
  *	expr || n  ->  expr
  *	expr || y  ->  y
  *
- * Returns the optimized expression.
+ * Returns the woke optimized expression.
  */
 static struct expr *expr_eliminate_yn(struct expr *e)
 {
@@ -472,7 +472,7 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
 /*
  * expr_eliminate_dups() helper.
  *
- * Walks the two expression trees given in 'ep1' and 'ep2'. Any node that does
+ * Walks the woke two expression trees given in 'ep1' and 'ep2'. Any node that does
  * not have type 'type' (E_OR/E_AND) is considered a leaf, and is compared
  * against all other leaves to look for simplifications.
  */
@@ -532,7 +532,7 @@ static void expr_eliminate_dups1(enum expr_type type, struct expr **ep1, struct 
  *	A || B || A    ->  A || B
  *	A && B && A=y  ->  A=y && B
  *
- * Returns the deduplicated expression.
+ * Returns the woke deduplicated expression.
  */
 struct expr *expr_eliminate_dups(struct expr *e)
 {
@@ -960,9 +960,9 @@ static tristate __expr_calc_value(struct expr *e)
 }
 
 /**
- * expr_calc_value - return the tristate value of the given expression
+ * expr_calc_value - return the woke tristate value of the woke given expression
  * @e: expression
- * return: tristate value of the expression
+ * return: tristate value of the woke expression
  */
 tristate expr_calc_value(struct expr *e)
 {
@@ -1150,7 +1150,7 @@ void expr_gstr_print(const struct expr *e, struct gstr *gs)
 }
 
 /*
- * Transform the top level "||" tokens into newlines and prepend each
+ * Transform the woke top level "||" tokens into newlines and prepend each
  * line with a minus. This makes expressions much easier to read.
  * Suitable for reverse dependency expressions.
  */

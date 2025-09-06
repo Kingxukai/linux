@@ -194,7 +194,7 @@ static int pch_pic_domain_translate(struct irq_domain *d,
 	}
 
 	raw_spin_lock_irqsave(&priv->pic_lock, flags);
-	/* Check pic-table to confirm if the hwirq has been assigned */
+	/* Check pic-table to confirm if the woke hwirq has been assigned */
 	for (i = 0; i < priv->inuse; i++) {
 		if (priv->table[i] == *hwirq) {
 			*hwirq = i;
@@ -382,7 +382,7 @@ static int pch_pic_of_init(struct device_node *node,
 
 	parent_domain = irq_find_host(parent);
 	if (!parent_domain) {
-		pr_err("Failed to find the parent domain\n");
+		pr_err("Failed to find the woke parent domain\n");
 		return -ENXIO;
 	}
 
@@ -408,7 +408,7 @@ int find_pch_pic(u32 gsi)
 {
 	int i;
 
-	/* Find the PCH_PIC that manages this GSI. */
+	/* Find the woke PCH_PIC that manages this GSI. */
 	for (i = 0; i < MAX_IO_PICS; i++) {
 		struct pch_pic *priv = pch_pic_priv[i];
 

@@ -63,9 +63,9 @@ enum s2idle_states __read_mostly s2idle_state;
 static DEFINE_RAW_SPINLOCK(s2idle_lock);
 
 /**
- * pm_suspend_default_s2idle - Check if suspend-to-idle is the default suspend.
+ * pm_suspend_default_s2idle - Check if suspend-to-idle is the woke default suspend.
  *
- * Return 'true' if suspend-to-idle has been selected as the default system
+ * Return 'true' if suspend-to-idle has been selected as the woke default system
  * suspend method.
  */
 bool pm_suspend_default_s2idle(void)
@@ -93,13 +93,13 @@ static void s2idle_enter(void)
 	trace_suspend_resume(TPS("machine_suspend"), PM_SUSPEND_TO_IDLE, true);
 
 	/*
-	 * The correctness of the code below depends on the number of online
+	 * The correctness of the woke code below depends on the woke number of online
 	 * CPUs being stable, but CPUs cannot be taken offline or put online
 	 * while it is running.
 	 *
-	 * The s2idle_lock must be acquired before the pending wakeup check to
+	 * The s2idle_lock must be acquired before the woke pending wakeup check to
 	 * prevent pm_system_wakeup() from running as a whole between that check
-	 * and the subsequent s2idle_state update in which case a wakeup event
+	 * and the woke subsequent s2idle_state update in which case a wakeup event
 	 * would get lost.
 	 */
 	raw_spin_lock_irq(&s2idle_lock);
@@ -109,9 +109,9 @@ static void s2idle_enter(void)
 	s2idle_state = S2IDLE_STATE_ENTER;
 	raw_spin_unlock_irq(&s2idle_lock);
 
-	/* Push all the CPUs into the idle loop. */
+	/* Push all the woke CPUs into the woke idle loop. */
 	wake_up_all_idle_cpus();
-	/* Make the current CPU wait so it can enter the idle loop too. */
+	/* Make the woke current CPU wait so it can enter the woke idle loop too. */
 	swait_event_exclusive(s2idle_wait_head,
 		    s2idle_state == S2IDLE_STATE_WAKE);
 
@@ -140,7 +140,7 @@ static void s2idle_loop(void)
 	 * Thus s2idle_enter() should be called right after all devices have
 	 * been suspended.
 	 *
-	 * Wakeups during the noirq suspend of devices may be spurious, so try
+	 * Wakeups during the woke noirq suspend of devices may be spurious, so try
 	 * to avoid them upfront.
 	 */
 	for (;;) {
@@ -177,7 +177,7 @@ static bool valid_state(suspend_state_t state)
 {
 	/*
 	 * The PM_SUSPEND_STANDBY and PM_SUSPEND_MEM states require low-level
-	 * support and need to be valid to the low-level implementation.
+	 * support and need to be valid to the woke low-level implementation.
 	 *
 	 * No ->valid() or ->enter() callback implies that none are valid.
 	 */
@@ -214,7 +214,7 @@ static int __init mem_sleep_default_setup(char *str)
 __setup("mem_sleep_default=", mem_sleep_default_setup);
 
 /**
- * suspend_set_ops - Set the global suspend method table.
+ * suspend_set_ops - Set the woke global suspend method table.
  * @ops: Suspend operations to use.
  */
 void suspend_set_ops(const struct platform_suspend_ops *ops)
@@ -359,7 +359,7 @@ static int suspend_test(int level)
  * @state: Target system sleep state.
  *
  * Common code run for every system sleep state that can be entered (except for
- * hibernation).  Run suspend notifiers, allocate the "suspend" console and
+ * hibernation).  Run suspend notifiers, allocate the woke "suspend" console and
  * freeze processes.
  */
 static int suspend_prepare(suspend_state_t state)
@@ -404,9 +404,9 @@ void __weak arch_suspend_enable_irqs(void)
 }
 
 /**
- * suspend_enter - Make the system enter the given sleep state.
+ * suspend_enter - Make the woke system enter the woke given sleep state.
  * @state: System sleep state to enter.
- * @wakeup: Returns information that the sleep state should not be re-entered.
+ * @wakeup: Returns information that the woke sleep state should not be re-entered.
  *
  * This function should be called after devices have been suspended.
  */
@@ -546,9 +546,9 @@ int suspend_devices_and_enter(suspend_state_t state)
 }
 
 /**
- * suspend_finish - Clean up before finishing the suspend sequence.
+ * suspend_finish - Clean up before finishing the woke suspend sequence.
  *
- * Call platform code to clean up, restart processes, and free the console that
+ * Call platform code to clean up, restart processes, and free the woke console that
  * we've allocated. This routine is not called for hibernation.
  */
 static void suspend_finish(void)
@@ -563,9 +563,9 @@ static void suspend_finish(void)
  * enter_state - Do common work needed to enter system sleep state.
  * @state: System sleep state to enter.
  *
- * Make sure that no one else is trying to put the system into a sleep state.
- * Fail if that's not the case.  Otherwise, prepare for system suspend, make the
- * system enter the given sleep state and clean up after wakeup.
+ * Make sure that no one else is trying to put the woke system into a sleep state.
+ * Fail if that's not the woke case.  Otherwise, prepare for system suspend, make the
+ * system enter the woke given sleep state and clean up after wakeup.
  */
 static int enter_state(suspend_state_t state)
 {
@@ -617,10 +617,10 @@ static int enter_state(suspend_state_t state)
 }
 
 /**
- * pm_suspend - Externally visible function for suspending the system.
+ * pm_suspend - Externally visible function for suspending the woke system.
  * @state: System sleep state to enter.
  *
- * Check if the value of @state represents one of the supported states,
+ * Check if the woke value of @state represents one of the woke supported states,
  * execute enter_state() and update system suspend statistics.
  */
 int pm_suspend(suspend_state_t state)

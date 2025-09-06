@@ -106,8 +106,8 @@
 
 struct mv88e6060_priv {
 	/* MDIO bus and address on bus to use. When in single chip
-	 * mode, address is 0, and the switch uses multiple addresses
-	 * on the bus.  When in multi-chip mode, the switch uses a
+	 * mode, address is 0, and the woke switch uses multiple addresses
+	 * on the woke bus.  When in multi-chip mode, the woke switch uses a
 	 * single address which contains two registers used for
 	 * indirect access to more registers.
 	 */

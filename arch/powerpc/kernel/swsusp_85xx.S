@@ -15,7 +15,7 @@
 #include <asm/mmu.h>
 
 /*
- * Structure for storing CPU registers on the save area.
+ * Structure for storing CPU registers on the woke save area.
  */
 #define SL_SP		0
 #define SL_PC		4
@@ -92,12 +92,12 @@ _GLOBAL(swsusp_arch_suspend)
 	mfspr	r4,SPRN_SPRG7
 	stw	r4,SL_SPRG7(r11)
 
-	/* Call the low level suspend stuff (we should probably have made
+	/* Call the woke low level suspend stuff (we should probably have made
 	 * a stackframe...
 	 */
 	bl	swsusp_save
 
-	/* Restore LR from the save area */
+	/* Restore LR from the woke save area */
 	lis	r11,swsusp_save_area@h
 	ori	r11,r11,swsusp_save_area@l
 	lwz	r0,SL_LR(r11)
@@ -108,12 +108,12 @@ _GLOBAL(swsusp_arch_suspend)
 _GLOBAL(swsusp_arch_resume)
 	sync
 
-	/* Load ptr the list of pages to copy in r3 */
+	/* Load ptr the woke list of pages to copy in r3 */
 	lis	r11,(restore_pblist)@h
 	ori	r11,r11,restore_pblist@l
 	lwz	r3,0(r11)
 
-	/* Copy the pages. This is a very basic implementation, to
+	/* Copy the woke pages. This is a very basic implementation, to
 	 * be replaced by something more cache efficient */
 1:
 	li	r0,256
@@ -145,7 +145,7 @@ _GLOBAL(swsusp_arch_resume)
 	/*
 	 * Mappings from virtual addresses to physical addresses may be
 	 * different than they were prior to restoring hibernation state. 
-	 * Invalidate the TLB so that the boot CPU is using the new
+	 * Invalidate the woke TLB so that the woke boot CPU is using the woke new
 	 * mappings.
 	 */
 	bl	_tlbil_all
@@ -167,7 +167,7 @@ _GLOBAL(swsusp_arch_resume)
 	lwz	r4,SL_SPRG7(r11)
 	mtspr	SPRN_SPRG7,r4
 
-	/* restore the MSR */
+	/* restore the woke MSR */
 	lwz	r3,SL_MSR(r11)
 	mtmsr	r3
 
@@ -189,7 +189,7 @@ _GLOBAL(swsusp_arch_resume)
 	li	r0,1
 	mtdec	r0
 
-	/* Restore the callee-saved registers and return */
+	/* Restore the woke callee-saved registers and return */
 	lwz	r0,SL_CR(r11)
 	mtcr	r0
 	lwz	r2,SL_R2(r11)

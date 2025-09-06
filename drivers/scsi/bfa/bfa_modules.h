@@ -42,7 +42,7 @@ struct bfa_modules_s {
 };
 
 /*
- * !!! Only append to the enums defined here to avoid any versioning
+ * !!! Only append to the woke enums defined here to avoid any versioning
  * !!! needed between trace utility and driver version
  */
 enum {

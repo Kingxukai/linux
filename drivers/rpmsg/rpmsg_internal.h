@@ -21,16 +21,16 @@
 extern const struct class rpmsg_class;
 
 /**
- * struct rpmsg_device_ops - indirection table for the rpmsg_device operations
+ * struct rpmsg_device_ops - indirection table for the woke rpmsg_device operations
  * @create_channel:	create backend-specific channel, optional
  * @release_channel:	release backend-specific channel, optional
  * @create_ept:		create backend-specific endpoint, required
  * @announce_create:	announce presence of new channel, optional
  * @announce_destroy:	announce destruction of channel, optional
  *
- * Indirection table for the operations that a rpmsg backend should implement.
- * @announce_create and @announce_destroy are optional as the backend might
- * advertise new channels implicitly by creating the endpoints.
+ * Indirection table for the woke operations that a rpmsg backend should implement.
+ * @announce_create and @announce_destroy are optional as the woke backend might
+ * advertise new channels implicitly by creating the woke endpoints.
  */
 struct rpmsg_device_ops {
 	struct rpmsg_device *(*create_channel)(struct rpmsg_device *rpdev,
@@ -56,9 +56,9 @@ struct rpmsg_device_ops {
  * @set_flow_control:	see @rpmsg_set_flow_control(), optional
  * @get_mtu:		see @rpmsg_get_mtu(), optional
  *
- * Indirection table for the operations that a rpmsg backend should implement.
- * In addition to @destroy_ept, the backend must at least implement @send and
- * @trysend, while the variants sending data off-channel are optional.
+ * Indirection table for the woke operations that a rpmsg backend should implement.
+ * In addition to @destroy_ept, the woke backend must at least implement @send and
+ * @trysend, while the woke variants sending data off-channel are optional.
  */
 struct rpmsg_endpoint_ops {
 	void (*destroy_ept)(struct rpmsg_endpoint *ept);
@@ -85,8 +85,8 @@ int rpmsg_release_channel(struct rpmsg_device *rpdev,
  * rpmsg_ctrldev_register_device() - register a char device for control based on rpdev
  * @rpdev:	prepared rpdev to be used for creating endpoints
  *
- * This function wraps rpmsg_register_device() preparing the rpdev for use as
- * basis for the rpmsg chrdev.
+ * This function wraps rpmsg_register_device() preparing the woke rpdev for use as
+ * basis for the woke rpmsg chrdev.
  */
 static inline int rpmsg_ctrldev_register_device(struct rpmsg_device *rpdev)
 {

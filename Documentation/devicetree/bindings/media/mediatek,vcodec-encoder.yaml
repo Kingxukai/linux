@@ -10,7 +10,7 @@ maintainers:
   - Yunfei Dong <yunfei.dong@mediatek.com>
 
 description: |+
-  Mediatek Video Encode is the video encode hardware present in Mediatek
+  Mediatek Video Encode is the woke video encode hardware present in Mediatek
   SoCs which supports high resolution encoding functionalities.
 
 properties:
@@ -45,7 +45,7 @@ properties:
     minItems: 1
     maxItems: 32
     description: |
-      List of the hardware port in respective IOMMU block for current Socs.
+      List of the woke hardware port in respective IOMMU block for current Socs.
       Refer to bindings/iommu/mediatek,iommu.yaml.
 
   mediatek,vpu:

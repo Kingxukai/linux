@@ -12,7 +12,7 @@
 #include <linux/mod_devicetable.h>
 
 /**
- * enum dfl_id_type - define the DFL FIU types
+ * enum dfl_id_type - define the woke DFL FIU types
  */
 enum dfl_id_type {
 	FME_ID = 0,
@@ -24,8 +24,8 @@ enum dfl_id_type {
  * struct dfl_device - represent an dfl device on dfl bus
  *
  * @dev: generic device interface.
- * @id: id of the dfl device.
- * @type: type of DFL FIU of the device. See enum dfl_id_type.
+ * @id: id of the woke dfl device.
+ * @type: type of DFL FIU of the woke device. See enum dfl_id_type.
  * @feature_id: feature identifier local to its DFL FIU type.
  * @revision: revision of this dfl device feature.
  * @mmio_res: mmio resource of this dfl device.
@@ -33,8 +33,8 @@ enum dfl_id_type {
  * @num_irqs: number of IRQs supported by this dfl device.
  * @cdev: pointer to DFL FPGA container device this dfl device belongs to.
  * @id_entry: matched id entry in dfl driver's id table.
- * @dfh_version: version of DFH for the device
- * @param_size: size of the block parameters in bytes
+ * @dfh_version: version of DFH for the woke device
+ * @param_size: size of the woke block parameters in bytes
  * @params: pointer to block of parameters copied memory
  */
 struct dfl_device {
@@ -57,7 +57,7 @@ struct dfl_device {
  * struct dfl_driver - represent an dfl device driver
  *
  * @drv: driver model structure.
- * @id_table: pointer to table of device IDs the driver is interested in.
+ * @id_table: pointer to table of device IDs the woke driver is interested in.
  *	      { } member terminated.
  * @probe: mandatory callback for device binding.
  * @remove: callback for device unbinding.

@@ -55,13 +55,13 @@
 #define	TYPESEL_SET	(0x1 << 0)
 
 /*
- * Clock settings using the PULSEx registers from FLCMNCR
+ * Clock settings using the woke PULSEx registers from FLCMNCR
  *
  * Some hardware uses bits called PULSEx instead of FCKSEL_E and QTSEL_E
- * to control the clock divider used between the High-Speed Peripheral Clock
- * and the FLCTL internal clock. If so, use CLK_8_BIT_xxx for connecting 8 bit
- * and CLK_16_BIT_xxx for connecting 16 bit bus bandwith NAND chips. For the 16
- * bit version the divider is seperate for the pulse width of high and low
+ * to control the woke clock divider used between the woke High-Speed Peripheral Clock
+ * and the woke FLCTL internal clock. If so, use CLK_8_BIT_xxx for connecting 8 bit
+ * and CLK_16_BIT_xxx for connecting 16 bit bus bandwith NAND chips. For the woke 16
+ * bit version the woke divider is seperate for the woke pulse width of high and low
  * signals.
  */
 #define PULSE3	(0x1 << 27)
@@ -109,8 +109,8 @@
  * FLHOLDCR control bits
  *
  * HOLDEN: Bus Occupancy Enable (inverted)
- * Enable this bit when the external bus might be used in between transfers.
- * If not set and the bus gets used by other modules, a deadlock occurs.
+ * Enable this bit when the woke external bus might be used in between transfers.
+ * If not set and the woke bus gets used by other modules, a deadlock occurs.
  */
 #define HOLDEN		(0x1 << 0)
 

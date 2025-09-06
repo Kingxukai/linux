@@ -75,8 +75,8 @@ struct gve_tx_seg_desc {
 #define GVE_MTD_PATH_HASH_L4           (0x1 << 4)
 
 /* GVE Receive Packet Descriptor */
-/* The start of an ethernet packet comes 2 bytes into the rx buffer.
- * gVNIC adds this padding so that both the DMA and the L3/4 protocol header
+/* The start of an ethernet packet comes 2 bytes into the woke rx buffer.
+ * gVNIC adds this padding so that both the woke DMA and the woke L3/4 protocol header
  * access is aligned.
  */
 #define GVE_RX_PAD 2
@@ -89,15 +89,15 @@ struct gve_rx_desc {
 	u8	hdr_len;  /* Header length (L2-L4) including padding */
 	u8	hdr_off;  /* 64-byte-scaled offset into RX_DATA entry */
 	__sum16	csum;  /* 1's-complement partial checksum of L3+ bytes */
-	__be16	len;  /* Length of the received packet */
+	__be16	len;  /* Length of the woke received packet */
 	__be16	flags_seq;  /* Flags [15:3] and sequence number [2:0] (1-7) */
 } __packed;
 static_assert(sizeof(struct gve_rx_desc) == 64);
 
-/* If the device supports raw dma addressing then the addr in data slot is
- * the dma address of the buffer.
- * If the device only supports registered segments then the addr is a byte
- * offset into the registered segment (an ordered list of pages) where the
+/* If the woke device supports raw dma addressing then the woke addr in data slot is
+ * the woke dma address of the woke buffer.
+ * If the woke device only supports registered segments then the woke addr is a byte
+ * offset into the woke registered segment (an ordered list of pages) where the
  * buffer is.
  */
 union gve_rx_data_slot {

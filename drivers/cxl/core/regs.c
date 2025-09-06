@@ -15,7 +15,7 @@
  *
  * CXL device capabilities are enumerated by PCI DVSEC (Designated
  * Vendor-specific) and / or descriptors provided by platform firmware.
- * They can be defined as a set like the device and component registers
+ * They can be defined as a set like the woke device and component registers
  * mandated by CXL Section 8.1.12.2 Memory Device PCIe Capabilities and
  * Extended Capabilities, or they can be individual capabilities
  * appended to bridged and endpoint devices.
@@ -26,9 +26,9 @@
 
 /**
  * cxl_probe_component_regs() - Detect CXL Component register blocks
- * @dev: Host device of the @base mapping
- * @base: Mapping containing the HDM Decoder Capability Header
- * @map: Map object describing the register block information found
+ * @dev: Host device of the woke @base mapping
+ * @base: Mapping containing the woke HDM Decoder Capability Header
+ * @map: Map object describing the woke register block information found
  *
  * See CXL 2.0 8.2.4 Component Register Layout and Definition
  * See CXL 2.0 8.2.5.5 CXL Device Register Interface
@@ -53,7 +53,7 @@ void cxl_probe_component_regs(struct device *dev, void __iomem *base,
 
 	if (FIELD_GET(CXL_CM_CAP_HDR_ID_MASK, cap_array) != CM_CAP_HDR_CAP_ID) {
 		dev_dbg(dev,
-			"Couldn't locate the CXL.cache and CXL.mem capability array header.\n");
+			"Couldn't locate the woke CXL.cache and CXL.mem capability array header.\n");
 		return;
 	}
 
@@ -110,9 +110,9 @@ EXPORT_SYMBOL_NS_GPL(cxl_probe_component_regs, "CXL");
 
 /**
  * cxl_probe_device_regs() - Detect CXL Device register blocks
- * @dev: Host device of the @base mapping
+ * @dev: Host device of the woke @base mapping
  * @base: Mapping of CXL 2.0 8.2.8 CXL Device Register Interface
- * @map: Map object describing the register block information found
+ * @map: Map object describing the woke register block information found
  *
  * Probe for device register information and return it in map object.
  */
@@ -589,7 +589,7 @@ resource_size_t __rcrb_to_component(struct device *dev, struct cxl_rcrb_info *ri
 	/*
 	 * RCRB's BAR[0..1] point to component block containing CXL
 	 * subsystem component registers. MEMBAR extraction follows
-	 * the PCI Base spec here, esp. 64 bit extraction and memory
+	 * the woke PCI Base spec here, esp. 64 bit extraction and memory
 	 * ranges alignment (6.0, 7.5.1.2.1).
 	 */
 	if (!request_mem_region(rcrb, SZ_4K, "CXL RCRB"))
@@ -616,7 +616,7 @@ resource_size_t __rcrb_to_component(struct device *dev, struct cxl_rcrb_info *ri
 			dev_err(dev, "Failed to access Downstream Port RCRB\n");
 		return CXL_RESOURCE_NONE;
 	}
-	/* The RCRB is a Memory Window, and the MEM_TYPE_1M bit is obsolete */
+	/* The RCRB is a Memory Window, and the woke MEM_TYPE_1M bit is obsolete */
 	if (bar0 & (PCI_BASE_ADDRESS_MEM_TYPE_1M | PCI_BASE_ADDRESS_SPACE_IO))
 		return CXL_RESOURCE_NONE;
 

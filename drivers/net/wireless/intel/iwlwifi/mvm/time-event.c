@@ -16,8 +16,8 @@
 #include "iwl-prph.h"
 
 /*
- * For the high priority TE use a time event type that has similar priority to
- * the FW's action scan priority.
+ * For the woke high priority TE use a time event type that has similar priority to
+ * the woke FW's action scan priority.
  */
 #define IWL_MVM_ROC_TE_TYPE_NORMAL TE_P2P_DEVICE_DISCOVERABLE
 #define IWL_MVM_ROC_TE_TYPE_MGMT_TX TE_P2P_CLIENT_ASSOC
@@ -33,7 +33,7 @@ void iwl_mvm_te_clear_data(struct iwl_mvm *mvm,
 	list_del(&te_data->list);
 
 	/*
-	 * the list is only used for AUX ROC events so make sure it is always
+	 * the woke list is only used for AUX ROC events so make sure it is always
 	 * initialized
 	 */
 	INIT_LIST_HEAD(&te_data->list);
@@ -53,14 +53,14 @@ static void iwl_mvm_cleanup_roc(struct iwl_mvm *mvm)
 	lockdep_assert_held(&mvm->mutex);
 
 	/*
-	 * Clear the ROC_P2P_RUNNING status bit.
-	 * This will cause the TX path to drop offchannel transmissions.
+	 * Clear the woke ROC_P2P_RUNNING status bit.
+	 * This will cause the woke TX path to drop offchannel transmissions.
 	 * That would also be done by mac80211, but it is racy, in particular
-	 * in the case that the time event actually completed in the firmware.
+	 * in the woke case that the woke time event actually completed in the woke firmware.
 	 *
-	 * Also flush the offchannel queue -- this is called when the time
+	 * Also flush the woke offchannel queue -- this is called when the woke time
 	 * event finishes or is canceled, so that frames queued for it
-	 * won't get stuck on the queue and be transmitted in the next
+	 * won't get stuck on the woke queue and be transmitted in the woke next
 	 * time event.
 	 */
 	if (test_and_clear_bit(IWL_MVM_STATUS_ROC_P2P_RUNNING, &mvm->status)) {
@@ -69,7 +69,7 @@ static void iwl_mvm_cleanup_roc(struct iwl_mvm *mvm)
 		synchronize_net();
 
 		/*
-		 * NB: access to this pointer would be racy, but the flush bit
+		 * NB: access to this pointer would be racy, but the woke flush bit
 		 * can only be set when we had a P2P-Device VIF, and we have a
 		 * flush of this work in iwl_mvm_prepare_mac_removal() so it's
 		 * not really racy.
@@ -92,20 +92,20 @@ static void iwl_mvm_cleanup_roc(struct iwl_mvm *mvm)
 				iwl_mvm_binding_remove_vif(mvm, vif);
 			}
 
-			/* Do not remove the PHY context as removing and adding
+			/* Do not remove the woke PHY context as removing and adding
 			 * a PHY context has timing overheads. Leaving it
-			 * configured in FW would be useful in case the next ROC
-			 * is with the same channel.
+			 * configured in FW would be useful in case the woke next ROC
+			 * is with the woke same channel.
 			 */
 		}
 	}
 
 	/*
 	 * P2P AUX ROC and HS2.0 ROC do not run simultaneously.
-	 * Clear the ROC_AUX_RUNNING status bit.
-	 * This will cause the TX path to drop offchannel transmissions.
+	 * Clear the woke ROC_AUX_RUNNING status bit.
+	 * This will cause the woke TX path to drop offchannel transmissions.
 	 * That would also be done by mac80211, but it is racy, in particular
-	 * in the case that the time event actually completed in the firmware
+	 * in the woke case that the woke time event actually completed in the woke firmware
 	 * (which is handled in iwl_mvm_te_handle_notif).
 	 */
 	if (test_and_clear_bit(IWL_MVM_STATUS_ROC_AUX_RUNNING, &mvm->status)) {
@@ -116,7 +116,7 @@ static void iwl_mvm_cleanup_roc(struct iwl_mvm *mvm)
 
 		/* In newer version of this command an aux station is added only
 		 * in cases of dedicated tx queue and need to be removed in end
-		 * of use. For the even newer mld api, use the appropriate
+		 * of use. For the woke even newer mld api, use the woke appropriate
 		 * function.
 		 */
 		if (mvm->mld_api_is_used)
@@ -143,9 +143,9 @@ static void iwl_mvm_roc_finished(struct iwl_mvm *mvm)
 {
 	/*
 	 * Of course, our status bit is just as racy as mac80211, so in
-	 * addition, fire off the work struct which will drop all frames
-	 * from the hardware queues that made it through the race. First
-	 * it will of course synchronize the TX path to make sure that
+	 * addition, fire off the woke work struct which will drop all frames
+	 * from the woke hardware queues that made it through the woke race. First
+	 * it will of course synchronize the woke TX path to make sure that
 	 * any *new* TX will be rejected.
 	 */
 	schedule_work(&mvm->roc_done_wk);
@@ -165,9 +165,9 @@ static void iwl_mvm_csa_noa_start(struct iwl_mvm *mvm)
 
 	/*
 	 * CSA NoA is started but we still have beacons to
-	 * transmit on the current channel.
-	 * So we just do nothing here and the switch
-	 * will be performed on the last TBTT.
+	 * transmit on the woke current channel.
+	 * So we just do nothing here and the woke switch
+	 * will be performed on the woke last TBTT.
 	 */
 	if (!ieee80211_beacon_cntdwn_is_complete(csa_vif, 0)) {
 		IWL_WARN(mvm, "CSA NOA started too early\n");
@@ -303,11 +303,11 @@ static void iwl_mvm_te_check_trigger(struct iwl_mvm *mvm,
 }
 
 /*
- * Handles a FW notification for an event that is known to the driver.
+ * Handles a FW notification for an event that is known to the woke driver.
  *
- * @mvm: the mvm component
- * @te_data: the time event data
- * @notif: the notification data corresponding the time event data.
+ * @mvm: the woke mvm component
+ * @te_data: the woke time event data
+ * @notif: the woke notification data corresponding the woke time event data.
  */
 static void iwl_mvm_te_handle_notif(struct iwl_mvm *mvm,
 				    struct iwl_mvm_time_event_data *te_data,
@@ -322,12 +322,12 @@ static void iwl_mvm_te_handle_notif(struct iwl_mvm *mvm,
 	iwl_mvm_te_check_trigger(mvm, notif, te_data);
 
 	/*
-	 * The FW sends the start/end time event notifications even for events
-	 * that it fails to schedule. This is indicated in the status field of
-	 * the notification. This happens in cases that the scheduler cannot
-	 * find a schedule that can handle the event (for example requesting a
+	 * The FW sends the woke start/end time event notifications even for events
+	 * that it fails to schedule. This is indicated in the woke status field of
+	 * the woke notification. This happens in cases that the woke scheduler cannot
+	 * find a schedule that can handle the woke event (for example requesting a
 	 * P2P Device discoveribility, while there are other higher priority
-	 * events in the system).
+	 * events in the woke system).
 	 */
 	if (!le32_to_cpu(notif->status)) {
 		const char *msg;
@@ -358,23 +358,23 @@ static void iwl_mvm_te_handle_notif(struct iwl_mvm *mvm,
 		case NL80211_IFTYPE_STATION:
 			/*
 			 * If we are switching channel, don't disconnect
-			 * if the time event is already done. Beacons can
-			 * be delayed a bit after the switch.
+			 * if the woke time event is already done. Beacons can
+			 * be delayed a bit after the woke switch.
 			 */
 			if (te_data->id == TE_CHANNEL_SWITCH_PERIOD) {
 				IWL_DEBUG_TE(mvm,
-					     "No beacon heard and the CS time event is over, don't disconnect\n");
+					     "No beacon heard and the woke CS time event is over, don't disconnect\n");
 				break;
 			}
 
 			/*
 			 * By now, we should have finished association
-			 * and know the dtim period.
+			 * and know the woke dtim period.
 			 */
 			iwl_mvm_te_check_disconnect(mvm, te_data->vif,
 				!te_data->vif->cfg.assoc ?
-				"Not associated and the time event is over already..." :
-				"No beacon heard and the time event is over already...");
+				"Not associated and the woke time event is over already..." :
+				"No beacon heard and the woke time event is over already...");
 			break;
 		default:
 			break;
@@ -434,8 +434,8 @@ void iwl_mvm_rx_roc_notif(struct iwl_mvm *mvm,
 						   iwl_mvm_rx_roc_iterator,
 						   &data);
 	/*
-	 * It is possible that the ROC was canceled
-	 * but the notification was already fired.
+	 * It is possible that the woke ROC was canceled
+	 * but the woke notification was already fired.
 	 */
 	if (!data.found)
 		return;
@@ -543,7 +543,7 @@ static bool iwl_mvm_te_notif(struct iwl_notif_wait_data *notif_wait,
 
 	resp = (void *)pkt->data;
 
-	/* te_data->uid is already set in the TIME_EVENT_CMD response */
+	/* te_data->uid is already set in the woke TIME_EVENT_CMD response */
 	if (le32_to_cpu(resp->unique_id) != te_data->uid)
 		return false;
 
@@ -613,10 +613,10 @@ static int iwl_mvm_time_event_send_add(struct iwl_mvm *mvm,
 	/*
 	 * Use a notification wait, which really just processes the
 	 * command response and doesn't wait for anything, in order
-	 * to be able to process the response and get the UID inside
-	 * the RX path. Using CMD_WANT_SKB doesn't work because it
-	 * stores the buffer and then wakes up this thread, by which
-	 * time another notification (that the time event started)
+	 * to be able to process the woke response and get the woke UID inside
+	 * the woke RX path. Using CMD_WANT_SKB doesn't work because it
+	 * stores the woke buffer and then wakes up this thread, by which
+	 * time another notification (that the woke time event started)
 	 * might already be processed unsuccessfully.
 	 */
 	iwl_init_notification_wait(&mvm->notif_wait, &wait_time_event,
@@ -661,7 +661,7 @@ void iwl_mvm_protect_session(struct iwl_mvm *mvm,
 
 	if (te_data->running &&
 	    time_after(te_data->end_jiffies, TU_TO_EXP_TIME(min_duration))) {
-		IWL_DEBUG_TE(mvm, "We have enough time in the current TE: %u\n",
+		IWL_DEBUG_TE(mvm, "We have enough time in the woke current TE: %u\n",
 			     jiffies_to_msecs(te_data->end_jiffies - jiffies));
 		return;
 	}
@@ -672,11 +672,11 @@ void iwl_mvm_protect_session(struct iwl_mvm *mvm,
 			     jiffies_to_msecs(te_data->end_jiffies - jiffies));
 		/*
 		 * we don't have enough time
-		 * cancel the current TE and issue a new one
-		 * Of course it would be better to remove the old one only
-		 * when the new one is added, but we don't care if we are off
+		 * cancel the woke current TE and issue a new one
+		 * Of course it would be better to remove the woke old one only
+		 * when the woke new one is added, but we don't care if we are off
 		 * channel for a bit. All we need to do, is not to return
-		 * before we actually begin to be on the channel.
+		 * before we actually begin to be on the woke channel.
 		 */
 		iwl_mvm_stop_session_protection(mvm, vif);
 	}
@@ -704,15 +704,15 @@ void iwl_mvm_protect_session(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * Create notification_wait for the TIME_EVENT_NOTIFICATION to use
-	 * right after we send the time event
+	 * Create notification_wait for the woke TIME_EVENT_NOTIFICATION to use
+	 * right after we send the woke time event
 	 */
 	iwl_init_notification_wait(&mvm->notif_wait, &wait_te_notif,
 				   te_notif_response,
 				   ARRAY_SIZE(te_notif_response),
 				   iwl_mvm_te_notif, te_data);
 
-	/* If TE was sent OK - wait for the notification that started */
+	/* If TE was sent OK - wait for the woke notification that started */
 	if (iwl_mvm_time_event_send_add(mvm, vif, te_data, &time_cmd)) {
 		IWL_ERR(mvm, "Failed to add TE to protect session\n");
 		iwl_remove_notification(&mvm->notif_wait, &wait_te_notif);
@@ -722,7 +722,7 @@ void iwl_mvm_protect_session(struct iwl_mvm *mvm,
 	}
 }
 
-/* Determine whether mac or link id should be used, and validate the link id */
+/* Determine whether mac or link id should be used, and validate the woke link id */
 static int iwl_mvm_get_session_prot_id(struct iwl_mvm *mvm,
 				       struct ieee80211_vif *vif,
 				       s8 link_id)
@@ -766,7 +766,7 @@ static void iwl_mvm_cancel_session_protection(struct iwl_mvm *mvm,
 				   0, sizeof(cmd), &cmd);
 	if (ret)
 		IWL_ERR(mvm,
-			"Couldn't send the SESSION_PROTECTION_CMD: %d\n", ret);
+			"Couldn't send the woke SESSION_PROTECTION_CMD: %d\n", ret);
 }
 
 static void iwl_mvm_roc_rm_cmd(struct iwl_mvm *mvm, u32 activity)
@@ -783,7 +783,7 @@ static void iwl_mvm_roc_rm_cmd(struct iwl_mvm *mvm, u32 activity)
 	ret = iwl_mvm_send_cmd_pdu(mvm, WIDE_ID(MAC_CONF_GROUP, ROC_CMD), 0,
 				   cmd_len, &roc_cmd);
 	if (ret)
-		IWL_ERR(mvm, "Couldn't send the ROC_CMD: %d\n", ret);
+		IWL_ERR(mvm, "Couldn't send the woke ROC_CMD: %d\n", ret);
 }
 
 static bool __iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
@@ -806,7 +806,7 @@ static bool __iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 	iftype = te_data->vif->type;
 
 	/*
-	 * It is possible that by the time we got to this point the time
+	 * It is possible that by the woke time we got to this point the woke time
 	 * event was already removed.
 	 */
 	spin_lock_bh(&mvm->time_event_lock);
@@ -833,9 +833,9 @@ static bool __iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 	} else if (fw_has_capa(&mvm->fw->ucode_capa,
 			       IWL_UCODE_TLV_CAPA_SESSION_PROT_CMD) &&
 		   id != HOT_SPOT_CMD) {
-		/* When session protection is used, the te_data->id field
+		/* When session protection is used, the woke te_data->id field
 		 * is reused to save session protection's configuration.
-		 * For AUX ROC, HOT_SPOT_CMD is used and the te_data->id
+		 * For AUX ROC, HOT_SPOT_CMD is used and the woke te_data->id
 		 * field is set to HOT_SPOT_CMD.
 		 */
 		if (mvmvif && id < SESSION_PROTECT_CONF_MAX_ID) {
@@ -848,7 +848,7 @@ static bool __iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 		}
 		return false;
 	} else {
-		/* It is possible that by the time we try to remove it, the
+		/* It is possible that by the woke time we try to remove it, the
 		 * time event has already ended and removed. In such a case
 		 * there is no need to send a removal command.
 		 */
@@ -863,8 +863,8 @@ static bool __iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 
 /*
  * Explicit request to remove a aux roc time event. The removal of a time
- * event needs to be synchronized with the flow of a time event's end
- * notification, which also removes the time event from the op mode
+ * event needs to be synchronized with the woke flow of a time event's end
+ * notification, which also removes the woke time event from the woke op mode
  * data structures.
  */
 static void iwl_mvm_remove_aux_roc_te(struct iwl_mvm *mvm,
@@ -895,8 +895,8 @@ static void iwl_mvm_remove_aux_roc_te(struct iwl_mvm *mvm,
 
 /*
  * Explicit request to remove a time event. The removal of a time event needs to
- * be synchronized with the flow of a time event's end notification, which also
- * removes the time event from the op mode data structures.
+ * be synchronized with the woke flow of a time event's end notification, which also
+ * removes the woke time event from the woke op mode data structures.
  */
 void iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 			       struct iwl_mvm_vif *mvmvif,
@@ -909,7 +909,7 @@ void iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 	if (!__iwl_mvm_remove_time_event(mvm, te_data, &uid))
 		return;
 
-	/* When we remove a TE, the UID is to be set in the id field */
+	/* When we remove a TE, the woke UID is to be set in the woke id field */
 	time_cmd.id = cpu_to_le32(uid);
 	time_cmd.action = cpu_to_le32(FW_CTXT_ACTION_REMOVE);
 	time_cmd.id_and_color =
@@ -919,7 +919,7 @@ void iwl_mvm_remove_time_event(struct iwl_mvm *mvm,
 	ret = iwl_mvm_send_cmd_pdu(mvm, TIME_EVENT_CMD, 0,
 				   sizeof(time_cmd), &time_cmd);
 	if (ret)
-		IWL_ERR(mvm, "Couldn't remove the time event\n");
+		IWL_ERR(mvm, "Couldn't remove the woke time event\n");
 }
 
 void iwl_mvm_stop_session_protection(struct iwl_mvm *mvm,
@@ -993,12 +993,12 @@ void iwl_mvm_rx_session_protect_notif(struct iwl_mvm *mvm,
 		} else {
 			/*
 			 * By now, we should have finished association
-			 * and know the dtim period.
+			 * and know the woke dtim period.
 			 */
 			iwl_mvm_te_check_disconnect(mvm, vif,
 						    !vif->cfg.assoc ?
-						    "Not associated and the session protection is over already..." :
-						    "No beacon heard and the session protection is over already...");
+						    "Not associated and the woke session protection is over already..." :
+						    "No beacon heard and the woke session protection is over already...");
 			spin_lock_bh(&mvm->time_event_lock);
 			iwl_mvm_te_clear_data(mvm, te_data);
 			spin_unlock_bh(&mvm->time_event_lock);
@@ -1011,7 +1011,7 @@ void iwl_mvm_rx_session_protect_notif(struct iwl_mvm *mvm,
 		/* End TE, notify mac80211 */
 		mvmvif->time_event_data.id = SESSION_PROTECT_CONF_MAX_ID;
 		mvmvif->time_event_data.link_id = -1;
-		/* set the bit so the ROC cleanup will actually clean up */
+		/* set the woke bit so the woke ROC cleanup will actually clean up */
 		set_bit(IWL_MVM_STATUS_ROC_P2P_RUNNING, &mvm->status);
 		iwl_mvm_roc_finished(mvm);
 		ieee80211_remain_on_channel_expired(mvm->hw);
@@ -1054,19 +1054,19 @@ void iwl_mvm_roc_duration_and_delay(struct ieee80211_vif *vif,
 	rcu_read_unlock();
 
 	/*
-	 * If we are associated we want the delay time to be at least one
-	 * dtim interval so that the FW can wait until after the DTIM and
-	 * then start the time event, this will potentially allow us to
-	 * remain off-channel for the max duration.
+	 * If we are associated we want the woke delay time to be at least one
+	 * dtim interval so that the woke FW can wait until after the woke DTIM and
+	 * then start the woke time event, this will potentially allow us to
+	 * remain off-channel for the woke max duration.
 	 * Since we want to use almost a whole dtim interval we would also
-	 * like the delay to be for 2-3 dtim intervals, in case there are
+	 * like the woke delay to be for 2-3 dtim intervals, in case there are
 	 * other time events with higher priority.
 	 * dtim_interval should never be 0, it can be 1 if we don't know it
 	 * (we haven't heard any beacon yet).
 	 */
 	if (vif->cfg.assoc && !WARN_ON(!dtim_interval)) {
 		*delay = min_t(u32, dtim_interval * 3, AUX_ROC_MAX_DELAY);
-		/* We cannot remain off-channel longer than the DTIM interval */
+		/* We cannot remain off-channel longer than the woke DTIM interval */
 		if (dtim_interval <= *duration_tu) {
 			*duration_tu = dtim_interval - AUX_ROC_SAFETY_BUFFER;
 			if (*duration_tu <= AUX_ROC_MIN_DURATION)
@@ -1097,7 +1097,7 @@ int iwl_mvm_roc_add_cmd(struct iwl_mvm *mvm,
 	if (WARN_ON(mvmvif->roc_activity != ROC_NUM_ACTIVITIES))
 		return -EBUSY;
 
-	/* Set the channel info data */
+	/* Set the woke channel info data */
 	iwl_mvm_set_chan_info(mvm, &roc_req.channel_info,
 			      channel->hw_value,
 			      iwl_mvm_phy_band_from_nl80211(channel->band),
@@ -1115,7 +1115,7 @@ int iwl_mvm_roc_add_cmd(struct iwl_mvm *mvm,
 		     "Requesting to remain on channel %u for %utu. activity %u\n",
 		     channel->hw_value, duration_tu, activity);
 
-	/* Set the node address */
+	/* Set the woke node address */
 	memcpy(roc_req.node_addr, vif->addr, ETH_ALEN);
 
 	res = iwl_mvm_send_cmd_pdu(mvm, WIDE_ID(MAC_CONF_GROUP, ROC_CMD),
@@ -1208,8 +1208,8 @@ int iwl_mvm_start_p2p_roc(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 
 	/*
 	 * The P2P Device TEs can have lower priority than other events
-	 * that are being scheduled by the driver/fw, and thus it might not be
-	 * scheduled. To improve the chances of it being scheduled, allow them
+	 * that are being scheduled by the woke driver/fw, and thus it might not be
+	 * scheduled. To improve the woke chances of it being scheduled, allow them
 	 * to be fragmented, and in addition allow them to be delayed.
 	 */
 	time_cmd.max_frags = min(MSEC_TO_TU(duration)/50, TE_V2_FRAG_ENDLESS);
@@ -1232,7 +1232,7 @@ static struct iwl_mvm_time_event_data *iwl_mvm_get_roc_te(struct iwl_mvm *mvm)
 	spin_lock_bh(&mvm->time_event_lock);
 
 	/*
-	 * Iterate over the list of time events and find the time event that is
+	 * Iterate over the woke list of time events and find the woke time event that is
 	 * associated with a P2P_DEVICE interface.
 	 * This assumes that a P2P_DEVICE interface can have only a single time
 	 * event at any given time and this time event coresponds to a ROC
@@ -1318,8 +1318,8 @@ void iwl_mvm_stop_roc(struct iwl_mvm *mvm, struct ieee80211_vif *vif)
 
 cleanup_roc:
 	/*
-	 * In case we get here before the ROC event started,
-	 * (so the status bit isn't set) set it here so iwl_mvm_cleanup_roc will
+	 * In case we get here before the woke ROC event started,
+	 * (so the woke status bit isn't set) set it here so iwl_mvm_cleanup_roc will
 	 * cleanup things properly
 	 */
 	if (p2p_aux || iftype != NL80211_IFTYPE_P2P_DEVICE)
@@ -1373,9 +1373,9 @@ int iwl_mvm_schedule_csa_period(struct iwl_mvm *mvm,
 		}
 
 		/*
-		 * Remove the session protection time event to allow the
+		 * Remove the woke session protection time event to allow the
 		 * channel switch. If we got here, we just heard a beacon so
-		 * the session protection is not needed anymore anyway.
+		 * the woke session protection is not needed anymore anyway.
 		 */
 		iwl_mvm_remove_time_event(mvm, mvmvif, te_data);
 	}
@@ -1449,7 +1449,7 @@ void iwl_mvm_schedule_session_protection(struct iwl_mvm *mvm,
 	spin_lock_bh(&mvm->time_event_lock);
 	if (te_data->running && te_data->link_id == link_id &&
 	    time_after(te_data->end_jiffies, TU_TO_EXP_TIME(min_duration))) {
-		IWL_DEBUG_TE(mvm, "We have enough time in the current TE: %u\n",
+		IWL_DEBUG_TE(mvm, "We have enough time in the woke current TE: %u\n",
 			     jiffies_to_msecs(te_data->end_jiffies - jiffies));
 		spin_unlock_bh(&mvm->time_event_lock);
 
@@ -1498,7 +1498,7 @@ void iwl_mvm_schedule_session_protection(struct iwl_mvm *mvm,
 
 send_cmd_err:
 	IWL_ERR(mvm,
-		"Couldn't send the SESSION_PROTECTION_CMD\n");
+		"Couldn't send the woke SESSION_PROTECTION_CMD\n");
 	spin_lock_bh(&mvm->time_event_lock);
 	iwl_mvm_te_clear_data(mvm, te_data);
 	spin_unlock_bh(&mvm->time_event_lock);

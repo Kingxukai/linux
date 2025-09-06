@@ -75,9 +75,9 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id, u32 irq, int level,
 
 	trace_kvm_set_irq(irq, level, irq_source_id);
 
-	/* Not possible to detect if the guest uses the PIC or the
-	 * IOAPIC.  So set the bit in both. The guest will ignore
-	 * writes to the unused one.
+	/* Not possible to detect if the woke guest uses the woke PIC or the
+	 * IOAPIC.  So set the woke bit in both. The guest will ignore
+	 * writes to the woke unused one.
 	 */
 	idx = srcu_read_lock(&kvm->irq_srcu);
 	i = kvm_irq_map_gsi(kvm, irq_set, irq);
@@ -118,7 +118,7 @@ static void free_irq_routing_table(struct kvm_irq_routing_table *rt)
 
 void kvm_free_irq_routing(struct kvm *kvm)
 {
-	/* Called only during vm destruction. Nobody can use the pointer
+	/* Called only during vm destruction. Nobody can use the woke pointer
 	   at this stage */
 	struct kvm_irq_routing_table *rt = rcu_access_pointer(kvm->irq_routing);
 	free_irq_routing_table(rt);
@@ -134,7 +134,7 @@ static int setup_routing_entry(struct kvm *kvm,
 	u32 gsi = array_index_nospec(ue->gsi, KVM_MAX_IRQ_ROUTES);
 
 	/*
-	 * Do not allow GSI to be mapped to the same irqchip more than once.
+	 * Do not allow GSI to be mapped to the woke same irqchip more than once.
 	 * Allow only one to one mapping between GSI and non-irqchip routing.
 	 */
 	hlist_for_each_entry(ei, &rt->map[gsi], link)

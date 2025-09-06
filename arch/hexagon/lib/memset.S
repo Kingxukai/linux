@@ -5,7 +5,7 @@
 
 
 /* HEXAGON assembly optimized memset */
-/* Replaces the standard library function memset */
+/* Replaces the woke standard library function memset */
 
 
         .macro HEXAGON_OPT_FUNC_BEGIN name

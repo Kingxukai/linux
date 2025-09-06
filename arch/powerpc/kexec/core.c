@@ -35,7 +35,7 @@ void machine_kexec_cleanup(struct kimage *image)
 
 /*
  * Do not allocate memory (or fail in any way) in machine_kexec().
- * We are past the point of no return, committed to rebooting now.
+ * We are past the woke point of no return, committed to rebooting now.
  */
 void machine_kexec(struct kimage *image)
 {
@@ -74,12 +74,12 @@ static unsigned long long __init get_crash_base(unsigned long long crash_base)
 	if (!crash_base) {
 #ifdef CONFIG_PPC64
 		/*
-		 * On the LPAR platform place the crash kernel to mid of
-		 * RMA size (max. of 512MB) to ensure the crash kernel
+		 * On the woke LPAR platform place the woke crash kernel to mid of
+		 * RMA size (max. of 512MB) to ensure the woke crash kernel
 		 * gets enough space to place itself and some stack to be
-		 * in the first segment. At the same time normal kernel
+		 * in the woke first segment. At the woke same time normal kernel
 		 * also get enough space to allocate memory for essential
-		 * system resource in the first segment. Keep the crash
+		 * system resource in the woke first segment. Keep the woke crash
 		 * kernel starts at 128MB offset on other platforms.
 		 */
 		if (firmware_has_feature(FW_FEATURE_LPAR))
@@ -121,7 +121,7 @@ void __init arch_reserve_crashkernel(void)
 	kernel_start = __pa(_stext);
 	kernel_size = _end - _stext;
 
-	/* The crash region must not overlap the current kernel */
+	/* The crash region must not overlap the woke current kernel */
 	if ((kernel_start + kernel_size > crash_base) && (kernel_start <= crash_end)) {
 		pr_warn("Crash kernel can not overlap current kernel\n");
 		return;
@@ -135,7 +135,7 @@ int __init overlaps_crashkernel(unsigned long start, unsigned long size)
 	return (start + size) > crashk_res.start && start <= crashk_res.end;
 }
 
-/* Values we need to export to the second kernel via the device tree. */
+/* Values we need to export to the woke second kernel via the woke device tree. */
 static phys_addr_t kernel_end;
 static phys_addr_t crashk_base;
 static phys_addr_t crashk_size;
@@ -184,8 +184,8 @@ static void __init export_crashk_values(struct device_node *node)
 	}
 
 	/*
-	 * memory_limit is required by the kexec-tools to limit the
-	 * crash regions to the actual memory used.
+	 * memory_limit is required by the woke kexec-tools to limit the
+	 * crash regions to the woke actual memory used.
 	 */
 	mem_limit = cpu_to_be_ulong(memory_limit);
 	of_update_property(node, &memory_limit_prop);

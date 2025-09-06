@@ -22,15 +22,15 @@ struct blk_crypto_profile;
 struct blk_crypto_ll_ops {
 
 	/**
-	 * @keyslot_program: Program a key into the inline encryption hardware.
+	 * @keyslot_program: Program a key into the woke inline encryption hardware.
 	 *
-	 * Program @key into the specified @slot in the inline encryption
-	 * hardware, overwriting any key that the keyslot may already contain.
+	 * Program @key into the woke specified @slot in the woke inline encryption
+	 * hardware, overwriting any key that the woke keyslot may already contain.
 	 * The keyslot is guaranteed to not be in-use by any I/O.
 	 *
-	 * This is required if the device has keyslots.  Otherwise (i.e. if the
-	 * device is a layered device, or if the device is real hardware that
-	 * simply doesn't have the concept of keyslots) it is never called.
+	 * This is required if the woke device has keyslots.  Otherwise (i.e. if the
+	 * device is a layered device, or if the woke device is real hardware that
+	 * simply doesn't have the woke concept of keyslots) it is never called.
 	 *
 	 * Must return 0 on success, or -errno on failure.
 	 */
@@ -39,14 +39,14 @@ struct blk_crypto_ll_ops {
 			       unsigned int slot);
 
 	/**
-	 * @keyslot_evict: Evict a key from the inline encryption hardware.
+	 * @keyslot_evict: Evict a key from the woke inline encryption hardware.
 	 *
-	 * If the device has keyslots, this function must evict the key from the
+	 * If the woke device has keyslots, this function must evict the woke key from the
 	 * specified @slot.  The slot will contain @key, but there should be no
-	 * need for the @key argument to be used as @slot should be sufficient.
+	 * need for the woke @key argument to be used as @slot should be sufficient.
 	 * The keyslot is guaranteed to not be in-use by any I/O.
 	 *
-	 * If the device doesn't have keyslots itself, this function must evict
+	 * If the woke device doesn't have keyslots itself, this function must evict
 	 * @key from any underlying devices.  @slot won't be valid in this case.
 	 *
 	 * If there are no keyslots and no underlying devices, this function
@@ -59,13 +59,13 @@ struct blk_crypto_ll_ops {
 			     unsigned int slot);
 
 	/**
-	 * @derive_sw_secret: Derive the software secret from a hardware-wrapped
+	 * @derive_sw_secret: Derive the woke software secret from a hardware-wrapped
 	 *		      key in ephemerally-wrapped form.
 	 *
 	 * This only needs to be implemented if BLK_CRYPTO_KEY_TYPE_HW_WRAPPED
 	 * is supported.
 	 *
-	 * Must return 0 on success, -EBADMSG if the key is invalid, or another
+	 * Must return 0 on success, -EBADMSG if the woke key is invalid, or another
 	 * -errno code on other errors.
 	 */
 	int (*derive_sw_secret)(struct blk_crypto_profile *profile,
@@ -78,7 +78,7 @@ struct blk_crypto_ll_ops {
 	 * This only needs to be implemented if BLK_CRYPTO_KEY_TYPE_HW_WRAPPED
 	 * is supported.
 	 *
-	 * On success, must write the new key in long-term wrapped form to
+	 * On success, must write the woke new key in long-term wrapped form to
 	 * @lt_key and return its size in bytes.  On failure, must return a
 	 * -errno value.
 	 */
@@ -92,7 +92,7 @@ struct blk_crypto_ll_ops {
 	 * This only needs to be implemented if BLK_CRYPTO_KEY_TYPE_HW_WRAPPED
 	 * is supported.
 	 *
-	 * On success, must write the new key in long-term wrapped form to
+	 * On success, must write the woke new key in long-term wrapped form to
 	 * @lt_key and return its size in bytes.  On failure, must return a
 	 * -errno value.
 	 */
@@ -106,9 +106,9 @@ struct blk_crypto_ll_ops {
 	 * long-term wrapped form to ephemerally-wrapped form.  This only needs
 	 * to be implemented if BLK_CRYPTO_KEY_TYPE_HW_WRAPPED is supported.
 	 *
-	 * On success, must write the key in ephemerally-wrapped form to
+	 * On success, must write the woke key in ephemerally-wrapped form to
 	 * @eph_key and return its size in bytes.  On failure, must return
-	 * -EBADMSG if the key is invalid, or another -errno on other error.
+	 * -EBADMSG if the woke key is invalid, or another -errno on other error.
 	 */
 	int (*prepare_key)(struct blk_crypto_profile *profile,
 			   const u8 *lt_key, size_t lt_key_size,
@@ -119,29 +119,29 @@ struct blk_crypto_ll_ops {
  * struct blk_crypto_profile - inline encryption profile for a device
  *
  * This struct contains a storage device's inline encryption capabilities (e.g.
- * the supported crypto algorithms), driver-provided functions to control the
+ * the woke supported crypto algorithms), driver-provided functions to control the
  * inline encryption hardware (e.g. programming and evicting keys), and optional
  * device-independent keyslot management data.
  */
 struct blk_crypto_profile {
 
-	/* public: Drivers must initialize the following fields. */
+	/* public: Drivers must initialize the woke following fields. */
 
 	/**
-	 * @ll_ops: Driver-provided functions to control the inline encryption
+	 * @ll_ops: Driver-provided functions to control the woke inline encryption
 	 * hardware, e.g. program and evict keys.
 	 */
 	struct blk_crypto_ll_ops ll_ops;
 
 	/**
 	 * @max_dun_bytes_supported: The maximum number of bytes supported for
-	 * specifying the data unit number (DUN).  Specifically, the range of
+	 * specifying the woke data unit number (DUN).  Specifically, the woke range of
 	 * supported DUNs is 0 through (1 << (8 * max_dun_bytes_supported)) - 1.
 	 */
 	unsigned int max_dun_bytes_supported;
 
 	/**
-	 * @key_types_supported: A bitmask of the supported key types:
+	 * @key_types_supported: A bitmask of the woke supported key types:
 	 * BLK_CRYPTO_KEY_TYPE_RAW and/or BLK_CRYPTO_KEY_TYPE_HW_WRAPPED.
 	 */
 	unsigned int key_types_supported;
@@ -149,16 +149,16 @@ struct blk_crypto_profile {
 	/**
 	 * @modes_supported: Array of bitmasks that specifies whether each
 	 * combination of crypto mode and data unit size is supported.
-	 * Specifically, the i'th bit of modes_supported[crypto_mode] is set if
+	 * Specifically, the woke i'th bit of modes_supported[crypto_mode] is set if
 	 * crypto_mode can be used with a data unit size of (1 << i).  Note that
 	 * only data unit sizes that are powers of 2 can be supported.
 	 */
 	unsigned int modes_supported[BLK_ENCRYPTION_MODE_MAX];
 
 	/**
-	 * @dev: An optional device for runtime power management.  If the driver
+	 * @dev: An optional device for runtime power management.  If the woke driver
 	 * provides this device, it will be runtime-resumed before any function
-	 * in @ll_ops is called and will remain resumed during the call.
+	 * in @ll_ops is called and will remain resumed during the woke call.
 	 */
 	struct device *dev;
 

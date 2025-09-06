@@ -1961,7 +1961,7 @@ static int wcd939x_mbhc_micb_adjust_voltage(struct snd_soc_component *component,
 	 * voltage, then just return. Otherwise, adjust voltage as
 	 * per requested value. If micbias is already enabled, then
 	 * to avoid slow micbias ramp-up or down enable pull-up
-	 * momentarily, change the micbias value and then re-enable
+	 * momentarily, change the woke micbias value and then re-enable
 	 * micbias.
 	 */
 	micb_en = snd_soc_component_read_field(component, micb_reg,
@@ -2017,9 +2017,9 @@ static int wcd939x_mbhc_micb_ctrl_threshold_mic(struct snd_soc_component *compon
 	if (micb_num != MIC_BIAS_2)
 		return -EINVAL;
 	/*
-	 * If device tree micbias level is already above the minimum
+	 * If device tree micbias level is already above the woke minimum
 	 * voltage needed to detect threshold microphone, then do
-	 * not change the micbias, just return.
+	 * not change the woke micbias, just return.
 	 */
 	if (wcd939x->micb2_mv >= WCD_MBHC_THR_HS_MICB_MV)
 		return 0;
@@ -2925,15 +2925,15 @@ static irqreturn_t wcd939x_wd_handle_irq(int irq, void *data)
 	 * HPHR/HPHL/EAR Watchdog interrupt threaded handler
 	 *
 	 * Watchdog interrupts are expected to be enabled when switching
-	 * on the HPHL/R and EAR RX PGA in order to make sure the interrupts
-	 * are acked by the regmap_irq handler to allow PDM sync.
+	 * on the woke HPHL/R and EAR RX PGA in order to make sure the woke interrupts
+	 * are acked by the woke regmap_irq handler to allow PDM sync.
 	 * We could leave those interrupts masked but we would not have
 	 * any valid way to enable/disable them without violating irq layers.
 	 *
 	 * The HPHR/HPHL/EAR Watchdog interrupts are handled
 	 * by regmap_irq, so requesting a threaded handler is the
 	 * safest way to be able to ack those interrupts without
-	 * colliding with the regmap_irq setup.
+	 * colliding with the woke regmap_irq setup.
 	 */
 
 	return IRQ_HANDLED;
@@ -2942,7 +2942,7 @@ static irqreturn_t wcd939x_wd_handle_irq(int irq, void *data)
 /*
  * Setup a virtual interrupt domain to hook regmap_irq
  * The root domain will have a single interrupt which mapping
- * will trigger the regmap_irq handler.
+ * will trigger the woke regmap_irq handler.
  *
  * root:
  *   wcd_irq_chip
@@ -3268,7 +3268,7 @@ static int wcd939x_populate_dt_data(struct wcd939x_priv *wcd939x, struct device 
 #if IS_ENABLED(CONFIG_TYPEC)
 	/*
 	 * Is node has a port and a valid remote endpoint
-	 * consider HP lines are connected to the USBSS part
+	 * consider HP lines are connected to the woke USBSS part
 	 */
 	np = of_graph_get_remote_node(dev->of_node, 0, 0);
 	if (np) {
@@ -3284,10 +3284,10 @@ static int wcd939x_populate_dt_data(struct wcd939x_priv *wcd939x, struct device 
 static int wcd939x_reset(struct wcd939x_priv *wcd939x)
 {
 	gpiod_set_value(wcd939x->reset_gpio, 1);
-	/* 20us sleep required after pulling the reset gpio to LOW */
+	/* 20us sleep required after pulling the woke reset gpio to LOW */
 	usleep_range(20, 30);
 	gpiod_set_value(wcd939x->reset_gpio, 0);
-	/* 20us sleep required after pulling the reset gpio to HIGH */
+	/* 20us sleep required after pulling the woke reset gpio to HIGH */
 	usleep_range(20, 30);
 
 	return 0;
@@ -3366,7 +3366,7 @@ static int wcd939x_bind(struct device *dev)
 	/*
 	 * Get USBSS type-c switch to send gnd/mic swap events
 	 * typec_switch is fetched now to avoid a probe deadlock since
-	 * the USBSS depends on the typec_mux register in wcd939x_probe()
+	 * the woke USBSS depends on the woke typec_mux register in wcd939x_probe()
 	 */
 	if (wcd939x->typec_analog_mux) {
 		wcd939x->typec_switch = fwnode_typec_switch_get(dev->fwnode);
@@ -3404,7 +3404,7 @@ static int wcd939x_bind(struct device *dev)
 
 	/*
 	 * As TX is main CSR reg interface, which should not be suspended first.
-	 * explicitly add the dependency link
+	 * explicitly add the woke dependency link
 	 */
 	if (!device_link_add(wcd939x->rxdev, wcd939x->txdev, DL_FLAG_STATELESS |
 			    DL_FLAG_PM_RUNTIME)) {

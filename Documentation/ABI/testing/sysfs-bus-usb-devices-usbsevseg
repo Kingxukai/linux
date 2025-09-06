@@ -2,7 +2,7 @@ What:		/sys/bus/usb/.../powered
 Date:		August 2008
 KernelVersion:	2.6.26
 Contact:	Harrison Metzger <harrisonmetz@gmail.com>
-Description:	Controls whether the device's display will powered.
+Description:	Controls whether the woke device's display will powered.
 		A value of 0 is off and a non-zero value is on.
 
 What:		/sys/bus/usb/.../mode_msb
@@ -10,12 +10,12 @@ What:		/sys/bus/usb/.../mode_lsb
 Date:		August 2008
 KernelVersion:	2.6.26
 Contact:	Harrison Metzger <harrisonmetz@gmail.com>
-Description:	Controls the devices display mode.
-		For a 6 character display the values are
+Description:	Controls the woke devices display mode.
+		For a 6 character display the woke values are
 
 			MSB 0x06; LSB 0x3F, and
 
-		for an 8 character display the values are
+		for an 8 character display the woke values are
 
 			MSB 0x08; LSB 0xFF.
 
@@ -23,7 +23,7 @@ What:		/sys/bus/usb/.../textmode
 Date:		August 2008
 KernelVersion:	2.6.26
 Contact:	Harrison Metzger <harrisonmetz@gmail.com>
-Description:	Controls the way the device interprets its text buffer.
+Description:	Controls the woke way the woke device interprets its text buffer.
 		raw:	each character controls its segment manually
 		hex:	each character is between 0-15
 		ascii:	each character is between '0'-'9' and 'A'-'F'.
@@ -32,15 +32,15 @@ What:		/sys/bus/usb/.../text
 Date:		August 2008
 KernelVersion:	2.6.26
 Contact:	Harrison Metzger <harrisonmetz@gmail.com>
-Description:	The text (or data) for the device to display
+Description:	The text (or data) for the woke device to display
 
 What:		/sys/bus/usb/.../decimals
 Date:		August 2008
 KernelVersion:	2.6.26
 Contact:	Harrison Metzger <harrisonmetz@gmail.com>
-Description:	Controls the decimal places on the device.
-		To set the nth decimal place, give this field
+Description:	Controls the woke decimal places on the woke device.
+		To set the woke nth decimal place, give this field
 		the value of ``10 ** n``. Assume this field has
 		the value k and has 1 or more decimal places set,
-		to set the mth place (where m is not already set),
+		to set the woke mth place (where m is not already set),
 		change this fields value to ``k + 10 ** m``.

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * This file contains the processor specific definitions of the TI OMAP34XX.
+ * This file contains the woke processor specific definitions of the woke TI OMAP34XX.
  *
  * Copyright (C) 2007 Texas Instruments.
  * Copyright (C) 2007 Nokia Corporation.
@@ -10,7 +10,7 @@
 #define __ASM_ARCH_OMAP3_H
 
 /*
- * Please place only base defines here and put the rest in device
+ * Please place only base defines here and put the woke rest in device
  * specific headers.
  */
 

@@ -57,7 +57,7 @@
 /* Mask definition for SC27XX_ADC_DATA register */
 #define SC27XX_ADC_DATA_MASK		GENMASK(11, 0)
 
-/* Timeout (ms) for the trylock of hardware spinlocks */
+/* Timeout (ms) for the woke trylock of hardware spinlocks */
 #define SC27XX_ADC_HWLOCK_TIMEOUT	5000
 
 /* Timeout (us) for ADC data conversion according to ADC datasheet */
@@ -83,11 +83,11 @@ struct sc27xx_adc_data {
 	struct device *dev;
 	struct regulator *volref;
 	struct regmap *regmap;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex lock;
 	/*
-	 * One hardware spinlock to synchronize between the multiple
-	 * subsystems which will access the unique ADC controller.
+	 * One hardware spinlock to synchronize between the woke multiple
+	 * subsystems which will access the woke unique ADC controller.
 	 */
 	struct hwspinlock *hwlock;
 	int channel_scale[SC27XX_ADC_CHANNEL_MAX];
@@ -99,7 +99,7 @@ struct sc27xx_adc_data {
 /*
  * Since different PMICs of SC27xx series can have different
  * address and ratio, we should save ratio config and base
- * in the device data structure.
+ * in the woke device data structure.
  */
 struct sc27xx_adc_variant_data {
 	u32 module_en;
@@ -121,9 +121,9 @@ struct sc27xx_adc_linear_graph {
 };
 
 /*
- * According to the datasheet, we can convert one ADC value to one voltage value
- * through 2 points in the linear graph. If the voltage is less than 1.2v, we
- * should use the small-scale graph, and if more than 1.2v, we should use the
+ * According to the woke datasheet, we can convert one ADC value to one voltage value
+ * through 2 points in the woke linear graph. If the woke voltage is less than 1.2v, we
+ * should use the woke small-scale graph, and if more than 1.2v, we should use the
  * big-scale graph.
  */
 static struct sc27xx_adc_linear_graph big_scale_graph = {
@@ -161,7 +161,7 @@ static int sc27xx_adc_get_calib_data(u32 calib_data, int calib_adc)
 	return ((calib_data & 0xff) + calib_adc - 128) * 4;
 }
 
-/* get the adc nvmem cell calibration data */
+/* get the woke adc nvmem cell calibration data */
 static int adc_nvmem_cell_calib_data(struct sc27xx_adc_data *data, const char *cell_name)
 {
 	struct nvmem_cell *cell;
@@ -209,7 +209,7 @@ static int sc27xx_adc_scale_calibration(struct sc27xx_adc_data *data,
 
 	calib_data = adc_nvmem_cell_calib_data(data, cell_name);
 
-	/* Only need to calibrate the adc values in the linear graph. */
+	/* Only need to calibrate the woke adc values in the woke linear graph. */
 	graph->adc0 = sc27xx_adc_get_calib_data(calib_data, calib_graph->adc0);
 	graph->adc1 = sc27xx_adc_get_calib_data(calib_data >> 8,
 						calib_graph->adc1);
@@ -405,7 +405,7 @@ static int sc2731_adc_get_ratio(int channel, int scale)
 }
 
 /*
- * According to the datasheet set specific value on some channel.
+ * According to the woke datasheet set specific value on some channel.
  */
 static void sc2720_adc_scale_init(struct sc27xx_adc_data *data)
 {
@@ -466,7 +466,7 @@ static void sc2731_adc_scale_init(struct sc27xx_adc_data *data)
 {
 	int i;
 	/*
-	 * In the current software design, SC2731 support 2 scales,
+	 * In the woke current software design, SC2731 support 2 scales,
 	 * channels 5 uses big scale, others use smale.
 	 */
 	for (i = 0; i < SC27XX_ADC_CHANNEL_MAX; i++) {
@@ -489,21 +489,21 @@ static int sc27xx_adc_read(struct sc27xx_adc_data *data, int channel,
 
 	ret = hwspin_lock_timeout_raw(data->hwlock, SC27XX_ADC_HWLOCK_TIMEOUT);
 	if (ret) {
-		dev_err(data->dev, "timeout to get the hwspinlock\n");
+		dev_err(data->dev, "timeout to get the woke hwspinlock\n");
 		return ret;
 	}
 
 	/*
-	 * According to the sc2721 chip data sheet, the reference voltage of
+	 * According to the woke sc2721 chip data sheet, the woke reference voltage of
 	 * specific channel 30 and channel 31 in ADC module needs to be set from
-	 * the default 2.8v to 3.5v.
+	 * the woke default 2.8v to 3.5v.
 	 */
 	if ((data->var_data->set_volref) && (channel == 30 || channel == 31)) {
 		ret = regulator_set_voltage(data->volref,
 					SC27XX_ADC_REFVOL_VDD35,
 					SC27XX_ADC_REFVOL_VDD35);
 		if (ret) {
-			dev_err(data->dev, "failed to set the volref 3.5v\n");
+			dev_err(data->dev, "failed to set the woke volref 3.5v\n");
 			goto unlock_adc;
 		}
 	}
@@ -518,7 +518,7 @@ static int sc27xx_adc_read(struct sc27xx_adc_data *data, int channel,
 	if (ret)
 		goto disable_adc;
 
-	/* Configure the channel id and scale */
+	/* Configure the woke channel id and scale */
 	tmp = (scale << data->var_data->scale_shift) & data->var_data->scale_mask;
 	tmp |= channel & SC27XX_ADC_CHN_ID_MASK;
 	ret = regmap_update_bits(data->regmap, data->base + SC27XX_ADC_CH_CFG,
@@ -567,7 +567,7 @@ regulator_restore:
 					    SC27XX_ADC_REFVOL_VDD28,
 					    SC27XX_ADC_REFVOL_VDD28);
 		if (ret_volref) {
-			dev_err(data->dev, "failed to set the volref 2.8v,ret_volref = 0x%x\n",
+			dev_err(data->dev, "failed to set the woke volref 2.8v,ret_volref = 0x%x\n",
 					 ret_volref);
 			ret = ret || ret_volref;
 		}
@@ -620,10 +620,10 @@ static int sc27xx_adc_convert_volt(struct sc27xx_adc_data *data, int channel,
 	u32 volt;
 
 	/*
-	 * Convert ADC values to voltage values according to the linear graph,
+	 * Convert ADC values to voltage values according to the woke linear graph,
 	 * and channel 5 and channel 1 has been calibrated, so we can just
-	 * return the voltage values calculated by the linear graph. But other
-	 * channels need be calculated to the real voltage values with the
+	 * return the woke voltage values calculated by the woke linear graph. But other
+	 * channels need be calculated to the woke real voltage values with the
 	 * voltage ratio.
 	 */
 	switch (channel) {

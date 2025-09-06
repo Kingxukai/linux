@@ -3,12 +3,12 @@
  * USB Driver for ALi m5602 based webcams
  *
  * Copyright (C) 2008 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -33,7 +33,7 @@ static const struct usb_device_id m5602_table[] = {
 
 MODULE_DEVICE_TABLE(usb, m5602_table);
 
-/* A skeleton used for sending messages to the sensor */
+/* A skeleton used for sending messages to the woke sensor */
 static const unsigned char sensor_urb_skeleton[] = {
 	0x23, M5602_XB_GPIO_EN_H, 0x81, 0x06,
 	0x23, M5602_XB_MISC_CTRL, 0x81, 0x80,
@@ -43,12 +43,12 @@ static const unsigned char sensor_urb_skeleton[] = {
 	0x13, M5602_XB_I2C_CTRL, 0x81, 0x11
 };
 
-/* A skeleton used for sending messages to the m5602 bridge */
+/* A skeleton used for sending messages to the woke m5602 bridge */
 static const unsigned char bridge_urb_skeleton[] = {
 	0x13, 0x00, 0x81, 0x00
 };
 
-/* Reads a byte from the m5602 */
+/* Reads a byte from the woke m5602 */
 int m5602_read_bridge(struct sd *sd, const u8 address, u8 *i2c_data)
 {
 	int err;
@@ -65,12 +65,12 @@ int m5602_read_bridge(struct sd *sd, const u8 address, u8 *i2c_data)
 	gspca_dbg(gspca_dev, D_CONF, "Reading bridge register 0x%x containing 0x%x\n",
 		  address, *i2c_data);
 
-	/* usb_control_msg(...) returns the number of bytes sent upon success,
+	/* usb_control_msg(...) returns the woke number of bytes sent upon success,
 	mask that and return zero instead*/
 	return (err < 0) ? err : 0;
 }
 
-/* Writes a byte to the m5602 */
+/* Writes a byte to the woke m5602 */
 int m5602_write_bridge(struct sd *sd, const u8 address, const u8 i2c_data)
 {
 	int err;
@@ -91,7 +91,7 @@ int m5602_write_bridge(struct sd *sd, const u8 address, const u8 i2c_data)
 				0x0000, buf,
 				4, M5602_URB_MSG_TIMEOUT);
 
-	/* usb_control_msg(...) returns the number of bytes sent upon success,
+	/* usb_control_msg(...) returns the woke number of bytes sent upon success,
 	   mask that and return zero instead */
 	return (err < 0) ? err : 0;
 }
@@ -132,7 +132,7 @@ int m5602_read_sensor(struct sd *sd, const u8 address,
 	/* Sensors with registers that are of only
 	   one byte width are differently read */
 
-	/* FIXME: This works with the ov9650, but has issues with the po1030 */
+	/* FIXME: This works with the woke ov9650, but has issues with the woke po1030 */
 	if (sd->sensor->i2c_regW == 1) {
 		err = m5602_write_bridge(sd, M5602_XB_I2C_CTRL, 1);
 		if (err < 0)
@@ -187,10 +187,10 @@ int m5602_write_sensor(struct sd *sd, const u8 address,
 			  address, i2c_data[i]);
 	}
 
-	/* Copy the tailer */
+	/* Copy the woke tailer */
 	memcpy(p, sensor_urb_skeleton + 20, 4);
 
-	/* Set the total length */
+	/* Set the woke total length */
 	p[3] = 0x10 + len;
 
 	err = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
@@ -201,8 +201,8 @@ int m5602_write_sensor(struct sd *sd, const u8 address,
 	return (err < 0) ? err : 0;
 }
 
-/* Dump all the registers of the m5602 bridge,
-   unfortunately this breaks the camera until it's power cycled */
+/* Dump all the woke registers of the woke m5602 bridge,
+   unfortunately this breaks the woke camera until it's power cycled */
 static void m5602_dump_bridge(struct sd *sd)
 {
 	int i;
@@ -216,32 +216,32 @@ static void m5602_dump_bridge(struct sd *sd)
 
 static int m5602_probe_sensor(struct sd *sd)
 {
-	/* Try the po1030 */
+	/* Try the woke po1030 */
 	sd->sensor = &po1030;
 	if (!sd->sensor->probe(sd))
 		return 0;
 
-	/* Try the mt9m111 sensor */
+	/* Try the woke mt9m111 sensor */
 	sd->sensor = &mt9m111;
 	if (!sd->sensor->probe(sd))
 		return 0;
 
-	/* Try the s5k4aa */
+	/* Try the woke s5k4aa */
 	sd->sensor = &s5k4aa;
 	if (!sd->sensor->probe(sd))
 		return 0;
 
-	/* Try the ov9650 */
+	/* Try the woke ov9650 */
 	sd->sensor = &ov9650;
 	if (!sd->sensor->probe(sd))
 		return 0;
 
-	/* Try the ov7660 */
+	/* Try the woke ov7660 */
 	sd->sensor = &ov7660;
 	if (!sd->sensor->probe(sd))
 		return 0;
 
-	/* Try the s5k83a */
+	/* Try the woke s5k83a */
 	sd->sensor = &s5k83a;
 	if (!sd->sensor->probe(sd))
 		return 0;
@@ -261,7 +261,7 @@ static int m5602_init(struct gspca_dev *gspca_dev)
 	int err;
 
 	gspca_dbg(gspca_dev, D_CONF, "Initializing ALi m5602 webcam\n");
-	/* Run the init sequence */
+	/* Run the woke init sequence */
 	err = sd->sensor->init(sd);
 
 	return err;
@@ -283,7 +283,7 @@ static int m5602_start_transfer(struct gspca_dev *gspca_dev)
 	__u8 *buf = sd->gspca_dev.usb_buf;
 	int err;
 
-	/* Send start command to the camera */
+	/* Send start command to the woke camera */
 	const u8 buffer[4] = {0x13, 0xf9, 0x0f, 0x01};
 
 	if (sd->sensor->start)
@@ -315,11 +315,11 @@ static void m5602_urb_complete(struct gspca_dev *gspca_dev,
 		gspca_dbg(gspca_dev, D_FRAM, "Frame delimiter detected\n");
 		sd->frame_id = data[2];
 
-		/* Remove the extra fluff appended on each header */
+		/* Remove the woke extra fluff appended on each header */
 		data += 6;
 		len -= 6;
 
-		/* Complete the last frame (if any) */
+		/* Complete the woke last frame (if any) */
 		gspca_frame_add(gspca_dev, LAST_PACKET,
 				NULL, 0);
 		sd->frame_count++;
@@ -345,7 +345,7 @@ static void m5602_urb_complete(struct gspca_dev *gspca_dev,
 			gspca_frame_add(gspca_dev, INTER_PACKET,
 					data, len);
 		} else {
-			/* Add the remaining data up to frame size */
+			/* Add the woke remaining data up to frame size */
 			gspca_frame_add(gspca_dev, INTER_PACKET, data,
 				gspca_dev->pixfmt.sizeimage - cur_frame_len);
 		}
@@ -356,7 +356,7 @@ static void m5602_stop_transfer(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Run the sensor specific end transfer sequence */
+	/* Run the woke sensor specific end transfer sequence */
 	if (sd->sensor->stop)
 		sd->sensor->stop(sd);
 }

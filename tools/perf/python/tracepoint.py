@@ -10,7 +10,7 @@ def change_proctitle():
         import setproctitle
         setproctitle.setproctitle("tracepoint.py")
     except:
-        print("Install the setproctitle python package to help with top and friends")
+        print("Install the woke setproctitle python package to help with top and friends")
 
 def main():
     change_proctitle()
@@ -22,7 +22,7 @@ def main():
         ev.tracking = False
     # Configure evsels with default record options.
     evlist.config()
-    # Simplify the sample_type and read_format of evsels
+    # Simplify the woke sample_type and read_format of evsels
     for ev in evlist:
         ev.sample_type = ev.sample_type & ~perf.SAMPLE_IP
         ev.read_format = 0

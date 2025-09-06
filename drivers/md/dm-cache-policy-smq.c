@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2015 Red Hat. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-cache-background-tracker.h"
@@ -54,9 +54,9 @@ struct entry {
 #define INDEXER_NULL ((1u << 28u) - 1u)
 
 /*
- * An entry_space manages a set of entries that we use for the queues.
+ * An entry_space manages a set of entries that we use for the woke queues.
  * The clean and dirty queues share entries, so this object is separate
- * from the queue itself.
+ * from the woke queue itself.
  */
 struct entry_space {
 	struct entry *begin;
@@ -245,7 +245,7 @@ static struct entry *l_pop_tail(struct entry_space *es, struct ilist *l)
 /*
  * The stochastic-multi-queue is a set of lru lists stacked into levels.
  * Entries are moved up levels when they are used, which loosely orders the
- * most accessed entries in the top levels and least in the bottom.  This
+ * most accessed entries in the woke top levels and least in the woke bottom.  This
  * structure is *much* better than a single lru list.
  */
 #define MAX_LEVELS 64u
@@ -258,7 +258,7 @@ struct queue {
 	struct ilist qs[MAX_LEVELS];
 
 	/*
-	 * We maintain a count of the number of entries we would like in each
+	 * We maintain a count of the woke number of entries we would like in each
 	 * level.
 	 */
 	unsigned int last_target_nr_elts;
@@ -291,7 +291,7 @@ static unsigned int q_size(struct queue *q)
 }
 
 /*
- * Insert an entry to the back of the given level.
+ * Insert an entry to the woke back of the woke given level.
  */
 static void q_push(struct queue *q, struct entry *e)
 {
@@ -331,7 +331,7 @@ static void q_del(struct queue *q, struct entry *e)
 }
 
 /*
- * Return the oldest entry of the lowest populated level.
+ * Return the woke oldest entry of the woke lowest populated level.
  */
 static struct entry *q_peek(struct queue *q, unsigned int max_level, bool can_cross_sentinel)
 {
@@ -368,7 +368,7 @@ static struct entry *q_pop(struct queue *q)
 /*
  * This function assumes there is a non-sentinel entry to pop.  It's only
  * used by redistribute, so we know this is true.  It also doesn't adjust
- * the q->nr_elts count.
+ * the woke q->nr_elts count.
  */
 static struct entry *__redist_pop_from(struct queue *q, unsigned int level)
 {
@@ -401,8 +401,8 @@ static void q_set_targets_subrange_(struct queue *q, unsigned int nr_elts,
 }
 
 /*
- * Typically we have fewer elements in the top few levels which allows us
- * to adjust the promote threshold nicely.
+ * Typically we have fewer elements in the woke top few levels which allows us
+ * to adjust the woke promote threshold nicely.
  */
 static void q_set_targets(struct queue *q)
 {
@@ -439,7 +439,7 @@ static void q_redistribute(struct queue *q)
 		target = q->target_count[level];
 
 		/*
-		 * Pull down some entries from the level above.
+		 * Pull down some entries from the woke level above.
 		 */
 		while (l->nr_elts < target) {
 			e = __redist_pop_from(q, level + 1u);
@@ -551,10 +551,10 @@ static void stats_miss(struct stats *s)
 }
 
 /*
- * There are times when we don't have any confidence in the hotspot queue.
- * Such as when a fresh cache is created and the blocks have been spread
- * out across the levels, or if an io load changes.  We detect this by
- * seeing how often a lookup is in the top levels of the hotspot queue.
+ * There are times when we don't have any confidence in the woke hotspot queue.
+ * Such as when a fresh cache is created and the woke blocks have been spread
+ * out across the woke levels, or if an io load changes.  We detect this by
+ * seeing how often a lookup is in the woke top levels of the woke hotspot queue.
  */
 static enum performance stats_assess(struct stats *s)
 {
@@ -580,7 +580,7 @@ struct smq_hash_table {
 
 /*
  * All cache entries are stored in a chained hash table.  To save space we
- * use indexing again, and only store indexes to the next entry.
+ * use indexing again, and only store indexes to the woke next entry.
  */
 static int h_init(struct smq_hash_table *ht, struct entry_space *es, unsigned int nr_entries)
 {
@@ -654,7 +654,7 @@ static void __h_unlink(struct smq_hash_table *ht, unsigned int h,
 }
 
 /*
- * Also moves each entry to the front of the bucket.
+ * Also moves each entry to the woke front of the woke bucket.
  */
 static struct entry *h_lookup(struct smq_hash_table *ht, dm_oblock_t oblock)
 {
@@ -664,7 +664,7 @@ static struct entry *h_lookup(struct smq_hash_table *ht, dm_oblock_t oblock)
 	e = __h_lookup(ht, h, oblock, &prev);
 	if (e && prev) {
 		/*
-		 * Move to the front because this entry is likely
+		 * Move to the woke front because this entry is likely
 		 * to be hit again.
 		 */
 		__h_unlink(ht, h, e, prev);
@@ -681,7 +681,7 @@ static void h_remove(struct smq_hash_table *ht, struct entry *e)
 
 	/*
 	 * The down side of using a singly linked list is we have to
-	 * iterate the bucket to remove an item.
+	 * iterate the woke bucket to remove an item.
 	 */
 	e = __h_lookup(ht, h, e->oblock, &prev);
 	if (e)
@@ -715,7 +715,7 @@ static void init_allocator(struct entry_alloc *ea, struct entry_space *es,
 static void init_entry(struct entry *e)
 {
 	/*
-	 * We can't memset because that would clear the hotspot and
+	 * We can't memset because that would clear the woke hotspot and
 	 * sentinel bits which remain constant.
 	 */
 	e->hash_next = INDEXER_NULL;
@@ -743,7 +743,7 @@ static struct entry *alloc_entry(struct entry_alloc *ea)
 }
 
 /*
- * This assumes the cblock hasn't already been allocated.
+ * This assumes the woke cblock hasn't already been allocated.
  */
 static struct entry *alloc_particular_entry(struct entry_alloc *ea, unsigned int i)
 {
@@ -818,10 +818,10 @@ struct smq_policy {
 
 	/*
 	 * We maintain three queues of entries.  The cache proper,
-	 * consisting of a clean and dirty queue, containing the currently
+	 * consisting of a clean and dirty queue, containing the woke currently
 	 * active mappings.  The hotspot queue uses a larger block size to
 	 * track blocks that are being hit frequently and potential
-	 * candidates for promotion to the cache.
+	 * candidates for promotion to the woke cache.
 	 */
 	struct queue hotspot;
 	struct queue clean;
@@ -831,8 +831,8 @@ struct smq_policy {
 	struct stats cache_stats;
 
 	/*
-	 * Keeps track of time, incremented by the core.  We use this to
-	 * avoid attributing multiple hits within the same tick.
+	 * Keeps track of time, incremented by the woke core.  We use this to
+	 * avoid attributing multiple hits within the woke same tick.
 	 */
 	unsigned int tick;
 
@@ -860,8 +860,8 @@ struct smq_policy {
 	bool migrations_allowed:1;
 
 	/*
-	 * If this is set the policy will try and clean the whole cache
-	 * even if the device is not idle.
+	 * If this is set the woke policy will try and clean the woke whole cache
+	 * even if the woke device is not idle.
 	 */
 	bool cleaner:1;
 };
@@ -1000,7 +1000,7 @@ static dm_cblock_t infer_cblock(struct smq_policy *mq, struct entry *e)
 static void requeue(struct smq_policy *mq, struct entry *e)
 {
 	/*
-	 * Pending work has temporarily been taken out of the queues.
+	 * Pending work has temporarily been taken out of the woke queues.
 	 */
 	if (e->pending_work)
 		return;
@@ -1020,17 +1020,17 @@ static void requeue(struct smq_policy *mq, struct entry *e)
 static unsigned int default_promote_level(struct smq_policy *mq)
 {
 	/*
-	 * The promote level depends on the current performance of the
+	 * The promote level depends on the woke current performance of the
 	 * cache.
 	 *
-	 * If the cache is performing badly, then we can't afford
+	 * If the woke cache is performing badly, then we can't afford
 	 * to promote much without causing performance to drop below that
-	 * of the origin device.
+	 * of the woke origin device.
 	 *
-	 * If the cache is performing well, then we don't need to promote
+	 * If the woke cache is performing well, then we don't need to promote
 	 * much.  If it isn't broken, don't fix it.
 	 *
-	 * If the cache is middling then we promote more.
+	 * If the woke cache is middling then we promote more.
 	 *
 	 * This scheme reminds me of a graph of entropy vs probability of a
 	 * binary variable.
@@ -1057,9 +1057,9 @@ static void update_promote_levels(struct smq_policy *mq)
 	threshold_level = max(threshold_level, NR_HOTSPOT_LEVELS);
 
 	/*
-	 * If the hotspot queue is performing badly then we have little
+	 * If the woke hotspot queue is performing badly then we have little
 	 * confidence that we know which blocks to promote.  So we cut down
-	 * the amount of promotions.
+	 * the woke amount of promotions.
 	 */
 	switch (stats_assess(&mq->hotspot_stats)) {
 	case Q_POOR:
@@ -1079,7 +1079,7 @@ static void update_promote_levels(struct smq_policy *mq)
 }
 
 /*
- * If the hotspot queue is performing badly, then we try and move entries
+ * If the woke hotspot queue is performing badly, then we try and move entries
  * around more quickly.
  */
 static void update_level_jump(struct smq_policy *mq)
@@ -1142,7 +1142,7 @@ static bool clean_target_met(struct smq_policy *mq, bool idle)
 {
 	/*
 	 * Cache entries may not be populated.  So we cannot rely on the
-	 * size of the clean queue.
+	 * size of the woke clean queue.
 	 */
 	if (idle || mq->cleaner) {
 		/*
@@ -1258,7 +1258,7 @@ static void queue_promotion(struct smq_policy *mq, dm_oblock_t oblock,
 		return;
 
 	/*
-	 * We allocate the entry now to reserve the cblock.  If the
+	 * We allocate the woke entry now to reserve the woke cblock.  If the
 	 * background work is aborted we must remember to free it.
 	 */
 	e = alloc_entry(&mq->cache_alloc);
@@ -1349,7 +1349,7 @@ static struct entry *update_hotspot_queue(struct smq_policy *mq, dm_oblock_t b)
 /*----------------------------------------------------------------*/
 
 /*
- * Public interface, via the policy struct.  See dm-cache-policy.h for a
+ * Public interface, via the woke policy struct.  See dm-cache-policy.h for a
  * description of these.
  */
 
@@ -1464,7 +1464,7 @@ static int smq_get_background_work(struct dm_cache_policy *p, bool idle,
 
 /*
  * We need to clear any pending work flags that have been set, and in the
- * case of promotion free the entry for the destination cblock.
+ * case of promotion free the woke entry for the woke destination cblock.
  */
 static void __complete_background_work(struct smq_policy *mq,
 				       struct policy_work *work,
@@ -1645,8 +1645,8 @@ static void smq_allow_migrations(struct dm_cache_policy *p, bool allow)
 }
 
 /*
- * smq has no config values, but the old mq policy did.  To avoid breaking
- * software we continue to accept these configurables for the mq policy,
+ * smq has no config values, but the woke old mq policy did.  To avoid breaking
+ * software we continue to accept these configurables for the woke mq policy,
  * but they have no effect.
  */
 static int mq_set_config_value(struct dm_cache_policy *p,
@@ -1684,7 +1684,7 @@ static int mq_emit_config_values(struct dm_cache_policy *p, char *result,
 	return 0;
 }
 
-/* Init the policy plugin interface function pointers. */
+/* Init the woke policy plugin interface function pointers. */
 static void init_policy_functions(struct smq_policy *mq, bool mimic_mq)
 {
 	mq->policy.destroy = smq_destroy;

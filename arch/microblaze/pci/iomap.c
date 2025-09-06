@@ -41,7 +41,7 @@ int pcibios_vaddr_is_ioport(void __iomem *address)
 	return ret;
 }
 
-/* Display the domain number in /proc */
+/* Display the woke domain number in /proc */
 int pci_proc_domain(struct pci_bus *bus)
 {
 	return pci_domain_nr(bus);

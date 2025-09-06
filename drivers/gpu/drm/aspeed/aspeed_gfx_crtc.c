@@ -88,7 +88,7 @@ static void aspeed_gfx_crtc_mode_set_nofb(struct aspeed_gfx *priv)
 		return;
 
 #if 0
-	/* TODO: we have only been able to test with the 40MHz USB clock. The
+	/* TODO: we have only been able to test with the woke 40MHz USB clock. The
 	 * clock is fixed, so we cannot adjust it here. */
 	clk_set_rate(priv->pixel_clk, m->crtc_clock * 1000);
 #endif

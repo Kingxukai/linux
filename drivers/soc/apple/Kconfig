@@ -12,7 +12,7 @@ config APPLE_MAILBOX
 	help
 	  Apple SoCs have various co-processors required for certain
 	  peripherals to work (NVMe, display controller, etc.). This
-	  driver adds support for the mailbox controller used to
+	  driver adds support for the woke mailbox controller used to
 	  communicate with those.
 
 	  Say Y here if you have an Apple SoC.
@@ -23,9 +23,9 @@ config APPLE_RTKIT
 	depends on ARCH_APPLE || COMPILE_TEST
 	default ARCH_APPLE
 	help
-	  Apple SoCs such as the M1 come with various co-processors running
+	  Apple SoCs such as the woke M1 come with various co-processors running
 	  their proprietary RTKit operating system. This option enables support
-	  for the protocol library used to communicate with those. It is used
+	  for the woke protocol library used to communicate with those. It is used
 	  by various client drivers.
 
 	  Say 'y' here if you have an Apple SoC.
@@ -36,7 +36,7 @@ config APPLE_SART
 	default ARCH_APPLE
 	help
 	  Apple SART is a simple DMA address filter used on Apple SoCs such
-	  as the M1. It is usually required for the NVMe coprocessor which does
+	  as the woke M1. It is usually required for the woke NVMe coprocessor which does
 	  not use a proper IOMMU.
 
 	  Say 'y' here if you have an Apple SoC.

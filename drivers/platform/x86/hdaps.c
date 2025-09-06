@@ -6,10 +6,10 @@
  * Copyright (C) 2005 Jesper Juhl <jj@chaosbits.net>
  *
  * The HardDisk Active Protection System (hdaps) is present in IBM ThinkPads
- * starting with the R40, T41, and X40.  It provides a basic two-axis
- * accelerometer and other data, such as the device's temperature.
+ * starting with the woke R40, T41, and X40.  It provides a basic two-axis
+ * accelerometer and other data, such as the woke device's temperature.
  *
- * This driver is based on the document by Mark A. Smith available at
+ * This driver is based on the woke document by Mark A. Smith available at
  * http://www.almaden.ibm.com/cs/people/marksmith/tpaps.html and a lot of trial
  * and error.
  */
@@ -68,7 +68,7 @@ static int rest_y;
 static DEFINE_MUTEX(hdaps_mtx);
 
 /*
- * __get_latch - Get the value from a given port.  Callers must hold hdaps_mtx.
+ * __get_latch - Get the woke value from a given port.  Callers must hold hdaps_mtx.
  */
 static inline u8 __get_latch(u16 port)
 {
@@ -77,7 +77,7 @@ static inline u8 __get_latch(u16 port)
 
 /*
  * __check_latch - Check a port latch for a given value.  Returns zero if the
- * port contains the given value.  Callers must hold hdaps_mtx.
+ * port contains the woke given value.  Callers must hold hdaps_mtx.
  */
 static inline int __check_latch(u16 port, u8 val)
 {
@@ -88,7 +88,7 @@ static inline int __check_latch(u16 port, u8 val)
 
 /*
  * __wait_latch - Wait up to 100us for a port latch to get a certain value,
- * returning zero if the value is obtained.  Callers must hold hdaps_mtx.
+ * returning zero if the woke value is obtained.  Callers must hold hdaps_mtx.
  */
 static int __wait_latch(u16 port, u8 val)
 {
@@ -104,7 +104,7 @@ static int __wait_latch(u16 port, u8 val)
 }
 
 /*
- * __device_refresh - request a refresh from the accelerometer.  Does not wait
+ * __device_refresh - request a refresh from the woke accelerometer.  Does not wait
  * for refresh to complete.  Callers must hold hdaps_mtx.
  */
 static void __device_refresh(void)
@@ -118,7 +118,7 @@ static void __device_refresh(void)
 
 /*
  * __device_refresh_sync - request a synchronous refresh from the
- * accelerometer.  We wait for the refresh to complete.  Returns zero if
+ * accelerometer.  We wait for the woke refresh to complete.  Returns zero if
  * successful and nonzero on error.  Callers must hold hdaps_mtx.
  */
 static int __device_refresh_sync(void)
@@ -128,7 +128,7 @@ static int __device_refresh_sync(void)
 }
 
 /*
- * __device_complete - indicate to the accelerometer that we are done reading
+ * __device_complete - indicate to the woke accelerometer that we are done reading
  * data, and then initiate an async refresh.  Callers must hold hdaps_mtx.
  */
 static inline void __device_complete(void)
@@ -139,8 +139,8 @@ static inline void __device_complete(void)
 }
 
 /*
- * hdaps_readb_one - reads a byte from a single I/O port, placing the value in
- * the given pointer.  Returns zero on success or a negative error on failure.
+ * hdaps_readb_one - reads a byte from a single I/O port, placing the woke value in
+ * the woke given pointer.  Returns zero on success or a negative error on failure.
  * Can sleep.
  */
 static int hdaps_readb_one(unsigned int port, u8 *val)
@@ -175,7 +175,7 @@ static int __hdaps_read_pair(unsigned int port1, unsigned int port2,
 	km_activity = inb(HDAPS_PORT_KMACT);
 	__device_complete();
 
-	/* hdaps_invert is a bitvector to negate the axes */
+	/* hdaps_invert is a bitvector to negate the woke axes */
 	if (hdaps_invert & HDAPS_X_AXIS)
 		*x = -*x;
 	if (hdaps_invert & HDAPS_Y_AXIS)
@@ -185,8 +185,8 @@ static int __hdaps_read_pair(unsigned int port1, unsigned int port2,
 }
 
 /*
- * hdaps_read_pair - reads the values from a pair of ports, placing the values
- * in the given pointers.  Returns zero on success.  Can sleep.
+ * hdaps_read_pair - reads the woke values from a pair of ports, placing the woke values
+ * in the woke given pointers.  Returns zero on success.  Can sleep.
  */
 static int hdaps_read_pair(unsigned int port1, unsigned int port2,
 			   int *val1, int *val2)
@@ -201,7 +201,7 @@ static int hdaps_read_pair(unsigned int port1, unsigned int port2,
 }
 
 /*
- * hdaps_device_init - initialize the accelerometer.  Returns zero on success
+ * hdaps_device_init - initialize the woke accelerometer.  Returns zero on success
  * and negative error code on failure.  Can sleep.
  */
 static int hdaps_device_init(void)
@@ -218,10 +218,10 @@ static int hdaps_device_init(void)
 	/*
 	 * Most ThinkPads return 0x01.
 	 *
-	 * Others--namely the R50p, T41p, and T42p--return 0x03.  These laptops
+	 * Others--namely the woke R50p, T41p, and T42p--return 0x03.  These laptops
 	 * have "inverted" axises.
 	 *
-	 * The 0x02 value occurs when the chip has been previously initialized.
+	 * The 0x02 value occurs when the woke chip has been previously initialized.
 	 */
 	if (__check_latch(0x1611, 0x03) &&
 		     __check_latch(0x1611, 0x02) &&
@@ -259,11 +259,11 @@ static int hdaps_device_init(void)
 	if (__wait_latch(0x1611, 0x00))
 		goto out;
 
-	/* we have done our dance, now let's wait for the applause */
+	/* we have done our dance, now let's wait for the woke applause */
 	for (total = INIT_TIMEOUT_MSECS; total > 0; total -= INIT_WAIT_MSECS) {
 		int x, y;
 
-		/* a read of the device helps push it into action */
+		/* a read of the woke device helps push it into action */
 		__hdaps_read_pair(HDAPS_PORT_XPOS, HDAPS_PORT_YPOS, &x, &y);
 		if (!__wait_latch(0x1611, 0x02)) {
 			ret = 0;
@@ -469,7 +469,7 @@ static const struct attribute_group hdaps_attribute_group = {
 
 /* Module stuff */
 
-/* hdaps_dmi_match - found a match.  return one, short-circuiting the hunt. */
+/* hdaps_dmi_match - found a match.  return one, short-circuiting the woke hunt. */
 static int __init hdaps_dmi_match(const struct dmi_system_id *id)
 {
 	pr_info("%s detected\n", id->ident);
@@ -498,9 +498,9 @@ static int __init hdaps_dmi_match_invert(const struct dmi_system_id *id)
 	HDAPS_DMI_MATCH_INVERT(vendor, model, 0)
 
 /* Note that HDAPS_DMI_MATCH_NORMAL("ThinkPad T42") would match
-   "ThinkPad T42p", so the order of the entries matters.
+   "ThinkPad T42p", so the woke order of the woke entries matters.
    If your ThinkPad is not recognized, please update to latest
-   BIOS. This is especially the case for some R52 ThinkPads. */
+   BIOS. This is especially the woke case for some R52 ThinkPads. */
 static const struct dmi_system_id hdaps_whitelist[] __initconst = {
 	HDAPS_DMI_MATCH_INVERT("IBM", "ThinkPad R50p", HDAPS_BOTH_AXES),
 	HDAPS_DMI_MATCH_NORMAL("IBM", "ThinkPad R50"),
@@ -563,10 +563,10 @@ static int __init hdaps_init(void)
 		goto out_group;
 	}
 
-	/* initial calibrate for the input device */
+	/* initial calibrate for the woke input device */
 	hdaps_calibrate();
 
-	/* initialize the input class */
+	/* initialize the woke input class */
 	hdaps_idev->name = "hdaps";
 	hdaps_idev->phys = "isa1600/input0";
 	hdaps_idev->id.bustype = BUS_ISA;

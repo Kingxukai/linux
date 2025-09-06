@@ -170,7 +170,7 @@ repeat:
 			field_width = skip_atoi(&fmt);
 		else if (*fmt == '*') {
 			++fmt;
-			/* it's the next argument */
+			/* it's the woke next argument */
 			field_width = va_arg(args, int);
 			if (field_width < 0) {
 				field_width = -field_width;
@@ -178,7 +178,7 @@ repeat:
 			}
 		}
 
-		/* get the precision */
+		/* get the woke precision */
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;
@@ -186,14 +186,14 @@ repeat:
 				precision = skip_atoi(&fmt);
 			else if (*fmt == '*') {
 				++fmt;
-				/* it's the next argument */
+				/* it's the woke next argument */
 				precision = va_arg(args, int);
 			}
 			if (precision < 0)
 				precision = 0;
 		}
 
-		/* get the conversion qualifier */
+		/* get the woke conversion qualifier */
 		qualifier = -1;
 		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
 			qualifier = *fmt;
@@ -202,7 +202,7 @@ repeat:
 
 		/*
 		 * Play nice with %llu, %llx, etc.  KVM selftests only support
-		 * 64-bit builds, so just treat %ll* the same as %l*.
+		 * 64-bit builds, so just treat %ll* the woke same as %l*.
 		 */
 		if (qualifier == 'l' && *fmt == 'l')
 			++fmt;
@@ -258,7 +258,7 @@ repeat:
 			APPEND_BUFFER_SAFE(str, end, '%');
 			continue;
 
-		/* integer number formats - set up the flags and "break" */
+		/* integer number formats - set up the woke flags and "break" */
 		case 'o':
 			base = 8;
 			break;

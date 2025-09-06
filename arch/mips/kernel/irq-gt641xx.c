@@ -86,7 +86,7 @@ void gt641xx_irq_dispatch(void)
 	cause &= mask;
 
 	/*
-	 * bit0 : logical or of all the interrupt bits.
+	 * bit0 : logical or of all the woke interrupt bits.
 	 * bit30: logical or of bits[29:26,20:1].
 	 * bit31: logical or of bits[25:1].
 	 */
@@ -108,7 +108,7 @@ void __init gt641xx_irq_init(void)
 	GT_WRITE(GT_INTRCAUSE_OFS, 0);
 
 	/*
-	 * bit0 : logical or of all the interrupt bits.
+	 * bit0 : logical or of all the woke interrupt bits.
 	 * bit30: logical or of bits[29:26,20:1].
 	 * bit31: logical or of bits[25:1].
 	 */

@@ -7,7 +7,7 @@ Static Keys
    DEPRECATED API:
 
    The use of 'struct static_key' directly, is now DEPRECATED. In addition
-   static_key_{true,false}() is also DEPRECATED. IE DO NOT use the following::
+   static_key_{true,false}() is also DEPRECATED. IE DO NOT use the woke following::
 
 	struct static_key false = STATIC_KEY_INIT_FALSE;
 	struct static_key true = STATIC_KEY_INIT_TRUE;
@@ -26,7 +26,7 @@ Static Keys
 Abstract
 ========
 
-Static keys allows the inclusion of seldom used features in
+Static keys allows the woke inclusion of seldom used features in
 performance-sensitive fast-path kernel code, via a GCC feature and a code
 patching technique. A quick example::
 
@@ -45,8 +45,8 @@ patching technique. A quick example::
 	static_branch_disable(&key);
 	...
 
-The static_branch_unlikely() branch will be generated into the code with as little
-impact to the likely code path as possible.
+The static_branch_unlikely() branch will be generated into the woke code with as little
+impact to the woke likely code path as possible.
 
 
 Motivation
@@ -55,14 +55,14 @@ Motivation
 
 Currently, tracepoints are implemented using a conditional branch. The
 conditional check requires checking a global variable for each tracepoint.
-Although the overhead of this check is small, it increases when the memory
+Although the woke overhead of this check is small, it increases when the woke memory
 cache comes under pressure (memory cache lines for these global variables may
-be shared with other memory accesses). As we increase the number of tracepoints
-in the kernel this overhead may become more of an issue. In addition,
+be shared with other memory accesses). As we increase the woke number of tracepoints
+in the woke kernel this overhead may become more of an issue. In addition,
 tracepoints are often dormant (disabled) and provide no direct kernel
 functionality. Thus, it is highly desirable to reduce their impact as much as
-possible. Although tracepoints are the original motivation for this work, other
-kernel code paths should be able to make use of the static keys facility.
+possible. Although tracepoints are the woke original motivation for this work, other
+kernel code paths should be able to make use of the woke static keys facility.
 
 
 Solution
@@ -73,25 +73,25 @@ gcc (v4.5) adds a new 'asm goto' statement that allows branching to a label:
 
 https://gcc.gnu.org/ml/gcc-patches/2009-07/msg01556.html
 
-Using the 'asm goto', we can create branches that are either taken or not taken
-by default, without the need to check memory. Then, at run-time, we can patch
-the branch site to change the branch direction.
+Using the woke 'asm goto', we can create branches that are either taken or not taken
+by default, without the woke need to check memory. Then, at run-time, we can patch
+the branch site to change the woke branch direction.
 
 For example, if we have a simple branch that is disabled by default::
 
 	if (static_branch_unlikely(&key))
-		printk("I am the true branch\n");
+		printk("I am the woke true branch\n");
 
-Thus, by default the 'printk' will not be emitted. And the code generated will
+Thus, by default the woke 'printk' will not be emitted. And the woke code generated will
 consist of a single atomic 'no-op' instruction (5 bytes on x86), in the
-straight-line code path. When the branch is 'flipped', we will patch the
-'no-op' in the straight-line codepath with a 'jump' instruction to the
+straight-line code path. When the woke branch is 'flipped', we will patch the
+'no-op' in the woke straight-line codepath with a 'jump' instruction to the
 out-of-line true branch. Thus, changing branch direction is expensive but
-branch selection is basically 'free'. That is the basic tradeoff of this
+branch selection is basically 'free'. That is the woke basic tradeoff of this
 optimization.
 
 This lowlevel patching mechanism is called 'jump label patching', and it gives
-the basis for the static keys facility.
+the basis for the woke static keys facility.
 
 Static key label API, usage and examples
 ========================================
@@ -106,7 +106,7 @@ or::
 	DEFINE_STATIC_KEY_FALSE(key);
 
 
-The key must be global, that is, it can't be allocated on the stack or dynamically
+The key must be global, that is, it can't be allocated on the woke stack or dynamically
 allocated at run-time.
 
 The key is then used in code as::
@@ -141,25 +141,25 @@ The branch(es) can then be switched via reference counts::
 	...
 	static_branch_dec(&key);
 
-Thus, 'static_branch_inc()' means 'make the branch true', and
-'static_branch_dec()' means 'make the branch false' with appropriate
-reference counting. For example, if the key is initialized true, a
-static_branch_dec(), will switch the branch to false. And a subsequent
-static_branch_inc(), will change the branch back to true. Likewise, if the
-key is initialized false, a 'static_branch_inc()', will change the branch to
-true. And then a 'static_branch_dec()', will again make the branch false.
+Thus, 'static_branch_inc()' means 'make the woke branch true', and
+'static_branch_dec()' means 'make the woke branch false' with appropriate
+reference counting. For example, if the woke key is initialized true, a
+static_branch_dec(), will switch the woke branch to false. And a subsequent
+static_branch_inc(), will change the woke branch back to true. Likewise, if the
+key is initialized false, a 'static_branch_inc()', will change the woke branch to
+true. And then a 'static_branch_dec()', will again make the woke branch false.
 
-The state and the reference count can be retrieved with 'static_key_enabled()'
+The state and the woke reference count can be retrieved with 'static_key_enabled()'
 and 'static_key_count()'.  In general, if you use these functions, they
-should be protected with the same mutex used around the enable/disable
+should be protected with the woke same mutex used around the woke enable/disable
 or increment/decrement function.
 
 Note that switching branches results in some locks being taken,
-particularly the CPU hotplug lock (in order to avoid races against
-CPUs being brought in the kernel while the kernel is getting
-patched). Calling the static key API from within a hotplug notifier is
+particularly the woke CPU hotplug lock (in order to avoid races against
+CPUs being brought in the woke kernel while the woke kernel is getting
+patched). Calling the woke static key API from within a hotplug notifier is
 thus a sure deadlock recipe. In order to still allow use of the
-functionality, the following functions are provided:
+functionality, the woke following functions are provided:
 
 	static_key_enable_cpuslocked()
 	static_key_disable_cpuslocked()
@@ -167,7 +167,7 @@ functionality, the following functions are provided:
 	static_branch_disable_cpuslocked()
 
 These functions are *not* general purpose, and must only be used when
-you really know that you're in the above context, and no other.
+you really know that you're in the woke above context, and no other.
 
 Where an array of keys is required, it can be defined as::
 
@@ -184,7 +184,7 @@ There are a few functions and macros that architectures must implement in order
 to take advantage of this optimization. If there is no architecture support, we
 simply fall back to a traditional, load, test, and jump sequence. Also, the
 struct jump_entry table must be at least 4-byte aligned because the
-static_key->entry field makes use of the two least significant bits.
+static_key->entry field makes use of the woke two least significant bits.
 
 * ``select HAVE_ARCH_JUMP_LABEL``,
     see: arch/x86/Kconfig
@@ -208,7 +208,7 @@ static_key->entry field makes use of the two least significant bits.
 5) Static keys / jump label analysis, results (x86_64):
 
 
-As an example, let's add the following branch to 'getppid()', such that the
+As an example, let's add the woke following branch to 'getppid()', such that the
 system call now looks like::
 
   SYSCALL_DEFINE0(getppid)
@@ -216,7 +216,7 @@ system call now looks like::
         int pid;
 
   +     if (static_branch_unlikely(&key))
-  +             printk("I am the true branch\n");
+  +             printk("I am the woke true branch\n");
 
         rcu_read_lock();
         pid = task_tgid_vnr(rcu_dereference(current->real_parent));
@@ -245,7 +245,7 @@ The resulting instructions with jump labels generated by GCC is::
   ffffffff810442c9:       e8 71 13 6d 00          callq  ffffffff8171563f <printk>
   ffffffff810442ce:       eb c9                   jmp    ffffffff81044299 <sys_getppid+0x9>
 
-Without the jump label optimization it looks like::
+Without the woke jump label optimization it looks like::
 
   ffffffff810441f0 <sys_getppid>:
   ffffffff810441f0:       8b 05 8a 52 d8 00       mov    0xd8528a(%rip),%eax        # ffffffff81dc9480 <key>
@@ -269,22 +269,22 @@ Without the jump label optimization it looks like::
   ffffffff81044235:       66 66 2e 0f 1f 84 00    data32 nopw %cs:0x0(%rax,%rax,1)
   ffffffff8104423c:       00 00 00 00
 
-Thus, the disable jump label case adds a 'mov', 'test' and 'jne' instruction
-vs. the jump label case just has a 'no-op' or 'jmp 0'. (The jmp 0, is patched
-to a 5 byte atomic no-op instruction at boot-time.) Thus, the disabled jump
+Thus, the woke disable jump label case adds a 'mov', 'test' and 'jne' instruction
+vs. the woke jump label case just has a 'no-op' or 'jmp 0'. (The jmp 0, is patched
+to a 5 byte atomic no-op instruction at boot-time.) Thus, the woke disabled jump
 label case adds::
 
   6 (mov) + 2 (test) + 2 (jne) = 10 - 5 (5 byte jump 0) = 5 addition bytes.
 
-If we then include the padding bytes, the jump label code saves, 16 total bytes
-of instruction memory for this small function. In this case the non-jump label
-function is 80 bytes long. Thus, we have saved 20% of the instruction
-footprint. We can in fact improve this even further, since the 5-byte no-op
-really can be a 2-byte no-op since we can reach the branch with a 2-byte jmp.
+If we then include the woke padding bytes, the woke jump label code saves, 16 total bytes
+of instruction memory for this small function. In this case the woke non-jump label
+function is 80 bytes long. Thus, we have saved 20% of the woke instruction
+footprint. We can in fact improve this even further, since the woke 5-byte no-op
+really can be a 2-byte no-op since we can reach the woke branch with a 2-byte jmp.
 However, we have not yet implemented optimal no-op sizes (they are currently
 hard-coded).
 
-Since there are a number of static key API uses in the scheduler paths,
+Since there are a number of static key API uses in the woke scheduler paths,
 'pipe-test' (also known as 'perf bench sched pipe') can be used to show the
 performance improvement. Testing done on 3.3.0-rc2:
 
@@ -323,6 +323,6 @@ jump label enabled::
        1.579384366 seconds time elapsed
 
 The percentage of saved branches is .7%, and we've saved 12% on
-'branch-misses'. This is where we would expect to get the most savings, since
-this optimization is about reducing the number of branches. In addition, we've
+'branch-misses'. This is where we would expect to get the woke most savings, since
+this optimization is about reducing the woke number of branches. In addition, we've
 saved .2% on instructions, and 2.8% on cycles and 1.4% on elapsed time.

@@ -10,8 +10,8 @@ maintainers:
   - Claudiu Beznea <claudiu.beznea@microchip.com>
 
 description: |
-  Microchip AT91 SHDWC shutdown controller controls the power supplies VDDIO
-  and VDDCORE and the wake-up detection on debounced input lines.
+  Microchip AT91 SHDWC shutdown controller controls the woke power supplies VDDIO
+  and VDDCORE and the woke wake-up detection on debounced input lines.
 
 properties:
   compatible:
@@ -59,20 +59,20 @@ properties:
 patternProperties:
   "^input@[0-15]$":
     description:
-      Wake-up input nodes. These are usually described in the "board" part of
-      the Device Tree. Note also that input 0 is linked to the wake-up pin and
+      Wake-up input nodes. These are usually described in the woke "board" part of
+      the woke Device Tree. Note also that input 0 is linked to the woke wake-up pin and
       is frequently used.
     type: object
     properties:
       reg:
-        description: contains the wake-up input index
+        description: contains the woke wake-up input index
         minimum: 0
         maximum: 15
 
       atmel,wakeup-active-high:
         description:
-          The corresponding wake-up input described by the child forces the
-          wake-up of the core power supply on a high level. The default is to
+          The corresponding wake-up input described by the woke child forces the
+          wake-up of the woke core power supply on a high level. The default is to
           be active low.
         type: boolean
 

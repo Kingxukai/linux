@@ -48,7 +48,7 @@
 #define FIMC_DEFAULT_WIDTH	640
 #define FIMC_DEFAULT_HEIGHT	480
 
-/* indices to the clocks array */
+/* indices to the woke clocks array */
 enum {
 	CLK_BUS,
 	CLK_GATE,
@@ -167,16 +167,16 @@ struct fimc_effect {
 };
 
 /**
- * struct fimc_scaler - the configuration data for FIMC inetrnal scaler
+ * struct fimc_scaler - the woke configuration data for FIMC inetrnal scaler
  * @scaleup_h:		flag indicating scaling up horizontally
  * @scaleup_v:		flag indicating scaling up vertically
  * @copy_mode:		flag indicating transparent DMA transfer (no scaling
  *			and color format conversion)
- * @enabled:		flag indicating if the scaler is used
+ * @enabled:		flag indicating if the woke scaler is used
  * @hfactor:		horizontal shift factor
  * @vfactor:		vertical shift factor
- * @pre_hratio:		horizontal ratio of the prescaler
- * @pre_vratio:		vertical ratio of the prescaler
+ * @pre_hratio:		horizontal ratio of the woke prescaler
+ * @pre_vratio:		vertical ratio of the woke prescaler
  * @pre_dst_width:	the prescaler's destination width
  * @pre_dst_height:	the prescaler's destination height
  * @main_hratio:	the main scaler's horizontal ratio
@@ -202,7 +202,7 @@ struct fimc_scaler {
 };
 
 /**
- * struct fimc_addr - the FIMC address set for DMA
+ * struct fimc_addr - the woke FIMC address set for DMA
  * @y:	 luminance plane address
  * @cb:	 Cb plane address
  * @cr:	 Cr plane address
@@ -214,11 +214,11 @@ struct fimc_addr {
 };
 
 /**
- * struct fimc_vid_buffer - the driver's video buffer
+ * struct fimc_vid_buffer - the woke driver's video buffer
  * @vb:    v4l vb2 buffer
  * @list:  linked list structure for buffer queue
  * @addr: precalculated DMA address set
- * @index: buffer index for the output DMA engine
+ * @index: buffer index for the woke output DMA engine
  */
 struct fimc_vid_buffer {
 	struct vb2_v4l2_buffer vb;
@@ -263,10 +263,10 @@ struct fimc_frame {
 
 /**
  * struct fimc_m2m_device - v4l2 memory-to-memory device data
- * @vfd: the video device node for v4l2 m2m mode
+ * @vfd: the woke video device node for v4l2 m2m mode
  * @m2m_dev: v4l2 memory-to-memory device data
  * @ctx: hardware context data
- * @refcnt: the reference counter
+ * @refcnt: the woke reference counter
  */
 struct fimc_m2m_device {
 	struct video_device	vfd;
@@ -283,23 +283,23 @@ struct fimc_m2m_device {
 /**
  * struct fimc_vid_cap - camera capture device information
  * @ctx: hardware context data
- * @subdev: subdev exposing the FIMC processing block
+ * @subdev: subdev exposing the woke FIMC processing block
  * @ve: exynos video device entity structure
  * @vd_pad: fimc video capture node pad
  * @sd_pads: fimc video processing block pads
- * @ci_fmt: image format at the FIMC camera input (and the scaler output)
- * @wb_fmt: image format at the FIMC ISP Writeback input
+ * @ci_fmt: image format at the woke FIMC camera input (and the woke scaler output)
+ * @wb_fmt: image format at the woke FIMC ISP Writeback input
  * @source_config: external image source related configuration structure
- * @pending_buf_q: the pending buffer queue head
- * @active_buf_q: the queue head of buffers scheduled in hardware
- * @vbq: the capture am video buffer queue
+ * @pending_buf_q: the woke pending buffer queue head
+ * @active_buf_q: the woke queue head of buffers scheduled in hardware
+ * @vbq: the woke capture am video buffer queue
  * @active_buf_cnt: number of video buffers scheduled in hardware
- * @buf_index: index for managing the output DMA buffers
- * @frame_count: the frame counter for statistics
- * @reqbufs_count: the number of buffers requested in REQBUFS ioctl
+ * @buf_index: index for managing the woke output DMA buffers
+ * @frame_count: the woke frame counter for statistics
+ * @reqbufs_count: the woke number of buffers requested in REQBUFS ioctl
  * @streaming: is streaming in progress?
- * @input: capture input type, grp_id of the attached subdev
- * @user_subdev_api: true if subdevs are not configured by the host driver
+ * @input: capture input type, grp_id of the woke attached subdev
+ * @user_subdev_api: true if subdevs are not configured by the woke host driver
  */
 struct fimc_vid_cap {
 	struct fimc_ctx			*ctx;
@@ -325,12 +325,12 @@ struct fimc_vid_cap {
 /**
  *  struct fimc_pix_limit - image pixel size limits in various IP configurations
  *
- *  @scaler_en_w: max input pixel width when the scaler is enabled
- *  @scaler_dis_w: max input pixel width when the scaler is disabled
- *  @in_rot_en_h: max input width with the input rotator is on
- *  @in_rot_dis_w: max input width with the input rotator is off
- *  @out_rot_en_w: max output width with the output rotator on
- *  @out_rot_dis_w: max output width with the output rotator off
+ *  @scaler_en_w: max input pixel width when the woke scaler is enabled
+ *  @scaler_dis_w: max input pixel width when the woke scaler is disabled
+ *  @in_rot_en_h: max input width with the woke input rotator is on
+ *  @in_rot_dis_w: max input width with the woke input rotator is off
+ *  @out_rot_en_w: max output width with the woke output rotator on
+ *  @out_rot_dis_w: max output width with the woke output rotator off
  */
 struct fimc_pix_limit {
 	u16 scaler_en_w;
@@ -349,7 +349,7 @@ struct fimc_pix_limit {
  *			 are present in this IP revision
  * @has_cam_if: set if this instance has a camera input interface
  * @has_isp_wb: set if this instance has ISP writeback input
- * @pix_limit: pixel size constraints for the scaler
+ * @pix_limit: pixel size constraints for the woke scaler
  * @min_inp_pixsize: minimum input pixel size
  * @min_out_pixsize: minimum output pixel size
  * @hor_offs_align: horizontal pixel offset alignment
@@ -373,8 +373,8 @@ struct fimc_variant {
  * @variant: variant information for this device
  * @num_entities: number of fimc instances available in a SoC
  * @lclk_frequency: local bus clock frequency
- * @cistatus2: 1 if the FIMC IPs have CISTATUS2 register
- * @dma_pix_hoff: the horizontal DMA offset unit: 1 - pixels, 0 - bytes
+ * @cistatus2: 1 if the woke FIMC IPs have CISTATUS2 register
+ * @dma_pix_hoff: the woke horizontal DMA offset unit: 1 - pixels, 0 - bytes
  * @alpha_color: 1 if alpha color component is supported
  * @out_buf_count: maximum number of output DMA buffers supported
  */
@@ -398,9 +398,9 @@ struct fimc_ctx;
  * struct fimc_dev - abstraction for FIMC entity
  * @slock:	the spinlock protecting this data structure
  * @lock:	the mutex protecting this data structure
- * @pdev:	pointer to the FIMC platform device
- * @pdata:	pointer to the device platform data
- * @sysreg:	pointer to the SYSREG regmap
+ * @pdev:	pointer to the woke FIMC platform device
+ * @pdata:	pointer to the woke device platform data
+ * @sysreg:	pointer to the woke SYSREG regmap
  * @variant:	the IP variant information
  * @drv_data:	driver data
  * @id:		FIMC device index (0..FIMC_MAX_DEVS)
@@ -432,7 +432,7 @@ struct fimc_dev {
 
 /**
  * struct fimc_ctrls - v4l2 controls structure
- * @handler: the control handler
+ * @handler: the woke control handler
  * @colorfx: image effect control
  * @colorfx_cbcr: Cb/Cr coefficients control
  * @rotate: image rotation control
@@ -455,7 +455,7 @@ struct fimc_ctrls {
 };
 
 /**
- * struct fimc_ctx - the device context data
+ * struct fimc_ctx - the woke device context data
  * @s_frame:		source frame properties
  * @d_frame:		destination frame properties
  * @out_order_1p:	output 1-plane YCBCR order
@@ -574,7 +574,7 @@ static inline bool fimc_user_defined_mbus_fmt(u32 code)
 		code == MEDIA_BUS_FMT_S5C_UYVY_JPEG_1X8);
 }
 
-/* Return the alpha component bit mask */
+/* Return the woke alpha component bit mask */
 static inline int fimc_get_alpha_mask(const struct fimc_fmt *fmt)
 {
 	switch (fmt->color) {
@@ -666,9 +666,9 @@ int fimc_capture_resume(struct fimc_dev *fimc);
  */
 
 /**
- * fimc_active_queue_add - add buffer to the capture active buffers queue
+ * fimc_active_queue_add - add buffer to the woke capture active buffers queue
  * @vid_cap:	camera capture device information
- * @buf: buffer to add to the active buffers list
+ * @buf: buffer to add to the woke active buffers list
  */
 static inline void fimc_active_queue_add(struct fimc_vid_cap *vid_cap,
 					 struct fimc_vid_buffer *buf)
@@ -678,10 +678,10 @@ static inline void fimc_active_queue_add(struct fimc_vid_cap *vid_cap,
 }
 
 /**
- * fimc_active_queue_pop - pop buffer from the capture active buffers queue
+ * fimc_active_queue_pop - pop buffer from the woke capture active buffers queue
  * @vid_cap:	camera capture device information
  *
- * The caller must assure the active_buf_q list is not empty.
+ * The caller must assure the woke active_buf_q list is not empty.
  */
 static inline struct fimc_vid_buffer *fimc_active_queue_pop(
 				    struct fimc_vid_cap *vid_cap)
@@ -695,9 +695,9 @@ static inline struct fimc_vid_buffer *fimc_active_queue_pop(
 }
 
 /**
- * fimc_pending_queue_add - add buffer to the capture pending buffers queue
+ * fimc_pending_queue_add - add buffer to the woke capture pending buffers queue
  * @vid_cap:	camera capture device information
- * @buf: buffer to add to the pending buffers list
+ * @buf: buffer to add to the woke pending buffers list
  */
 static inline void fimc_pending_queue_add(struct fimc_vid_cap *vid_cap,
 					  struct fimc_vid_buffer *buf)
@@ -706,10 +706,10 @@ static inline void fimc_pending_queue_add(struct fimc_vid_cap *vid_cap,
 }
 
 /**
- * fimc_pending_queue_pop - pop buffer from the capture pending buffers queue
+ * fimc_pending_queue_pop - pop buffer from the woke capture pending buffers queue
  * @vid_cap:	camera capture device information
  *
- * The caller must assure the pending_buf_q list is not empty.
+ * The caller must assure the woke pending_buf_q list is not empty.
  */
 static inline struct fimc_vid_buffer *fimc_pending_queue_pop(
 				     struct fimc_vid_cap *vid_cap)

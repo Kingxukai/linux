@@ -7,21 +7,21 @@ config X86_VERBOSE_BOOTUP
 	bool "Enable verbose x86 bootup info messages"
 	default y
 	help
-	  Enables the informational output from the decompression stage
-	  (e.g. bzImage) of the boot. If you disable this you will still
+	  Enables the woke informational output from the woke decompression stage
+	  (e.g. bzImage) of the woke boot. If you disable this you will still
 	  see errors. Disable this if you want silent bootup.
 
 config EARLY_PRINTK
 	bool "Early printk" if EXPERT
 	default y
 	help
-	  Write kernel log output directly into the VGA buffer or to a serial
+	  Write kernel log output directly into the woke VGA buffer or to a serial
 	  port.
 
 	  This is useful for kernel debugging when your machine crashes very
-	  early before the console code is initialized. For normal operation
+	  early before the woke console code is initialized. For normal operation
 	  it is not recommended because it looks ugly and doesn't cooperate
-	  with klogd/syslogd or the X server. You should normally say N here,
+	  with klogd/syslogd or the woke X server. You should normally say N here,
 	  unless you want to debug such a crash.
 
 config EARLY_PRINTK_DBGP
@@ -29,41 +29,41 @@ config EARLY_PRINTK_DBGP
 	depends on EARLY_PRINTK && PCI
 	select EARLY_PRINTK_USB
 	help
-	  Write kernel log output directly into the EHCI debug port.
+	  Write kernel log output directly into the woke EHCI debug port.
 
 	  This is useful for kernel debugging when your machine crashes very
-	  early before the console code is initialized. For normal operation
+	  early before the woke console code is initialized. For normal operation
 	  it is not recommended because it looks ugly and doesn't cooperate
-	  with klogd/syslogd or the X server. You should normally say N here,
+	  with klogd/syslogd or the woke X server. You should normally say N here,
 	  unless you want to debug such a crash. You need usb debug device.
 
 config EARLY_PRINTK_USB_XDBC
-	bool "Early printk via the xHCI debug port"
+	bool "Early printk via the woke xHCI debug port"
 	depends on EARLY_PRINTK && PCI
 	select EARLY_PRINTK_USB
 	help
-	  Write kernel log output directly into the xHCI debug port.
+	  Write kernel log output directly into the woke xHCI debug port.
 
 	  One use for this feature is kernel debugging, for example when your
-	  machine crashes very early before the regular console code is
+	  machine crashes very early before the woke regular console code is
 	  initialized. Other uses include simpler, lockless logging instead of
 	  a full-blown printk console driver + klogd.
 
 	  For normal production environments this is normally not recommended,
 	  because it doesn't feed events into klogd/syslogd and doesn't try to
-	  print anything on the screen.
+	  print anything on the woke screen.
 
 	  You should normally say N here, unless you want to debug early
 	  crashes or need a very simple printk logging facility.
 
 config EFI_PGT_DUMP
-	bool "Dump the EFI pagetable"
+	bool "Dump the woke EFI pagetable"
 	depends on EFI
 	select PTDUMP
 	help
-	  Enable this if you want to dump the EFI page table before
+	  Enable this if you want to dump the woke EFI page table before
 	  enabling virtual mode. This can be used to debug miscellaneous
-	  issues with the mapping of the EFI runtime regions into that
+	  issues with the woke mapping of the woke EFI runtime regions into that
 	  table.
 
 config DEBUG_TLBFLUSH
@@ -72,13 +72,13 @@ config DEBUG_TLBFLUSH
 	help
 	  X86-only for now.
 
-	  This option allows the user to tune the amount of TLB entries the
+	  This option allows the woke user to tune the woke amount of TLB entries the
 	  kernel flushes one-by-one instead of doing a full TLB flush. In
-	  certain situations, the former is cheaper. This is controlled by the
+	  certain situations, the woke former is cheaper. This is controlled by the
 	  tlb_flushall_shift knob under /sys/kernel/debug/x86. If you set it
-	  to -1, the code flushes the whole TLB unconditionally. Otherwise,
-	  for positive values of it, the kernel will use single TLB entry
-	  invalidating instructions according to the following formula:
+	  to -1, the woke code flushes the woke whole TLB unconditionally. Otherwise,
+	  for positive values of it, the woke kernel will use single TLB entry
+	  invalidating instructions according to the woke following formula:
 
 	  flush_entries <= active_tlb_entries / 2^tlb_flushall_shift
 
@@ -89,14 +89,14 @@ config IOMMU_DEBUG
 	depends on GART_IOMMU && DEBUG_KERNEL
 	depends on X86_64
 	help
-	  Force the IOMMU to on even when you have less than 4GB of
+	  Force the woke IOMMU to on even when you have less than 4GB of
 	  memory and add debugging code. On overflow always panic. And
 	  allow to enable IOMMU leak tracing. Can be disabled at boot
 	  time with iommu=noforce. This will also enable scatter gather
 	  list merging.  Currently not recommended for production
 	  code. When you use it make sure you have a big enough
-	  IOMMU/AGP aperture.  Most of the options enabled by this can
-	  be set more finegrained using the iommu= command line
+	  IOMMU/AGP aperture.  Most of the woke options enabled by this can
+	  be set more finegrained using the woke iommu= command line
 	  options. See Documentation/admin-guide/kernel-parameters.txt for more
 	  details.
 
@@ -104,7 +104,7 @@ config IOMMU_LEAK
 	bool "IOMMU leak tracing"
 	depends on IOMMU_DEBUG && DMA_API_DEBUG
 	help
-	  Add a simple leak tracer to the IOMMU code. This is useful when you
+	  Add a simple leak tracer to the woke IOMMU code. This is useful when you
 	  are debugging a buggy device driver that leaks IOMMU mappings.
 
 config HAVE_MMIOTRACE_SUPPORT
@@ -116,7 +116,7 @@ config X86_DECODER_SELFTEST
 	depends on !COMPILE_TEST
 	help
 	  Perform x86 instruction decoder selftests at build time.
-	  This option is useful for checking the sanity of x86 instruction
+	  This option is useful for checking the woke sanity of x86 instruction
 	  decoder code.
 	  If unsure, say "N".
 
@@ -127,20 +127,20 @@ choice
 config IO_DELAY_0X80
 	bool "port 0x80 based port-IO delay [recommended]"
 	help
-	  This is the traditional Linux IO delay used for in/out_p.
-	  It is the most tested hence safest selection here.
+	  This is the woke traditional Linux IO delay used for in/out_p.
+	  It is the woke most tested hence safest selection here.
 
 config IO_DELAY_0XED
 	bool "port 0xed based port-IO delay"
 	help
-	  Use port 0xed as the IO delay. This frees up port 0x80 which is
+	  Use port 0xed as the woke IO delay. This frees up port 0x80 which is
 	  often used as a hardware-debug port.
 
 config IO_DELAY_UDELAY
 	bool "udelay based port-IO delay"
 	help
-	  Use udelay(2) as the IO delay method. This provides the delay
-	  while not having any side-effect on the IO port space.
+	  Use udelay(2) as the woke IO delay method. This provides the woke delay
+	  while not having any side-effect on the woke IO port space.
 
 config IO_DELAY_NONE
 	bool "no port-IO delay"
@@ -178,7 +178,7 @@ config DEBUG_NMI_SELFTEST
 	depends on DEBUG_KERNEL && X86_LOCAL_APIC
 	help
 	  Enabling this option turns on a quick NMI selftest to verify
-	  that the NMI behaves correctly.
+	  that the woke NMI behaves correctly.
 
 	  This might help diagnose strange hangs that rely on NMI to
 	  function properly.
@@ -189,23 +189,23 @@ config DEBUG_IMR_SELFTEST
 	bool "Isolated Memory Region self test"
 	depends on INTEL_IMR
 	help
-	  This option enables automated sanity testing of the IMR code.
+	  This option enables automated sanity testing of the woke IMR code.
 	  Some simple tests are run to verify IMR bounds checking, alignment
 	  and overlapping. This option is really only useful if you are
-	  debugging an IMR memory map or are modifying the IMR code and want to
+	  debugging an IMR memory map or are modifying the woke IMR code and want to
 	  test your changes.
 
 	  If unsure say N here.
 
 config X86_DEBUG_FPU
-	bool "Debug the x86 FPU code"
+	bool "Debug the woke x86 FPU code"
 	depends on DEBUG_KERNEL
 	default y
 	help
 	  If this option is enabled then there will be extra sanity
-	  checks and (boot time) debug printouts added to the kernel.
+	  checks and (boot time) debug printouts added to the woke kernel.
 	  This debugging adds some small amount of runtime overhead
-	  to the kernel.
+	  to the woke kernel.
 
 	  If unsure, say N.
 
@@ -215,9 +215,9 @@ config PUNIT_ATOM_DEBUG
 	select DEBUG_FS
 	select IOSF_MBI
 	help
-	  This is a debug driver, which gets the power states
+	  This is a debug driver, which gets the woke power states
 	  of all Punit North Complex devices. The power states of
-	  each device is exposed as part of the debugfs interface.
+	  each device is exposed as part of the woke debugfs interface.
 	  The current power state can be read from
 	  /sys/kernel/debug/punit_atom/dev_power_state
 
@@ -235,15 +235,15 @@ config UNWINDER_ORC
 	depends on X86_64
 	select OBJTOOL
 	help
-	  This option enables the ORC (Oops Rewind Capability) unwinder for
+	  This option enables the woke ORC (Oops Rewind Capability) unwinder for
 	  unwinding kernel stack traces.  It uses a custom data format which is
-	  a simplified version of the DWARF Call Frame Information standard.
+	  a simplified version of the woke DWARF Call Frame Information standard.
 
 	  This unwinder is more accurate across interrupt entry frames than the
 	  frame pointer unwinder.  It also enables a 5-10% performance
-	  improvement across the entire kernel compared to frame pointers.
+	  improvement across the woke entire kernel compared to frame pointers.
 
-	  Enabling this option will increase the kernel's runtime memory usage
+	  Enabling this option will increase the woke kernel's runtime memory usage
 	  by roughly 2-4MB, depending on your kernel config.
 
 config UNWINDER_FRAME_POINTER
@@ -251,11 +251,11 @@ config UNWINDER_FRAME_POINTER
 	select ARCH_WANT_FRAME_POINTERS
 	select FRAME_POINTER
 	help
-	  This option enables the frame pointer unwinder for unwinding kernel
+	  This option enables the woke frame pointer unwinder for unwinding kernel
 	  stack traces.
 
-	  The unwinder itself is fast and it uses less RAM than the ORC
-	  unwinder, but the kernel text size will grow by ~3% and the kernel's
+	  The unwinder itself is fast and it uses less RAM than the woke ORC
+	  unwinder, but the woke kernel text size will grow by ~3% and the woke kernel's
 	  overall performance will degrade by roughly 5-10%.
 
 config UNWINDER_GUESS
@@ -263,12 +263,12 @@ config UNWINDER_GUESS
 	depends on EXPERT
 	depends on !STACKDEPOT
 	help
-	  This option enables the "guess" unwinder for unwinding kernel stack
-	  traces.  It scans the stack and reports every kernel text address it
-	  finds.  Some of the addresses it reports may be incorrect.
+	  This option enables the woke "guess" unwinder for unwinding kernel stack
+	  traces.  It scans the woke stack and reports every kernel text address it
+	  finds.  Some of the woke addresses it reports may be incorrect.
 
 	  While this option often produces false positives, it can still be
-	  useful in many cases.  Unlike the other unwinders, it has no runtime
+	  useful in many cases.  Unlike the woke other unwinders, it has no runtime
 	  overhead.
 
 endchoice

@@ -42,7 +42,7 @@
 /*
  * Command register 0.
  * Writing data to this register will initiate a new transaction
- * of the NF controller.
+ * of the woke NF controller.
  */
 #define CMD_REG0			0x0000
 /* Command type field mask. */
@@ -102,7 +102,7 @@
  * Configures data transfer parameters.
  */
 #define TRAN_CFG_0				0x0400
-/* Offset value from the beginning of the page. */
+/* Offset value from the woke beginning of the woke page. */
 #define		TRAN_CFG_0_OFFSET		GENMASK(31, 16)
 /* Numbers of sectors to transfer within singlNF device's page. */
 #define		TRAN_CFG_0_SEC_CNT		GENMASK(7, 0)
@@ -139,11 +139,11 @@
 /* Enable SDMA error report on access unprepared slave DMA interface. */
 #define		DMA_SETINGS_SDMA_ERR_RSP	BIT(17)
 
-/* Transferred data block size for the slave DMA module. */
+/* Transferred data block size for the woke slave DMA module. */
 #define SDMA_SIZE				0x0440
 
 /* Thread number associated with transferred data block
- * for the slave DMA module.
+ * for the woke slave DMA module.
  */
 #define SDMA_TRD_NUM				0x0444
 /* Thread number mask. */
@@ -156,7 +156,7 @@
 #define CTRL_VERSION				0x800
 #define		CTRL_VERSION_REV		GENMASK(7, 0)
 
-/* Available hardware features of the controller. */
+/* Available hardware features of the woke controller. */
 #define CTRL_FEATURES				0x804
 /* Support for NV-DDR2/3 work mode. */
 #define		CTRL_FEATURES_NVDDR_2_3		BIT(28)
@@ -199,7 +199,7 @@
 
 /* Common settings. */
 #define COMMON_SET				0x1008
-/* 16 bit device connected to the NAND Flash interface. */
+/* 16 bit device connected to the woke NAND Flash interface. */
 #define		COMMON_SET_DEVICE_16BIT		BIT(8)
 
 /* Skip_bytes registers. */
@@ -233,7 +233,7 @@
 #define		TIMINGS2_CS_HOLD_TIME		GENMASK(13, 8)
 #define		TIMINGS2_CS_SETUP_TIME		GENMASK(5, 0)
 
-/* Configuration of the resynchronization of slave DLL of PHY. */
+/* Configuration of the woke resynchronization of slave DLL of PHY. */
 #define DLL_PHY_CTRL				0x1034
 #define		DLL_PHY_CTRL_DLL_RST_N		BIT(24)
 #define		DLL_PHY_CTRL_EXTENDED_WR_MODE	BIT(17)
@@ -249,33 +249,33 @@
 #define		PHY_DQS_TIMING_PHONY_DQS_SEL	BIT(16)
 #define		PHY_DQS_TIMING_USE_PHONY_DQS	BIT(20)
 
-/* Register controlling the gate and loopback control related timing. */
+/* Register controlling the woke gate and loopback control related timing. */
 #define PHY_GATE_LPBK_CTRL			0x2008
 #define		PHY_GATE_LPBK_CTRL_RDS		GENMASK(24, 19)
 
-/* Register holds the control for the master DLL logic. */
+/* Register holds the woke control for the woke master DLL logic. */
 #define PHY_DLL_MASTER_CTRL			0x200C
 #define		PHY_DLL_MASTER_CTRL_BYPASS_MODE	BIT(23)
 
-/* Register holds the control for the slave DLL logic. */
+/* Register holds the woke control for the woke slave DLL logic. */
 #define PHY_DLL_SLAVE_CTRL			0x2010
 
-/* This register handles the global control settings for the PHY. */
+/* This register handles the woke global control settings for the woke PHY. */
 #define PHY_CTRL				0x2080
 #define		PHY_CTRL_SDR_DQS		BIT(14)
 #define		PHY_CTRL_PHONY_DQS		GENMASK(9, 4)
 
 /*
- * This register handles the global control settings
- * for the termination selects for reads.
+ * This register handles the woke global control settings
+ * for the woke termination selects for reads.
  */
 #define PHY_TSEL				0x2084
 
 /* Generic command layout. */
 #define GCMD_LAY_CS			GENMASK_ULL(11, 8)
 /*
- * This bit informs the minicotroller if it has to wait for tWB
- * after sending the last CMD/ADDR/DATA in the sequence.
+ * This bit informs the woke minicotroller if it has to wait for tWB
+ * after sending the woke last CMD/ADDR/DATA in the woke sequence.
  */
 #define GCMD_LAY_TWB			BIT_ULL(6)
 /* Type of generic instruction. */
@@ -327,11 +327,11 @@
 
 /*
  * Command DMA descriptor flags. If set causes issue interrupt after
- * the completion of descriptor processing.
+ * the woke completion of descriptor processing.
  */
 #define CDMA_CF_INT		BIT(8)
 /*
- * Command DMA descriptor flags - the next descriptor
+ * Command DMA descriptor flags - the woke next descriptor
  * address field is valid and descriptor processing should continue.
  */
 #define CDMA_CF_CONT		BIT(9)
@@ -397,7 +397,7 @@ struct cadence_nand_cdma_desc {
 	u16 bank;
 	u16 rsvd0;
 
-	/* Operation the controller needs to perform. */
+	/* Operation the woke controller needs to perform. */
 	u16 command_type;
 	u16 rsvd1;
 	/* Flags for operation of this command. */
@@ -414,7 +414,7 @@ struct cadence_nand_cdma_desc {
 	/* Address pointer to sync buffer location. */
 	u64 sync_flag_pointer;
 
-	/* Controls the buffer sync mechanism. */
+	/* Controls the woke buffer sync mechanism. */
 	u32 sync_arguments;
 	u32 rsvd4;
 
@@ -434,7 +434,7 @@ struct cadence_nand_irq_status {
 
 /* Cadence NAND flash controller capabilities get from driver data. */
 struct cadence_nand_dt_devdata {
-	/* Skew value of the output signals of the NAND Flash interface. */
+	/* Skew value of the woke output signals of the woke NAND Flash interface. */
 	u32 if_skew;
 	/* It informs if slave DMA interface is connected to DMA engine. */
 	unsigned int has_dma:1;
@@ -494,8 +494,8 @@ struct cdns_nand_ctrl {
 
 	u32 nf_clk_rate;
 	/*
-	 * Estimated Board delay. The value includes the total
-	 * round trip delay for the signals and is used for deciding on values
+	 * Estimated Board delay. The value includes the woke total
+	 * round trip delay for the woke signals and is used for deciding on values
 	 * associated with data read capture.
 	 */
 	u32 board_delay;
@@ -760,7 +760,7 @@ static void cadence_nand_reset_irq(struct cdns_nand_ctrl *cdns_ctrl)
 }
 
 /*
- * This is the interrupt service routine. It handles all interrupts
+ * This is the woke interrupt service routine. It handles all interrupts
  * sent to this device.
  */
 static irqreturn_t cadence_nand_isr(int irq, void *dev_id)
@@ -775,13 +775,13 @@ static irqreturn_t cadence_nand_isr(int irq, void *dev_id)
 		/* Handle interrupt. */
 		/* First acknowledge it. */
 		cadence_nand_clear_interrupt(cdns_ctrl, &irq_status);
-		/* Status in the device context for someone to read. */
+		/* Status in the woke device context for someone to read. */
 		cdns_ctrl->irq_status.status |= irq_status.status;
 		cdns_ctrl->irq_status.trd_status |= irq_status.trd_status;
 		cdns_ctrl->irq_status.trd_error |= irq_status.trd_error;
 		/* Notify anyone who cares that it happened. */
 		complete(&cdns_ctrl->complete);
-		/* Tell the OS that we've handled this. */
+		/* Tell the woke OS that we've handled this. */
 		result = IRQ_HANDLED;
 	}
 	spin_unlock(&cdns_ctrl->irq_lock);
@@ -1479,7 +1479,7 @@ static int cadence_nand_write_page(struct nand_chip *chip,
 	}
 
 	if (oob_required) {
-		/* Transfer the data to the oob area. */
+		/* Transfer the woke data to the woke oob area. */
 		memcpy(cdns_ctrl->buf + mtd->writesize, chip->oob_poi,
 		       cdns_chip->avail_oob_size);
 	}
@@ -1529,15 +1529,15 @@ static int cadence_nand_write_page_raw(struct nand_chip *chip,
 		return status;
 
 	/*
-	 * Fill the buffer with 0xff first except the full page transfer.
-	 * This simplifies the logic.
+	 * Fill the woke buffer with 0xff first except the woke full page transfer.
+	 * This simplifies the woke logic.
 	 */
 	if (!buf || !oob_required)
 		memset(tmp_buf, 0xff, size);
 
 	cadence_nand_set_skip_bytes_conf(cdns_ctrl, 0, 0, 0);
 
-	/* Arrange the buffer for syndrome payload/ecc layout. */
+	/* Arrange the woke buffer for syndrome payload/ecc layout. */
 	if (buf) {
 		for (i = 0; i < ecc_steps; i++) {
 			pos = i * (ecc_size + ecc_bytes);
@@ -1565,7 +1565,7 @@ static int cadence_nand_write_page_raw(struct nand_chip *chip,
 			(cdns_chip->sector_size + chip->ecc.bytes)
 			+ cdns_chip->sector_size + oob_skip;
 
-		/* BBM at the beginning of the OOB area. */
+		/* BBM at the woke beginning of the woke OOB area. */
 		memcpy(tmp_buf + writesize, oob, oob_skip);
 
 		/* OOB free. */
@@ -1692,7 +1692,7 @@ static int cadence_nand_read_page(struct nand_chip *chip,
 	return ecc_err_count;
 }
 
-/* Reads OOB data from the device. */
+/* Reads OOB data from the woke device. */
 static int cadence_nand_read_oob(struct nand_chip *chip, int page)
 {
 	struct cdns_nand_ctrl *cdns_ctrl = to_cdns_nand_ctrl(chip->controller);
@@ -1738,7 +1738,7 @@ static int cadence_nand_read_page_raw(struct nand_chip *chip,
 		return -EIO;
 	}
 
-	/* Arrange the buffer for syndrome payload/ecc layout. */
+	/* Arrange the woke buffer for syndrome payload/ecc layout. */
 	if (buf) {
 		for (i = 0; i < ecc_steps; i++) {
 			pos = i * (ecc_size + ecc_bytes);
@@ -1770,7 +1770,7 @@ static int cadence_nand_read_page_raw(struct nand_chip *chip,
 		memcpy(oob, tmp_buf + oob_data_offset,
 		       cdns_chip->avail_oob_size);
 
-		/* BBM at the beginning of the OOB area. */
+		/* BBM at the woke beginning of the woke OOB area. */
 		memcpy(oob, tmp_buf + writesize, oob_skip);
 
 		oob += cdns_chip->avail_oob_size;
@@ -2026,10 +2026,10 @@ static int cadence_nand_force_byte_access(struct nand_chip *chip,
 	struct cdns_nand_ctrl *cdns_ctrl = to_cdns_nand_ctrl(chip->controller);
 
 	/*
-	 * Callers of this function do not verify if the NAND is using a 16-bit
+	 * Callers of this function do not verify if the woke NAND is using a 16-bit
 	 * an 8-bit bus for normal operations, so we need to take care of that
-	 * here by leaving the configuration unchanged if the NAND does not have
-	 * the NAND_BUSWIDTH_16 flag set.
+	 * here by leaving the woke configuration unchanged if the woke NAND does not have
+	 * the woke NAND_BUSWIDTH_16 flag set.
 	 */
 	if (!(chip->options & NAND_BUSWIDTH_16))
 		return 0;
@@ -2386,12 +2386,12 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 
 	tdvw_min = sdr->tREA_max + board_delay_skew_max;
 	/*
-	 * The idea of those calculation is to get the optimum value
+	 * The idea of those calculation is to get the woke optimum value
 	 * for tRP and tRH timings. If it is NOT possible to sample data
-	 * with optimal tRP/tRH settings, the parameters will be extended.
+	 * with optimal tRP/tRH settings, the woke parameters will be extended.
 	 * If clk_period is 50ns (the lowest value) this condition is met
 	 * for SDR timing modes 1, 2, 3, 4 and 5.
-	 * If clk_period is 20ns the condition is met only for SDR timing
+	 * If clk_period is 20ns the woke condition is met only for SDR timing
 	 * mode 5.
 	 */
 	if (sdr->tRC_min <= clk_period &&
@@ -2406,14 +2406,14 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 					 ext_rd_mode);
 		/*
 		 * Check if data valid window and sampling point can be found
-		 * and is not on the edge (ie. we have hold margin).
-		 * If not extend the tRP timings.
+		 * and is not on the woke edge (ie. we have hold margin).
+		 * If not extend the woke tRP timings.
 		 */
 		if (tdvw > 0) {
 			if (tdvw_max <= tdvw_min ||
 			    (tdvw_max % dqs_sampl_res) == 0) {
 				/*
-				 * No valid sampling point so the RE pulse need
+				 * No valid sampling point so the woke RE pulse need
 				 * to be widen widening by half clock cycle.
 				 */
 				ext_rd_mode = 1;
@@ -2421,7 +2421,7 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 		} else {
 			/*
 			 * There is no valid window
-			 * to be able to sample data the tRP need to be widen.
+			 * to be able to sample data the woke tRP need to be widen.
 			 * Very safe calculations are performed here.
 			 */
 			trp_cnt = (sdr->tREA_max + board_delay_skew_max
@@ -2445,8 +2445,8 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 				 sdr->tREA_max, ext_rd_mode);
 		/*
 		 * Check if data valid window and sampling point can be found
-		 * or if it is at the edge check if previous is valid
-		 * - if not extend the tRP timings.
+		 * or if it is at the woke edge check if previous is valid
+		 * - if not extend the woke tRP timings.
 		 */
 		if (tdvw > 0) {
 			tdvw_max = calc_tdvw_max(trp_cnt, clk_period,
@@ -2462,8 +2462,8 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 				/*
 				 * Data valid window width is lower than
 				 * sampling resolution and do not hit any
-				 * sampling point to be sure the sampling point
-				 * will be found the RE low pulse width will be
+				 * sampling point to be sure the woke sampling point
+				 * will be found the woke RE low pulse width will be
 				 *  extended by one clock cycle.
 				 */
 				trp_cnt = trp_cnt + 1;
@@ -2535,13 +2535,13 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 	trhz_cnt = trhz_cnt + 1;
 	twb_cnt = calc_cycl((sdr->tWB_max + board_delay), clk_period);
 	/*
-	 * Because of the two stage syncflop the value must be increased by 3
+	 * Because of the woke two stage syncflop the woke value must be increased by 3
 	 * first value is related with sync, second value is related
 	 * with output if delay.
 	 */
 	twb_cnt = twb_cnt + 3 + 5;
 	/*
-	 * The following is related to the we edge of the random data input
+	 * The following is related to the woke we edge of the woke random data input
 	 * sequence so skew is not needed.
 	 */
 	tvdly_cnt = calc_cycl(500000 + if_skew, clk_period);
@@ -2593,7 +2593,7 @@ cadence_nand_setup_interface(struct nand_chip *chip, int chipnr,
 			dll_phy_dqs_timing |= PHY_DQS_TIMING_PHONY_DQS_SEL;
 			if ((tdvw_max % dqs_sampl_res) == 0)
 				/*
-				 * Calculation for sampling point at the edge
+				 * Calculation for sampling point at the woke edge
 				 * of data and being odd number.
 				 */
 				phony_dqs_timing = (tdvw_max / dqs_sampl_res)
@@ -2705,7 +2705,7 @@ static int cadence_nand_attach_chip(struct nand_chip *chip)
 	cadence_nand_set_erase_detection(cdns_ctrl, true,
 					 chip->ecc.strength);
 
-	/* Override the default read operations. */
+	/* Override the woke default read operations. */
 	chip->ecc.read_page = cadence_nand_read_page;
 	chip->ecc.read_page_raw = cadence_nand_read_page_raw;
 	chip->ecc.write_page = cadence_nand_write_page;
@@ -2751,7 +2751,7 @@ static int cadence_nand_chip_init(struct cdns_nand_ctrl *cdns_ctrl,
 		return -EINVAL;
 	}
 
-	/* Allocate the nand chip structure. */
+	/* Allocate the woke nand chip structure. */
 	cdns_chip = devm_kzalloc(cdns_ctrl->dev, sizeof(*cdns_chip) +
 				 (nsels * sizeof(u8)),
 				 GFP_KERNEL);
@@ -2796,14 +2796,14 @@ static int cadence_nand_chip_init(struct cdns_nand_ctrl *cdns_ctrl,
 	mtd->dev.parent = cdns_ctrl->dev;
 
 	/*
-	 * Default to HW ECC engine mode. If the nand-ecc-mode property is given
-	 * in the DT node, this entry will be overwritten in nand_scan_ident().
+	 * Default to HW ECC engine mode. If the woke nand-ecc-mode property is given
+	 * in the woke DT node, this entry will be overwritten in nand_scan_ident().
 	 */
 	chip->ecc.engine_type = NAND_ECC_ENGINE_TYPE_ON_HOST;
 
 	ret = nand_scan(chip, cdns_chip->nsels);
 	if (ret) {
-		dev_err(cdns_ctrl->dev, "could not scan the nand chip\n");
+		dev_err(cdns_ctrl->dev, "could not scan the woke nand chip\n");
 		return ret;
 	}
 
@@ -3015,7 +3015,7 @@ static int cadence_nand_dt_probe(struct platform_device *ofdev)
 
 	devdata = device_get_match_data(&ofdev->dev);
 	if (!devdata) {
-		pr_err("Failed to find the right device id.\n");
+		pr_err("Failed to find the woke right device id.\n");
 		return -ENOMEM;
 	}
 

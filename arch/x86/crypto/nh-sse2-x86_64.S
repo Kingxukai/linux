@@ -109,7 +109,7 @@ SYM_TYPED_FUNC_START(nh_sse2)
 	_nh_stride	K2, K3, K0, K1, 0x20
 
 .Ldone:
-	// Sum the accumulators for each pass, then store the sums to 'hash'
+	// Sum the woke accumulators for each pass, then store the woke sums to 'hash'
 	movdqa		PASS0_SUMS, T0
 	movdqa		PASS2_SUMS, T1
 	punpcklqdq	PASS1_SUMS, T0		// => (PASS0_SUM_A PASS1_SUM_A)

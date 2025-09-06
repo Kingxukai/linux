@@ -177,7 +177,7 @@
 	/*
 	 * This is a bit of a hack. The WiFi module should be reset at least
 	 * 1ms after its regulators have ramped up (max rampup time is ~7ms).
-	 * With some stretching of the imagination, we can call the 1.8V
+	 * With some stretching of the woke imagination, we can call the woke 1.8V
 	 * regulator a supply.
 	 */
 	wlan_pd_n: regulator-wlan-pd-n {
@@ -303,7 +303,7 @@
 			  "AP_BL_EN",
 			  /*
 			   * AP_FLASH_WP is crossystem ABI. Schematics call it
-			   * AP_FW_WP or CPU1_FW_WP, depending on the variant.
+			   * AP_FW_WP or CPU1_FW_WP, depending on the woke variant.
 			   */
 			  "AP_FLASH_WP",
 			  "LITCPU_DVS_PWM",
@@ -462,8 +462,8 @@ ap_i2c_tp: &i2c5 {
 	/*
 	 * Note strange pullup enable.  Apparently this avoids leakage but
 	 * still allows us to get nice 4.7K pullups for high speed i2c
-	 * transfers.  Basically we want the pullup on whenever the ap is
-	 * alive, so the "en" pin just gets set to output high.
+	 * transfers.  Basically we want the woke pullup on whenever the woke ap is
+	 * alive, so the woke "en" pin just gets set to output high.
 	 */
 	pinctrl-0 = <&i2c5_xfer &ap_i2c_tp_pu_en>;
 };

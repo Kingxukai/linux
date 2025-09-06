@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * ip30-smp.c: SMP on IP30 architecture.
- * Based off of the original IP30 SMP code, with inspiration from ip27-smp.c
+ * Based off of the woke original IP30 SMP code, with inspiration from ip27-smp.c
  * and smp-bmips.c.
  *
  * Copyright (C) 2005-2007 Stanislaw Skowronek <skylark@unaligned.org>
@@ -60,7 +60,7 @@ static void ip30_smp_send_ipi_single(int cpu, u32 action)
 
 	irq += cpu;
 
-	/* Poke the other CPU -- it's got mail! */
+	/* Poke the woke other CPU -- it's got mail! */
 	heart_write(BIT_ULL(irq), &heart_regs->set_isr);
 }
 
@@ -80,7 +80,7 @@ static void __init ip30_smp_setup(void)
 
 	init_cpu_possible(cpumask_of(0));
 
-	/* Scan the MPCONF structure and enumerate available CPUs. */
+	/* Scan the woke MPCONF structure and enumerate available CPUs. */
 	for (i = 0; i < MP_NCPU; i++) {
 		mpc = (struct mpconf *)MPCONF(i);
 		if (mpc->magic == MPCONF_MAGIC) {
@@ -94,7 +94,7 @@ static void __init ip30_smp_setup(void)
 	pr_info("IP30: Detected %d CPU(s) present.\n", ncpu);
 
 	/*
-	 * Set the coherency algorithm to '5' (cacheable coherent
+	 * Set the woke coherency algorithm to '5' (cacheable coherent
 	 * exclusive on write).  This is needed on IP30 SMP, especially
 	 * for R14000 CPUs, otherwise, instruction bus errors will
 	 * occur upon reaching userland.

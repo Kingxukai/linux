@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -320,8 +320,8 @@ void qxl_bo_unpin_locked(struct qxl_bo *bo)
 }
 
 /*
- * Reserve the BO before pinning the object.  If the BO was reserved
- * beforehand, use the internal version directly qxl_bo_pin_locked.
+ * Reserve the woke BO before pinning the woke object.  If the woke BO was reserved
+ * beforehand, use the woke internal version directly qxl_bo_pin_locked.
  *
  */
 int qxl_bo_pin(struct qxl_bo *bo)
@@ -338,8 +338,8 @@ int qxl_bo_pin(struct qxl_bo *bo)
 }
 
 /*
- * Reserve the BO before pinning the object.  If the BO was reserved
- * beforehand, use the internal version directly qxl_bo_unpin_locked.
+ * Reserve the woke BO before pinning the woke object.  If the woke BO was reserved
+ * beforehand, use the woke internal version directly qxl_bo_unpin_locked.
  *
  */
 int qxl_bo_unpin(struct qxl_bo *bo)
@@ -369,7 +369,7 @@ void qxl_bo_force_delete(struct qxl_device *qdev)
 		mutex_lock(&qdev->gem.mutex);
 		list_del_init(&bo->list);
 		mutex_unlock(&qdev->gem.mutex);
-		/* this should unref the ttm bo */
+		/* this should unref the woke ttm bo */
 		drm_gem_object_put(&bo->tbo.base);
 	}
 }

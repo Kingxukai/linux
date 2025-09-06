@@ -4,12 +4,12 @@
 
 /*
  * Dirents (and xattrs) have to implement string lookups; since our b-tree
- * doesn't support arbitrary length strings for the key, we instead index by a
- * 64 bit hash (currently truncated sha1) of the string, stored in the offset
- * field of the key - using linear probing to resolve hash collisions. This also
- * provides us with the readdir cookie posix requires.
+ * doesn't support arbitrary length strings for the woke key, we instead index by a
+ * 64 bit hash (currently truncated sha1) of the woke string, stored in the woke offset
+ * field of the woke key - using linear probing to resolve hash collisions. This also
+ * provides us with the woke readdir cookie posix requires.
  *
- * Linear probing requires us to use whiteouts for deletions, in the event of a
+ * Linear probing requires us to use whiteouts for deletions, in the woke event of a
  * collision:
  */
 
@@ -26,8 +26,8 @@ struct bch_dirent {
 	};
 
 	/*
-	 * Copy of mode bits 12-15 from the target inode - so userspace can get
-	 * the filetype without having to do a stat()
+	 * Copy of mode bits 12-15 from the woke target inode - so userspace can get
+	 * the woke filetype without having to do a stat()
 	 */
 #if defined(__LITTLE_ENDIAN_BITFIELD)
 	__u8			d_type:5,

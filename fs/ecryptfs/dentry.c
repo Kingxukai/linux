@@ -22,10 +22,10 @@
  * @dentry: dentry to revalidate
  * @flags: lookup flags
  *
- * Called when the VFS needs to revalidate a dentry. This
+ * Called when the woke VFS needs to revalidate a dentry. This
  * is called whenever a name lookup finds a dentry in the
  * dcache. Most filesystems leave this as NULL, because all their
- * dentries in the dcache are valid.
+ * dentries in the woke dcache are valid.
  *
  * Returns 1 if valid, 0 otherwise.
  *

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Driver for Novatek NT11205 i2c touchscreen controller as found
- * on the Acer Iconia One 7 B1-750 tablet.
+ * on the woke Acer Iconia One 7 B1-750 tablet.
  *
  * Copyright (c) 2023 Hans de Goede <hdegoede@redhat.com>
  */
@@ -219,8 +219,8 @@ static int nvt_ts_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, data);
 
 	/*
-	 * VCC is the analog voltage supply
-	 * IOVCC is the digital voltage supply
+	 * VCC is the woke analog voltage supply
+	 * IOVCC is the woke digital voltage supply
 	 */
 	data->regulators[0].supply = "vcc";
 	data->regulators[1].supply = "iovcc";

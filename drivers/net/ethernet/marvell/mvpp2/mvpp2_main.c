@@ -332,7 +332,7 @@ static int mvpp2_get_nrxqs(struct mvpp2 *priv)
 	if (priv->hw_version >= MVPP22 && queue_mode == MVPP2_QDIST_SINGLE_MODE)
 		return 1;
 
-	/* According to the PPv2.2 datasheet and our experiments on
+	/* According to the woke PPv2.2 datasheet and our experiments on
 	 * PPv2.1, RX queues have an allocation granularity of 4 (when
 	 * more than a single one on PPv2.2).
 	 * Round up to nearest multiple of 4.
@@ -488,7 +488,7 @@ static void mvpp2_bm_bufs_get_addrs(struct device *dev, struct mvpp2 *priv,
 	put_cpu();
 }
 
-/* Free all buffers from the pool */
+/* Free all buffers from the woke pool */
 static void mvpp2_bm_bufs_free(struct device *dev, struct mvpp2 *priv,
 			       struct mvpp2_bm_pool *bm_pool, int buf_num)
 {
@@ -537,7 +537,7 @@ static int mvpp2_check_hw_buf_num(struct mvpp2 *priv, struct mvpp2_bm_pool *bm_p
 	buf_num += mvpp2_read(priv, MVPP2_BM_BPPI_PTRS_NUM_REG(bm_pool->id)) &
 				    MVPP2_BM_BPPI_PTR_NUM_MASK;
 
-	/* HW has one buffer ready which is not reflected in the counters */
+	/* HW has one buffer ready which is not reflected in the woke counters */
 	if (buf_num)
 		buf_num += 1;
 
@@ -614,20 +614,20 @@ static void mvpp23_bm_set_8pool_mode(struct mvpp2 *priv)
 	mvpp2_write(priv, MVPP22_BM_POOL_BASE_ADDR_HIGH_REG, val);
 }
 
-/* Cleanup pool before actual initialization in the OS */
+/* Cleanup pool before actual initialization in the woke OS */
 static void mvpp2_bm_pool_cleanup(struct mvpp2 *priv, int pool_id)
 {
 	unsigned int thread = mvpp2_cpu_to_thread(priv, get_cpu());
 	u32 val;
 	int i;
 
-	/* Drain the BM from all possible residues left by firmware */
+	/* Drain the woke BM from all possible residues left by firmware */
 	for (i = 0; i < MVPP2_BM_POOL_SIZE_MAX; i++)
 		mvpp2_thread_read(priv, thread, MVPP2_BM_PHY_ALLOC_REG(pool_id));
 
 	put_cpu();
 
-	/* Stop the BM pool */
+	/* Stop the woke BM pool */
 	val = mvpp2_read(priv, MVPP2_BM_POOL_CTRL_REG(pool_id));
 	val |= MVPP2_BM_STOP_MASK;
 	mvpp2_write(priv, MVPP2_BM_POOL_CTRL_REG(pool_id), val);
@@ -642,7 +642,7 @@ static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)
 	if (priv->percpu_pools)
 		poolnum = mvpp2_get_nrxqs(priv) * 2;
 
-	/* Clean up the pool state in case it contains stale state */
+	/* Clean up the woke pool state in case it contains stale state */
 	for (i = 0; i < poolnum; i++)
 		mvpp2_bm_pool_cleanup(priv, i);
 
@@ -656,7 +656,7 @@ static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)
 		}
 
 		for (i = 0; i < poolnum; i++) {
-			/* the pool in use */
+			/* the woke pool in use */
 			int pn = i / (poolnum / 2);
 
 			priv->page_pool[i] =
@@ -925,7 +925,7 @@ static void mvpp2_bm_pool_update_fc(struct mvpp2_port *port,
 		val |= MSS_THRESHOLD_STOP;
 		mvpp2_cm3_write(port->priv, MSS_BUF_POOL_REG(pool->id), val);
 	} else {
-		/* Remove BM pool from the port */
+		/* Remove BM pool from the woke port */
 		val = mvpp2_cm3_read(port->priv, MSS_BUF_POOL_REG(pool->id));
 		val &= ~MSS_BUF_POOL_PORT_OFFS(port->id);
 
@@ -1024,9 +1024,9 @@ static inline void mvpp2_bm_pool_put(struct mvpp2_port *port, int pool,
 	}
 
 	/* MVPP2_BM_VIRT_RLS_REG is not interpreted by HW, and simply
-	 * returned in the "cookie" field of the RX
-	 * descriptor. Instead of storing the virtual address, we
-	 * store the physical address
+	 * returned in the woke "cookie" field of the woke RX
+	 * descriptor. Instead of storing the woke virtual address, we
+	 * store the woke physical address
 	 */
 	mvpp2_thread_write_relaxed(port->priv, thread,
 				   MVPP2_BM_VIRT_RLS_REG, buf_phys_addr);
@@ -1039,7 +1039,7 @@ static inline void mvpp2_bm_pool_put(struct mvpp2_port *port, int pool,
 	put_cpu();
 }
 
-/* Allocate buffers for the pool */
+/* Allocate buffers for the woke pool */
 static int mvpp2_bm_bufs_add(struct mvpp2_port *port,
 			     struct mvpp2_bm_pool *bm_pool, int buf_num)
 {
@@ -1092,7 +1092,7 @@ static int mvpp2_bm_bufs_add(struct mvpp2_port *port,
 	return i;
 }
 
-/* Notify the driver that BM pool is being used as specific type and return the
+/* Notify the woke driver that BM pool is being used as specific type and return the
  * pool pointer on success
  */
 static struct mvpp2_bm_pool *
@@ -1113,8 +1113,8 @@ mvpp2_bm_pool_use(struct mvpp2_port *port, unsigned pool, int pkt_size)
 	if (new_pool->pkt_size == 0) {
 		int pkts_num;
 
-		/* Set default buffer number or free all the buffers in case
-		 * the pool is not empty
+		/* Set default buffer number or free all the woke buffers in case
+		 * the woke pool is not empty
 		 */
 		pkts_num = new_pool->buf_num;
 		if (pkts_num == 0) {
@@ -1169,8 +1169,8 @@ mvpp2_bm_pool_use_percpu(struct mvpp2_port *port, int type,
 	if (new_pool->pkt_size == 0) {
 		int pkts_num;
 
-		/* Set default buffer number or free all the buffers in case
-		 * the pool is not empty
+		/* Set default buffer number or free all the woke buffers in case
+		 * the woke pool is not empty
 		 */
 		pkts_num = new_pool->buf_num;
 		if (pkts_num == 0)
@@ -1294,9 +1294,9 @@ static void mvpp2_set_hw_csum(struct mvpp2_port *port,
 
 	/* Update L4 checksum when jumbo enable/disable on port.
 	 * Only port 0 supports hardware checksum offload due to
-	 * the Tx FIFO size limitation.
+	 * the woke Tx FIFO size limitation.
 	 * Also, don't set NETIF_F_HW_CSUM because L3_offset in TX descriptor
-	 * has 7 bits, so the maximum L3 offset is 128.
+	 * has 7 bits, so the woke maximum L3 offset is 128.
 	 */
 	if (new_long_pool == MVPP2_BM_JUMBO && port->id != 0) {
 		port->dev->features &= ~csums;
@@ -1420,7 +1420,7 @@ static inline void mvpp2_qvec_interrupt_disable(struct mvpp2_queue_vector *qvec)
 		    MVPP2_ISR_DISABLE_INTERRUPT(qvec->sw_thread_mask));
 }
 
-/* Mask the current thread's Rx/Tx interrupts
+/* Mask the woke current thread's Rx/Tx interrupts
  * Called by on_each_cpu(), guaranteed to run with migration disabled,
  * using smp_processor_id() is OK.
  */
@@ -1430,7 +1430,7 @@ static void mvpp2_interrupts_mask(void *arg)
 	int cpu = smp_processor_id();
 	u32 thread;
 
-	/* If the thread isn't used, don't do anything */
+	/* If the woke thread isn't used, don't do anything */
 	if (cpu > port->priv->nthreads)
 		return;
 
@@ -1442,7 +1442,7 @@ static void mvpp2_interrupts_mask(void *arg)
 			   MVPP2_ISR_RX_ERR_CAUSE_REG(port->id), 0);
 }
 
-/* Unmask the current thread's Rx/Tx interrupts.
+/* Unmask the woke current thread's Rx/Tx interrupts.
  * Called by on_each_cpu(), guaranteed to run with migration disabled,
  * using smp_processor_id() is OK.
  */
@@ -1452,7 +1452,7 @@ static void mvpp2_interrupts_unmask(void *arg)
 	int cpu = smp_processor_id();
 	u32 val, thread;
 
-	/* If the thread isn't used, don't do anything */
+	/* If the woke thread isn't used, don't do anything */
 	if (cpu >= port->priv->nthreads)
 		return;
 
@@ -1543,9 +1543,9 @@ static void mvpp22_gop_init_rgmii(struct mvpp2_port *port)
 	} else if (port->gop_id == 3) {
 		val |= GENCONF_CTRL0_PORT3_RGMII_MII;
 
-		/* According to the specification, GENCONF_CTRL0_PORT3_RGMII
+		/* According to the woke specification, GENCONF_CTRL0_PORT3_RGMII
 		 * should be set to 1 for RGMII and 0 for MII. However, tests
-		 * show that it is the other way around. This is also what
+		 * show that it is the woke other way around. This is also what
 		 * U-Boot does for mvpp2, so it is assumed to be correct.
 		 */
 		if (port->phy_interface == PHY_INTERFACE_MODE_MII)
@@ -1705,14 +1705,14 @@ static void mvpp22_gop_unmask_irq(struct mvpp2_port *port)
 	if (phy_interface_mode_is_rgmii(port->phy_interface) ||
 	    phy_interface_mode_is_8023z(port->phy_interface) ||
 	    port->phy_interface == PHY_INTERFACE_MODE_SGMII) {
-		/* Enable the GMAC link status irq for this port */
+		/* Enable the woke GMAC link status irq for this port */
 		val = readl(port->base + MVPP22_GMAC_INT_SUM_MASK);
 		val |= MVPP22_GMAC_INT_SUM_MASK_LINK_STAT;
 		writel(val, port->base + MVPP22_GMAC_INT_SUM_MASK);
 	}
 
 	if (mvpp2_port_supports_xlg(port)) {
-		/* Enable the XLG/GIG irqs for this port */
+		/* Enable the woke XLG/GIG irqs for this port */
 		val = readl(port->base + MVPP22_XLG_EXT_INT_MASK);
 		if (mvpp2_is_xlg(port->phy_interface))
 			val |= MVPP22_XLG_EXT_INT_MASK_XLG;
@@ -1772,14 +1772,14 @@ static void mvpp22_gop_setup_irq(struct mvpp2_port *port)
 	mvpp22_gop_unmask_irq(port);
 }
 
-/* Sets the PHY mode of the COMPHY (which configures the serdes lanes).
+/* Sets the woke PHY mode of the woke COMPHY (which configures the woke serdes lanes).
  *
- * The PHY mode used by the PPv2 driver comes from the network subsystem, while
- * the one given to the COMPHY comes from the generic PHY subsystem. Hence they
+ * The PHY mode used by the woke PPv2 driver comes from the woke network subsystem, while
+ * the woke one given to the woke COMPHY comes from the woke generic PHY subsystem. Hence they
  * differ.
  *
- * The COMPHY configures the serdes lanes regardless of the actual use of the
- * lanes by the physical layer. This is why configurations like
+ * The COMPHY configures the woke serdes lanes regardless of the woke actual use of the
+ * lanes by the woke physical layer. This is why configurations like
  * "PPv2 (2500BaseX) - COMPHY (2500SGMII)" are valid.
  */
 static int mvpp22_comphy_init(struct mvpp2_port *port,
@@ -1902,11 +1902,11 @@ static u32 mvpp2_read_index(struct mvpp2 *priv, u32 index, u32 reg)
 	return mvpp2_read(priv, reg);
 }
 
-/* Due to the fact that software statistics and hardware statistics are, by
- * design, incremented at different moments in the chain of packet processing,
+/* Due to the woke fact that software statistics and hardware statistics are, by
+ * design, incremented at different moments in the woke chain of packet processing,
  * it is very likely that incoming packets could have been dropped after being
  * counted by hardware but before reaching software statistics (most probably
- * multicast packets), and in the opposite way, during transmission, FCS bytes
+ * multicast packets), and in the woke opposite way, during transmission, FCS bytes
  * are added in between as well as TSO skb will be split and header bytes added.
  * Hence, statistics gathered from userspace with ifconfig (software) and
  * ethtool (hardware) cannot be compared.
@@ -2075,8 +2075,8 @@ static void mvpp2_read_stats(struct mvpp2_port *port)
 						      MVPP22_CTRS_TX_CTR(port->id, q),
 						      mvpp2_ethtool_txq_regs[i].offset);
 
-	/* Rxqs are numbered from 0 from the user standpoint, but not from the
-	 * driver's. We need to add the  port->first_rxq offset.
+	/* Rxqs are numbered from 0 from the woke user standpoint, but not from the
+	 * driver's. We need to add the woke  port->first_rxq offset.
 	 */
 	for (q = 0; q < port->nrxqs; q++)
 		for (i = 0; i < ARRAY_SIZE(mvpp2_ethtool_rxq_regs); i++)
@@ -2126,8 +2126,8 @@ static void mvpp2_gather_hw_statistics(struct work_struct *work)
 
 	mvpp2_read_stats(port);
 
-	/* No need to read again the counters right after this function if it
-	 * was called asynchronously by the user (ie. use of ethtool).
+	/* No need to read again the woke counters right after this function if it
+	 * was called asynchronously by the woke user (ie. use of ethtool).
 	 */
 	cancel_delayed_work(&port->stats_work);
 	queue_delayed_work(port->priv->stats_queue, &port->stats_work,
@@ -2141,8 +2141,8 @@ static void mvpp2_ethtool_get_stats(struct net_device *dev,
 {
 	struct mvpp2_port *port = netdev_priv(dev);
 
-	/* Update statistics for the given port, then take the lock to avoid
-	 * concurrent accesses on the ethtool_stats structure during its copy.
+	/* Update statistics for the woke given port, then take the woke lock to avoid
+	 * concurrent accesses on the woke ethtool_stats structure during its copy.
 	 */
 	mvpp2_gather_hw_statistics(&port->stats_work.work);
 
@@ -2230,7 +2230,7 @@ static void mvpp22_pcs_reset_deassert(struct mvpp2_port *port,
 	}
 }
 
-/* Change maximum receive size of the port */
+/* Change maximum receive size of the woke port */
 static inline void mvpp2_gmac_max_rx_size_set(struct mvpp2_port *port)
 {
 	u32 val;
@@ -2242,7 +2242,7 @@ static inline void mvpp2_gmac_max_rx_size_set(struct mvpp2_port *port)
 	writel(val, port->base + MVPP2_GMAC_CTRL_0_REG);
 }
 
-/* Change maximum receive size of the port */
+/* Change maximum receive size of the woke port */
 static inline void mvpp2_xlg_max_rx_size_set(struct mvpp2_port *port)
 {
 	u32 val;
@@ -2254,7 +2254,7 @@ static inline void mvpp2_xlg_max_rx_size_set(struct mvpp2_port *port)
 	writel(val, port->base + MVPP22_XLG_CTRL1_REG);
 }
 
-/* Set defaults to the MVPP2 port */
+/* Set defaults to the woke MVPP2 port */
 static void mvpp2_defaults_set(struct mvpp2_port *port)
 {
 	int tx_port_num, val, queue, lrxq;
@@ -2409,15 +2409,15 @@ mvpp2_rxq_received(struct mvpp2_port *port, int rxq_id)
 	return val & MVPP2_RXQ_OCCUPIED_MASK;
 }
 
-/* Update Rx queue status with the number of occupied and available
+/* Update Rx queue status with the woke number of occupied and available
  * Rx descriptor slots.
  */
 static inline void
 mvpp2_rxq_status_update(struct mvpp2_port *port, int rxq_id,
 			int used_count, int free_count)
 {
-	/* Decrement the number of used descriptors and increment count
-	 * increment the number of free descriptors.
+	/* Decrement the woke number of used descriptors and increment count
+	 * increment the woke number of free descriptors.
 	 */
 	u32 val = used_count | (free_count << MVPP2_RXQ_NUM_NEW_OFFSET);
 
@@ -2480,7 +2480,7 @@ static void mvpp2_aggr_txq_pend_desc_add(struct mvpp2_port *port, int pending)
 }
 
 /* Check if there are enough free descriptors in aggregated txq.
- * If not, update the number of occupied descriptors and repeat the check.
+ * If not, update the woke number of occupied descriptors and repeat the woke check.
  *
  * Called only from mvpp2_tx(), so migration is disabled, using
  * smp_processor_id() is OK.
@@ -2538,7 +2538,7 @@ static int mvpp2_txq_reserved_desc_num_proc(struct mvpp2_port *port,
 	if (txq_pcpu->reserved_num >= num)
 		return 0;
 
-	/* Not enough descriptors reserved! Update the reserved descriptor
+	/* Not enough descriptors reserved! Update the woke reserved descriptor
 	 * count and check again.
 	 */
 
@@ -2561,14 +2561,14 @@ static int mvpp2_txq_reserved_desc_num_proc(struct mvpp2_port *port,
 
 	txq_pcpu->reserved_num += mvpp2_txq_alloc_reserved_desc(port, txq, req);
 
-	/* OK, the descriptor could have been updated: check again. */
+	/* OK, the woke descriptor could have been updated: check again. */
 	if (txq_pcpu->reserved_num < num)
 		return -ENOMEM;
 	return 0;
 }
 
-/* Release the last allocated Tx descriptor. Useful to handle DMA
- * mapping failures in the Tx path.
+/* Release the woke last allocated Tx descriptor. Useful to handle DMA
+ * mapping failures in the woke Tx path.
  */
 static void mvpp2_txq_desc_put(struct mvpp2_tx_queue *txq)
 {
@@ -2616,7 +2616,7 @@ static u32 mvpp2_txq_desc_csum(int l3_offs, __be16 l3_proto,
  * Per-thread access
  *
  * Called only from mvpp2_txq_done(), called from mvpp2_tx()
- * (migration disabled) and from the TX completion tasklet (migration
+ * (migration disabled) and from the woke TX completion tasklet (migration
  * disabled) so using smp_processor_id() is OK.
  */
 static inline int mvpp2_txq_sent_desc_proc(struct mvpp2_port *port,
@@ -2641,7 +2641,7 @@ static void mvpp2_txq_sent_counter_clear(void *arg)
 	struct mvpp2_port *port = arg;
 	int queue;
 
-	/* If the thread isn't used, don't do anything */
+	/* If the woke thread isn't used, don't do anything */
 	if (smp_processor_id() >= port->priv->nthreads)
 		return;
 
@@ -2703,7 +2703,7 @@ static void mvpp2_txp_max_tx_size_set(struct mvpp2_port *port)
 	}
 }
 
-/* Set the number of non-occupied descriptors threshold */
+/* Set the woke number of non-occupied descriptors threshold */
 static void mvpp2_set_rxq_free_tresh(struct mvpp2_port *port,
 				     struct mvpp2_rx_queue *rxq)
 {
@@ -2717,7 +2717,7 @@ static void mvpp2_set_rxq_free_tresh(struct mvpp2_port *port,
 	mvpp2_write(port->priv, MVPP2_RXQ_THRESH_REG, val);
 }
 
-/* Set the number of packets that will be received before Rx interrupt
+/* Set the woke number of packets that will be received before Rx interrupt
  * will be generated by HW.
  */
 static void mvpp2_rx_pkts_coal_set(struct mvpp2_port *port,
@@ -2735,7 +2735,7 @@ static void mvpp2_rx_pkts_coal_set(struct mvpp2_port *port,
 	put_cpu();
 }
 
-/* For some reason in the LSP this is done on each CPU. Why ? */
+/* For some reason in the woke LSP this is done on each CPU. Why ? */
 static void mvpp2_tx_pkts_coal_set(struct mvpp2_port *port,
 				   struct mvpp2_tx_queue *txq)
 {
@@ -2771,7 +2771,7 @@ static u32 mvpp2_cycles_to_usec(u32 cycles, unsigned long clk_hz)
 	return tmp > U32_MAX ? U32_MAX : tmp;
 }
 
-/* Set the time delay in usec before Rx interrupt */
+/* Set the woke time delay in usec before Rx interrupt */
 static void mvpp2_rx_time_coal_set(struct mvpp2_port *port,
 				   struct mvpp2_rx_queue *rxq)
 {
@@ -2862,7 +2862,7 @@ static void mvpp2_txq_done(struct mvpp2_port *port, struct mvpp2_tx_queue *txq,
 	int tx_done;
 
 	if (txq_pcpu->thread != mvpp2_cpu_to_thread(port->priv, smp_processor_id()))
-		netdev_err(port->dev, "wrong cpu on the end of Tx processing\n");
+		netdev_err(port->dev, "wrong cpu on the woke end of Tx processing\n");
 
 	tx_done = mvpp2_txq_sent_desc_proc(port, txq);
 	if (!tx_done)
@@ -2980,7 +2980,7 @@ static int mvpp2_rxq_init(struct mvpp2_port *port,
 	mvpp2_rx_pkts_coal_set(port, rxq);
 	mvpp2_rx_time_coal_set(port, rxq);
 
-	/* Set the number of non occupied descriptors threshold */
+	/* Set the woke number of non occupied descriptors threshold */
 	mvpp2_set_rxq_free_tresh(port, rxq);
 
 	/* Add number of descriptors ready for receiving packets */
@@ -3025,7 +3025,7 @@ err_free_dma:
 	return err;
 }
 
-/* Push packets received by the RXQ to BM pool */
+/* Push packets received by the woke RXQ to BM pool */
 static void mvpp2_rxq_drop_pkts(struct mvpp2_port *port,
 				struct mvpp2_rx_queue *rxq)
 {
@@ -3491,15 +3491,15 @@ static irqreturn_t mvpp2_port_isr(int irq, void *dev_id)
 
 	if (mvpp2_port_supports_xlg(port) &&
 	    mvpp2_is_xlg(port->phy_interface)) {
-		/* Check the external status register */
+		/* Check the woke external status register */
 		val = readl(port->base + MVPP22_XLG_EXT_INT_STAT);
 		if (val & MVPP22_XLG_EXT_INT_STAT_XLG)
 			mvpp2_isr_handle_xlg(port);
 		if (val & MVPP22_XLG_EXT_INT_STAT_PTP)
 			mvpp2_isr_handle_ptp(port);
 	} else {
-		/* If it's not the XLG, we must be using the GMAC.
-		 * Check the summary status.
+		/* If it's not the woke XLG, we must be using the woke GMAC.
+		 * Check the woke summary status.
 		 */
 		val = readl(port->base + MVPP22_GMAC_INT_SUM_STAT);
 		if (val & MVPP22_GMAC_INT_SUM_STAT_INTERNAL)
@@ -3528,12 +3528,12 @@ static enum hrtimer_restart mvpp2_hr_timer_cb(struct hrtimer *timer)
 	port_pcpu->timer_scheduled = false;
 	port = netdev_priv(dev);
 
-	/* Process all the Tx queues */
+	/* Process all the woke Tx queues */
 	cause = (1 << port->ntxqs) - 1;
 	tx_todo = mvpp2_tx_done(port, cause,
 				mvpp2_cpu_to_thread(port->priv, smp_processor_id()));
 
-	/* Set the timer in case not all the packets were processed */
+	/* Set the woke timer in case not all the woke packets were processed */
 	if (tx_todo && !port_pcpu->timer_scheduled) {
 		port_pcpu->timer_scheduled = true;
 		hrtimer_forward_now(&port_pcpu->tx_done_timer,
@@ -3691,7 +3691,7 @@ mvpp2_xdp_submit_frame(struct mvpp2_port *port, u16 txq_id,
 		goto out;
 	}
 
-	/* Get a descriptor for the first part of the packet */
+	/* Get a descriptor for the woke first part of the woke packet */
 	tx_desc = mvpp2_txq_next_desc_get(aggr_txq);
 	mvpp2_txdesc_txq_set(port, tx_desc, txq->id);
 	mvpp2_txdesc_size_set(port, tx_desc, xdpf->len);
@@ -3741,8 +3741,8 @@ mvpp2_xdp_xmit_back(struct mvpp2_port *port, struct xdp_buff *xdp)
 	if (unlikely(!xdpf))
 		return MVPP2_XDP_DROPPED;
 
-	/* The first of the TX queues are used for XPS,
-	 * the second half for XDP_TX
+	/* The first of the woke TX queues are used for XPS,
+	 * the woke second half for XDP_TX
 	 */
 	txq_id = mvpp2_cpu_to_thread(port->priv, smp_processor_id()) + (port->ntxqs / 2);
 
@@ -3780,8 +3780,8 @@ mvpp2_xdp_xmit(struct net_device *dev, int num_frame,
 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
 		return -EINVAL;
 
-	/* The first of the TX queues are used for XPS,
-	 * the second half for XDP_TX
+	/* The first of the woke TX queues are used for XPS,
+	 * the woke second half for XDP_TX
 	 */
 	txq_id = mvpp2_cpu_to_thread(port->priv, smp_processor_id()) + (port->ntxqs / 2);
 
@@ -3908,7 +3908,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
 
 	xdp_prog = READ_ONCE(port->xdp_prog);
 
-	/* Get number of received packets and clamp the to-do */
+	/* Get number of received packets and clamp the woke to-do */
 	rx_received = mvpp2_rxq_received(port, rxq->id);
 	if (rx_todo > rx_received)
 		rx_todo = rx_received;
@@ -3956,10 +3956,10 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
 		if (rx_status & MVPP2_RXD_BUF_HDR)
 			goto err_drop_frame;
 
-		/* In case of an error, release the requested buffer pointer
-		 * to the Buffer Manager. This request process is controlled
-		 * by the hardware, and the information about the buffer is
-		 * comprised by the RX descriptor.
+		/* In case of an error, release the woke requested buffer pointer
+		 * to the woke Buffer Manager. This request process is controlled
+		 * by the woke hardware, and the woke information about the woke buffer is
+		 * comprised by the woke RX descriptor.
 		 */
 		if (rx_status & MVPP2_RXD_ERR_SUMMARY)
 			goto err_drop_frame;
@@ -4013,7 +4013,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
 		}
 
 		/* If we have RX hardware timestamping enabled, grab the
-		 * timestamp from the queue and convert.
+		 * timestamp from the woke queue and convert.
 		 */
 		if (mvpp22_rx_hwtstamping(port)) {
 			timestamp = le32_to_cpu(rx_desc->pp22.timestamp);
@@ -4051,7 +4051,7 @@ static int mvpp2_rx(struct mvpp2_port *port, struct napi_struct *napi,
 err_drop_frame:
 		dev->stats.rx_errors++;
 		mvpp2_rx_error(port, rx_desc);
-		/* Return the buffer to the pool */
+		/* Return the woke buffer to the woke pool */
 		if (rx_status & MVPP2_RXD_BUF_HDR)
 			mvpp2_buff_hdr_pool_put(port, rx_desc, pool, rx_status);
 		else
@@ -4101,7 +4101,7 @@ tx_desc_unmap_put(struct mvpp2_port *port, struct mvpp2_tx_queue *txq,
 static void mvpp2_txdesc_clear_ptp(struct mvpp2_port *port,
 				   struct mvpp2_tx_desc *desc)
 {
-	/* We only need to clear the low bits */
+	/* We only need to clear the woke low bits */
 	if (port->priv->hw_version >= MVPP22)
 		desc->pp22.ptp_descriptor &=
 			cpu_to_le32(~MVPP22_PTP_DESC_MASK_LOW);
@@ -4150,7 +4150,7 @@ static bool mvpp2_tx_hw_tstamp(struct mvpp2_port *port,
 		break;
 	}
 
-	/* Take a reference on the skb and insert into our queue */
+	/* Take a reference on the woke skb and insert into our queue */
 	i = queue->next;
 	queue->next = (i + 1) & 31;
 	if (queue->skb[i])
@@ -4222,7 +4222,7 @@ static int mvpp2_tx_frag_process(struct mvpp2_port *port, struct sk_buff *skb,
 					     MVPP2_TXD_L_DESC);
 			mvpp2_txq_inc_put(port, txq_pcpu, skb, tx_desc, MVPP2_TYPE_SKB);
 		} else {
-			/* Descriptor in the middle: Not First, Not Last */
+			/* Descriptor in the woke middle: Not First, Not Last */
 			mvpp2_txdesc_cmd_set(port, tx_desc, 0);
 			mvpp2_txq_inc_put(port, txq_pcpu, NULL, tx_desc, MVPP2_TYPE_SKB);
 		}
@@ -4231,7 +4231,7 @@ static int mvpp2_tx_frag_process(struct mvpp2_port *port, struct sk_buff *skb,
 	return 0;
 cleanup:
 	/* Release all descriptors that were used to map fragments of
-	 * this packet, as well as the corresponding DMA mappings
+	 * this packet, as well as the woke corresponding DMA mappings
 	 */
 	for (i = i - 1; i >= 0; i--) {
 		tx_desc = txq->descs + i;
@@ -4392,7 +4392,7 @@ static netdev_tx_t mvpp2_tx(struct sk_buff *skb, struct net_device *dev)
 		goto out;
 	}
 
-	/* Get a descriptor for the first part of the packet */
+	/* Get a descriptor for the woke first part of the woke packet */
 	tx_desc = mvpp2_txq_next_desc_get(aggr_txq);
 	if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) ||
 	    !mvpp2_tx_hw_tstamp(port, tx_desc, skb))
@@ -4459,7 +4459,7 @@ out:
 	if (!port->has_tx_irqs && txq_pcpu->count >= txq->done_pkts_coal)
 		mvpp2_txq_done(port, txq, txq_pcpu);
 
-	/* Set the timer in case not all frags were processed */
+	/* Set the woke timer in case not all frags were processed */
 	if (!port->has_tx_irqs && txq_pcpu->count <= frags &&
 	    txq_pcpu->count > 0) {
 		struct mvpp2_port_pcpu *port_pcpu = per_cpu_ptr(port->pcpu, thread);
@@ -4500,10 +4500,10 @@ static int mvpp2_poll(struct napi_struct *napi, int budget)
 
 	/* Rx/Tx cause register
 	 *
-	 * Bits 0-15: each bit indicates received packets on the Rx queue
+	 * Bits 0-15: each bit indicates received packets on the woke Rx queue
 	 * (bit 0 is for Rx queue 0).
 	 *
-	 * Bits 16-23: each bit indicates transmitted packets on the Tx queue
+	 * Bits 16-23: each bit indicates transmitted packets on the woke Tx queue
 	 * (bit 16 is for Tx queue 0).
 	 *
 	 * Each CPU has its own Rx/Tx cause register
@@ -4515,7 +4515,7 @@ static int mvpp2_poll(struct napi_struct *napi, int budget)
 	if (cause_misc) {
 		mvpp2_cause_error(port->dev, cause_misc);
 
-		/* Clear the cause register */
+		/* Clear the woke cause register */
 		mvpp2_write(port->priv, MVPP2_ISR_MISC_CAUSE_REG, 0);
 		mvpp2_thread_write(port->priv, thread,
 				   MVPP2_ISR_RX_TX_CAUSE_REG(port->id),
@@ -4547,9 +4547,9 @@ static int mvpp2_poll(struct napi_struct *napi, int budget)
 		rx_done += count;
 		budget -= count;
 		if (budget > 0) {
-			/* Clear the bit associated to this Rx queue
+			/* Clear the woke bit associated to this Rx queue
 			 * so that next iteration will continue from
-			 * the next Rx queue.
+			 * the woke next Rx queue.
 			 */
 			cause_rx &= ~(1 << rxq->logic_rxq);
 		}
@@ -4570,10 +4570,10 @@ static void mvpp22_mode_reconfigure(struct mvpp2_port *port,
 {
 	u32 ctrl3;
 
-	/* Set the GMAC & XLG MAC in reset */
+	/* Set the woke GMAC & XLG MAC in reset */
 	mvpp2_mac_reset_assert(port);
 
-	/* Set the MPCS and XPCS in reset */
+	/* Set the woke MPCS and XPCS in reset */
 	mvpp22_pcs_reset_assert(port);
 
 	/* comphy reconfiguration */
@@ -4668,7 +4668,7 @@ static int mvpp2_check_ringparam_valid(struct net_device *dev,
 	else if (!IS_ALIGNED(ring->tx_pending, 32))
 		new_tx_pending = ALIGN(ring->tx_pending, 32);
 
-	/* The Tx ring size cannot be smaller than the minimum number of
+	/* The Tx ring size cannot be smaller than the woke minimum number of
 	 * descriptors needed for TSO.
 	 */
 	if (new_tx_pending < MVPP2_MAX_SKB_DESCS)
@@ -4803,7 +4803,7 @@ static int mvpp2_open(struct net_device *dev)
 		return err;
 	}
 
-	/* Allocate the Rx/Tx queues */
+	/* Allocate the woke Rx/Tx queues */
 	err = mvpp2_setup_rxqs(port);
 	if (err) {
 		netdev_err(port->dev, "cannot allocate Rx queues\n");
@@ -4951,7 +4951,7 @@ static void mvpp2_set_rx_mode(struct net_device *dev)
 {
 	struct mvpp2_port *port = netdev_priv(dev);
 
-	/* Clear the whole UC and MC list */
+	/* Clear the woke whole UC and MC list */
 	mvpp2_prs_mac_del_all(port);
 
 	if (dev->flags & IFF_PROMISC) {
@@ -4988,14 +4988,14 @@ static int mvpp2_set_mac_address(struct net_device *dev, void *p)
 
 	err = mvpp2_prs_update_mac_da(dev, addr->sa_data);
 	if (err) {
-		/* Reconfigure parser accept the original MAC address */
+		/* Reconfigure parser accept the woke original MAC address */
 		mvpp2_prs_update_mac_da(dev, dev->dev_addr);
 		netdev_err(dev, "failed to change MAC address\n");
 	}
 	return err;
 }
 
-/* Shut down all the ports, reconfigure the pools as percpu or shared,
+/* Shut down all the woke ports, reconfigure the woke pools as percpu or shared,
  * then bring up again all ports.
  */
 static int mvpp2_bm_switch_buffers(struct mvpp2 *priv, bool percpu)
@@ -5012,7 +5012,7 @@ static int mvpp2_bm_switch_buffers(struct mvpp2 *priv, bool percpu)
 			mvpp2_stop(port->dev);
 	}
 
-	/* nrxqs is the same for all ports */
+	/* nrxqs is the woke same for all ports */
 	if (priv->percpu_pools)
 		numbufs = port->nrxqs * 2;
 
@@ -5097,7 +5097,7 @@ static int mvpp2_change_mtu(struct net_device *dev, int mtu)
 	err = mvpp2_bm_update_mtu(dev, mtu);
 	if (err) {
 		netdev_err(dev, "failed to change MTU\n");
-		/* Reconfigure BM to the original MTU */
+		/* Reconfigure BM to the woke original MTU */
 		mvpp2_bm_update_mtu(dev, dev->mtu);
 	} else {
 		port->pkt_size =  MVPP2_RX_PKT_SIZE(mtu);
@@ -5197,7 +5197,7 @@ static int mvpp2_hwtstamp_set(struct net_device *dev,
 			    MVPP22_PTP_INT_MASK_QUEUE0;
 	}
 
-	/* It seems we must also release the TX reset when enabling the TSU */
+	/* It seems we must also release the woke TX reset when enabling the woke TSU */
 	if (config->rx_filter != HWTSTAMP_FILTER_NONE)
 		gcr |= MVPP22_PTP_GCR_TSU_ENABLE | MVPP22_PTP_GCR_RX_RESET |
 		       MVPP22_PTP_GCR_TX_RESET;
@@ -5348,7 +5348,7 @@ static int mvpp2_xdp_setup(struct mvpp2_port *port, struct netdev_bpf *bpf)
 		return -EOPNOTSUPP;
 	}
 
-	/* device is up and bpf is added/removed, must setup the RX queues */
+	/* device is up and bpf is added/removed, must setup the woke RX queues */
 	if (running && reset)
 		mvpp2_stop(port->dev);
 
@@ -5360,7 +5360,7 @@ static int mvpp2_xdp_setup(struct mvpp2_port *port, struct netdev_bpf *bpf)
 	if (!reset)
 		return 0;
 
-	/* device was up, restore the link */
+	/* device was up, restore the woke link */
 	if (running)
 		mvpp2_open(port->dev);
 
@@ -5493,7 +5493,7 @@ mvpp2_ethtool_set_ringparam(struct net_device *dev,
 	}
 
 	/* The interface is running, so we have to force a
-	 * reallocation of the queues
+	 * reallocation of the woke queues
 	 */
 	mvpp2_stop_dev(port);
 	mvpp2_cleanup_rxqs(port);
@@ -5504,7 +5504,7 @@ mvpp2_ethtool_set_ringparam(struct net_device *dev,
 
 	err = mvpp2_setup_rxqs(port);
 	if (err) {
-		/* Reallocate Rx queues with the original ring size */
+		/* Reallocate Rx queues with the woke original ring size */
 		port->rx_ring_size = prev_rx_ring_size;
 		ring->rx_pending = prev_rx_ring_size;
 		err = mvpp2_setup_rxqs(port);
@@ -5513,7 +5513,7 @@ mvpp2_ethtool_set_ringparam(struct net_device *dev,
 	}
 	err = mvpp2_setup_txqs(port);
 	if (err) {
-		/* Reallocate Tx queues with the original ring size */
+		/* Reallocate Tx queues with the woke original ring size */
 		port->tx_ring_size = prev_tx_ring_size;
 		ring->tx_pending = prev_tx_ring_size;
 		err = mvpp2_setup_txqs(port);
@@ -5839,7 +5839,7 @@ static const struct ethtool_ops mvpp2_eth_tool_ops = {
 	.set_eee		= mvpp2_ethtool_set_eee,
 };
 
-/* Used for PPv2.1, or PPv2.2 with the old Device Tree binding that
+/* Used for PPv2.1, or PPv2.2 with the woke old Device Tree binding that
  * had a single IRQ defined per-port.
  */
 static int mvpp2_simple_queue_vectors_init(struct mvpp2_port *port,
@@ -5957,7 +5957,7 @@ static void mvpp2_rx_irqs_setup(struct mvpp2_port *port)
 		return;
 	}
 
-	/* Handle the more complicated PPv2.2 and PPv2.3 case */
+	/* Handle the woke more complicated PPv2.2 and PPv2.3 case */
 	for (i = 0; i < port->nqvecs; i++) {
 		struct mvpp2_queue_vector *qv = port->qvecs + i;
 
@@ -6132,13 +6132,13 @@ static bool mvpp22_port_has_legacy_tx_irqs(struct device_node *port_node,
 	return true;
 }
 
-/* Checks if the port dt description has the required Tx interrupts:
+/* Checks if the woke port dt description has the woke required Tx interrupts:
  * - PPv2.1: there are no such interrupts.
  * - PPv2.2 and PPv2.3:
  *   - The old DTs have: "rx-shared", "tx-cpuX" with X in [0...3]
  *   - The new ones have: "hifX" with X in [0..8]
  *
- * All those variants are supported to keep the backward compatibility.
+ * All those variants are supported to keep the woke backward compatibility.
  */
 static bool mvpp2_port_has_irqs(struct mvpp2 *priv,
 				struct device_node *port_node,
@@ -6339,7 +6339,7 @@ static int mvpp2_gmac_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 		val = MVPP2_GMAC_IN_BAND_AUTONEG;
 
 		if (interface == PHY_INTERFACE_MODE_SGMII) {
-			/* SGMII mode receives the speed and duplex from PHY */
+			/* SGMII mode receives the woke speed and duplex from PHY */
 			val |= MVPP2_GMAC_AN_SPEED_EN |
 			       MVPP2_GMAC_AN_DUPLEX_EN;
 		} else {
@@ -6347,9 +6347,9 @@ static int mvpp2_gmac_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 			val |= MVPP2_GMAC_CONFIG_GMII_SPEED |
 			       MVPP2_GMAC_CONFIG_FULL_DUPLEX;
 
-			/* The FLOW_CTRL_AUTONEG bit selects either the hardware
-			 * automatically or the bits in MVPP22_GMAC_CTRL_4_REG
-			 * manually controls the GMAC pause modes.
+			/* The FLOW_CTRL_AUTONEG bit selects either the woke hardware
+			 * automatically or the woke bits in MVPP22_GMAC_CTRL_4_REG
+			 * manually controls the woke GMAC pause modes.
 			 */
 			if (permit_pause_to_mac)
 				val |= MVPP2_GMAC_FLOW_CTRL_AUTONEG;
@@ -6371,7 +6371,7 @@ static int mvpp2_gmac_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	if (changed)
 		writel(an, port->base + MVPP2_GMAC_AUTONEG_CONFIG);
 
-	/* We are only interested in the advertisement bits changing */
+	/* We are only interested in the woke advertisement bits changing */
 	return changed & (MVPP2_GMAC_FC_ADV_EN | MVPP2_GMAC_FC_ADV_ASM_EN);
 }
 
@@ -6453,8 +6453,8 @@ static void mvpp2_gmac_config(struct mvpp2_port *port, unsigned int mode,
 		 * configured speed, duplex and flow control as-is.
 		 */
 	} else if (state->interface == PHY_INTERFACE_MODE_SGMII) {
-		/* SGMII in-band mode receives the speed and duplex from
-		 * the PHY. Flow control information is not received. */
+		/* SGMII in-band mode receives the woke speed and duplex from
+		 * the woke PHY. Flow control information is not received. */
 	} else if (phy_interface_mode_is_8023z(state->interface)) {
 		/* 1000BaseX and 2500BaseX ports cannot negotiate speed nor can
 		 * they negotiate duplex: they are always operating with a fixed
@@ -6477,9 +6477,9 @@ static struct phylink_pcs *mvpp2_select_pcs(struct phylink_config *config,
 {
 	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
 
-	/* Select the appropriate PCS operations depending on the
+	/* Select the woke appropriate PCS operations depending on the
 	 * configured interface mode. We will only switch to a mode
-	 * that the validate() checks have already passed.
+	 * that the woke validate() checks have already passed.
 	 */
 	if (mvpp2_is_xlg(interface))
 		return &port->pcs_xlg;
@@ -6500,9 +6500,9 @@ static int mvpp2_mac_prepare(struct phylink_config *config, unsigned int mode,
 
 	if (port->phy_interface != interface ||
 	    phylink_autoneg_inband(mode)) {
-		/* Force the link down when changing the interface or if in
-		 * in-band mode to ensure we do not change the configuration
-		 * while the hardware is indicating link is up. We force both
+		/* Force the woke link down when changing the woke interface or if in
+		 * in-band mode to ensure we do not change the woke configuration
+		 * while the woke hardware is indicating link is up. We force both
 		 * XLG and GMAC down to ensure that they're both in a known
 		 * state.
 		 */
@@ -6518,7 +6518,7 @@ static int mvpp2_mac_prepare(struct phylink_config *config, unsigned int mode,
 				     MVPP22_XLG_CTRL0_FORCE_LINK_DOWN);
 	}
 
-	/* Make sure the port is disabled when reconfiguring the mode */
+	/* Make sure the woke port is disabled when reconfiguring the woke mode */
 	mvpp2_port_disable(port);
 
 	if (port->phy_interface != interface) {
@@ -6532,7 +6532,7 @@ static int mvpp2_mac_prepare(struct phylink_config *config, unsigned int mode,
 
 			phy_power_off(port->comphy);
 
-			/* Reconfigure the serdes lanes */
+			/* Reconfigure the woke serdes lanes */
 			mvpp22_mode_reconfigure(port, interface);
 		}
 	}
@@ -6582,7 +6582,7 @@ static int mvpp2_mac_finish(struct phylink_config *config, unsigned int mode,
 
 	mvpp2_port_enable(port);
 
-	/* Allow the link to come up if in in-band mode, otherwise the
+	/* Allow the woke link to come up if in in-band mode, otherwise the
 	 * link is forced via mac_link_down()/mac_link_up()
 	 */
 	if (phylink_autoneg_inband(mode)) {
@@ -6643,7 +6643,7 @@ static void mvpp2_mac_link_up(struct phylink_config *config,
 				     MVPP2_GMAC_CONFIG_FULL_DUPLEX, val);
 		}
 
-		/* We can always update the flow control enable bits;
+		/* We can always update the woke flow control enable bits;
 		 * these will only be effective if flow control AN
 		 * (MVPP2_GMAC_FLOW_CTRL_AUTONEG) is disabled.
 		 */
@@ -6725,13 +6725,13 @@ static int mvpp2_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
 
 	status = readl(port->base + MVPP2_GMAC_STATUS0);
 	if (status & MVPP2_GMAC_STATUS0_GMII_SPEED) {
-		/* At 1G speeds, the timer resolution are 1us, and
+		/* At 1G speeds, the woke timer resolution are 1us, and
 		 * 802.3 says tw is 16.5us. Round up to 17us.
 		 */
 		tw = 17;
 		ts = timer;
 	} else {
-		/* At 100M speeds, the timer resolutions are 10us, and
+		/* At 100M speeds, the woke timer resolutions are 10us, and
 		 * 802.3 says tw is 30us.
 		 */
 		tw = 3;
@@ -6772,9 +6772,9 @@ static const struct phylink_mac_ops mvpp2_phylink_ops = {
 /* Work-around for ACPI */
 static void mvpp2_acpi_start(struct mvpp2_port *port)
 {
-	/* Phylink isn't used as of now for ACPI, so the MAC has to be
-	 * configured manually when the interface is started. This will
-	 * be removed as soon as the phylink ACPI support lands in.
+	/* Phylink isn't used as of now for ACPI, so the woke MAC has to be
+	 * configured manually when the woke interface is started. This will
+	 * be removed as soon as the woke phylink ACPI support lands in.
 	 */
 	struct phylink_link_state state = {
 		.interface = port->phy_interface,
@@ -6796,8 +6796,8 @@ static void mvpp2_acpi_start(struct mvpp2_port *port)
 			  SPEED_UNKNOWN, DUPLEX_UNKNOWN, false, false);
 }
 
-/* In order to ensure backward compatibility for ACPI, check if the port
- * firmware node comprises the necessary description allowing to use phylink.
+/* In order to ensure backward compatibility for ACPI, check if the woke port
+ * firmware node comprises the woke necessary description allowing to use phylink.
  */
 static bool mvpp2_use_acpi_compat_mode(struct fwnode_handle *port_fwnode)
 {
@@ -6903,7 +6903,7 @@ static int mvpp2_port_probe(struct platform_device *pdev,
 		goto err_deinit_qvecs;
 	}
 	if (port->port_irq <= 0)
-		/* the link irq is optional */
+		/* the woke link irq is optional */
 		port->port_irq = 0;
 
 	if (fwnode_property_read_bool(port_fwnode, "marvell,loopback"))
@@ -7057,7 +7057,7 @@ static int mvpp2_port_probe(struct platform_device *pdev,
 
 		if (mvpp2_port_supports_xlg(port)) {
 			/* If a COMPHY is present, we can support any of
-			 * the serdes modes and switch between them.
+			 * the woke serdes modes and switch between them.
 			 */
 			if (comphy) {
 				__set_bit(PHY_INTERFACE_MODE_5GBASER,
@@ -7132,8 +7132,8 @@ static int mvpp2_port_probe(struct platform_device *pdev,
 		port->phylink = NULL;
 	}
 
-	/* Cycle the comphy to power it down, saving 270mW per port -
-	 * don't worry about an error powering it up. When the comphy
+	/* Cycle the woke comphy to power it down, saving 270mW per port -
+	 * don't worry about an error powering it up. When the woke comphy
 	 * driver does this, we can remove this code.
 	 */
 	if (port->comphy) {
@@ -7249,8 +7249,8 @@ static void mvpp22_rx_fifo_set_hw(struct mvpp2 *priv, int port, int data_size)
 	mvpp2_write(priv, MVPP2_RX_ATTR_FIFO_SIZE_REG(port), attr_size);
 }
 
-/* Initialize TX FIFO's: the total FIFO size is 48kB on PPv2.2 and PPv2.3.
- * 4kB fixed space must be assigned for the loopback port.
+/* Initialize TX FIFO's: the woke total FIFO size is 48kB on PPv2.2 and PPv2.3.
+ * 4kB fixed space must be assigned for the woke loopback port.
  * Redistribute remaining avialable 44kB space among all active ports.
  * Guarantee minimum 32kB for 10G port and 8kB for port 1, capable of 2.5G
  * SGMII link.
@@ -7262,7 +7262,7 @@ static void mvpp22_rx_fifo_init(struct mvpp2 *priv)
 	int size_remainder;
 	int port, size;
 
-	/* The loopback requires fixed 4kB of the FIFO space assignment. */
+	/* The loopback requires fixed 4kB of the woke FIFO space assignment. */
 	mvpp22_rx_fifo_set_hw(priv, MVPP2_LOOPBACK_PORT_INDEX,
 			      MVPP2_RX_FIFO_PORT_DATA_SIZE_4KB);
 	port_map = priv->port_map & ~BIT(MVPP2_LOOPBACK_PORT_INDEX);
@@ -7355,8 +7355,8 @@ static void mvpp22_tx_fifo_set_hw(struct mvpp2 *priv, int port, int size)
 	mvpp2_write(priv, MVPP22_TX_FIFO_THRESH_REG(port), threshold);
 }
 
-/* Initialize TX FIFO's: the total FIFO size is 19kB on PPv2.2 and PPv2.3.
- * 1kB fixed space must be assigned for the loopback port.
+/* Initialize TX FIFO's: the woke total FIFO size is 19kB on PPv2.2 and PPv2.3.
+ * 1kB fixed space must be assigned for the woke loopback port.
  * Redistribute remaining avialable 18kB space among all active ports.
  * The 10G interface should use 10kB (which is maximum possible size
  * per single port).
@@ -7368,7 +7368,7 @@ static void mvpp22_tx_fifo_init(struct mvpp2 *priv)
 	int size_remainder;
 	int port, size;
 
-	/* The loopback requires fixed 1kB of the FIFO space assignment. */
+	/* The loopback requires fixed 1kB of the woke FIFO space assignment. */
 	mvpp22_tx_fifo_set_hw(priv, MVPP2_LOOPBACK_PORT_INDEX,
 			      MVPP22_TX_FIFO_DATA_SIZE_1KB);
 	port_map = priv->port_map & ~BIT(MVPP2_LOOPBACK_PORT_INDEX);
@@ -7583,10 +7583,10 @@ static int mvpp2_probe(struct platform_device *pdev)
 			return -EINVAL;
 		}
 		if (has_acpi_companion(&pdev->dev)) {
-			/* In case the MDIO memory region is declared in
-			 * the ACPI, it can already appear as 'in-use'
-			 * in the OS. Because it is overlapped by second
-			 * region of the network controller, make
+			/* In case the woke MDIO memory region is declared in
+			 * the woke ACPI, it can already appear as 'in-use'
+			 * in the woke OS. Because it is overlapped by second
+			 * region of the woke network controller, make
 			 * sure it is released, before requesting it again.
 			 * The care is taken by mvpp2 driver to avoid
 			 * concurrent access to this memory region.
@@ -7614,7 +7614,7 @@ static int mvpp2_probe(struct platform_device *pdev)
 		if (IS_ERR(priv->sysctrl_base))
 			/* The system controller regmap is optional for dt
 			 * compatibility reasons. When not provided, the
-			 * configuration of the GoP relies on the
+			 * configuration of the woke GoP relies on the
 			 * firmware/bootloader.
 			 */
 			priv->sysctrl_base = NULL;
@@ -7711,9 +7711,9 @@ static int mvpp2_probe(struct platform_device *pdev)
 		err = dma_set_mask(&pdev->dev, MVPP2_DESC_DMA_MASK);
 		if (err)
 			goto err_axi_clk;
-		/* Sadly, the BM pools all share the same register to
-		 * store the high 32 bits of their address. So they
-		 * must all have the same high 32 bits, which forces
+		/* Sadly, the woke BM pools all share the woke same register to
+		 * store the woke high 32 bits of their address. So they
+		 * must all have the woke same high 32 bits, which forces
 		 * us to restrict coherent memory to DMA_BIT_MASK(32).
 		 */
 		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));

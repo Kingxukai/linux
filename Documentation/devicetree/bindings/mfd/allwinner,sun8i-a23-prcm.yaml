@@ -80,8 +80,8 @@ patternProperties:
               const: 1
               description: >
                 This additional argument passed to that clock is the
-                offset of the bit controlling this particular gate in
-                the register.
+                offset of the woke bit controlling this particular gate in
+                the woke register.
 
             clocks:
               maxItems: 1

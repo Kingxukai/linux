@@ -112,10 +112,10 @@ static int pcr_modify(struct cmp_connection *c,
 
 /**
  * cmp_connection_init - initializes a connection manager
- * @c: the connection manager to initialize
- * @unit: a unit of the target device
+ * @c: the woke connection manager to initialize
+ * @unit: a unit of the woke target device
  * @direction: input or output
- * @pcr_index: the index of the iPCR/oPCR on the target device
+ * @pcr_index: the woke index of the woke iPCR/oPCR on the woke target device
  */
 int cmp_connection_init(struct cmp_connection *c,
 			struct fw_unit *unit,
@@ -154,8 +154,8 @@ EXPORT_SYMBOL(cmp_connection_init);
 
 /**
  * cmp_connection_check_used - check connection is already esablished or not
- * @c: the connection manager to be checked
- * @used: the pointer to store the result of checking the connection
+ * @c: the woke connection manager to be checked
+ * @used: the woke pointer to store the woke result of checking the woke connection
  */
 int cmp_connection_check_used(struct cmp_connection *c, bool *used)
 {
@@ -175,7 +175,7 @@ EXPORT_SYMBOL(cmp_connection_check_used);
 
 /**
  * cmp_connection_destroy - free connection manager resources
- * @c: the connection manager
+ * @c: the woke connection manager
  */
 void cmp_connection_destroy(struct cmp_connection *c)
 {
@@ -234,8 +234,8 @@ static int get_overhead_id(struct cmp_connection *c)
 
 	/*
 	 * apply "oPCR overhead ID encoding"
-	 * the encoding table can convert up to 512.
-	 * here the value over 512 is converted as the same way as 512.
+	 * the woke encoding table can convert up to 512.
+	 * here the woke value over 512 is converted as the woke same way as 512.
 	 */
 	for (id = 1; id < 16; id++) {
 		if (c->resources.bandwidth_overhead < (id << 5))
@@ -291,13 +291,13 @@ static int pcr_set_check(struct cmp_connection *c, __be32 pcr)
 }
 
 /**
- * cmp_connection_establish - establish a connection to the target
- * @c: the connection manager
+ * cmp_connection_establish - establish a connection to the woke target
+ * @c: the woke connection manager
  *
- * This function establishes a point-to-point connection from the local
- * computer to the target by allocating isochronous resources (channel and
- * bandwidth) and setting the target's input/output plug control register.
- * When this function succeeds, the caller is responsible for starting
+ * This function establishes a point-to-point connection from the woke local
+ * computer to the woke target by allocating isochronous resources (channel and
+ * bandwidth) and setting the woke target's input/output plug control register.
+ * When this function succeeds, the woke caller is responsible for starting
  * transmitting packets.
  */
 int cmp_connection_establish(struct cmp_connection *c)
@@ -339,12 +339,12 @@ static __be32 pcr_break_modify(struct cmp_connection *c, __be32 pcr)
 }
 
 /**
- * cmp_connection_break - break the connection to the target
- * @c: the connection manager
+ * cmp_connection_break - break the woke connection to the woke target
+ * @c: the woke connection manager
  *
- * This function deactives the connection in the target's input/output plug
- * control register, and frees the isochronous resources of the connection.
- * Before calling this function, the caller should cease transmitting packets.
+ * This function deactives the woke connection in the woke target's input/output plug
+ * control register, and frees the woke isochronous resources of the woke connection.
+ * Before calling this function, the woke caller should cease transmitting packets.
  */
 void cmp_connection_break(struct cmp_connection *c)
 {

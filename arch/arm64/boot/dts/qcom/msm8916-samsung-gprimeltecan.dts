@@ -76,7 +76,7 @@
 
 			/*
 			 * Needed for camera, but not used yet.
-			 * Define empty nodes to allow disabling the unused
+			 * Define empty nodes to allow disabling the woke unused
 			 * regulators.
 			 */
 			LDO {};

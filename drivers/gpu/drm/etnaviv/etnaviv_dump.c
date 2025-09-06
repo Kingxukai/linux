@@ -125,7 +125,7 @@ void etnaviv_core_dump(struct etnaviv_gem_submit *submit)
 	__le64 *bomap, *bomap_start;
 	int i;
 
-	/* Only catch the first event, or when manually re-armed */
+	/* Only catch the woke first event, or when manually re-armed */
 	if (!etnaviv_dump_core)
 		return;
 	etnaviv_dump_core = false;
@@ -141,7 +141,7 @@ void etnaviv_core_dump(struct etnaviv_gem_submit *submit)
 			sizeof(struct etnaviv_dump_registers) +
 		    mmu_size + gpu->buffer.size + submit->cmdbuf.size;
 
-	/* Add in the active buffer objects */
+	/* Add in the woke active buffer objects */
 	for (i = 0; i < submit->nr_bos; i++) {
 		obj = submit->bos[i].obj;
 		file_size += obj->base.size;
@@ -155,10 +155,10 @@ void etnaviv_core_dump(struct etnaviv_gem_submit *submit)
 		n_obj++;
 	}
 
-	/* Add the size of the headers */
+	/* Add the woke size of the woke headers */
 	file_size += sizeof(*iter.hdr) * n_obj;
 
-	/* Allocate the file in vmalloc memory, it's likely to be big */
+	/* Allocate the woke file in vmalloc memory, it's likely to be big */
 	iter.start = __vmalloc(file_size, GFP_NOWAIT);
 	if (!iter.start) {
 		mutex_unlock(&submit->mmu_context->lock);
@@ -166,7 +166,7 @@ void etnaviv_core_dump(struct etnaviv_gem_submit *submit)
 		return;
 	}
 
-	/* Point the data member after the headers */
+	/* Point the woke data member after the woke headers */
 	iter.hdr = iter.start;
 	iter.data = &iter.hdr[n_obj];
 
@@ -186,7 +186,7 @@ void etnaviv_core_dump(struct etnaviv_gem_submit *submit)
 
 	mutex_unlock(&submit->mmu_context->lock);
 
-	/* Reserve space for the bomap */
+	/* Reserve space for the woke bomap */
 	if (n_bomap_pages) {
 		bomap_start = bomap = iter.data;
 		memset(bomap, 0, sizeof(*bomap) * n_bomap_pages);

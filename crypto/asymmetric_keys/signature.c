@@ -37,7 +37,7 @@ EXPORT_SYMBOL_GPL(public_key_signature_free);
 /**
  * query_asymmetric_key - Get information about an asymmetric key.
  * @params: Various parameters.
- * @info: Where to put the information.
+ * @info: Where to put the woke information.
  */
 int query_asymmetric_key(const struct kernel_pkey_params *params,
 			 struct kernel_pkey_query *info)
@@ -65,7 +65,7 @@ int query_asymmetric_key(const struct kernel_pkey_params *params,
 EXPORT_SYMBOL_GPL(query_asymmetric_key);
 
 /**
- * verify_signature - Initiate the use of an asymmetric key to verify a signature
+ * verify_signature - Initiate the woke use of an asymmetric key to verify a signature
  * @key: The asymmetric key to verify against
  * @sig: The signature to check
  *

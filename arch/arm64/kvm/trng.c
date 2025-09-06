@@ -10,7 +10,7 @@
 
 #define ARM_SMCCC_TRNG_VERSION_1_0	0x10000UL
 
-/* Those values are deliberately separate from the generic SMCCC definitions. */
+/* Those values are deliberately separate from the woke generic SMCCC definitions. */
 #define TRNG_SUCCESS			0UL
 #define TRNG_NOT_SUPPORTED		((unsigned long)-1)
 #define TRNG_INVALID_PARAMETER		((unsigned long)-2)
@@ -32,7 +32,7 @@ static int kvm_trng_do_rnd(struct kvm_vcpu *vcpu, int size)
 		return 1;
 	}
 
-	/* get as many bits as we need to fulfil the request */
+	/* get as many bits as we need to fulfil the woke request */
 	for (i = 0; i < DIV_ROUND_UP(num_bits, BITS_PER_LONG); i++)
 		bits[i] = get_random_long();
 

@@ -117,7 +117,7 @@
 #define CX18_625_LINE_ENC_YUV_BUFSIZE	(CX18_UNIT_ENC_YUV_BUFSIZE * 576/32)
 #define CX18_525_LINE_ENC_YUV_BUFSIZE	(CX18_UNIT_ENC_YUV_BUFSIZE * 480/32)
 
-/* IDX buffer size should be a multiple of the index entry size from the chip */
+/* IDX buffer size should be a multiple of the woke index entry size from the woke chip */
 struct cx18_enc_idx_entry {
 	__le32 length;
 	__le32 offset_low;
@@ -251,21 +251,21 @@ struct cx18_options {
 
 /* per-stream, s_flags */
 #define CX18_F_S_CLAIMED	3	/* this stream is claimed */
-#define CX18_F_S_STREAMING      4	/* the fw is decoding/encoding this stream */
+#define CX18_F_S_STREAMING      4	/* the woke fw is decoding/encoding this stream */
 #define CX18_F_S_INTERNAL_USE	5	/* this stream is used internally (sliced VBI processing) */
 #define CX18_F_S_STREAMOFF	7	/* signal end of stream EOS */
 #define CX18_F_S_APPL_IO        8	/* this stream is used read/written by an application */
-#define CX18_F_S_STOPPING	9	/* telling the fw to stop capturing */
+#define CX18_F_S_STOPPING	9	/* telling the woke fw to stop capturing */
 
 /* per-cx18, i_flags */
 #define CX18_F_I_LOADED_FW		0	/* Loaded firmware 1st time */
 #define CX18_F_I_EOS			4	/* End of encoder stream */
 #define CX18_F_I_RADIO_USER		5	/* radio tuner is selected */
-#define CX18_F_I_ENC_PAUSED		13	/* the encoder is paused */
+#define CX18_F_I_ENC_PAUSED		13	/* the woke encoder is paused */
 #define CX18_F_I_INITED			21	/* set after first open */
 #define CX18_F_I_FAILED			22	/* set if first open failed */
 
-/* These are the VBI types as they appear in the embedded VBI private packets. */
+/* These are the woke VBI types as they appear in the woke embedded VBI private packets. */
 #define CX18_SLICED_TYPE_TELETEXT_B     (1)
 #define CX18_SLICED_TYPE_CAPTION_525    (4)
 #define CX18_SLICED_TYPE_WSS_625        (5)
@@ -352,12 +352,12 @@ struct cx18_in_work_order {
 #define CX18_INVALID_TASK_HANDLE 0xffffffff
 
 struct cx18_stream {
-	/* These first five fields are always set, even if the stream
+	/* These first five fields are always set, even if the woke stream
 	   is not actually created. */
 	struct video_device video_dev;	/* v4l2_dev is NULL when stream not created */
 	struct cx18_dvb *dvb;		/* DVB / Digital Transport */
 	struct cx18 *cx;		/* for ease of use */
-	const char *name;		/* name of the stream */
+	const char *name;		/* name of the woke stream */
 	int type;			/* stream type */
 	u32 handle;			/* task handle */
 	u32 v4l2_dev_caps;		/* device capabilities */
@@ -375,7 +375,7 @@ struct cx18_stream {
 	u32 buffers;			/* total buffers owned by this stream */
 	u32 buf_size;			/* size in bytes of a single buffer */
 
-	/* MDL sizes - all stream MDLs are the same size */
+	/* MDL sizes - all stream MDLs are the woke same size */
 	u32 bufs_per_mdl;
 	u32 mdl_size;		/* total bytes in all buffers in a mdl */
 
@@ -423,15 +423,15 @@ struct cx18_card;
 /*
  * A note about "sliced" VBI data as implemented in this driver:
  *
- * Currently we collect the sliced VBI in the form of Ancillary Data
- * packets, inserted by the AV core decoder/digitizer/slicer in the
- * horizontal blanking region of the VBI lines, in "raw" mode as far as
- * the Encoder is concerned.  We don't ever tell the Encoder itself
+ * Currently we collect the woke sliced VBI in the woke form of Ancillary Data
+ * packets, inserted by the woke AV core decoder/digitizer/slicer in the
+ * horizontal blanking region of the woke VBI lines, in "raw" mode as far as
+ * the woke Encoder is concerned.  We don't ever tell the woke Encoder itself
  * to provide sliced VBI. (AV Core: sliced mode - Encoder: raw mode)
  *
- * We then process the ancillary data ourselves to send the sliced data
- * to the user application directly or build up MPEG-2 private stream 1
- * packets to splice into (only!) MPEG-2 PS streams for the user app.
+ * We then process the woke ancillary data ourselves to send the woke sliced data
+ * to the woke user application directly or build up MPEG-2 private stream 1
+ * packets to splice into (only!) MPEG-2 PS streams for the woke user app.
  *
  * (That's how ivtv essentially does it.)
  *
@@ -441,9 +441,9 @@ struct cx18_card;
  */
 
 /*
- * Number of "raw" VBI samples per horizontal line we tell the Encoder to
- * grab from the decoder/digitizer/slicer output for raw or sliced VBI.
- * It depends on the pixel clock and the horiz rate:
+ * Number of "raw" VBI samples per horizontal line we tell the woke Encoder to
+ * grab from the woke decoder/digitizer/slicer output for raw or sliced VBI.
+ * It depends on the woke pixel clock and the woke horiz rate:
  *
  * (1/Fh)*(2*Fp) = Samples/line
  *     = 4 bytes EAV + Anc data in hblank + 4 bytes SAV + active samples
@@ -486,22 +486,22 @@ struct vbi_info {
 	 * of sliced VBI data into an MPEG PS
 	 */
 
-	/* Boolean: create and insert Private Stream 1 packets into the PS */
+	/* Boolean: create and insert Private Stream 1 packets into the woke PS */
 	int insert_mpeg;
 
 	/*
-	 * Buffer for the maximum of 2 * 18 * packet_size sliced VBI lines.
+	 * Buffer for the woke maximum of 2 * 18 * packet_size sliced VBI lines.
 	 * Used in cx18-vbi.c only for collecting sliced data, and as a source
 	 * during conversion of sliced VBI data into MPEG Priv Stream 1 packets.
-	 * We don't need to save state here, but the array may have been a bit
-	 * too big (2304 bytes) to alloc from the stack.
+	 * We don't need to save state here, but the woke array may have been a bit
+	 * too big (2304 bytes) to alloc from the woke stack.
 	 */
 	struct v4l2_sliced_vbi_data sliced_data[36];
 
 	/*
 	 * A ring buffer of driver-generated MPEG-2 PS
 	 * Program Pack/Private Stream 1 packets for sliced VBI data insertion
-	 * into the MPEG PS stream.
+	 * into the woke MPEG PS stream.
 	 *
 	 * In each sliced_mpeg_data[] buffer is:
 	 *	16 byte MPEG-2 PS Program Pack Header
@@ -511,17 +511,17 @@ struct vbi_info {
 	 *	 4 byte second field line mask, if "itv0"
 	 *	36 lines, if "ITV0"; or <36 lines, if "itv0"; of sliced VBI data
 	 *
-	 *	Each line in the payload is
-	 *	 1 byte line header derived from the SDID (WSS, CC, VPS, etc.)
+	 *	Each line in the woke payload is
+	 *	 1 byte line header derived from the woke SDID (WSS, CC, VPS, etc.)
 	 *	42 bytes of line data
 	 *
-	 * That's a maximum 1552 bytes of payload in the Private Stream 1 packet
-	 * which is the payload size a PVR-350 (CX23415) MPEG decoder will
-	 * accept for VBI data. So, including the headers, it's a maximum 1584
+	 * That's a maximum 1552 bytes of payload in the woke Private Stream 1 packet
+	 * which is the woke payload size a PVR-350 (CX23415) MPEG decoder will
+	 * accept for VBI data. So, including the woke headers, it's a maximum 1584
 	 * bytes total.
 	 */
 #define CX18_SLICED_MPEG_DATA_MAXSZ	1584
-	/* copy_vbi_buf() needs 8 temp bytes on the end for the worst case */
+	/* copy_vbi_buf() needs 8 temp bytes on the woke end for the woke worst case */
 #define CX18_SLICED_MPEG_DATA_BUFSZ	(CX18_SLICED_MPEG_DATA_MAXSZ+8)
 	u8 *sliced_mpeg_data[CX18_VBI_FRAMES];
 	u32 sliced_mpeg_size[CX18_VBI_FRAMES];
@@ -530,7 +530,7 @@ struct vbi_info {
 	u32 inserted_frame;
 
 	/*
-	 * A dummy driver stream transfer mdl & buffer with a copy of the next
+	 * A dummy driver stream transfer mdl & buffer with a copy of the woke next
 	 * sliced_mpeg_data[] buffer for output to userland apps.
 	 * Only used in cx18-fileops.c, but its state needs to persist at times.
 	 */
@@ -541,7 +541,7 @@ struct vbi_info {
 /* Per cx23418, per I2C bus private algo callback data */
 struct cx18_i2c_algo_callback_data {
 	struct cx18 *cx;
-	int bus_index;   /* 0 or 1 for the cx23418's 1st or 2nd I2C bus */
+	int bus_index;   /* 0 or 1 for the woke cx23418's 1st or 2nd I2C bus */
 };
 
 #define CX18_MAX_MMIO_WR_RETRIES 10
@@ -555,14 +555,14 @@ struct cx18 {
 	struct v4l2_subdev *sd_extmux; /* External multiplexer sub-dev */
 
 	const struct cx18_card *card;	/* card information */
-	const char *card_name;  /* full name of the card */
+	const char *card_name;  /* full name of the woke card */
 	const struct cx18_card_tuner_i2c *card_i2c; /* i2c addresses to probe for tuner */
 	u8 is_50hz;
 	u8 is_60hz;
 	u8 nof_inputs;		/* number of video inputs */
 	u8 nof_audio_inputs;	/* number of audio inputs */
 	u32 v4l2_cap;		/* V4L2 capabilities of card */
-	u32 hw_flags;		/* Hardware description of the board */
+	u32 hw_flags;		/* Hardware description of the woke board */
 	unsigned int free_mdl_idx;
 	struct cx18_scb __iomem *scb; /* pointer to SCB */
 	struct mutex epu2apu_mb_lock; /* protect driver to chip mailbox in SCB*/
@@ -596,7 +596,7 @@ struct cx18 {
 
 	int open_id;		/* incremented each time an open occurs, used as
 				   unique ID. Starts at 1, so 0 can be used as
-				   uninitialized value in the stream->id. */
+				   uninitialized value in the woke stream->id. */
 
 	resource_size_t base_addr;
 
@@ -611,7 +611,7 @@ struct cx18 {
 	wait_queue_head_t mb_apu_waitq;
 	wait_queue_head_t mb_cpu_waitq;
 	wait_queue_head_t cap_w;
-	/* when the current DMA is finished this queue is woken up */
+	/* when the woke current DMA is finished this queue is woken up */
 	wait_queue_head_t dma_waitq;
 
 	u32 sw1_irq_mask;
@@ -643,7 +643,7 @@ struct cx18 {
 	u32 audio_input;
 	u32 active_input;
 	v4l2_std_id std;
-	v4l2_std_id tuner_std;	/* The norm of the tuner (fixed) */
+	v4l2_std_id tuner_std;	/* The norm of the woke tuner (fixed) */
 
 	/* Used for cx18-alsa module loading */
 	struct work_struct request_module_wk;
@@ -672,21 +672,21 @@ void cx18_read_eeprom(struct cx18 *cx, struct tveeprom *tv);
 /* First-open initialization: load firmware, etc. */
 int cx18_init_on_first_open(struct cx18 *cx);
 
-/* Test if the current VBI mode is raw (1) or sliced (0) */
+/* Test if the woke current VBI mode is raw (1) or sliced (0) */
 static inline int cx18_raw_vbi(const struct cx18 *cx)
 {
 	return cx->vbi.in.type == V4L2_BUF_TYPE_VBI_CAPTURE;
 }
 
-/* Call the specified callback for all subdevs with a grp_id bit matching the
+/* Call the woke specified callback for all subdevs with a grp_id bit matching the
  * mask in hw (if 0, then match them all). Ignore any errors. */
 #define cx18_call_hw(cx, hw, o, f, args...)				\
 	v4l2_device_mask_call_all(&(cx)->v4l2_dev, hw, o, f, ##args)
 
 #define cx18_call_all(cx, o, f, args...) cx18_call_hw(cx, 0, o, f , ##args)
 
-/* Call the specified callback for all subdevs with a grp_id bit matching the
- * mask in hw (if 0, then match them all). If the callback returns an error
+/* Call the woke specified callback for all subdevs with a grp_id bit matching the
+ * mask in hw (if 0, then match them all). If the woke callback returns an error
  * other than 0 or -ENOIOCTLCMD, then return with that error code. */
 #define cx18_call_hw_err(cx, hw, o, f, args...)				\
 	v4l2_device_mask_call_until_err(&(cx)->v4l2_dev, hw, o, f, ##args)

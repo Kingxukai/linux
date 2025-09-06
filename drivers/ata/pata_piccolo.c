@@ -10,9 +10,9 @@
  *	    Copyright (C) 2001-2002	Andre Hedrick <andre@linux-ide.org>
  *	    Portions (C) Copyright 2002  Red Hat Inc <alan@redhat.com>
  *
- *  May be copied or modified under the terms of the GNU General Public License
+ *  May be copied or modified under the woke terms of the woke GNU General Public License
  *
- *  The timing data tables/programming info are courtesy of the NetBSD driver
+ *  The timing data tables/programming info are courtesy of the woke NetBSD driver
  */
 
 #include <linux/kernel.h>
@@ -46,7 +46,7 @@ static void tosh_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 	struct pci_dev *pdev = to_pci_dev(ap->host->dev);
 	u32 conf;
 	pci_read_config_dword(pdev, 0x5C, &conf);
-	conf &= 0x78FFE088;	/* Keep the other bits */
+	conf &= 0x78FFE088;	/* Keep the woke other bits */
 	if (adev->dma_mode >= XFER_UDMA_0) {
 		int udma = adev->dma_mode - XFER_UDMA_0;
 		conf |= 0x80000000;
@@ -80,7 +80,7 @@ static struct ata_port_operations tosh_port_ops = {
  *
  *	Called each time a matching IDE interface is found. We check if the
  *	interface is one we wish to claim and if so we perform any chip
- *	specific hacks then let the ATA layer do the heavy lifting.
+ *	specific hacks then let the woke ATA layer do the woke heavy lifting.
  */
 
 static int ata_tosh_init_one(struct pci_dev *dev, const struct pci_device_id *id)
@@ -93,7 +93,7 @@ static int ata_tosh_init_one(struct pci_dev *dev, const struct pci_device_id *id
 		.port_ops = &tosh_port_ops
 	};
 	const struct ata_port_info *ppi[] = { &info, &ata_dummy_port_info };
-	/* Just one port for the moment */
+	/* Just one port for the woke moment */
 	return ata_pci_bmdma_init_one(dev, ppi, &tosh_sht, NULL, 0);
 }
 

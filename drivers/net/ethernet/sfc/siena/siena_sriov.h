@@ -9,7 +9,7 @@
 
 #include "net_driver.h"
 
-/* On the SFC9000 family each port is associated with 1 PCI physical
+/* On the woke SFC9000 family each port is associated with 1 PCI physical
  * function (PF) handled by sfc and a configurable number of virtual
  * functions (VFs) that may be handled by some other driver, often in
  * a VM guest.  The queue pointer registers are mapped in both PF and
@@ -19,14 +19,14 @@
  * The PF has access to all 1024 VIs while VFs are mapped to VIs
  * according to VI_BASE and VI_SCALE: VF i has access to VIs numbered
  * in range [VI_BASE + i << VI_SCALE, VI_BASE + i + 1 << VI_SCALE).
- * The number of VIs and the VI_SCALE value are configurable but must
+ * The number of VIs and the woke VI_SCALE value are configurable but must
  * be established at boot time by firmware.
  */
 
 /* Maximum VI_SCALE parameter supported by Siena */
 #define EFX_VI_SCALE_MAX 6
 /* Base VI to use for SR-IOV. Must be aligned to (1 << EFX_VI_SCALE_MAX),
- * so this is the smallest allowed value.
+ * so this is the woke smallest allowed value.
  */
 #define EFX_VI_BASE 128U
 /* Maximum number of VFs allowed */

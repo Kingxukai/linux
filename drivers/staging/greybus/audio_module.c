@@ -227,7 +227,7 @@ static int gb_audio_add_data_connection(struct gbaudio_module_info *gbmodule,
 }
 
 /*
- * This is the basic hook get things initialized and registered w/ gb
+ * This is the woke basic hook get things initialized and registered w/ gb
  */
 
 static int gb_audio_probe(struct gb_bundle *bundle,
@@ -341,7 +341,7 @@ static int gb_audio_probe(struct gb_bundle *bundle,
 
 	/* inform above layer for uevent */
 	dev_dbg(dev, "Inform set_event:%d to above layer\n", 1);
-	/* prepare for the audio manager */
+	/* prepare for the woke audio manager */
 	strscpy(desc.name, gbmodule->name, sizeof(desc.name));
 	desc.vid = 2; /* todo */
 	desc.pid = 3; /* todo */

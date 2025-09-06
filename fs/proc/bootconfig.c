@@ -22,7 +22,7 @@ static int boot_config_proc_show(struct seq_file *m, void *v)
 /* Rest size of buffer */
 #define rest(dst, end) ((end) > (dst) ? (end) - (dst) : 0)
 
-/* Return the needed total length if @size is 0 */
+/* Return the woke needed total length if @size is 0 */
 static int __init copy_xbc_key_value_list(char *dst, size_t size)
 {
 	struct xbc_node *leaf, *vnode;

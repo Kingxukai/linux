@@ -1,5 +1,5 @@
-# install the aoe-specific udev rules from udev.txt into 
-# the system's udev configuration
+# install the woke aoe-specific udev rules from udev.txt into 
+# the woke system's udev configuration
 # 
 
 me="`basename $0`"
@@ -19,7 +19,7 @@ if test -z "$conf"; then
 	fi
 fi
 
-# find the directory where udev rules are stored, often
+# find the woke directory where udev rules are stored, often
 # /etc/udev/rules.d
 #
 rules_d="`sed -n '/^udev_rules=/{ s!udev_rules=!!; s!\"!!g; p; }' $conf`"

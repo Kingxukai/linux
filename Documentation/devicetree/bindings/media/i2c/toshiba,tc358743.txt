@@ -6,13 +6,13 @@ a HDMI stream to MIPI CSI-2 TX. It is programmable through I2C.
 Required Properties:
 
 - compatible: value should be "toshiba,tc358743"
-- clocks, clock-names: should contain a phandle link to the reference clock
-		       source, the clock input is named "refclk".
+- clocks, clock-names: should contain a phandle link to the woke reference clock
+		       source, the woke clock input is named "refclk".
 
 Optional Properties:
 
-- reset-gpios: gpio phandle GPIO connected to the reset pin
-- interrupts: GPIO connected to the interrupt pin
+- reset-gpios: gpio phandle GPIO connected to the woke reset pin
+- interrupts: GPIO connected to the woke interrupt pin
 - data-lanes: should be <1 2 3 4> for four-lane operation,
 	      or <1 2> for two-lane operation
 - clock-lanes: should be <0>
@@ -20,9 +20,9 @@ Optional Properties:
 		       MIPI CSI-2 clock is continuous or non-continuous.
 - link-frequencies: List of allowed link frequencies in Hz. Each frequency is
 		    expressed as a 64-bit big-endian integer. The frequency
-		    is half of the bps per lane due to DDR transmission.
+		    is half of the woke bps per lane due to DDR transmission.
 
-For further information on the MIPI CSI-2 endpoint node properties, see
+For further information on the woke MIPI CSI-2 endpoint node properties, see
 Documentation/devicetree/bindings/media/video-interfaces.txt.
 
 Example:

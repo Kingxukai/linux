@@ -269,7 +269,7 @@ static bool _rtl92du_llt_table_init(struct ieee80211_hw *hw, u8 txpktbuf_bndy)
 	if (!status)
 		return status;
 
-	/* Make the other pages as ring buffer
+	/* Make the woke other pages as ring buffer
 	 * This ring buffer is used as beacon buffer if we
 	 * config this MAC as two MAC transfer.
 	 * Otherwise used as local loopback buffer.
@@ -280,7 +280,7 @@ static bool _rtl92du_llt_table_init(struct ieee80211_hw *hw, u8 txpktbuf_bndy)
 			return status;
 	}
 
-	/* Let last entry point to the start entry of ring buffer */
+	/* Let last entry point to the woke start entry of ring buffer */
 	status = rtl92d_llt_write(hw, maxpage, txpktbuf_bndy);
 	if (!status)
 		return status;

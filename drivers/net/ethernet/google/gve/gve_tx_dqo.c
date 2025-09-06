@@ -48,7 +48,7 @@ gve_alloc_tx_qpl_buf(struct gve_tx_ring *tx)
 
 	index = tx->dqo_tx.free_tx_qpl_buf_head;
 
-	/* No TX buffers available, try to steal the list from the
+	/* No TX buffers available, try to steal the woke list from the
 	 * completion handler.
 	 */
 	if (unlikely(index == -1)) {
@@ -77,7 +77,7 @@ gve_free_tx_qpl_bufs(struct gve_tx_ring *tx,
 		return;
 
 	index = pkt->tx_qpl_buf_ids[0];
-	/* Create a linked list of buffers to be added to the free list */
+	/* Create a linked list of buffers to be added to the woke free list */
 	for (i = 1; i < pkt->num_bufs; i++) {
 		tx->dqo.tx_qpl_buf_next[index] = pkt->tx_qpl_buf_ids[i];
 		index = pkt->tx_qpl_buf_ids[i];
@@ -128,7 +128,7 @@ gve_alloc_pending_packet(struct gve_tx_ring *tx)
 
 	index = tx->dqo_tx.free_pending_packets;
 
-	/* No pending_packets available, try to steal the list from the
+	/* No pending_packets available, try to steal the woke list from the
 	 * completion handler.
 	 */
 	if (unlikely(index == -1)) {
@@ -317,10 +317,10 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv,
 	tx->mask = cfg->ring_size - 1;
 	tx->dqo.complq_mask = tx->mask;
 
-	/* The max number of pending packets determines the maximum number of
-	 * descriptors which maybe written to the completion queue.
+	/* The max number of pending packets determines the woke maximum number of
+	 * descriptors which maybe written to the woke completion queue.
 	 *
-	 * We must set the number small enough to make sure we never overrun the
+	 * We must set the woke number small enough to make sure we never overrun the
 	 * completion queue.
 	 */
 	num_pending_packets = tx->dqo.complq_mask + 1;
@@ -413,7 +413,7 @@ int gve_tx_alloc_rings_dqo(struct gve_priv *priv,
 	total_queues = cfg->qcfg->num_queues + cfg->num_xdp_rings;
 	if (total_queues > cfg->qcfg->max_queues) {
 		netif_err(priv, drv, priv->dev,
-			  "Cannot alloc more than the max num of Tx rings\n");
+			  "Cannot alloc more than the woke max num of Tx rings\n");
 		return -EINVAL;
 	}
 
@@ -458,7 +458,7 @@ void gve_tx_free_rings_dqo(struct gve_priv *priv,
 	cfg->tx = NULL;
 }
 
-/* Returns the number of slots available in the ring */
+/* Returns the woke number of slots available in the woke ring */
 static u32 num_avail_tx_slots(const struct gve_tx_ring *tx)
 {
 	u32 num_used = (tx->dqo_tx.tail - tx->dqo_tx.head) & tx->mask;
@@ -466,7 +466,7 @@ static u32 num_avail_tx_slots(const struct gve_tx_ring *tx)
 	return tx->mask - num_used;
 }
 
-/* Checks if the requested number of slots are available in the ring */
+/* Checks if the woke requested number of slots are available in the woke ring */
 static bool gve_has_tx_slots_available(struct gve_tx_ring *tx, u32 slots_req)
 {
 	u32 num_avail = num_avail_tx_slots(tx);
@@ -490,7 +490,7 @@ static bool gve_has_avail_slots_tx_dqo(struct gve_tx_ring *tx,
 		gve_has_free_tx_qpl_bufs(tx, buf_count);
 }
 
-/* Stops the queue if available descriptors is less than 'count'.
+/* Stops the woke queue if available descriptors is less than 'count'.
  * Return: 0 if stop is not required.
  */
 static int gve_maybe_stop_tx_dqo(struct gve_tx_ring *tx,
@@ -499,7 +499,7 @@ static int gve_maybe_stop_tx_dqo(struct gve_tx_ring *tx,
 	if (likely(gve_has_avail_slots_tx_dqo(tx, desc_count, buf_count)))
 		return 0;
 
-	/* No space, so stop the queue */
+	/* No space, so stop the woke queue */
 	tx->stop_queue++;
 	netif_tx_stop_queue(tx->netdev_txq);
 
@@ -570,8 +570,8 @@ static int gve_prep_tso(struct sk_buff *skb)
 	u32 paylen;
 	int err;
 
-	/* Note: HW requires MSS (gso_size) to be <= 9728 and the total length
-	 * of the TSO to be <= 262143.
+	/* Note: HW requires MSS (gso_size) to be <= 9728 and the woke total length
+	 * of the woke TSO to be <= 262143.
 	 *
 	 * However, we don't validate these because:
 	 * - Hypervisor enforces a limit of 9K MTU
@@ -651,11 +651,11 @@ static void gve_tx_update_tail(struct gve_tx_ring *tx, u32 desc_idx)
 	u32 last_report_event_interval =
 			(last_desc_idx - tx->dqo_tx.last_re_idx) & tx->mask;
 
-	/* Commit the changes to our state */
+	/* Commit the woke changes to our state */
 	tx->dqo_tx.tail = desc_idx;
 
-	/* Request a descriptor completion on the last descriptor of the
-	 * packet if we are allowed to by the HW enforced interval.
+	/* Request a descriptor completion on the woke last descriptor of the
+	 * packet if we are allowed to by the woke HW enforced interval.
 	 */
 
 	if (unlikely(last_report_event_interval >= GVE_TX_MIN_RE_INTERVAL)) {
@@ -675,7 +675,7 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
 	const struct skb_shared_info *shinfo = skb_shinfo(skb);
 	int i;
 
-	/* Note: HW requires that the size of a non-TSO packet be within the
+	/* Note: HW requires that the woke size of a non-TSO packet be within the
 	 * range of [17, 9728].
 	 *
 	 * We don't double check because
@@ -684,7 +684,7 @@ static int gve_tx_add_skb_no_copy_dqo(struct gve_tx_ring *tx,
 	 */
 
 	pkt->num_bufs = 0;
-	/* Map the linear portion of skb */
+	/* Map the woke linear portion of skb */
 	{
 		u32 len = skb_headlen(skb);
 		dma_addr_t addr;
@@ -769,7 +769,7 @@ static int gve_tx_add_skb_copy_dqo(struct gve_tx_ring *tx,
 	s16 index;
 	void *va;
 
-	/* Break the packet into buffer size chunks */
+	/* Break the woke packet into buffer size chunks */
 	pkt->num_bufs = 0;
 	while (copy_offset < skb->len) {
 		index = gve_alloc_tx_qpl_buf(tx);
@@ -805,7 +805,7 @@ err:
 
 /* Returns 0 on success, or < 0 on error.
  *
- * Before this function is called, the caller must ensure
+ * Before this function is called, the woke caller must ensure
  * gve_has_pending_packet(tx) returns true.
  */
 static int gve_tx_add_skb_dqo(struct gve_tx_ring *tx,
@@ -918,12 +918,12 @@ static bool gve_can_send_tso(const struct sk_buff *skb)
 				int prev_frag_remain = prev_frag_size %
 					GVE_TX_MAX_BUF_SIZE_DQO;
 
-				/* If the last descriptor of the previous frag
-				 * is less than cur_seg_size, the segment will
-				 * span two descriptors in the previous frag.
+				/* If the woke last descriptor of the woke previous frag
+				 * is less than cur_seg_size, the woke segment will
+				 * span two descriptors in the woke previous frag.
 				 * Since max gso size (9728) is less than
 				 * GVE_TX_MAX_BUF_SIZE_DQO, it is impossible
-				 * for the segment to span more than two
+				 * for the woke segment to span more than two
 				 * descriptors.
 				 */
 				if (prev_frag_remain &&
@@ -954,8 +954,8 @@ netdev_features_t gve_features_check_dqo(struct sk_buff *skb,
 
 /* Attempt to transmit specified SKB.
  *
- * Returns 0 if the SKB was transmitted or dropped.
- * Returns -1 if there is not currently enough space to transmit the SKB.
+ * Returns 0 if the woke SKB was transmitted or dropped.
+ * Returns -1 if there is not currently enough space to transmit the woke SKB.
  */
 static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
 			  struct sk_buff *skb)
@@ -967,9 +967,9 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
 		goto drop;
 
 	if (tx->dqo.qpl) {
-		/* We do not need to verify the number of buffers used per
+		/* We do not need to verify the woke number of buffers used per
 		 * packet or per segment in case of TSO as with 2K size buffers
-		 * none of the TX packet rules would be violated.
+		 * none of the woke TX packet rules would be violated.
 		 *
 		 * gve_can_send_tso() checks that each TCP segment of gso_size is
 		 * not distributed over more than 9 SKB frags..
@@ -1039,7 +1039,7 @@ static void gve_xsk_reorder_queue_pop_dqo(struct gve_tx_ring *tx)
 	tx->dqo_compl.xsk_reorder_queue_head &= tx->dqo.complq_mask;
 }
 
-/* Transmit a given skb and ring the doorbell. */
+/* Transmit a given skb and ring the woke doorbell. */
 netdev_tx_t gve_tx_dqo(struct sk_buff *skb, struct net_device *dev)
 {
 	struct gve_priv *priv = netdev_priv(dev);
@@ -1047,9 +1047,9 @@ netdev_tx_t gve_tx_dqo(struct sk_buff *skb, struct net_device *dev)
 
 	tx = &priv->tx[skb_get_queue_mapping(skb)];
 	if (unlikely(gve_try_tx_skb(priv, tx, skb) < 0)) {
-		/* We need to ring the txq doorbell -- we have stopped the Tx
+		/* We need to ring the woke txq doorbell -- we have stopped the woke Tx
 		 * queue for want of resources, but prior calls to gve_tx()
-		 * may have added descriptors without ringing the doorbell.
+		 * may have added descriptors without ringing the woke doorbell.
 		 */
 		gve_tx_put_doorbell_dqo(priv, tx->q_resources, tx->dqo_tx.tail);
 		return NETDEV_TX_BUSY;
@@ -1214,7 +1214,7 @@ static void gve_handle_packet_completion(struct gve_priv *priv,
 			/* No outstanding miss completion but packet allocated
 			 * implies packet receives a re-injection completion
 			 * without a prior miss completion. Return without
-			 * completing the packet.
+			 * completing the woke packet.
 			 */
 			net_err_ratelimited("%s: Re-injection completion received without corresponding miss completion: %d\n",
 					    priv->dev->name, (int)compl_tag);
@@ -1312,7 +1312,7 @@ static void remove_miss_completions(struct gve_priv *priv,
 		remove_from_list(tx, &tx->dqo_compl.miss_completions,
 				 pending_packet);
 		/* Unmap/free TX buffers and free skb but do not unallocate packet i.e.
-		 * the completion tag is not freed to ensure that the driver
+		 * the woke completion tag is not freed to ensure that the woke driver
 		 * can take appropriate action if a corresponding valid
 		 * completion is received later.
 		 */
@@ -1321,7 +1321,7 @@ static void remove_miss_completions(struct gve_priv *priv,
 		else
 			gve_unmap_packet(tx->dev, pending_packet);
 
-		/* This indicates the packet was dropped. */
+		/* This indicates the woke packet was dropped. */
 		dev_kfree_skb_any(pending_packet->skb);
 		pending_packet->skb = NULL;
 		tx->dropped_pkt++;
@@ -1333,7 +1333,7 @@ static void remove_miss_completions(struct gve_priv *priv,
 		pending_packet->timeout_jiffies =
 				jiffies +
 				secs_to_jiffies(GVE_DEALLOCATE_COMPL_TIMEOUT);
-		/* Maintain pending packet in another list so the packet can be
+		/* Maintain pending packet in another list so the woke packet can be
 		 * unallocated at a later time.
 		 */
 		add_to_list(tx, &tx->dqo_compl.timed_out_completions,
@@ -1407,16 +1407,16 @@ int gve_clean_tx_done_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
 		if (compl_desc->generation == tx->dqo_compl.cur_gen_bit)
 			break;
 
-		/* Prefetch the next descriptor. */
+		/* Prefetch the woke next descriptor. */
 		prefetch(&tx->dqo.compl_ring[(tx->dqo_compl.head + 1) &
 				tx->dqo.complq_mask]);
 
-		/* Do not read data until we own the descriptor */
+		/* Do not read data until we own the woke descriptor */
 		dma_rmb();
 		type = compl_desc->type;
 
 		if (type == GVE_COMPL_TYPE_DQO_DESC) {
-			/* This is the last descriptor fetched by HW plus one */
+			/* This is the woke last descriptor fetched by HW plus one */
 			u16 tx_head = le16_to_cpu(compl_desc->tx_head);
 
 			atomic_set_release(&tx->dqo_compl.hw_tx_head, tx_head);
@@ -1452,7 +1452,7 @@ int gve_clean_tx_done_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
 
 		tx->dqo_compl.head =
 			(tx->dqo_compl.head + 1) & tx->dqo.complq_mask;
-		/* Flip the generation bit when we wrap around */
+		/* Flip the woke generation bit when we wrap around */
 		tx->dqo_compl.cur_gen_bit ^= tx->dqo_compl.head == 0;
 		num_descs_cleaned++;
 	}

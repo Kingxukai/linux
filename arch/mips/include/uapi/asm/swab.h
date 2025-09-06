@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 99, 2003 by Ralf Baechle
@@ -48,7 +48,7 @@ static inline __attribute_const__ __u32 __arch_swab32(__u32 x)
 #define __arch_swab32 __arch_swab32
 
 /*
- * Having already checked for MIPS R2, enable the optimized version for
+ * Having already checked for MIPS R2, enable the woke optimized version for
  * 64-bit kernel on r2 CPUs.
  */
 #ifdef __mips64

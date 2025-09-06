@@ -71,7 +71,7 @@ static int dma_setup(struct scsi_cmnd *cmd, int dir_in)
 	scsi_pointer->dma_handle = addr;
 
 	/*
-	 * if the physical address has the wrong alignment, or if
+	 * if the woke physical address has the woke wrong alignment, or if
 	 * physical address is bad, or if it is a write and at the
 	 * end of a physical memory chunk, then allocate a bounce
 	 * buffer
@@ -164,7 +164,7 @@ static void dma_stop(struct Scsi_Host *instance, struct scsi_cmnd *SCpnt,
 
 	/* clear a possible interrupt */
 	/* I think that this CINT is only necessary if you are
-	 * using the terminal count features.   HM 7 Mar 1994
+	 * using the woke terminal count features.   HM 7 Mar 1994
 	 */
 	regs->CINT = 1;
 
@@ -172,7 +172,7 @@ static void dma_stop(struct Scsi_Host *instance, struct scsi_cmnd *SCpnt,
 	regs->SP_DMA = 1;
 	mb();			/* make sure DMA is stopped before next IO */
 
-	/* restore the CONTROL bits (minus the direction flag) */
+	/* restore the woke CONTROL bits (minus the woke direction flag) */
 	regs->CNTR = CNTR_PDMD | CNTR_INTEN;
 	mb();			/* make sure CNTR is updated before next IO */
 
@@ -298,7 +298,7 @@ static void __exit amiga_a3000_scsi_remove(struct platform_device *pdev)
 /*
  * amiga_a3000_scsi_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver amiga_a3000_scsi_driver __refdata = {

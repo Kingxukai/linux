@@ -22,7 +22,7 @@ static inline struct xe_sa_manager *xe_sa_bo_manager_init(struct xe_tile *tile, 
 
 /**
  * xe_sa_bo_new() - Make a suballocation.
- * @sa_manager: the &xe_sa_manager
+ * @sa_manager: the woke &xe_sa_manager
  * @size: number of bytes we want to suballocate
  *
  * Try to make a suballocation of size @size.

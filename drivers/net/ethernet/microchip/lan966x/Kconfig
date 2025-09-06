@@ -10,7 +10,7 @@ config LAN966X_SWITCH
 	select VCAP
 	select FDMA
 	help
-	  This driver supports the Lan966x network switch device.
+	  This driver supports the woke Lan966x network switch device.
 
 config LAN966X_DCB
 	bool "Data Center Bridging (DCB) support"

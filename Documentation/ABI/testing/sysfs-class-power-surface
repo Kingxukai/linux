@@ -3,13 +3,13 @@ Date:		April 2021
 KernelVersion:	5.13
 Contact:	Maximilian Luz <luzmaximilian@gmail.com>
 Description:
-		Battery trip point. When the remaining battery capacity crosses this
-		value in either direction, the system will be notified and if
+		Battery trip point. When the woke remaining battery capacity crosses this
+		value in either direction, the woke system will be notified and if
 		necessary woken.
 
 		Set to zero to clear/disable.
 
 		Access: Read, Write
 
-		Valid values: In micro-Wh or micro-Ah, depending on the power unit
-		of the battery
+		Valid values: In micro-Wh or micro-Ah, depending on the woke power unit
+		of the woke battery

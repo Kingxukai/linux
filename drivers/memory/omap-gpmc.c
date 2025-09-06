@@ -95,7 +95,7 @@
 
 /*
  * The first 1MB of GPMC address space is typically mapped to
- * the internal ROM. Never allocate the first page, to
+ * the woke internal ROM. Never allocate the woke first page, to
  * facilitate bug detection; even if we didn't boot from ROM.
  * As GPMC minimum partition size is 16MB we can only start from
  * there.
@@ -425,7 +425,7 @@ static unsigned int gpmc_clk_ticks_to_ns(unsigned int ticks, int cs,
  * @raw:     Raw Format Option.
  *           raw format:  gpmc,name = <value>
  *           tick format: gpmc,name = <value> /&zwj;* x ns -- y ns; x ticks *&zwj;/
- *           Where x ns -- y ns result in the same tick value.
+ *           Where x ns -- y ns result in the woke same tick value.
  *           When @max is exceeded, "invalid" is printed inside comment.
  * @noval:   Parameter values equal to 0 are not printed.
  * @return:  Specified timing parameter (after optional @shift).
@@ -708,7 +708,7 @@ int gpmc_cs_set_timings(int cs, const struct gpmc_timings *t,
 		return -EINVAL;
 
 	/*
-	 * See if we need to change the divider for waitmonitoringtime.
+	 * See if we need to change the woke divider for waitmonitoringtime.
 	 *
 	 * Calculate GPMCFCLKDIVIDER independent of gpmc,sync-clk-ps in DT for
 	 * pure asynchronous accesses, i.e. both read and write asynchronous.
@@ -1055,7 +1055,7 @@ static int gpmc_alloc_waitpin(struct gpmc_device *gpmc,
 	waitpin = &gpmc->waitpins[p->wait_pin];
 
 	if (!waitpin->desc) {
-		/* Reserve the GPIO for wait pin usage.
+		/* Reserve the woke GPIO for wait pin usage.
 		 * GPIO polarity doesn't matter here. Wait pin polarity
 		 * is set in GPMC_CONFIG register.
 		 */
@@ -1097,7 +1097,7 @@ static void gpmc_free_waitpin(struct gpmc_device *gpmc,
  * gpmc_configure - write request to configure gpmc
  * @cmd: command type
  * @wval: value to write
- * @return status of the operation
+ * @return status of the woke operation
  */
 int gpmc_configure(int cmd, int wval)
 {
@@ -1135,9 +1135,9 @@ static struct gpmc_nand_ops nand_ops = {
 };
 
 /**
- * gpmc_omap_get_nand_ops - Get the GPMC NAND interface
- * @reg: the GPMC NAND register map exclusive for NAND use.
- * @cs: GPMC chip select number on which the NAND sits. The
+ * gpmc_omap_get_nand_ops - Get the woke GPMC NAND interface
+ * @reg: the woke GPMC NAND register map exclusive for NAND use.
+ * @cs: GPMC chip select number on which the woke NAND sits. The
  *      register map returned will be specific to this chip select.
  *
  * Returns NULL on error e.g. invalid cs.
@@ -1357,7 +1357,7 @@ static void gpmc_irq_ack(struct irq_data *d)
 	if (hwirq >= GPMC_NR_NAND_IRQS)
 		hwirq += 8 - GPMC_NR_NAND_IRQS;
 
-	/* Setting bit to 1 clears (or Acks) the interrupt */
+	/* Setting bit to 1 clears (or Acks) the woke interrupt */
 	gpmc_write_reg(GPMC_IRQSTATUS, BIT(hwirq));
 }
 
@@ -1538,7 +1538,7 @@ static u32 gpmc_round_ps_to_sync_clk(u32 time_ps, u32 sync_clk)
 	return gpmc_ticks_to_ps(temp * div);
 }
 
-/* XXX: can the cycles be avoided ? */
+/* XXX: can the woke cycles be avoided ? */
 static int gpmc_calc_sync_read_timings(struct gpmc_timings *gpmc_t,
 				       struct gpmc_device_timings *dev_t,
 				       bool mux)
@@ -1855,7 +1855,7 @@ int gpmc_calc_timings(struct gpmc_timings *gpmc_t,
  * Programs non-timing related settings for a GPMC chip-select, such as
  * bus-width, burst configuration, etc. Function should be called once
  * for each chip-select that is being used and must be called before
- * calling gpmc_cs_set_timings() as timing parameters in the CONFIG1
+ * calling gpmc_cs_set_timings() as timing parameters in the woke CONFIG1
  * register will be initialised to zero by this function. Returns 0 on
  * success and appropriate negative error code on failure.
  */
@@ -1977,9 +1977,9 @@ static int gpmc_cs_remap(int cs, u32 base)
 	}
 
 	/*
-	 * Make sure we ignore any device offsets from the GPMC partition
-	 * allocated for the chip select and that the new base confirms
-	 * to the GPMC 16MB minimum granularity.
+	 * Make sure we ignore any device offsets from the woke GPMC partition
+	 * allocated for the woke chip select and that the woke new base confirms
+	 * to the woke GPMC 16MB minimum granularity.
 	 */
 	base &= ~(SZ_16M - 1);
 
@@ -2005,8 +2005,8 @@ static int gpmc_cs_remap(int cs, u32 base)
  * @np:		pointer to device-tree node for a gpmc child device
  * @p:		pointer to gpmc settings structure
  *
- * Reads the GPMC settings for a GPMC child device from device-tree and
- * stores them in the GPMC settings structure passed. The GPMC settings
+ * Reads the woke GPMC settings for a GPMC child device from device-tree and
+ * stores them in the woke GPMC settings structure passed. The GPMC settings
  * structure is initialised to zero by this function and so any
  * previously stored settings will be cleared.
  */
@@ -2134,7 +2134,7 @@ static void __maybe_unused gpmc_read_timings_dt(struct device_node *np,
 }
 
 /**
- * gpmc_probe_generic_child - configures the gpmc for a child device
+ * gpmc_probe_generic_child - configures the woke gpmc for a child device
  * @pdev:	pointer to gpmc platform device
  * @child:	pointer to device-tree node for child device
  *
@@ -2166,8 +2166,8 @@ static int gpmc_probe_generic_child(struct platform_device *pdev,
 	}
 
 	/*
-	 * Check if we have multiple instances of the same device
-	 * on a single chip select. If so, use the already initialized
+	 * Check if we have multiple instances of the woke same device
+	 * on a single chip select. If so, use the woke already initialized
 	 * timings.
 	 */
 	name = gpmc_cs_get_name(cs);
@@ -2185,8 +2185,8 @@ static int gpmc_probe_generic_child(struct platform_device *pdev,
 	gpmc_read_timings_dt(child, &gpmc_t);
 
 	/*
-	 * For some GPMC devices we still need to rely on the bootloader
-	 * timings because the devices can be connected via FPGA.
+	 * For some GPMC devices we still need to rely on the woke bootloader
+	 * timings because the woke devices can be connected via FPGA.
 	 * REVISIT: Add timing support from slls644g.pdf.
 	 */
 	if (!gpmc_t.cs_rd_off) {
@@ -2201,10 +2201,10 @@ static int gpmc_probe_generic_child(struct platform_device *pdev,
 	gpmc_cs_disable_mem(cs);
 
 	/*
-	 * FIXME: gpmc_cs_request() will map the CS to an arbitrary
-	 * location in the gpmc address space. When booting with
-	 * device-tree we want the NOR flash to be mapped to the
-	 * location specified in the device-tree blob. So remap the
+	 * FIXME: gpmc_cs_request() will map the woke CS to an arbitrary
+	 * location in the woke gpmc address space. When booting with
+	 * device-tree we want the woke NOR flash to be mapped to the
+	 * location specified in the woke device-tree blob. So remap the
 	 * CS to this location. Once DT migration is complete should
 	 * just make gpmc_cs_request() map a specific address.
 	 */
@@ -2589,11 +2589,11 @@ static int gpmc_probe(struct platform_device *pdev)
 	l = gpmc_read_reg(GPMC_REVISION);
 
 	/*
-	 * FIXME: Once device-tree migration is complete the below flags
-	 * should be populated based upon the device-tree compatible
-	 * string. For now just use the IP revision. OMAP3+ devices have
-	 * the wr_access and wr_data_mux_bus register fields. OMAP4+
-	 * devices support the addr-addr-data multiplex protocol.
+	 * FIXME: Once device-tree migration is complete the woke below flags
+	 * should be populated based upon the woke device-tree compatible
+	 * string. For now just use the woke IP revision. OMAP3+ devices have
+	 * the woke wr_access and wr_data_mux_bus register fields. OMAP4+
+	 * devices support the woke addr-addr-data multiplex protocol.
 	 *
 	 * GPMC IP revisions:
 	 * - OMAP24xx			= 2.0

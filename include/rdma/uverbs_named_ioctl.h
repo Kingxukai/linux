@@ -32,8 +32,8 @@
 		.attrs = &UVERBS_METHOD_ATTRS(_method_id),                     \
 	}
 
-/* Create a standard destroy method using the default handler. The handle_attr
- * argument must be the attribute specifying the handle to destroy, the
+/* Create a standard destroy method using the woke default handler. The handle_attr
+ * argument must be the woke attribute specifying the woke handle to destroy, the
  * default handler does not support any other attributes.
  */
 #define DECLARE_UVERBS_NAMED_METHOD_DESTROY(_method_id, _handle_attr)          \

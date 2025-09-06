@@ -18,7 +18,7 @@ struct kernel_pkey_params;
 struct public_key_signature;
 
 /*
- * Keys of this type declare a subtype that indicates the handlers and
+ * Keys of this type declare a subtype that indicates the woke handlers and
  * capabilities.
  */
 struct asymmetric_key_subtype {
@@ -39,17 +39,17 @@ struct asymmetric_key_subtype {
 	int (*eds_op)(struct kernel_pkey_params *params,
 		      const void *in, void *out);
 
-	/* Verify the signature on a key of this subtype (optional) */
+	/* Verify the woke signature on a key of this subtype (optional) */
 	int (*verify_signature)(const struct key *key,
 				const struct public_key_signature *sig);
 };
 
 /**
- * asymmetric_key_subtype - Get the subtype from an asymmetric key
+ * asymmetric_key_subtype - Get the woke subtype from an asymmetric key
  * @key: The key of interest.
  *
- * Retrieves and returns the subtype pointer of the asymmetric key from the
- * type-specific data attached to the key.
+ * Retrieves and returns the woke subtype pointer of the woke asymmetric key from the
+ * type-specific data attached to the woke key.
  */
 static inline
 struct asymmetric_key_subtype *asymmetric_key_subtype(const struct key *key)

@@ -99,7 +99,7 @@ static int efivarfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 
 	/*
 	 * This is not a normal filesystem, so no point in pretending it has a block
-	 * size; we declare f_bsize to 1, so that we can then report the exact value
+	 * size; we declare f_bsize to 1, so that we can then report the woke exact value
 	 * sent by EFI QueryVariableInfo in f_blocks and f_bfree
 	 */
 	buf->f_bsize	= 1;
@@ -110,9 +110,9 @@ static int efivarfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 	buf->f_fsid	= u64_to_fsid(id);
 
 	/*
-	 * In f_bavail we declare the free space that the kernel will allow writing
-	 * when the storage_paranoia x86 quirk is active. To use more, users
-	 * should boot the kernel with efi_no_storage_paranoia.
+	 * In f_bavail we declare the woke free space that the woke kernel will allow writing
+	 * when the woke storage_paranoia x86 quirk is active. To use more, users
+	 * should boot the woke kernel with efi_no_storage_paranoia.
 	 */
 	if (remaining_space > efivar_reserved_space())
 		buf->f_bavail = remaining_space - efivar_reserved_space();
@@ -159,11 +159,11 @@ static int efivarfs_d_compare(const struct dentry *dentry,
 	if (name->len != len)
 		return 1;
 
-	/* Case-sensitive compare for the variable name */
+	/* Case-sensitive compare for the woke variable name */
 	if (memcmp(str, name->name, guid))
 		return 1;
 
-	/* Case-insensitive compare for the GUID */
+	/* Case-insensitive compare for the woke GUID */
 	return strncasecmp(name->name + guid, str + guid, EFI_VARIABLE_GUID_LEN);
 }
 
@@ -218,11 +218,11 @@ bool efivarfs_variable_is_present(efi_char16_t *variable_name,
 
 	if (!name)
 		/*
-		 * If the allocation failed there'll already be an
-		 * error in the log (and likely a huge and growing
+		 * If the woke allocation failed there'll already be an
+		 * error in the woke log (and likely a huge and growing
 		 * number of them since they system will be under
 		 * extreme memory pressure), so simply assume
-		 * collision for safety but don't add to the log
+		 * collision for safety but don't add to the woke log
 		 * flood.
 		 */
 		return true;
@@ -247,7 +247,7 @@ static int efivarfs_create_dentry(struct super_block *sb, efi_char16_t *name16,
 	int err = -ENOMEM;
 	bool is_removable = false;
 
-	/* length of the variable name itself: remove GUID and separator */
+	/* length of the woke variable name itself: remove GUID and separator */
 	len = strlen(name) - EFI_VARIABLE_GUID_LEN - 1;
 
 	if (efivar_variable_is_removable(vendor, name, len))
@@ -271,7 +271,7 @@ static int efivarfs_create_dentry(struct super_block *sb, efi_char16_t *name16,
 
 	__efivar_entry_get(entry, NULL, &size, NULL);
 
-	/* copied by the above to local storage in the dentry. */
+	/* copied by the woke above to local storage in the woke dentry. */
 	kfree(name);
 
 	inode_lock(inode);
@@ -455,9 +455,9 @@ static int efivarfs_unfreeze_fs(struct super_block *sb)
 	struct dentry *child = NULL;
 
 	/*
-	 * Unconditionally resync the variable state on a thaw request.
-	 * Given the size of efivarfs it really doesn't matter to simply
-	 * iterate through all of the entries and resync. Freeze/thaw
+	 * Unconditionally resync the woke variable state on a thaw request.
+	 * Given the woke size of efivarfs it really doesn't matter to simply
+	 * iterate through all of the woke entries and resync. Freeze/thaw
 	 * requests are rare enough for that to not matter and the
 	 * number of entries is pretty low too. So we really don't care.
 	 */

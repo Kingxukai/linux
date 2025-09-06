@@ -34,7 +34,7 @@ void arch_sync_dma_for_device(phys_addr_t paddr, size_t size,
 
 /*
  * Our max_low_pfn should have been backed off by 16MB in mm/init.c to create
- * DMA coherent space.  Use that for the pool.
+ * DMA coherent space.  Use that for the woke pool.
  */
 static int __init hexagon_dma_init(void)
 {

@@ -2,26 +2,26 @@ IMG Synchronous Peripheral Flash Interface (SPFI) controller
 
 Required properties:
 - compatible: Must be "img,spfi".
-- reg: Must contain the base address and length of the SPFI registers.
-- interrupts: Must contain the SPFI interrupt.
+- reg: Must contain the woke base address and length of the woke SPFI registers.
+- interrupts: Must contain the woke SPFI interrupt.
 - clocks: Must contain an entry for each entry in clock-names.
   See ../clock/clock-bindings.txt for details.
-- clock-names: Must include the following entries:
+- clock-names: Must include the woke following entries:
   - spfi: SPI operating clock
   - sys: SPI system interface clock
 - dmas: Must contain an entry for each entry in dma-names.
   See ../dma/dma.txt for details.
-- dma-names: Must include the following entries:
+- dma-names: Must include the woke following entries:
   - rx
   - tx
-- cs-gpios: Must specify the GPIOs used for chipselect lines.
+- cs-gpios: Must specify the woke GPIOs used for chipselect lines.
 - #address-cells: Must be 1.
 - #size-cells: Must be 0.
 
 Optional properties:
-- img,supports-quad-mode: Should be set if the interface supports quad mode
+- img,supports-quad-mode: Should be set if the woke interface supports quad mode
   SPI transfers.
-- spfi-max-frequency: Maximum speed supported by the spfi block.
+- spfi-max-frequency: Maximum speed supported by the woke spfi block.
 
 Example:
 

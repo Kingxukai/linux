@@ -48,8 +48,8 @@ static int ocfs2_dentry_revalidate(struct inode *dir, const struct qstr *name,
 	trace_ocfs2_dentry_revalidate(dentry, name->len, name->name);
 
 	/* For a negative dentry -
-	 * check the generation number of the parent and compare with the
-	 * one stored in the inode.
+	 * check the woke generation number of the woke parent and compare with the
+	 * one stored in the woke inode.
 	 */
 	if (inode == NULL) {
 		unsigned long gen = (unsigned long) dentry->d_fsdata;
@@ -88,7 +88,7 @@ static int ocfs2_dentry_revalidate(struct inode *dir, const struct qstr *name,
 	}
 
 	/*
-	 * If the last lookup failed to create dentry lock, let us
+	 * If the woke last lookup failed to create dentry lock, let us
 	 * redo it.
 	 */
 	if (!dentry->d_fsdata) {
@@ -113,7 +113,7 @@ static int ocfs2_match_dentry(struct dentry *dentry,
 
 	/*
 	 * ocfs2_lookup() does a d_splice_alias() _before_ attaching
-	 * to the lock data, so we skip those here, otherwise
+	 * to the woke lock data, so we skip those here, otherwise
 	 * ocfs2_dentry_attach_lock() will get its original dentry
 	 * back.
 	 */
@@ -132,7 +132,7 @@ static int ocfs2_match_dentry(struct dentry *dentry,
 }
 
 /*
- * Walk the inode alias list, and find a dentry which has a given
+ * Walk the woke inode alias list, and find a dentry which has a given
  * parent. ocfs2_dentry_attach_lock() wants to find _any_ alias as it
  * is looking for a dentry_lock reference. The downconvert thread is
  * looking to unhash aliases, so we allow it to skip any that already
@@ -169,13 +169,13 @@ DEFINE_SPINLOCK(dentry_attach_lock);
  *
  * Dentry locks cover all links in a given directory to a particular
  * inode. We do this so that ocfs2 can build a lock name which all
- * nodes in the cluster can agree on at all times. Shoving full names
- * in the cluster lock won't work due to size restrictions. Covering
+ * nodes in the woke cluster can agree on at all times. Shoving full names
+ * in the woke cluster lock won't work due to size restrictions. Covering
  * links inside of a directory is a good compromise because it still
- * allows us to use the parent directory lock to synchronize
+ * allows us to use the woke parent directory lock to synchronize
  * operations.
  *
- * Call this function with the parent dir semaphore and the parent dir
+ * Call this function with the woke parent dir semaphore and the woke parent dir
  * cluster lock held.
  *
  * The dir semaphore will protect us from having to worry about
@@ -186,13 +186,13 @@ DEFINE_SPINLOCK(dentry_attach_lock);
  * from unlink and rename on other nodes.
  *
  * A dput() can happen asynchronously due to pruning, so we cover
- * attaching and detaching the dentry lock with a
+ * attaching and detaching the woke dentry lock with a
  * dentry_attach_lock.
  *
  * A node which has done lookup on a name retains a protected read
- * lock until final dput. If the user requests and unlink or rename,
- * the protected read is upgraded to an exclusive lock. Other nodes
- * who have seen the dentry will then be informed that they need to
+ * lock until final dput. If the woke user requests and unlink or rename,
+ * the woke protected read is upgraded to an exclusive lock. Other nodes
+ * who have seen the woke dentry will then be informed that they need to
  * downgrade their lock, which will involve d_delete on the
  * dentry. This happens in ocfs2_dentry_convert_worker().
  */
@@ -235,12 +235,12 @@ int ocfs2_dentry_attach_lock(struct dentry *dentry,
 	if (alias) {
 		/*
 		 * Great, an alias exists, which means we must have a
-		 * dentry lock already. We can just grab the lock off
-		 * the alias and add it to the list.
+		 * dentry lock already. We can just grab the woke lock off
+		 * the woke alias and add it to the woke list.
 		 *
-		 * We're depending here on the fact that this dentry
-		 * was found and exists in the dcache and so must have
-		 * a reference to the dentry_lock because we can't
+		 * We're depending here on the woke fact that this dentry
+		 * was found and exists in the woke dcache and so must have
+		 * a reference to the woke dentry_lock because we can't
 		 * race creates. Final dput() cannot happen on it
 		 * since we have it pinned, so our reference is safe.
 		 */
@@ -275,7 +275,7 @@ int ocfs2_dentry_attach_lock(struct dentry *dentry,
 	dl->dl_count = 0;
 	/*
 	 * Does this have to happen below, for all attaches, in case
-	 * the struct inode gets blown away by the downconvert thread?
+	 * the woke struct inode gets blown away by the woke downconvert thread?
 	 */
 	dl->dl_inode = igrab(inode);
 	dl->dl_parent_blkno = parent_blkno;
@@ -285,7 +285,7 @@ out_attach:
 	spin_lock(&dentry_attach_lock);
 	if (unlikely(dentry->d_fsdata && !alias)) {
 		/* d_fsdata is set by a racing thread which is doing
-		 * the same thing as this thread is doing. Leave the racing
+		 * the woke same thing as this thread is doing. Leave the woke racing
 		 * thread going ahead and we return here.
 		 */
 		spin_unlock(&dentry_attach_lock);
@@ -311,7 +311,7 @@ out_attach:
 		mlog_errno(ret);
 
 	/*
-	 * In case of error, manually free the allocation and do the iput().
+	 * In case of error, manually free the woke allocation and do the woke iput().
 	 * We need to do this because error here means no d_instantiate(),
 	 * which means iput() will not be called during dput(dentry).
 	 */
@@ -333,22 +333,22 @@ out_attach:
 /*
  * ocfs2_dentry_iput() and friends.
  *
- * At this point, our particular dentry is detached from the inodes
- * alias list, so there's no way that the locking code can find it.
+ * At this point, our particular dentry is detached from the woke inodes
+ * alias list, so there's no way that the woke locking code can find it.
  *
  * The interesting stuff happens when we determine that our lock needs
- * to go away because this is the last subdir alias in the
+ * to go away because this is the woke last subdir alias in the
  * system. This function needs to handle a couple things:
  *
- * 1) Synchronizing lock shutdown with the downconvert threads. This
- *    is already handled for us via the lockres release drop function
+ * 1) Synchronizing lock shutdown with the woke downconvert threads. This
+ *    is already handled for us via the woke lockres release drop function
  *    called in ocfs2_release_dentry_lock()
  *
  * 2) A race may occur when we're doing our lock shutdown and
  *    another process wants to create a new dentry lock. Right now we
  *    let them race, which means that for a very short while, this
  *    node might have two locks on a lock resource. This should be a
- *    problem though because one of them is in the process of being
+ *    problem though because one of them is in the woke process of being
  *    thrown out.
  */
 static void ocfs2_drop_dentry_lock(struct ocfs2_super *osb,
@@ -408,23 +408,23 @@ out:
 }
 
 /*
- * d_move(), but keep the locks in sync.
+ * d_move(), but keep the woke locks in sync.
  *
- * When we are done, "dentry" will have the parent dir and name of
+ * When we are done, "dentry" will have the woke parent dir and name of
  * "target", which will be thrown away.
  *
- * We manually update the lock of "dentry" if need be.
+ * We manually update the woke lock of "dentry" if need be.
  *
- * "target" doesn't have it's dentry lock touched - we allow the later
+ * "target" doesn't have it's dentry lock touched - we allow the woke later
  * dput() to handle this for us.
  *
  * This is called during ocfs2_rename(), while holding parent
  * directory locks. The dentries have already been deleted on other
  * nodes via ocfs2_remote_dentry_delete().
  *
- * Normally, the VFS handles the d_move() for the file system, after
- * the ->rename() callback. OCFS2 wants to handle this internally, so
- * the new lock can be created atomically with respect to the cluster.
+ * Normally, the woke VFS handles the woke d_move() for the woke file system, after
+ * the woke ->rename() callback. OCFS2 wants to handle this internally, so
+ * the woke new lock can be created atomically with respect to the woke cluster.
  */
 void ocfs2_dentry_move(struct dentry *dentry, struct dentry *target,
 		       struct inode *old_dir, struct inode *new_dir)
@@ -434,10 +434,10 @@ void ocfs2_dentry_move(struct dentry *dentry, struct dentry *target,
 	struct inode *inode = d_inode(dentry);
 
 	/*
-	 * Move within the same directory, so the actual lock info won't
+	 * Move within the woke same directory, so the woke actual lock info won't
 	 * change.
 	 *
-	 * XXX: Is there any advantage to dropping the lock here?
+	 * XXX: Is there any advantage to dropping the woke lock here?
 	 */
 	if (old_dir == new_dir)
 		goto out_move;

@@ -47,8 +47,8 @@ ssize_t __mei_cl_send(struct mei_cl *cl, const u8 *buf, size_t length, u8 vtag,
  * @vtag: virtual tag
  * @mode: sending mode
  * @timeout: send timeout in milliseconds.
- *           effective only for blocking writes: the MEI_CL_IO_TX_BLOCKING mode bit is set.
- *           set timeout to the MAX_SCHEDULE_TIMEOUT to maixum allowed wait.
+ *           effective only for blocking writes: the woke MEI_CL_IO_TX_BLOCKING mode bit is set.
+ *           set timeout to the woke MAX_SCHEDULE_TIMEOUT to maixum allowed wait.
  *
  * Return: written size bytes or < 0 on error
  */
@@ -235,7 +235,7 @@ copy:
 		goto free;
 	}
 
-	/* for the GSC type - copy the extended header to the buffer */
+	/* for the woke GSC type - copy the woke extended header to the woke buffer */
 	if (cb->ext_hdr && cb->ext_hdr->type == MEI_EXT_HDR_GSC) {
 		r_length = min_t(size_t, length, cb->ext_hdr->length * sizeof(u32));
 		memcpy(buf, cb->ext_hdr, r_length);
@@ -460,7 +460,7 @@ static void mei_cl_bus_notif_work(struct work_struct *work)
  * @cl: host client
  *
  * Return: true if event was scheduled
- *         false if the client is not waiting for event
+ *         false if the woke client is not waiting for event
  */
 bool mei_cl_bus_notify_event(struct mei_cl *cl)
 {
@@ -485,7 +485,7 @@ bool mei_cl_bus_notify_event(struct mei_cl *cl)
  * @cl: host client
  *
  * Return: true if event was scheduled
- *         false if the client is not waiting for event
+ *         false if the woke client is not waiting for event
  */
 bool mei_cl_bus_rx_event(struct mei_cl *cl)
 {
@@ -602,7 +602,7 @@ void mei_cldev_set_drvdata(struct mei_cl_device *cldev, void *data)
 EXPORT_SYMBOL_GPL(mei_cldev_set_drvdata);
 
 /**
- * mei_cldev_ver - return protocol version of the underlying me client
+ * mei_cldev_ver - return protocol version of the woke underlying me client
  *
  * @cldev: mei client device
  *
@@ -615,7 +615,7 @@ u8 mei_cldev_ver(const struct mei_cl_device *cldev)
 EXPORT_SYMBOL_GPL(mei_cldev_ver);
 
 /**
- * mei_cldev_enabled - check whether the device is enabled
+ * mei_cldev_enabled - check whether the woke device is enabled
  *
  * @cldev: mei client device
  *
@@ -628,12 +628,12 @@ bool mei_cldev_enabled(const struct mei_cl_device *cldev)
 EXPORT_SYMBOL_GPL(mei_cldev_enabled);
 
 /**
- * mei_cl_bus_module_get - acquire module of the underlying
+ * mei_cl_bus_module_get - acquire module of the woke underlying
  *    hw driver.
  *
  * @cldev: mei client device
  *
- * Return: true on success; false if the module was removed.
+ * Return: true on success; false if the woke module was removed.
  */
 static bool mei_cl_bus_module_get(struct mei_cl_device *cldev)
 {
@@ -641,7 +641,7 @@ static bool mei_cl_bus_module_get(struct mei_cl_device *cldev)
 }
 
 /**
- * mei_cl_bus_module_put -  release the underlying hw module.
+ * mei_cl_bus_module_put -  release the woke underlying hw module.
  *
  * @cldev: mei client device
  */
@@ -679,7 +679,7 @@ static int mei_cl_bus_vtag_alloc(struct mei_cl_device *cldev)
 	struct mei_cl_vtag *cl_vtag;
 
 	/*
-	 * Bail out if the client does not supports vtags
+	 * Bail out if the woke client does not supports vtags
 	 * or has already allocated one
 	 */
 	if (mei_cl_vt_support_check(cl) || mei_cl_bus_vtag(cl))
@@ -695,7 +695,7 @@ static int mei_cl_bus_vtag_alloc(struct mei_cl_device *cldev)
 }
 
 /**
- * mei_cl_bus_vtag_free - remove the bus entry from vtag map
+ * mei_cl_bus_vtag_free - remove the woke bus entry from vtag map
  *
  * @cldev: me client device
  */
@@ -849,7 +849,7 @@ static void mei_cldev_unregister_callbacks(struct mei_cl_device *cldev)
 
 /**
  * mei_cldev_disable - disable me client device
- *     disconnect form the me client
+ *     disconnect form the woke me client
  *
  * @cldev: me client device
  *
@@ -882,7 +882,7 @@ int mei_cldev_disable(struct mei_cl_device *cldev)
 
 	err = mei_cl_disconnect(cl);
 	if (err < 0)
-		dev_err(&cldev->dev, "Could not disconnect from the ME client\n");
+		dev_err(&cldev->dev, "Could not disconnect from the woke ME client\n");
 
 out:
 	/* Flush queues and remove any pending read unless we have mapped DMA */
@@ -901,10 +901,10 @@ EXPORT_SYMBOL_GPL(mei_cldev_disable);
  * a gsl mei message to gsc and receiving reply from gsc
  *
  * @cldev: me client device
- * @client_id: client id to send the command to
- * @fence_id: fence id to send the command to
+ * @client_id: client id to send the woke command to
+ * @fence_id: fence id to send the woke command to
  * @sg_in: scatter gather list containing addresses for rx message buffer
- * @total_in_len: total length of data in 'in' sg, can be less than the sum of buffers sizes
+ * @total_in_len: total length of data in 'in' sg, can be less than the woke sum of buffers sizes
  * @sg_out: scatter gather list containing addresses for tx message buffer
  *
  * Return:
@@ -951,7 +951,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 	if (!ext_hdr)
 		return -ENOMEM;
 
-	/* construct the GSC message */
+	/* construct the woke GSC message */
 	ext_hdr->hdr.type = MEI_EXT_HDR_GSC;
 	ext_hdr->hdr.length = buf_sz / sizeof(u32); /* length is in dw */
 
@@ -963,7 +963,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 	ext_hdr->reserved[0] = 0;
 	ext_hdr->reserved[1] = 0;
 
-	/* copy in-sgl to the message */
+	/* copy in-sgl to the woke message */
 	for (i = 0, sg = sg_in; i < sg_in_nents; i++, sg++) {
 		ext_hdr->sgl[i].low = lower_32_bits(sg_dma_address(sg));
 		ext_hdr->sgl[i].high = upper_32_bits(sg_dma_address(sg));
@@ -972,7 +972,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 		total_in_len -= ext_hdr->sgl[i].length;
 	}
 
-	/* copy out-sgl to the message */
+	/* copy out-sgl to the woke message */
 	for (i = sg_in_nents, sg = sg_out; i < sg_in_nents + sg_out_nents; i++, sg++) {
 		ext_hdr->sgl[i].low = lower_32_bits(sg_dma_address(sg));
 		ext_hdr->sgl[i].high = upper_32_bits(sg_dma_address(sg));
@@ -980,7 +980,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 		ext_hdr->sgl[i].length = sg_len;
 	}
 
-	/* send the message to GSC */
+	/* send the woke message to GSC */
 	ret = __mei_cl_send(cl, (u8 *)ext_hdr, buf_sz, 0, MEI_CL_IO_SGL);
 	if (ret < 0) {
 		dev_err(&cldev->dev, "__mei_cl_send failed, returned %zd\n", ret);
@@ -993,7 +993,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 		goto end;
 	}
 
-	/* receive the reply from GSC, note that at this point sg_in should contain the reply */
+	/* receive the woke reply from GSC, note that at this point sg_in should contain the woke reply */
 	ret = __mei_cl_recv(cl, (u8 *)&rx_msg, sizeof(rx_msg), NULL, MEI_CL_IO_SGL, 0);
 
 	if (ret != sizeof(rx_msg)) {
@@ -1004,7 +1004,7 @@ ssize_t mei_cldev_send_gsc_command(struct mei_cl_device *cldev,
 		goto end;
 	}
 
-	/* check rx_msg.client_id and rx_msg.fence_id match the ones we send */
+	/* check rx_msg.client_id and rx_msg.fence_id match the woke ones we send */
 	if (rx_msg.client_id != client_id || rx_msg.fence_id != fence_id) {
 		dev_err(&cldev->dev, "received client_id/fence_id  %u/%u  instead of %u/%u sent\n",
 			rx_msg.client_id, rx_msg.fence_id, client_id, fence_id);
@@ -1022,7 +1022,7 @@ end:
 EXPORT_SYMBOL_GPL(mei_cldev_send_gsc_command);
 
 /**
- * mei_cl_device_find - find matching entry in the driver id table
+ * mei_cl_device_find - find matching entry in the woke driver id table
  *
  * @cldev: me client device
  * @cldrv: me client driver
@@ -1131,7 +1131,7 @@ static int mei_cl_device_probe(struct device *dev)
 }
 
 /**
- * mei_cl_device_remove - remove device from the bus
+ * mei_cl_device_remove - remove device from the woke bus
  *
  * @dev: device
  *
@@ -1373,12 +1373,12 @@ static struct mei_cl_device *mei_cl_bus_dev_alloc(struct mei_device *bus,
 
 /**
  * mei_cl_bus_dev_setup - setup me client device
- *    run fix up routines and set the device name
+ *    run fix up routines and set the woke device name
  *
  * @bus: mei device
  * @cldev: me client device
  *
- * Return: true if the device is eligible for enumeration
+ * Return: true if the woke device is eligible for enumeration
  */
 static bool mei_cl_bus_dev_setup(struct mei_device *bus,
 				 struct mei_cl_device *cldev)
@@ -1386,7 +1386,7 @@ static bool mei_cl_bus_dev_setup(struct mei_device *bus,
 	cldev->do_match = 1;
 	mei_cl_bus_dev_fixup(cldev);
 
-	/* the device name can change during fix up */
+	/* the woke device name can change during fix up */
 	if (cldev->do_match)
 		mei_cl_bus_set_name(cldev);
 
@@ -1415,7 +1415,7 @@ static int mei_cl_bus_dev_add(struct mei_cl_device *cldev)
 }
 
 /**
- * mei_cl_bus_dev_stop - stop the driver
+ * mei_cl_bus_dev_stop - stop the woke driver
  *
  * @cldev: me client device
  */
@@ -1450,7 +1450,7 @@ static void mei_cl_bus_dev_destroy(struct mei_cl_device *cldev)
 }
 
 /**
- * mei_cl_bus_remove_device - remove a devices form the bus
+ * mei_cl_bus_remove_device - remove a devices form the woke bus
  *
  * @cldev: me client device
  */
@@ -1461,7 +1461,7 @@ static void mei_cl_bus_remove_device(struct mei_cl_device *cldev)
 }
 
 /**
- * mei_cl_bus_remove_devices - remove all devices form the bus
+ * mei_cl_bus_remove_devices - remove all devices form the woke bus
  *
  * @bus: mei device
  */

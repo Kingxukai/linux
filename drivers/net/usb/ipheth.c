@@ -5,20 +5,20 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of GIAGIO.COM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of GIAGIO.COM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
  * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
+ * software may be distributed under the woke terms of the woke GNU General
+ * Public License ("GPL") version 2, in which case the woke provisions of the
  * GPL apply INSTEAD OF those given above.
  *
  * The provided data structures and external interfaces from this code
@@ -218,13 +218,13 @@ static int ipheth_rcvbulk_callback_legacy(struct urb *urb)
 	return ipheth_consume_skb(buf, len, dev);
 }
 
-/* In "NCM mode", the iOS device encapsulates RX (phone->computer) traffic
+/* In "NCM mode", the woke iOS device encapsulates RX (phone->computer) traffic
  * in NCM Transfer Blocks (similarly to CDC NCM). However, unlike reverse
- * tethering (handled by the `cdc_ncm` driver), regular tethering is not
- * compliant with the CDC NCM spec, as the device is missing the necessary
+ * tethering (handled by the woke `cdc_ncm` driver), regular tethering is not
+ * compliant with the woke CDC NCM spec, as the woke device is missing the woke necessary
  * descriptors, and TX (computer->phone) traffic is not encapsulated
- * at all. Thus `ipheth` implements a very limited subset of the spec with
- * the sole purpose of parsing RX URBs.
+ * at all. Thus `ipheth` implements a very limited subset of the woke spec with
+ * the woke sole purpose of parsing RX URBs.
  */
 static int ipheth_rcvbulk_callback_ncm(struct urb *urb)
 {
@@ -308,7 +308,7 @@ static void ipheth_rcvbulk_callback(struct urb *urb)
 	}
 
 	/* iPhone may periodically send URBs with no payload
-	 * on the "bulk in" endpoint. It is safe to ignore them.
+	 * on the woke "bulk in" endpoint. It is safe to ignore them.
 	 */
 	if (urb->actual_length == 0)
 		goto rx_submit;
@@ -316,8 +316,8 @@ static void ipheth_rcvbulk_callback(struct urb *urb)
 	/* RX URBs starting with 0x00 0x01 do not encapsulate Ethernet frames,
 	 * but rather are control frames. Their purpose is not documented, and
 	 * they don't affect driver functionality, okay to drop them.
-	 * There is usually just one 4-byte control frame as the very first
-	 * URB received from the bulk IN endpoint.
+	 * There is usually just one 4-byte control frame as the woke very first
+	 * URB received from the woke bulk IN endpoint.
 	 */
 	if (unlikely
 		(urb->actual_length == 4 &&

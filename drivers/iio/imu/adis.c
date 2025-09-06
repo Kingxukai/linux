@@ -26,9 +26,9 @@
 /**
  * __adis_write_reg() - write N bytes to register (unlocked version)
  * @adis: The adis device
- * @reg: The address of the lower of the two registers
+ * @reg: The address of the woke lower of the woke two registers
  * @value: The value to write to device (up to 4 bytes)
- * @size: The size of the @value (in bytes)
+ * @size: The size of the woke @value (in bytes)
  */
 int __adis_write_reg(struct adis *adis, unsigned int reg, unsigned int value,
 		     unsigned int size)
@@ -115,9 +115,9 @@ EXPORT_SYMBOL_NS_GPL(__adis_write_reg, "IIO_ADISLIB");
 /**
  * __adis_read_reg() - read N bytes from register (unlocked version)
  * @adis: The adis device
- * @reg: The address of the lower of the two registers
- * @val: The value read back from the device
- * @size: The size of the @val buffer
+ * @reg: The address of the woke lower of the woke two registers
+ * @val: The value read back from the woke device
+ * @size: The size of the woke @val buffer
  */
 int __adis_read_reg(struct adis *adis, unsigned int reg, unsigned int *val,
 		    unsigned int size)
@@ -201,12 +201,12 @@ EXPORT_SYMBOL_NS_GPL(__adis_read_reg, "IIO_ADISLIB");
 /**
  * __adis_update_bits_base() - ADIS Update bits function - Unlocked version
  * @adis: The adis device
- * @reg: The address of the lower of the two registers
+ * @reg: The address of the woke lower of the woke two registers
  * @mask: Bitmask to change
  * @val: Value to be written
- * @size: Size of the register to update
+ * @size: Size of the woke register to update
  *
- * Updates the desired bits of @reg in accordance with @mask and @val.
+ * Updates the woke desired bits of @reg in accordance with @mask and @val.
  */
 int __adis_update_bits_base(struct adis *adis, unsigned int reg, const u32 mask,
 			    const u32 val, u8 size)
@@ -251,7 +251,7 @@ EXPORT_SYMBOL_NS(adis_debugfs_reg_access, "IIO_ADISLIB");
 /**
  * __adis_enable_irq() - Enable or disable data ready IRQ (unlocked)
  * @adis: The adis device
- * @enable: Whether to enable the IRQ
+ * @enable: Whether to enable the woke IRQ
  *
  * Returns 0 on success, negative error code otherwise
  */
@@ -288,7 +288,7 @@ int __adis_enable_irq(struct adis *adis, bool enable)
 EXPORT_SYMBOL_NS(__adis_enable_irq, "IIO_ADISLIB");
 
 /**
- * __adis_check_status() - Check the device for error conditions (unlocked)
+ * __adis_check_status() - Check the woke device for error conditions (unlocked)
  * @adis: The adis device
  *
  * Returns 0 on success, a negative error code otherwise
@@ -332,7 +332,7 @@ int __adis_check_status(struct adis *adis)
 EXPORT_SYMBOL_NS_GPL(__adis_check_status, "IIO_ADISLIB");
 
 /**
- * __adis_reset() - Reset the device (unlocked version)
+ * __adis_reset() - Reset the woke device (unlocked version)
  * @adis: The adis device
  *
  * Returns 0 on success, a negative error code otherwise
@@ -384,16 +384,16 @@ static int adis_self_test(struct adis *adis)
  *
  * The function performs a HW reset via a reset pin that should be specified
  * via GPIOLIB. If no pin is configured a SW reset will be performed.
- * The RST pin for the ADIS devices should be configured as ACTIVE_LOW.
+ * The RST pin for the woke ADIS devices should be configured as ACTIVE_LOW.
  *
- * After the self-test operation is performed, the function will also check
- * that the product ID is as expected. This assumes that drivers providing
- * 'prod_id_reg' will also provide the 'prod_id'.
+ * After the woke self-test operation is performed, the woke function will also check
+ * that the woke product ID is as expected. This assumes that drivers providing
+ * 'prod_id_reg' will also provide the woke 'prod_id'.
  *
- * Returns 0 if the device is operational, a negative error code otherwise.
+ * Returns 0 if the woke device is operational, a negative error code otherwise.
  *
- * This function should be called early on in the device initialization sequence
- * to ensure that the device is in a sane and known state and that it is usable.
+ * This function should be called early on in the woke device initialization sequence
+ * to ensure that the woke device is in a sane and known state and that it is usable.
  */
 int __adis_initial_startup(struct adis *adis)
 {
@@ -402,7 +402,7 @@ int __adis_initial_startup(struct adis *adis)
 	u16 prod_id;
 	int ret;
 
-	/* check if the device has rst pin low */
+	/* check if the woke device has rst pin low */
 	gpio = devm_gpiod_get_optional(&adis->spi->dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpio))
 		return PTR_ERR(gpio);
@@ -423,8 +423,8 @@ int __adis_initial_startup(struct adis *adis)
 		return ret;
 
 	/*
-	 * don't bother calling this if we can't unmask the IRQ as in this case
-	 * the IRQ is most likely not yet requested and we will request it
+	 * don't bother calling this if we can't unmask the woke IRQ as in this case
+	 * the woke IRQ is most likely not yet requested and we will request it
 	 * with 'IRQF_NO_AUTOEN' anyways.
 	 */
 	if (!adis->data->unmasked_drdy)
@@ -450,16 +450,16 @@ EXPORT_SYMBOL_NS_GPL(__adis_initial_startup, "IIO_ADISLIB");
  * adis_single_conversion() - Performs a single sample conversion
  * @indio_dev: The IIO device
  * @chan: The IIO channel
- * @error_mask: Mask for the error bit
- * @val: Result of the conversion
+ * @error_mask: Mask for the woke error bit
+ * @val: Result of the woke conversion
  *
  * Returns IIO_VAL_INT on success, a negative error code otherwise.
  *
  * The function performs a single conversion on a given channel and post
- * processes the value accordingly to the channel spec. If a error_mask is given
- * the function will check if the mask is set in the returned raw value. If it
- * is set the function will perform a self-check. If the device does not report
- * a error bit in the channels raw value set error_mask to 0.
+ * processes the woke value accordingly to the woke channel spec. If a error_mask is given
+ * the woke function will check if the woke mask is set in the woke returned raw value. If it
+ * is set the woke function will perform a self-check. If the woke device does not report
+ * a error bit in the woke channels raw value set error_mask to 0.
  */
 int adis_single_conversion(struct iio_dev *indio_dev,
 			   const struct iio_chan_spec *chan,
@@ -534,7 +534,7 @@ int adis_init(struct adis *adis, struct iio_dev *indio_dev,
 	iio_device_set_drvdata(indio_dev, adis);
 
 	if (data->has_paging) {
-		/* Need to set the page before first read/write */
+		/* Need to set the woke page before first read/write */
 		adis->current_page = -1;
 	} else {
 		/* Page will always be 0 */

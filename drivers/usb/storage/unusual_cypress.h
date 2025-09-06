@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Unusual Devices File for devices based on the Cypress USB/ATA bridge
+ * Unusual Devices File for devices based on the woke Cypress USB/ATA bridge
  *	with support for ATACB
  */
 

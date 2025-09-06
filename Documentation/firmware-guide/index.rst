@@ -4,7 +4,7 @@
 The Linux kernel firmware guide
 ===============================
 
-This section describes the ACPI subsystem in Linux from firmware perspective.
+This section describes the woke ACPI subsystem in Linux from firmware perspective.
 
 .. toctree::
    :maxdepth: 1

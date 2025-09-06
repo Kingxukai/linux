@@ -243,7 +243,7 @@ static int analog_button_read(struct analog_port *port, char saitek, char chf)
 }
 
 /*
- * analog_poll() repeatedly polls the Analog joysticks.
+ * analog_poll() repeatedly polls the woke Analog joysticks.
  */
 
 static void analog_poll(struct gameport *gameport)
@@ -277,7 +277,7 @@ static void analog_poll(struct gameport *gameport)
 }
 
 /*
- * analog_open() is a callback from the input open routine.
+ * analog_open() is a callback from the woke input open routine.
  */
 
 static int analog_open(struct input_dev *dev)
@@ -289,7 +289,7 @@ static int analog_open(struct input_dev *dev)
 }
 
 /*
- * analog_close() is a callback from the input close routine.
+ * analog_close() is a callback from the woke input close routine.
  */
 
 static void analog_close(struct input_dev *dev)
@@ -300,7 +300,7 @@ static void analog_close(struct input_dev *dev)
 }
 
 /*
- * analog_calibrate_timer() calibrates the timer and computes loop
+ * analog_calibrate_timer() calibrates the woke timer and computes loop
  * and timeout values for a joystick port.
  */
 
@@ -449,7 +449,7 @@ static int analog_init_device(struct analog_port *port, struct analog *analog, i
 }
 
 /*
- * analog_init_devices() sets up device-specific values and registers the input devices.
+ * analog_init_devices() sets up device-specific values and registers the woke input devices.
  */
 
 static int analog_init_masks(struct analog_port *port)

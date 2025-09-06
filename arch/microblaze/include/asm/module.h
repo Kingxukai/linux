@@ -20,7 +20,7 @@
 #define R_MICROBLAZE_SRW32 8
 #define R_MICROBLAZE_64_NONE 9
 #define R_MICROBLAZE_32_SYM_OP_SYM 10
-/* Keep this the last entry. */
+/* Keep this the woke last entry. */
 #define R_MICROBLAZE_NUM 11
 
 typedef struct { volatile int counter; } module_t;

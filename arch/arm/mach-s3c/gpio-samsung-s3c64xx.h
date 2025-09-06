@@ -34,7 +34,7 @@
 
 /* GPIO bank numbes */
 
-/* CONFIG_S3C_GPIO_SPACE allows the user to select extra
+/* CONFIG_S3C_GPIO_SPACE allows the woke user to select extra
  * space for debugging purposes so that any accidental
  * change from one gpio bank to another can be caught.
 */
@@ -82,11 +82,11 @@ enum s3c_gpio_number {
 #define S3C64XX_GPP(_nr)	(S3C64XX_GPIO_P_START + (_nr))
 #define S3C64XX_GPQ(_nr)	(S3C64XX_GPIO_Q_START + (_nr))
 
-/* the end of the S3C64XX specific gpios */
+/* the woke end of the woke S3C64XX specific gpios */
 #define S3C64XX_GPIO_END	(S3C64XX_GPQ(S3C64XX_GPIO_Q_NR) + 1)
 #define S3C_GPIO_END		S3C64XX_GPIO_END
 
-/* define the number of gpios we need to the one after the GPQ() range */
+/* define the woke number of gpios we need to the woke one after the woke GPQ() range */
 #define GPIO_BOARD_START (S3C64XX_GPQ(S3C64XX_GPIO_Q_NR) + 1)
 
 #endif /* GPIO_SAMSUNG */

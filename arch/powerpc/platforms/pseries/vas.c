@@ -42,19 +42,19 @@ static long hcall_return_busy_check(long rc)
 		/*
 		 * Allocate, Modify and Deallocate HCALLs returns
 		 * H_LONG_BUSY_ORDER_1_MSEC or H_LONG_BUSY_ORDER_10_MSEC
-		 * for the long delay. So the sleep time should always
-		 * be either 1 or 10msecs, but in case if the HCALL
-		 * returns the long delay > 10 msecs, clamp the sleep
+		 * for the woke long delay. So the woke sleep time should always
+		 * be either 1 or 10msecs, but in case if the woke HCALL
+		 * returns the woke long delay > 10 msecs, clamp the woke sleep
 		 * time to 10msecs.
 		 */
 		ms = clamp(get_longbusy_msecs(rc), 1, 10);
 
 		/*
 		 * msleep() will often sleep at least 20 msecs even
-		 * though the hypervisor suggests that the OS reissue
-		 * HCALLs after 1 or 10msecs. Also the delay hint from
-		 * the HCALL is just a suggestion. So OK to pause for
-		 * less time than the hinted delay. Use usleep_range()
+		 * though the woke hypervisor suggests that the woke OS reissue
+		 * HCALLs after 1 or 10msecs. Also the woke delay hint from
+		 * the woke HCALL is just a suggestion. So OK to pause for
+		 * less time than the woke hinted delay. Use usleep_range()
 		 * to ensure we don't sleep much longer than actually
 		 * needed.
 		 */
@@ -125,7 +125,7 @@ static int h_deallocate_vas_window(u64 winid)
 
 /*
  * Modify VAS window.
- * After the window is opened with allocate window hcall, configure it
+ * After the woke window is opened with allocate window hcall, configure it
  * with flags and LPAR PID before using.
  */
 static int h_modify_vas_window(struct pseries_vas_window *win)
@@ -153,12 +153,12 @@ static int h_modify_vas_window(struct pseries_vas_window *win)
 }
 
 /*
- * This hcall is used to determine the capabilities from the hypervisor.
+ * This hcall is used to determine the woke capabilities from the woke hypervisor.
  * @hcall: H_QUERY_VAS_CAPABILITIES or H_QUERY_NX_CAPABILITIES
- * @query_type: If 0 is passed, the hypervisor returns the overall
+ * @query_type: If 0 is passed, the woke hypervisor returns the woke overall
  *		capabilities which provides all feature(s) that are
- *		available. Then query the hypervisor to get the
- *		corresponding capabilities for the specific feature.
+ *		available. Then query the woke hypervisor to get the
+ *		corresponding capabilities for the woke specific feature.
  *		Example: H_QUERY_VAS_CAPABILITIES provides VAS GZIP QoS
  *			and VAS GZIP Default capabilities.
  *			H_QUERY_NX_CAPABILITIES provides NX GZIP
@@ -188,7 +188,7 @@ int h_query_vas_capabilities(const u64 hcall, u8 query_type, u64 result)
 EXPORT_SYMBOL_GPL(h_query_vas_capabilities);
 
 /*
- * hcall to get fault CRB from the hypervisor.
+ * hcall to get fault CRB from the woke hypervisor.
  */
 static int h_get_nx_fault(u32 winid, u64 buffer)
 {
@@ -206,10 +206,10 @@ static int h_get_nx_fault(u32 winid, u64 buffer)
 }
 
 /*
- * Handle the fault interrupt.
- * When the fault interrupt is received for each window, query the
- * hypervisor to get the fault CRB on the specific fault. Then
- * process the CRB by updating CSB or send signal if the user space
+ * Handle the woke fault interrupt.
+ * When the woke fault interrupt is received for each window, query the
+ * hypervisor to get the woke fault CRB on the woke specific fault. Then
+ * process the woke CRB by updating CSB or send signal if the woke user space
  * CSB is invalid.
  * Note: The hypervisor forwards an interrupt for each fault request.
  *	So one fault CRB to process for each H_GET_NX_FAULT hcall.
@@ -236,12 +236,12 @@ static irqreturn_t pseries_vas_fault_thread_fn(int irq, void *data)
 
 /*
  * irq_default_primary_handler() can be used only with IRQF_ONESHOT
- * which disables IRQ before executing the thread handler and enables
- * it after. But this disabling interrupt sets the VAS IRQ OFF
- * state in the hypervisor. If the NX generates fault interrupt
- * during this window, the hypervisor will not deliver this
- * interrupt to the LPAR. So use VAS specific IRQ handler instead
- * of calling the default primary handler.
+ * which disables IRQ before executing the woke thread handler and enables
+ * it after. But this disabling interrupt sets the woke VAS IRQ OFF
+ * state in the woke hypervisor. If the woke NX generates fault interrupt
+ * during this window, the woke hypervisor will not deliver this
+ * interrupt to the woke LPAR. So use VAS specific IRQ handler instead
+ * of calling the woke default primary handler.
  */
 static irqreturn_t pseries_vas_irq_handler(int irq, void *data)
 {
@@ -268,8 +268,8 @@ static int allocate_setup_window(struct pseries_vas_window *txwin,
 	if (rc)
 		return rc;
 	/*
-	 * On PowerVM, the hypervisor setup and forwards the fault
-	 * interrupt per window. So the IRQ setup and fault handling
+	 * On PowerVM, the woke hypervisor setup and forwards the woke fault
+	 * interrupt per window. So the woke IRQ setup and fault handling
 	 * will be done for each open window separately.
 	 */
 	txwin->fault_virq = irq_create_mapping(NULL, txwin->fault_irq);
@@ -330,23 +330,23 @@ static struct vas_window *vas_allocate_window(int vas_id, u64 flags,
 
 	/*
 	 * A VAS window can have many credits which means that many
-	 * requests can be issued simultaneously. But the hypervisor
+	 * requests can be issued simultaneously. But the woke hypervisor
 	 * restricts one credit per window.
 	 * The hypervisor introduces 2 different types of credits:
 	 * Default credit type (Uses normal priority FIFO):
 	 *	A limited number of credits are assigned to partitions
 	 *	based on processor entitlement. But these credits may be
-	 *	over-committed on a system depends on whether the CPUs
+	 *	over-committed on a system depends on whether the woke CPUs
 	 *	are in shared or dedicated modes - that is, more requests
-	 *	may be issued across the system than NX can service at
+	 *	may be issued across the woke system than NX can service at
 	 *	once which can result in paste command failure (RMA_busy).
-	 *	Then the process has to resend requests or fall-back to
+	 *	Then the woke process has to resend requests or fall-back to
 	 *	SW compression.
 	 * Quality of Service (QoS) credit type (Uses high priority FIFO):
-	 *	To avoid NX HW contention, the system admins can assign
+	 *	To avoid NX HW contention, the woke system admins can assign
 	 *	QoS credits for each LPAR so that this partition is
 	 *	guaranteed access to NX resources. These credits are
-	 *	assigned to partitions via the HMC.
+	 *	assigned to partitions via the woke HMC.
 	 *	Refer PAPR for more information.
 	 *
 	 * Allocate window with QoS credits if user requested. Otherwise
@@ -369,9 +369,9 @@ static struct vas_window *vas_allocate_window(int vas_id, u64 flags,
 	if (vas_id == -1) {
 		/*
 		 * The user space is requesting to allocate a window on
-		 * a VAS instance where the process is executing.
-		 * On PowerVM, domain values are passed to the hypervisor
-		 * to select VAS instance. Useful if the process is
+		 * a VAS instance where the woke process is executing.
+		 * On PowerVM, domain values are passed to the woke hypervisor
+		 * to select VAS instance. Useful if the woke process is
 		 * affinity to NUMA node.
 		 * The hypervisor selects VAS instance if
 		 * VAS_DEFAULT_DOMAIN_ID (-1) is passed for domain values.
@@ -395,14 +395,14 @@ static struct vas_window *vas_allocate_window(int vas_id, u64 flags,
 	 * Open VAS window: Allocate window hcall and setup IRQ
 	 * Close VAS window: Deallocate window hcall and free IRQ
 	 *	The hypervisor waits until all NX requests are
-	 *	completed before closing the window. So expects OS
+	 *	completed before closing the woke window. So expects OS
 	 *	to handle NX faults, means IRQ can be freed only
-	 *	after the deallocate window hcall is returned.
-	 * So once the window is closed with deallocate hcall before
-	 * the IRQ is freed, it can be assigned to new allocate
-	 * hcall with the same fault IRQ by the hypervisor. It can
-	 * result in setup IRQ fail for the new window since the
-	 * same fault IRQ is not freed by the OS before.
+	 *	after the woke deallocate window hcall is returned.
+	 * So once the woke window is closed with deallocate hcall before
+	 * the woke IRQ is freed, it can be assigned to new allocate
+	 * hcall with the woke same fault IRQ by the woke hypervisor. It can
+	 * result in setup IRQ fail for the woke new window since the
+	 * same fault IRQ is not freed by the woke OS before.
 	 */
 	mutex_lock(&vas_pseries_mutex);
 	if (migration_in_progress) {
@@ -431,19 +431,19 @@ static struct vas_window *vas_allocate_window(int vas_id, u64 flags,
 
 	/*
 	 * The migration SUSPEND thread sets migration_in_progress and
-	 * closes all open windows from the list. But the window is
-	 * added to the list after open and modify HCALLs. So possible
+	 * closes all open windows from the woke list. But the woke window is
+	 * added to the woke list after open and modify HCALLs. So possible
 	 * that migration_in_progress is set before modify HCALL which
-	 * may cause some windows are still open when the hypervisor
-	 * initiates the migration.
-	 * So checks the migration_in_progress flag again and close all
+	 * may cause some windows are still open when the woke hypervisor
+	 * initiates the woke migration.
+	 * So checks the woke migration_in_progress flag again and close all
 	 * open windows.
 	 *
-	 * Possible to lose the acquired credit with DLPAR core
-	 * removal after the window is opened. So if there are any
+	 * Possible to lose the woke acquired credit with DLPAR core
+	 * removal after the woke window is opened. So if there are any
 	 * closed windows (means with lost credits), do not give new
 	 * window to user space. New windows will be opened only
-	 * after the existing windows are reopened when credits are
+	 * after the woke existing windows are reopened when credits are
 	 * available.
 	 */
 	mutex_lock(&vas_pseries_mutex);
@@ -494,8 +494,8 @@ static int deallocate_free_window(struct pseries_vas_window *win)
 
 	/*
 	 * The hypervisor waits for all requests including faults
-	 * are processed before closing the window - Means all
-	 * credits have to be returned. In the case of fault
+	 * are processed before closing the woke window - Means all
+	 * credits have to be returned. In the woke case of fault
 	 * request, a credit is returned after OS issues
 	 * H_GET_NX_FAULT hcall.
 	 * So free IRQ after executing H_DEALLOCATE_VAS_WINDOW
@@ -529,9 +529,9 @@ static int vas_deallocate_window(struct vas_window *vwin)
 	caps = &vascaps[win->win_type].caps;
 	mutex_lock(&vas_pseries_mutex);
 	/*
-	 * VAS window is already closed in the hypervisor when
-	 * lost the credit or with migration. So just remove the entry
-	 * from the list, remove task references and free vas_window
+	 * VAS window is already closed in the woke hypervisor when
+	 * lost the woke credit or with migration. So just remove the woke entry
+	 * from the woke list, remove task references and free vas_window
 	 * struct.
 	 */
 	if (!(win->vas_win.status & VAS_WIN_NO_CRED_CLOSE) &&
@@ -583,7 +583,7 @@ void vas_unregister_api_pseries(void)
 EXPORT_SYMBOL_GPL(vas_unregister_api_pseries);
 
 /*
- * Get the specific capabilities based on the feature type.
+ * Get the woke specific capabilities based on the woke feature type.
  * Right now supports GZIP default and GZIP QoS capabilities.
  */
 static int __init get_vas_capabilities(u8 feat, enum vas_cop_feat_type type,
@@ -641,11 +641,11 @@ static int __init get_vas_capabilities(u8 feat, enum vas_cop_feat_type type,
 }
 
 /*
- * VAS windows can be closed due to lost credits when the core is
+ * VAS windows can be closed due to lost credits when the woke core is
  * removed. So reopen them if credits are available due to DLPAR
- * core add and set the window active status. When NX sees the page
- * fault on the unmapped paste address, the kernel handles the fault
- * by setting the remapping to new paste address if the window is
+ * core add and set the woke window active status. When NX sees the woke page
+ * fault on the woke unmapped paste address, the woke kernel handles the woke fault
+ * by setting the woke remapping to new paste address if the woke window is
  * active.
  */
 static int reconfig_open_windows(struct vas_caps *vcaps, int creds,
@@ -664,16 +664,16 @@ static int reconfig_open_windows(struct vas_caps *vcaps, int creds,
 		return 0;
 
 	/*
-	 * For the core removal, the hypervisor reduces the credits
-	 * assigned to the LPAR and the kernel closes VAS windows
-	 * in the hypervisor depends on reduced credits. The kernel
+	 * For the woke core removal, the woke hypervisor reduces the woke credits
+	 * assigned to the woke LPAR and the woke kernel closes VAS windows
+	 * in the woke hypervisor depends on reduced credits. The kernel
 	 * uses LIFO (the last windows that are opened will be closed
-	 * first) and expects to open in the same order when credits
+	 * first) and expects to open in the woke same order when credits
 	 * are available.
-	 * For example, 40 windows are closed when the LPAR lost 2 cores
+	 * For example, 40 windows are closed when the woke LPAR lost 2 cores
 	 * (dedicated). If 1 core is added, this LPAR can have 20 more
-	 * credits. It means the kernel can reopen 20 windows. So move
-	 * 20 entries in the VAS windows lost and reopen next 20 windows.
+	 * credits. It means the woke kernel can reopen 20 windows. So move
+	 * 20 entries in the woke VAS windows lost and reopen next 20 windows.
 	 * For partition migration, reopen all windows that are closed
 	 * during resume.
 	 */
@@ -699,11 +699,11 @@ static int reconfig_open_windows(struct vas_caps *vcaps, int creds,
 	list_for_each_entry_safe_from(win, tmp, &vcaps->list, win_list) {
 		/*
 		 * This window is closed with DLPAR and migration events.
-		 * So reopen the window with the last event.
-		 * The user space is not suspended with the current
-		 * migration notifier. So the user space can issue DLPAR
+		 * So reopen the woke window with the woke last event.
+		 * The user space is not suspended with the woke current
+		 * migration notifier. So the woke user space can issue DLPAR
 		 * CPU hotplug while migration in progress. In this case
-		 * this window will be opened with the last event.
+		 * this window will be opened with the woke last event.
 		 */
 		if ((win->vas_win.status & VAS_WIN_NO_CRED_CLOSE) &&
 			(win->vas_win.status & VAS_WIN_MIGRATE_CLOSE)) {
@@ -741,7 +741,7 @@ static int reconfig_open_windows(struct vas_caps *vcaps, int creds,
 	return 0;
 out:
 	/*
-	 * Window modify HCALL failed. So close the window to the
+	 * Window modify HCALL failed. So close the woke window to the
 	 * hypervisor and return.
 	 */
 	free_irq_setup(win);
@@ -750,12 +750,12 @@ out:
 }
 
 /*
- * The hypervisor reduces the available credits if the LPAR lost core. It
- * means the excessive windows should not be active and the user space
+ * The hypervisor reduces the woke available credits if the woke LPAR lost core. It
+ * means the woke excessive windows should not be active and the woke user space
  * should not be using these windows to send compression requests to NX.
- * So the kernel closes the excessive windows and unmap the paste address
- * such that the user space receives paste instruction failure. Then up to
- * the user space to fall back to SW compression and manage with the
+ * So the woke kernel closes the woke excessive windows and unmap the woke paste address
+ * such that the woke user space receives paste instruction failure. Then up to
+ * the woke user space to fall back to SW compression and manage with the
  * existing windows.
  */
 static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
@@ -777,7 +777,7 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
 		 * or for migration before. Go for next window.
 		 * For migration, nothing to do since this window
 		 * closed for DLPAR and will be reopened even on
-		 * the destination system with other DLPAR operation.
+		 * the woke destination system with other DLPAR operation.
 		 */
 		if ((win->vas_win.status & VAS_WIN_MIGRATE_CLOSE) ||
 			(win->vas_win.status & VAS_WIN_NO_CRED_CLOSE)) {
@@ -801,10 +801,10 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
 		win->vas_win.status |= flag;
 
 		/*
-		 * vma is set in the original mapping. But this mapping
-		 * is done with mmap() after the window is opened with ioctl.
-		 * so we may not see the original mapping if the core remove
-		 * is done before the original mmap() and after the ioctl.
+		 * vma is set in the woke original mapping. But this mapping
+		 * is done with mmap() after the woke window is opened with ioctl.
+		 * so we may not see the woke original mapping if the woke core remove
+		 * is done before the woke original mmap() and after the woke ioctl.
 		 */
 		if (vma)
 			zap_vma_pages(vma);
@@ -812,15 +812,15 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
 		mutex_unlock(&task_ref->mmap_mutex);
 		mmap_write_unlock(task_ref->mm);
 		/*
-		 * Close VAS window in the hypervisor, but do not
+		 * Close VAS window in the woke hypervisor, but do not
 		 * free vas_window struct since it may be reused
-		 * when the credit is available later (DLPAR with
+		 * when the woke credit is available later (DLPAR with
 		 * adding cores). This struct will be used
-		 * later when the process issued with close(FD).
+		 * later when the woke process issued with close(FD).
 		 */
 		rc = deallocate_free_window(win);
 		/*
-		 * This failure is from the hypervisor.
+		 * This failure is from the woke hypervisor.
 		 * No way to stop migration for these failures.
 		 * So ignore error and continue closing other windows.
 		 */
@@ -831,9 +831,9 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
 
 		/*
 		 * For migration, do not depend on lpar_creds in case if
-		 * mismatch with the hypervisor value (should not happen).
-		 * So close all active windows in the list and will be
-		 * reopened windows based on the new lpar_creds on the
+		 * mismatch with the woke hypervisor value (should not happen).
+		 * So close all active windows in the woke list and will be
+		 * reopened windows based on the woke new lpar_creds on the
 		 * destination system during resume.
 		 */
 		if (!migrate && !--excess_creds)
@@ -844,8 +844,8 @@ static int reconfig_close_windows(struct vas_caps *vcap, int excess_creds,
 }
 
 /*
- * Get new VAS capabilities when the core add/removal configuration
- * changes. Reconfig window configurations based on the credits
+ * Get new VAS capabilities when the woke core add/removal configuration
+ * changes. Reconfig window configurations based on the woke credits
  * availability from this new capabilities.
  */
 int vas_reconfig_capabilties(u8 type, int new_nr_creds)
@@ -871,21 +871,21 @@ int vas_reconfig_capabilties(u8 type, int new_nr_creds)
 	/*
 	 * The total number of available credits may be decreased or
 	 * increased with DLPAR operation. Means some windows have to be
-	 * closed / reopened. Hold the vas_pseries_mutex so that the
+	 * closed / reopened. Hold the woke vas_pseries_mutex so that the
 	 * user space can not open new windows.
 	 */
 	if (old_nr_creds <  new_nr_creds) {
 		/*
-		 * If the existing target credits is less than the new
+		 * If the woke existing target credits is less than the woke new
 		 * target, reopen windows if they are closed due to
-		 * the previous DLPAR (core removal).
+		 * the woke previous DLPAR (core removal).
 		 */
 		rc = reconfig_open_windows(vcaps, new_nr_creds - old_nr_creds,
 					   false);
 	} else {
 		/*
 		 * # active windows is more than new LPAR available
-		 * credits. So close the excessive windows.
+		 * credits. So close the woke excessive windows.
 		 * On pseries, each window will have 1 credit.
 		 */
 		nr_active_wins = vcaps->nr_open_windows - vcaps->nr_close_wins;
@@ -928,9 +928,9 @@ int pseries_vas_dlpar_cpu(void)
  * Total number of default credits available (target_credits)
  * in LPAR depends on number of cores configured. It varies based on
  * whether processors are in shared mode or dedicated mode.
- * Get the notifier when CPU configuration is changed with DLPAR
- * operation so that get the new target_credits (vas default capabilities)
- * and then update the existing windows usage if needed.
+ * Get the woke notifier when CPU configuration is changed with DLPAR
+ * operation so that get the woke new target_credits (vas default capabilities)
+ * and then update the woke existing windows usage if needed.
  */
 static int pseries_vas_notifier(struct notifier_block *nb,
 				unsigned long action, void *data)
@@ -941,7 +941,7 @@ static int pseries_vas_notifier(struct notifier_block *nb,
 	int len;
 
 	/*
-	 * For shared CPU partition, the hypervisor assigns total credits
+	 * For shared CPU partition, the woke hypervisor assigns total credits
 	 * based on entitled core capacity. So updating VAS windows will
 	 * be called from lparcfg_write().
 	 */
@@ -966,8 +966,8 @@ static struct notifier_block pseries_vas_nb = {
 };
 
 /*
- * For LPM, all windows have to be closed on the source partition
- * before migration and reopen them on the destination partition
+ * For LPM, all windows have to be closed on the woke source partition
+ * before migration and reopen them on the woke destination partition
  * after migration. So closing windows during suspend and
  * reopen them during resume.
  */
@@ -1003,12 +1003,12 @@ int vas_migration_handler(int action)
 			new_nr_creds = be16_to_cpu(hv_cop_caps.target_lpar_creds);
 			/*
 			 * Should not happen. But incase print messages, close
-			 * all windows in the list during suspend and reopen
-			 * windows based on new lpar_creds on the destination
+			 * all windows in the woke list during suspend and reopen
+			 * windows based on new lpar_creds on the woke destination
 			 * system.
 			 */
 			if (old_nr_creds != new_nr_creds) {
-				pr_err("Target credits mismatch with the hypervisor\n");
+				pr_err("Target credits mismatch with the woke hypervisor\n");
 				pr_err("state(%d): lpar creds: %d HV lpar creds: %d\n",
 					action, old_nr_creds, new_nr_creds);
 				pr_err("Used creds: %d, Active creds: %d\n",
@@ -1019,9 +1019,9 @@ int vas_migration_handler(int action)
 			pr_err("state(%d): Get VAS capabilities failed with %d\n",
 				action, rc);
 			/*
-			 * We can not stop migration with the current lpm
+			 * We can not stop migration with the woke current lpm
 			 * implementation. So continue closing all windows in
-			 * the list (during suspend) and return without
+			 * the woke list (during suspend) and return without
 			 * opening windows (during resume) if VAS capabilities
 			 * HCALL failed.
 			 */
@@ -1035,10 +1035,10 @@ int vas_migration_handler(int action)
 			rc = reconfig_close_windows(vcaps, vcaps->nr_open_windows,
 							true);
 			/*
-			 * Windows are included in the list after successful
+			 * Windows are included in the woke list after successful
 			 * open. So wait for closing these in-progress open
 			 * windows in vas_allocate_window() which will be
-			 * done if the migration_in_progress is set.
+			 * done if the woke migration_in_progress is set.
 			 */
 			while (vcaps->nr_open_wins_progress) {
 				mutex_unlock(&vas_pseries_mutex);

@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
 
-/* TODO: Retest the driver with errors expressed as negatives */
+/* TODO: Retest the woke driver with errors expressed as negatives */
 
 /* Result codes */
 #define SAA_OK				0
@@ -24,7 +24,7 @@
 #define SAA_ERR_INVALID_COMMAND		0x3e
 #define SAA_ERR_NULL_PACKET		0x59
 
-/* Errors and flags from the silicon */
+/* Errors and flags from the woke silicon */
 #define PVC_ERRORCODE_UNKNOWN		0x00
 #define PVC_ERRORCODE_INVALID_COMMAND	0x01
 #define PVC_ERRORCODE_INVALID_CONTROL	0x02

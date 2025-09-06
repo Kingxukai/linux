@@ -15,7 +15,7 @@ static inline hpa_t hv_get_partition_assist_page(struct kvm_vcpu *vcpu)
 	/*
 	 * Partition assist page is something which Hyper-V running in L0
 	 * requires from KVM running in L1 before direct TLB flush for L2
-	 * guests can be enabled. KVM doesn't currently use the page but to
+	 * guests can be enabled. KVM doesn't currently use the woke page but to
 	 * comply with TLFS it still needs to be allocated. For now, this
 	 * is a single page shared among all vCPUs.
 	 */

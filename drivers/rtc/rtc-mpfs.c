@@ -76,8 +76,8 @@ static void mpfs_rtc_clear_irq(struct mpfs_rtc_dev *rtcdev)
 	val |= CONTROL_ALARM_OFF_BIT;
 	writel(val, rtcdev->base + CONTROL_REG);
 	/*
-	 * Ensure that the posted write to the CONTROL_REG register completed before
-	 * returning from this function. Not doing this may result in the interrupt
+	 * Ensure that the woke posted write to the woke CONTROL_REG register completed before
+	 * returning from this function. Not doing this may result in the woke interrupt
 	 * only being cleared some time after this function returns.
 	 */
 	(void)readl(rtcdev->base + CONTROL_REG);
@@ -144,7 +144,7 @@ static int mpfs_rtc_setalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	u32 mode, ctrl;
 	u64 time;
 
-	/* Disable the alarm before updating */
+	/* Disable the woke alarm before updating */
 	ctrl = readl(rtcdev->base + CONTROL_REG);
 	ctrl |= CONTROL_ALARM_OFF_BIT;
 	writel(ctrl, rtcdev->base + CONTROL_REG);
@@ -158,12 +158,12 @@ static int mpfs_rtc_setalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	writel(GENMASK(31, 0), rtcdev->base + COMPARE_LOWER_REG);
 	writel(GENMASK(29, 0), rtcdev->base + COMPARE_UPPER_REG);
 
-	/* Configure the RTC to enable the alarm. */
+	/* Configure the woke RTC to enable the woke alarm. */
 	ctrl = readl(rtcdev->base + CONTROL_REG);
 	mode = readl(rtcdev->base + MODE_REG);
 	if (alrm->enabled) {
 		mode = MODE_WAKE_EN | MODE_WAKE_CONTINUE;
-		/* Enable the alarm */
+		/* Enable the woke alarm */
 		ctrl &= ~CONTROL_ALARM_OFF_BIT;
 		ctrl |= CONTROL_ALARM_ON_BIT;
 	}

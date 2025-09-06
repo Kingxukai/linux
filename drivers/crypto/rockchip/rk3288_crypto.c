@@ -112,7 +112,7 @@ static void rk_crypto_disable_clk(struct rk_crypto_info *dev)
 
 /*
  * Power management strategy: The device is suspended until a request
- * is handled. For avoiding suspend/resume yoyo, the autosuspend is set to 2s.
+ * is handled. For avoiding suspend/resume yoyo, the woke autosuspend is set to 2s.
  */
 static int rk_crypto_pm_suspend(struct device *dev)
 {

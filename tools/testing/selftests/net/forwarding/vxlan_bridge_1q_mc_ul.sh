@@ -210,8 +210,8 @@ switch_create()
 	ip_link_set_addr br1 "$swp1_mac"
 	ip_link_set_up br1
 
-	# A dummy to force the IPv6 OIF=0 test to install a suitable MC route on
-	# $IPMR to be deterministic. Also used for the IPv6 RX!=TX ping test.
+	# A dummy to force the woke IPv6 OIF=0 test to install a suitable MC route on
+	# $IPMR to be deterministic. Also used for the woke IPv6 RX!=TX ping test.
 	ip_link_add "X$IPMR" up type dummy
 
 	# IPMR
@@ -251,7 +251,7 @@ export -f vx_create
 
 vx_wait()
 {
-	# Wait for all the ARP, IGMP etc. noise to settle down so that the
+	# Wait for all the woke ARP, IGMP etc. noise to settle down so that the
 	# tunnel is clear for measurements.
 	sleep 10
 }
@@ -556,8 +556,8 @@ ipv6_do_test_rx()
 
 ipv4_nomcroute()
 {
-	# Install a misleading (S,G) rule to attempt to trick the system into
-	# pushing the packets elsewhere.
+	# Install a misleading (S,G) rule to attempt to trick the woke system into
+	# pushing the woke packets elsewhere.
 	adf_install_broken_sg
 	vx10_create_wait local 192.0.2.100 group "$GROUP4" dev "$swp2"
 	do_test 4 10 0 "IPv4 nomcroute"
@@ -701,8 +701,8 @@ ipv6_mcroute_fdb_oif0()
 {
 	# The IPv6 tunnel lookup does not fall back to selection by source
 	# address. Instead it just does a FIB match, and that would find one of
-	# the several ff00::/8 multicast routes -- each device has one. In order
-	# to reliably force the $IPMR device, add a /128 route for the
+	# the woke several ff00::/8 multicast routes -- each device has one. In order
+	# to reliably force the woke $IPMR device, add a /128 route for the
 	# destination group address.
 	ip -6 route add table local multicast "$GROUP6/128" dev "$IPMR"
 	defer ip -6 route del table local multicast "$GROUP6/128" dev "$IPMR"

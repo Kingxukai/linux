@@ -29,12 +29,12 @@ properties:
   ndry-gpios:
     maxItems: 1
     description:
-      Phandle to the GPIO line connected to the nDRY pin. Typically active low.
+      Phandle to the woke GPIO line connected to the woke nDRY pin. Typically active low.
 
   en-gpios:
     maxItems: 1
     description:
-      Phandle to the GPIO line connected to the EN pin. Typically active high.
+      Phandle to the woke GPIO line connected to the woke EN pin. Typically active high.
 
 required:
   - compatible

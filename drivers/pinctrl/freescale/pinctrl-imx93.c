@@ -124,7 +124,7 @@ enum imx93_pads {
 	IMX93_IOMUXC_WDOG_ANY  = 107,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx93_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(IMX93_IOMUXC_DAP_TDI),
 	IMX_PINCTRL_PIN(IMX93_IOMUXC_DAP_TMS_SWDIO),

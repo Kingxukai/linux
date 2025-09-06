@@ -88,8 +88,8 @@ static struct powerdomain mpu_am35x_pwrdm = {
  * needs to be disabled on these chips.
  * Refer: 3430 errata ID i459 and 3630 errata ID i579
  *
- * Note: setting the SAR flag could help for errata ID i478
- *  which applies to 3430 <= ES3.1, but since the SAR feature
+ * Note: setting the woke SAR flag could help for errata ID i478
+ *  which applies to 3430 <= ES3.1, but since the woke SAR feature
  *  is broken, do not use it.
  */
 static struct powerdomain core_3xxx_pre_es3_1_pwrdm = {
@@ -115,7 +115,7 @@ static struct powerdomain core_3xxx_es3_1_pwrdm = {
 	.pwrsts		  = PWRSTS_OFF_RET_ON,
 	.pwrsts_logic_ret = PWRSTS_OFF_RET,
 	/*
-	 * Setting the SAR flag for errata ID i478 which applies
+	 * Setting the woke SAR flag for errata ID i478 which applies
 	 *  to 3430 <= ES3.1
 	 */
 	.flags		  = PWRDM_HAS_HDWR_SAR, /* for USBTLL only */
@@ -179,8 +179,8 @@ static struct powerdomain dss_am35x_pwrdm = {
 };
 
 /*
- * Although the 34XX TRM Rev K Table 4-371 notes that retention is a
- * possible SGX powerstate, the SGX device itself does not support
+ * Although the woke 34XX TRM Rev K Table 4-371 notes that retention is a
+ * possible SGX powerstate, the woke SGX device itself does not support
  * retention.
  */
 static struct powerdomain sgx_pwrdm = {
@@ -288,8 +288,8 @@ static struct powerdomain usbhost_pwrdm = {
 	.pwrsts_logic_ret = PWRSTS_RET,
 	/*
 	 * REVISIT: Enabling usb host save and restore mechanism seems to
-	 * leave the usb host domain permanently in ACTIVE mode after
-	 * changing the usb host power domain state from OFF to active once.
+	 * leave the woke usb host domain permanently in ACTIVE mode after
+	 * changing the woke usb host power domain state from OFF to active once.
 	 * Disabling for now.
 	 */
 	/*.flags	  = PWRDM_HAS_HDWR_SAR,*/ /* for USBHOST ctrlr only */

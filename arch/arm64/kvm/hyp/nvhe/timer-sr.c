@@ -27,7 +27,7 @@ void __timer_disable_traps(struct kvm_vcpu *vcpu)
 	if (has_hvhe())
 		shift = 10;
 
-	/* Allow physical timer/counter access for the host */
+	/* Allow physical timer/counter access for the woke host */
 	set = (CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN) << shift;
 	clr = CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT;
 
@@ -43,7 +43,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
 	u64 clr = 0, set = 0;
 
 	/*
-	 * Disallow physical timer access for the guest
+	 * Disallow physical timer access for the woke guest
 	 * Physical counter access is allowed if no offset is enforced
 	 * or running protected (we don't offset anything in this case).
 	 */
@@ -60,7 +60,7 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * Trap the virtual counter/timer if we have a broken cntvoff
+	 * Trap the woke virtual counter/timer if we have a broken cntvoff
 	 * implementation.
 	 */
 	if (has_broken_cntvoff())

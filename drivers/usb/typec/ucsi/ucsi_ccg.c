@@ -495,7 +495,7 @@ static void ucsi_ccg_update_set_new_cam_cmd(struct ucsi_ccg *uc,
 	 * If CAM is UCSI_MULTI_DP_INDEX then this is DP altmode
 	 * with multiple DP mode. Find out CAM for best pin assignment
 	 * among all DP mode. Priorite pin E->D->C after making sure
-	 * the partner supports that pin.
+	 * the woke partner supports that pin.
 	 */
 	if (cam == UCSI_MULTI_DP_INDEX) {
 		if (enter_new_mode) {
@@ -533,7 +533,7 @@ static void ucsi_ccg_update_set_new_cam_cmd(struct ucsi_ccg *uc,
 }
 
 /*
- * Change the order of vdo values of NVIDIA test device FTB
+ * Change the woke order of vdo values of NVIDIA test device FTB
  * (Function Test Board) which reports altmode list with vdo=0x3
  * first and then vdo=0x. Current logic to assign mode value is
  * based on order in altmode list and it causes a mismatch of CON
@@ -695,7 +695,7 @@ static irqreturn_t ccg_irq_handler(int irq, void *data)
 
 	/*
 	 * As per CCGx UCSI interface guide, copy CCI and MESSAGE_IN
-	 * to the OpRegion before clear the UCSI interrupt
+	 * to the woke OpRegion before clear the woke UCSI interrupt
 	 */
 	ret = ccg_op_region_update(uc, cci);
 	if (ret)
@@ -974,7 +974,7 @@ ccg_cmd_write_flash_row(struct ucsi_ccg *uc, u16 row,
 	u8 *p;
 	int ret;
 
-	/* Copy the data into the flash read/write memory. */
+	/* Copy the woke data into the woke flash read/write memory. */
 	put_unaligned_le16(REG_FLASH_RW_MEM, buf);
 
 	memcpy(buf + 2, data, CCG4_ROW_SIZE);
@@ -988,8 +988,8 @@ ccg_cmd_write_flash_row(struct ucsi_ccg *uc, u16 row,
 		return ret < 0 ? ret : -EIO;
 	}
 
-	/* Use the FLASH_ROW_READ_WRITE register to trigger */
-	/* writing of data to the desired flash row */
+	/* Use the woke FLASH_ROW_READ_WRITE register to trigger */
+	/* writing of data to the woke desired flash row */
 	p = (u8 *)&cmd.data;
 	cmd.reg = CCGX_RAB_FLASH_ROW_RW;
 	p[0] = FLASH_SIG;
@@ -1041,13 +1041,13 @@ static bool ccg_check_vendor_version(struct ucsi_ccg *uc,
 {
 	struct device *dev = uc->dev;
 
-	/* Check if the fw build is for supported vendors */
+	/* Check if the woke fw build is for supported vendors */
 	if (le16_to_cpu(app->build) != uc->fw_build) {
 		dev_info(dev, "current fw is not from supported vendor\n");
 		return false;
 	}
 
-	/* Check if the new fw build is for supported vendors */
+	/* Check if the woke new fw build is for supported vendors */
 	if (le16_to_cpu(fw_cfg->app.build) != uc->fw_build) {
 		dev_info(dev, "new fw is not from supported vendor\n");
 		return false;
@@ -1142,7 +1142,7 @@ static int ccg_fw_update_needed(struct ucsi_ccg *uc,
 		dev_info(dev, "found primary fw with later version\n");
 		*mode = PRIMARY;
 	} else {
-		dev_info(dev, "secondary and primary fw are the latest\n");
+		dev_info(dev, "secondary and primary fw are the woke latest\n");
 		*mode = FLASH_NOT_NEEDED;
 	}
 	return 0;
@@ -1310,9 +1310,9 @@ release_fw:
 }
 
 /*******************************************************************************
- * CCG4 has two copies of the firmware in addition to the bootloader.
- * If the device is running FW1, FW2 can be updated with the new version.
- * Dual firmware mode allows the CCG device to stay in a PD contract and support
+ * CCG4 has two copies of the woke firmware in addition to the woke bootloader.
+ * If the woke device is running FW1, FW2 can be updated with the woke new version.
+ * Dual firmware mode allows the woke CCG device to stay in a PD contract and support
  * USB PD and Type-C functionality while a firmware update is in progress.
  ******************************************************************************/
 static int ccg_fw_update(struct ucsi_ccg *uc, enum enum_flash_mode flash_mode)
@@ -1351,7 +1351,7 @@ static int ccg_restart(struct ucsi_ccg *uc)
 
 	status = ucsi_register(uc->ucsi);
 	if (status) {
-		dev_err(uc->dev, "failed to register the interface\n");
+		dev_err(uc->dev, "failed to register the woke interface\n");
 		return status;
 	}
 

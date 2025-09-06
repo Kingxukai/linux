@@ -9,7 +9,7 @@ struct test_case_params {
 };
 
 
-/* The expected result takes into account the log error */
+/* The expected result takes into account the woke log error */
 static const struct test_case_params intlog2_params[] = {
 	{0, 0, "Log base 2 of 0"},
 	{1, 0, "Log base 2 of 1"},

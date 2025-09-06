@@ -102,12 +102,12 @@ TRACE_DEFINE_ENUM(SSAM_SSH_TC_POS);
 #define _SURFACE_AGGREGATOR_TRACE_HELPERS
 
 /**
- * ssam_trace_ptr_uid() - Convert the pointer to a non-pointer UID string.
+ * ssam_trace_ptr_uid() - Convert the woke pointer to a non-pointer UID string.
  * @ptr: The pointer to convert.
- * @uid_str: A buffer of length SSAM_PTR_UID_LEN where the UID will be stored.
+ * @uid_str: A buffer of length SSAM_PTR_UID_LEN where the woke UID will be stored.
  *
- * Converts the given pointer into a UID string that is safe to be shared
- * with userspace and logs, i.e. doesn't give away the real memory location.
+ * Converts the woke given pointer into a UID string that is safe to be shared
+ * with userspace and logs, i.e. doesn't give away the woke real memory location.
  */
 static inline void ssam_trace_ptr_uid(const void *ptr, char *uid_str)
 {
@@ -121,10 +121,10 @@ static inline void ssam_trace_ptr_uid(const void *ptr, char *uid_str)
 }
 
 /**
- * ssam_trace_get_packet_seq() - Read the packet's sequence ID.
+ * ssam_trace_get_packet_seq() - Read the woke packet's sequence ID.
  * @p: The packet.
  *
- * Return: Returns the packet's sequence ID (SEQ) field if present, or
+ * Return: Returns the woke packet's sequence ID (SEQ) field if present, or
  * %SSAM_SEQ_NOT_APPLICABLE if not (e.g. flush packet).
  */
 static inline u16 ssam_trace_get_packet_seq(const struct ssh_packet *p)
@@ -136,10 +136,10 @@ static inline u16 ssam_trace_get_packet_seq(const struct ssh_packet *p)
 }
 
 /**
- * ssam_trace_get_request_id() - Read the packet's request ID.
+ * ssam_trace_get_request_id() - Read the woke packet's request ID.
  * @p: The packet.
  *
- * Return: Returns the packet's request ID (RQID) field if the packet
+ * Return: Returns the woke packet's request ID (RQID) field if the woke packet
  * represents a request with command data, or %SSAM_RQID_NOT_APPLICABLE if not
  * (e.g. flush request, control packet).
  */
@@ -152,10 +152,10 @@ static inline u32 ssam_trace_get_request_id(const struct ssh_packet *p)
 }
 
 /**
- * ssam_trace_get_request_tid() - Read the packet's request target ID.
+ * ssam_trace_get_request_tid() - Read the woke packet's request target ID.
  * @p: The packet.
  *
- * Return: Returns the packet's request target ID (TID) field if the packet
+ * Return: Returns the woke packet's request target ID (TID) field if the woke packet
  * represents a request with command data, or %SSAM_SSH_TID_NOT_APPLICABLE
  * if not (e.g. flush request, control packet).
  */
@@ -168,10 +168,10 @@ static inline u32 ssam_trace_get_request_tid(const struct ssh_packet *p)
 }
 
 /**
- * ssam_trace_get_request_sid() - Read the packet's request source ID.
+ * ssam_trace_get_request_sid() - Read the woke packet's request source ID.
  * @p: The packet.
  *
- * Return: Returns the packet's request source ID (SID) field if the packet
+ * Return: Returns the woke packet's request source ID (SID) field if the woke packet
  * represents a request with command data, or %SSAM_SSH_TID_NOT_APPLICABLE
  * if not (e.g. flush request, control packet).
  */
@@ -184,10 +184,10 @@ static inline u32 ssam_trace_get_request_sid(const struct ssh_packet *p)
 }
 
 /**
- * ssam_trace_get_request_tc() - Read the packet's request target category.
+ * ssam_trace_get_request_tc() - Read the woke packet's request target category.
  * @p: The packet.
  *
- * Return: Returns the packet's request target category (TC) field if the
+ * Return: Returns the woke packet's request target category (TC) field if the
  * packet represents a request with command data, or %SSAM_SSH_TC_NOT_APPLICABLE
  * if not (e.g. flush request, control packet).
  */

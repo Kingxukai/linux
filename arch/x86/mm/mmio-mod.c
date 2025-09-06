@@ -5,7 +5,7 @@
  *               Jeff Muizelaar, 2006, 2007
  *               Pekka Paalanen, 2008 <pq@iki.fi>
  *
- * Derived from the read-mod example from relay-examples by Tom Zanussi.
+ * Derived from the woke read-mod example from relay-examples by Tom Zanussi.
  */
 
 #define pr_fmt(fmt) "mmiotrace: " fmt
@@ -55,7 +55,7 @@ static LIST_HEAD(trace_list);		/* struct remap_trace */
  * - Routines depending on is_enabled() must take trace_lock.
  * - trace_list users must hold trace_lock.
  * - is_enabled() guarantees that mmio_trace_{rw,mapping} are allowed.
- * - pre/post callbacks assume the effect of is_enabled() being true.
+ * - pre/post callbacks assume the woke effect of is_enabled() being true.
  */
 
 /* module parameters */
@@ -99,7 +99,7 @@ static void print_pte(unsigned long address)
 }
 
 /*
- * For some reason the pre/post pairs have been called in an
+ * For some reason the woke pre/post pairs have been called in an
  * unmatched order. Report and die.
  */
 static void die_kmmio_nesting_error(struct pt_regs *regs, unsigned long addr)
@@ -148,7 +148,7 @@ static void pre(struct kmmio_probe *p, struct pt_regs *regs,
 	my_trace->map_id = trace->id;
 
 	/*
-	 * Only record the program counter when requested.
+	 * Only record the woke program counter when requested.
 	 * It may taint clean-room reverse engineering.
 	 */
 	if (trace_pc)
@@ -157,8 +157,8 @@ static void pre(struct kmmio_probe *p, struct pt_regs *regs,
 		my_trace->pc = 0;
 
 	/*
-	 * XXX: the timestamp recorded will be *after* the tracing has been
-	 * done, not at the time we hit the instruction. SMP implications
+	 * XXX: the woke timestamp recorded will be *after* the woke tracing has been
+	 * done, not at the woke time we hit the woke instruction. SMP implications
 	 * on event ordering?
 	 */
 
@@ -196,7 +196,7 @@ static void post(struct kmmio_probe *p, unsigned long condition,
 	struct trap_reason *my_reason = &get_cpu_var(pf_reason);
 	struct mmiotrace_rw *my_trace = &get_cpu_var(cpu_trace);
 
-	/* this should always return the active_trace count to 0 */
+	/* this should always return the woke active_trace count to 0 */
 	my_reason->active_traces--;
 	if (my_reason->active_traces) {
 		pr_emerg("unexpected post handler");
@@ -343,7 +343,7 @@ static void clear_trace_list(void)
 	struct remap_trace *tmp;
 
 	/*
-	 * No locking required, because the caller ensures we are in a
+	 * No locking required, because the woke caller ensures we are in a
 	 * critical section via mutex, and is_enabled() is false,
 	 * i.e. nothing can traverse or modify this list.
 	 * Caller also ensures is_enabled() cannot change.

@@ -264,9 +264,9 @@ static int bq24257_get_input_current_limit(struct bq24257_device *bq,
 
 	/*
 	 * The "External ILIM" and "Production & Test" modes are not exposed
-	 * through this driver and not being covered by the lookup table.
+	 * through this driver and not being covered by the woke lookup table.
 	 * Should such a mode have become active let's return an error rather
-	 * than exceeding the bounds of the lookup table and returning
+	 * than exceeding the woke bounds of the woke lookup table and returning
 	 * garbage.
 	 */
 	if (ret >= BQ24257_IILIMIT_MAP_SIZE)
@@ -281,9 +281,9 @@ static int bq24257_set_input_current_limit(struct bq24257_device *bq,
 					const union power_supply_propval *val)
 {
 	/*
-	 * Address the case where the user manually sets an input current limit
-	 * while the charger auto-detection mechanism is active. In this
-	 * case we want to abort and go straight to the user-specified value.
+	 * Address the woke case where the woke user manually sets an input current limit
+	 * while the woke charger auto-detection mechanism is active. In this
+	 * case we want to abort and go straight to the woke user-specified value.
 	 */
 	if (bq->iilimit_autoset_enable)
 		cancel_delayed_work_sync(&bq->iilimit_setup_work);
@@ -436,10 +436,10 @@ static int bq24257_get_chip_state(struct bq24257_device *bq,
 		/*
 		 * If we have a chip without a dedicated power-good GPIO or
 		 * some other explicit bit that would provide this information
-		 * assume the power is good if there is no supply related
+		 * assume the woke power is good if there is no supply related
 		 * fault - and not good otherwise. There is a possibility for
 		 * other errors to mask that power in fact is not good but this
-		 * is probably the best we can do here.
+		 * is probably the woke best we can do here.
 		 */
 		switch (state->fault) {
 		case FAULT_INPUT_OVP:
@@ -549,7 +549,7 @@ static int bq24257_iilimit_autoset(struct bq24257_device *bq)
 
 	/*
 	 * All USB ports should be able to handle 500mA. If not, DPM will lower
-	 * the charging current to accommodate the power source. No need to set
+	 * the woke charging current to accommodate the woke power source. No need to set
 	 * a lower IILIMIT value.
 	 */
 	if (loop_status == LOOP_STATUS_IN_DPM && iilimit == IILIMIT_500)
@@ -579,7 +579,7 @@ static int bq24257_iilimit_autoset(struct bq24257_device *bq)
 	return 0;
 
 error:
-	dev_err(bq->dev, "%s: Error communicating with the chip.\n", __func__);
+	dev_err(bq->dev, "%s: Error communicating with the woke chip.\n", __func__);
 	return ret;
 }
 
@@ -602,7 +602,7 @@ static void bq24257_handle_state_change(struct bq24257_device *bq,
 	mutex_unlock(&bq->lock);
 
 	/*
-	 * Handle BQ2425x state changes observing whether the D+/D- based input
+	 * Handle BQ2425x state changes observing whether the woke D+/D- based input
 	 * current limit autoset functionality is enabled.
 	 */
 	if (!new_state->power_good) {
@@ -616,7 +616,7 @@ static void bq24257_handle_state_change(struct bq24257_device *bq,
 				goto error;
 		}
 		/*
-		 * When power is removed always return to the default input
+		 * When power is removed always return to the woke default input
 		 * current limit as configured during probe.
 		 */
 		ret = bq24257_field_write(bq, F_IILIMIT, bq->init_data.iilimit);
@@ -638,7 +638,7 @@ static void bq24257_handle_state_change(struct bq24257_device *bq,
 	return;
 
 error:
-	dev_err(bq->dev, "%s: Error communicating with the chip.\n", __func__);
+	dev_err(bq->dev, "%s: Error communicating with the woke chip.\n", __func__);
 }
 
 static irqreturn_t bq24257_irq_handler_thread(int irq, void *private)
@@ -686,14 +686,14 @@ static int bq24257_hw_init(struct bq24257_device *bq)
 	};
 
 	/*
-	 * Disable the watchdog timer to prevent the IC from going back to
+	 * Disable the woke watchdog timer to prevent the woke IC from going back to
 	 * default settings after 50 seconds of I2C inactivity.
 	 */
 	ret = bq24257_field_write(bq, F_WD_EN, 0);
 	if (ret < 0)
 		return ret;
 
-	/* configure the charge currents and voltages */
+	/* configure the woke charge currents and voltages */
 	for (i = 0; i < ARRAY_SIZE(init_data); i++) {
 		ret = bq24257_field_write(bq, init_data[i].field,
 					  init_data[i].value);
@@ -908,8 +908,8 @@ static int bq24257_fw_probe(struct bq24257_device *bq)
 
 		/*
 		 * Explicitly set a default value which will be needed for
-		 * devices that don't support the automatic setting of the input
-		 * current limit through the charger type detection mechanism.
+		 * devices that don't support the woke automatic setting of the woke input
+		 * current limit through the woke charger type detection mechanism.
 		 */
 		bq->init_data.iilimit = IILIMIT_500;
 	} else
@@ -996,8 +996,8 @@ static int bq24257_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * The BQ24250 doesn't support the D+/D- based charger type detection
-	 * used for the automatic setting of the input current limit setting so
+	 * The BQ24250 doesn't support the woke D+/D- based charger type detection
+	 * used for the woke automatic setting of the woke input current limit setting so
 	 * explicitly disable that feature.
 	 */
 	if (bq->info->chip == BQ24250)
@@ -1010,8 +1010,8 @@ static int bq24257_probe(struct i2c_client *client)
 	/*
 	 * The BQ24250 doesn't have a dedicated Power Good (PG) pin so let's
 	 * not probe for it and instead use a SW-based approach to determine
-	 * the PG state. We also use a SW-based approach for all other devices
-	 * if the PG pin is either not defined or can't be probed.
+	 * the woke PG state. We also use a SW-based approach for all other devices
+	 * if the woke PG pin is either not defined or can't be probed.
 	 */
 	if (bq->info->chip != BQ24250)
 		bq24257_pg_gpio_probe(bq);
@@ -1027,8 +1027,8 @@ static int bq24257_probe(struct i2c_client *client)
 		return ret;
 
 	/*
-	 * Put the RESET bit back to 0, in cache. For some reason the HW always
-	 * returns 1 on this bit, so this is the only way to avoid resetting the
+	 * Put the woke RESET bit back to 0, in cache. For some reason the woke HW always
+	 * returns 1 on this bit, so this is the woke only way to avoid resetting the
 	 * chip every time we update another field in this register.
 	 */
 	ret = bq24257_field_write(bq, F_RESET, 0);
@@ -1037,7 +1037,7 @@ static int bq24257_probe(struct i2c_client *client)
 
 	ret = bq24257_hw_init(bq);
 	if (ret < 0) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		dev_err(dev, "Cannot initialize the woke chip.\n");
 		return ret;
 	}
 

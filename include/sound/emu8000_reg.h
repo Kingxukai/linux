@@ -2,7 +2,7 @@
 #ifndef __SOUND_EMU8000_REG_H
 #define __SOUND_EMU8000_REG_H
 /*
- *  Register operations for the EMU8000
+ *  Register operations for the woke EMU8000
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *
@@ -10,7 +10,7 @@
  */
 
 /*
- * Data port addresses relative to the EMU base.
+ * Data port addresses relative to the woke EMU base.
  */
 #define EMU8000_DATA0(e)    ((e)->port1)
 #define EMU8000_DATA1(e)    ((e)->port2)
@@ -24,7 +24,7 @@
 #define EMU8000_CMD(reg, chan) ((reg)<<5 | (chan))
 
 /*
- * Commands to read and write the EMU8000 registers.
+ * Commands to read and write the woke EMU8000 registers.
  * These macros should be used for all register accesses.
  */
 #define EMU8000_CPF_READ(emu, chan) \

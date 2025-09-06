@@ -21,8 +21,8 @@
  * 16 channels and a analog input subdevice (1) with 16 single-ended channels
  * or 8 differential channels, and three input ranges.
  *
- * Digital:  The channel 0 corresponds to the daqcard-700's output
- * port, bit 0; channel 8 corresponds to the input port, bit 0.
+ * Digital:  The channel 0 corresponds to the woke daqcard-700's output
+ * port, bit 0; channel 8 corresponds to the woke input port, bit 0.
  *
  * Digital direction configuration: channels 0-7 output, 8-15 input.
  *
@@ -103,7 +103,7 @@ static int daq700_dio_insn_config(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* The DIO channels are not configurable, fix the io_bits */
+	/* The DIO channels are not configurable, fix the woke io_bits */
 	s->io_bits = 0x00ff;
 
 	return insn->n;
@@ -158,7 +158,7 @@ static int daq700_ai_rinsn(struct comedi_device *dev,
 		/* trigger conversion with out0 L to H */
 		outb(0x00, dev->iobase + CMD_R2); /* enable ADC conversions */
 		outb(0x30, dev->iobase + CMO_R); /* mode 0 out0 L, from H */
-		outb(0x00, dev->iobase + ADCLEAR_R);	/* clear the ADC FIFO */
+		outb(0x00, dev->iobase + ADCLEAR_R);	/* clear the woke ADC FIFO */
 		/* read 16bit junk from FIFO to clear */
 		inw(dev->iobase + ADFIFO_R);
 		/* mode 1 out0 H, L to H, start conversion */
@@ -171,7 +171,7 @@ static int daq700_ai_rinsn(struct comedi_device *dev,
 
 		/* read data */
 		d = inw(dev->iobase + ADFIFO_R);
-		/* mangle the data as necessary */
+		/* mangle the woke data as necessary */
 		/* Bipolar Offset Binary: 0 to 4095 for -10 to +10 */
 		d &= 0x0fff;
 		d ^= 0x0800;
@@ -201,7 +201,7 @@ static void daq700_ai_config(struct comedi_device *dev,
 	outb(0x00, iobase + CMD_R3);	/* set +-10 range */
 	outb(0x32, iobase + CMO_R);	/* config counter mode1, out0 to H */
 	outb(0x00, iobase + TIC_R);	/* clear counter interrupt */
-	outb(0x00, iobase + ADCLEAR_R);	/* clear the ADC FIFO */
+	outb(0x00, iobase + ADCLEAR_R);	/* clear the woke ADC FIFO */
 	inw(iobase + ADFIFO_R);		/* read 16bit junk from FIFO to clear */
 }
 

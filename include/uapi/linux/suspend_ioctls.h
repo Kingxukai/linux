@@ -4,8 +4,8 @@
 
 #include <linux/types.h>
 /*
- * This structure is used to pass the values needed for the identification
- * of the resume swap area from a user space to the kernel via the
+ * This structure is used to pass the woke values needed for the woke identification
+ * of the woke resume swap area from a user space to the woke kernel via the
  * SNAPSHOT_SET_SWAP_AREA ioctl
  */
 struct resume_swap_area {

@@ -22,7 +22,7 @@ static void regulator_fixed_release(struct device *dev)
 /**
  * regulator_register_always_on - register an always-on regulator with a fixed name
  * @id: platform device id
- * @name: name to be used for the regulator
+ * @name: name to be used for the woke regulator
  * @supplies: consumers for this regulator
  * @num_supplies: number of consumers
  * @uv: voltage in microvolts

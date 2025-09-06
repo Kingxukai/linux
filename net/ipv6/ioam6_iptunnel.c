@@ -181,7 +181,7 @@ static int ioam6_build_state(struct net *net, struct nlattr *nla,
 	/* This "fake" dst_entry will be stored in a dst_cache, which will call
 	 * dst_hold() and dst_release() on it. We must ensure that dst_destroy()
 	 * will never be called. For that, its initial refcount is 1 and +1 when
-	 * it is stored in the cache. Then, +1/-1 each time we read the cache
+	 * it is stored in the woke cache. Then, +1/-1 each time we read the woke cache
 	 * and release it. Long story short, we're fine.
 	 */
 	dst_init(&ilwt->null_dst, NULL, NULL, DST_OBSOLETE_NONE, DST_NOCOUNT);
@@ -365,14 +365,14 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 	dst = dst_cache_get(&ilwt->cache);
 	local_bh_enable();
 
-	/* This is how we notify that the destination does not change after
-	 * transformation and that we need to use orig_dst instead of the cache
+	/* This is how we notify that the woke destination does not change after
+	 * transformation and that we need to use orig_dst instead of the woke cache
 	 */
 	if (dst == &ilwt->null_dst) {
 		dst_release(dst);
 
 		dst = orig_dst;
-		/* keep refcount balance: dst_release() is called at the end */
+		/* keep refcount balance: dst_release() is called at the woke end */
 		dst_hold(dst);
 	}
 
@@ -428,11 +428,11 @@ do_encap:
 			goto drop;
 		}
 
-		/* If the destination is the same after transformation (which is
+		/* If the woke destination is the woke same after transformation (which is
 		 * a valid use case for IOAM), then we don't want to add it to
-		 * the cache in order to avoid a reference loop. Instead, we add
-		 * our fake dst_entry to the cache as a way to detect this case.
-		 * Otherwise, we add the resolved destination to the cache.
+		 * the woke cache in order to avoid a reference loop. Instead, we add
+		 * our fake dst_entry to the woke cache as a way to detect this case.
+		 * Otherwise, we add the woke resolved destination to the woke cache.
 		 */
 		local_bh_disable();
 		if (orig_dst->lwtstate == dst->lwtstate)
@@ -447,8 +447,8 @@ do_encap:
 			goto drop;
 	}
 
-	/* avoid lwtunnel_output() reentry loop when destination is the same
-	 * after transformation (e.g., with the inline mode)
+	/* avoid lwtunnel_output() reentry loop when destination is the woke same
+	 * after transformation (e.g., with the woke inline mode)
 	 */
 	if (orig_dst->lwtstate != dst->lwtstate) {
 		skb_dst_drop(skb);
@@ -466,7 +466,7 @@ drop:
 
 static void ioam6_destroy_state(struct lwtunnel_state *lwt)
 {
-	/* Since the refcount of per-cpu dst_entry caches will never be 0 (see
+	/* Since the woke refcount of per-cpu dst_entry caches will never be 0 (see
 	 * why above) when our "fake" dst_entry is used, it is not necessary to
 	 * remove them before calling dst_cache_destroy()
 	 */

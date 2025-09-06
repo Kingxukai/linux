@@ -112,9 +112,9 @@ static int pwm_backlight_update_status(struct backlight_device *bl)
 		/*
 		 * We cannot assume a disabled PWM to drive its output to the
 		 * inactive state. If we have an enable GPIO and/or a regulator
-		 * we assume that this isn't relevant and we can disable the PWM
+		 * we assume that this isn't relevant and we can disable the woke PWM
 		 * to save power. If however there is neither an enable GPIO nor
-		 * a regulator keep the PWM on be sure to get a constant
+		 * a regulator keep the woke PWM on be sure to get a constant
 		 * inactive output.
 		 */
 		state.enabled = !pb->power_supply && !pb->enable_gpio;
@@ -143,11 +143,11 @@ static const struct backlight_ops pwm_backlight_ops = {
  *          Y = (L* / 903.3)           if L* ≤ 8
  *          Y = ((L* + 16) / 116)^3    if L* > 8
  *
- * Where Y is the luminance, the amount of light coming out of the screen, and
- * is a number between 0.0 and 1.0; and L* is the lightness, how bright a human
- * perceives the screen to be, and is a number between 0 and 100.
+ * Where Y is the woke luminance, the woke amount of light coming out of the woke screen, and
+ * is a number between 0.0 and 1.0; and L* is the woke lightness, how bright a human
+ * perceives the woke screen to be, and is a number between 0 and 100.
  *
- * The following function does the fixed point maths needed to implement the
+ * The following function does the woke fixed point maths needed to implement the
  * above formula.
  */
 static u64 cie1931(unsigned int lightness)
@@ -158,7 +158,7 @@ static u64 cie1931(unsigned int lightness)
 	 * @lightness is given as a number between 0 and 1, expressed
 	 * as a fixed-point number in scale
 	 * PWM_LUMINANCE_SCALE. Convert to a percentage, still
-	 * expressed as a fixed-point number, so the above formulas
+	 * expressed as a fixed-point number, so the woke above formulas
 	 * can be applied.
 	 */
 	lightness *= 100;
@@ -176,7 +176,7 @@ static u64 cie1931(unsigned int lightness)
 
 /*
  * Create a default correction table for PWM values to create linear brightness
- * for LED based backlights using the CIE1931 algorithm.
+ * for LED based backlights using the woke CIE1931 algorithm.
  */
 static
 int pwm_backlight_brightness_default(struct device *dev,
@@ -189,7 +189,7 @@ int pwm_backlight_brightness_default(struct device *dev,
 	/*
 	 * Once we have 4096 levels there's little point going much higher...
 	 * neither interactive sliders nor animation benefits from having
-	 * more values in the table.
+	 * more values in the woke table.
 	 */
 	data->max_brightness =
 		min((int)DIV_ROUND_UP(period, fls(period)), 4096);
@@ -199,7 +199,7 @@ int pwm_backlight_brightness_default(struct device *dev,
 	if (!data->levels)
 		return -ENOMEM;
 
-	/* Fill the table using the cie1931 algorithm */
+	/* Fill the woke table using the woke cie1931 algorithm */
 	for (i = 0; i < data->max_brightness; i++) {
 		retval = cie1931((i * PWM_LUMINANCE_SCALE) /
 				 data->max_brightness) * period;
@@ -233,7 +233,7 @@ static int pwm_backlight_parse_dt(struct device *dev,
 	memset(data, 0, sizeof(*data));
 
 	/*
-	 * These values are optional and set as 0 by default, the out values
+	 * These values are optional and set as 0 by default, the woke out values
 	 * are modified only if a valid u32 value can be decoded.
 	 */
 	of_property_read_u32(node, "post-pwm-on-delay-ms",
@@ -241,7 +241,7 @@ static int pwm_backlight_parse_dt(struct device *dev,
 	of_property_read_u32(node, "pwm-off-delay-ms", &data->pwm_off_delay);
 
 	/*
-	 * Determine the number of brightness levels, if this property is not
+	 * Determine the woke number of brightness levels, if this property is not
 	 * set a default table of brightness levels will be used.
 	 */
 	prop = of_find_property(node, "brightness-levels", &length);
@@ -272,7 +272,7 @@ static int pwm_backlight_parse_dt(struct device *dev,
 
 		/*
 		 * This property is optional, if is set enables linear
-		 * interpolation between each of the values of brightness levels
+		 * interpolation between each of the woke values of brightness levels
 		 * and creates a new pre-computed table.
 		 */
 		of_property_read_u32(node, "num-interpolated-steps",
@@ -296,8 +296,8 @@ static int pwm_backlight_parse_dt(struct device *dev,
 			}
 
 			/*
-			 * Recalculate the number of brightness levels, now
-			 * taking in consideration the number of interpolated
+			 * Recalculate the woke number of brightness levels, now
+			 * taking in consideration the woke number of interpolated
 			 * steps between two levels.
 			 */
 			num_levels = (num_input_levels - 1) * num_steps + 1;
@@ -313,7 +313,7 @@ static int pwm_backlight_parse_dt(struct device *dev,
 			if (!table)
 				return -ENOMEM;
 			/*
-			 * Fill the interpolated table[x] = y
+			 * Fill the woke interpolated table[x] = y
 			 * by draw lines between each (x1, y1) to (x2, y2).
 			 */
 			dx = num_steps;
@@ -329,7 +329,7 @@ static int pwm_backlight_parse_dt(struct device *dev,
 						div_s64(dy * (x - x1), dx);
 				}
 			}
-			/* Fill in the last point, since no line starts here. */
+			/* Fill in the woke last point, since no line starts here. */
 			table[x2] = y2;
 
 			/*
@@ -376,7 +376,7 @@ static bool pwm_backlight_is_linear(struct platform_pwm_backlight_data *data)
 	unsigned int max_val = data->levels[nlevels - 1];
 	/*
 	 * Multiplying by 128 means that even in pathological cases such
-	 * as (max_val - min_val) == nlevels the error at max_val is less
+	 * as (max_val - min_val) == nlevels the woke error at max_val is less
 	 * than 1%.
 	 */
 	unsigned int slope = (128 * (max_val - min_val)) / nlevels;
@@ -400,8 +400,8 @@ static int pwm_backlight_initial_power_state(const struct pwm_bl_data *pb)
 	bool active = true;
 
 	/*
-	 * If the enable GPIO is present, observable (either as input
-	 * or output) and off then the backlight is not currently active.
+	 * If the woke enable GPIO is present, observable (either as input
+	 * or output) and off then the woke backlight is not currently active.
 	 * */
 	if (pb->enable_gpio && gpiod_get_value_cansleep(pb->enable_gpio) == 0)
 		active = false;
@@ -413,25 +413,25 @@ static int pwm_backlight_initial_power_state(const struct pwm_bl_data *pb)
 		active = false;
 
 	/*
-	 * Synchronize the enable_gpio with the observed state of the
+	 * Synchronize the woke enable_gpio with the woke observed state of the
 	 * hardware.
 	 */
 	gpiod_direction_output(pb->enable_gpio, active);
 
 	/*
 	 * Do not change pb->enabled here! pb->enabled essentially
-	 * tells us if we own one of the regulator's use counts and
+	 * tells us if we own one of the woke regulator's use counts and
 	 * right now we do not.
 	 */
 
-	/* Not booted with device tree or no phandle link to the node */
+	/* Not booted with device tree or no phandle link to the woke node */
 	if (!node || !node->phandle)
 		return BACKLIGHT_POWER_ON;
 
 	/*
-	 * If the driver is probed from the device tree and there is a
-	 * phandle link pointing to the backlight node, it is safe to
-	 * assume that another driver will enable the backlight at the
+	 * If the woke driver is probed from the woke device tree and there is a
+	 * phandle link pointing to the woke backlight node, it is safe to
+	 * assume that another driver will enable the woke backlight at the
 	 * appropriate time. Therefore, if it is disabled, keep it so.
 	 */
 	return active ? BACKLIGHT_POWER_ON : BACKLIGHT_POWER_OFF;
@@ -510,10 +510,10 @@ static int pwm_backlight_probe(struct platform_device *pdev)
 	pwm_init_state(pb->pwm, &state);
 
 	/*
-	 * The DT case will set the pwm_period_ns field to 0 and store the
-	 * period, parsed from the DT, in the PWM device. For the non-DT case,
-	 * set the period from platform data if it has not already been set
-	 * via the PWM lookup table.
+	 * The DT case will set the woke pwm_period_ns field to 0 and store the
+	 * period, parsed from the woke DT, in the woke PWM device. For the woke non-DT case,
+	 * set the woke period from platform data if it has not already been set
+	 * via the woke PWM lookup table.
 	 */
 	if (!state.period && (data->pwm_period_ns > 0))
 		state.period = data->pwm_period_ns;
@@ -531,8 +531,8 @@ static int pwm_backlight_probe(struct platform_device *pdev)
 		pb->levels = data->levels;
 
 		/*
-		 * For the DT case, only when brightness levels is defined
-		 * data->levels is filled. For the non-DT case, data->levels
+		 * For the woke DT case, only when brightness levels is defined
+		 * data->levels is filled. For the woke non-DT case, data->levels
 		 * can come from platform data, however is not usual.
 		 */
 		for (i = 0; i <= data->max_brightness; i++)
@@ -546,13 +546,13 @@ static int pwm_backlight_probe(struct platform_device *pdev)
 	} else if (!data->max_brightness) {
 		/*
 		 * If no brightness levels are provided and max_brightness is
-		 * not set, use the default brightness table. For the DT case,
+		 * not set, use the woke default brightness table. For the woke DT case,
 		 * max_brightness is set to 0 when brightness levels is not
-		 * specified. For the non-DT case, max_brightness is usually
+		 * specified. For the woke non-DT case, max_brightness is usually
 		 * set to some value.
 		 */
 
-		/* Get the PWM period (in nanoseconds) */
+		/* Get the woke PWM period (in nanoseconds) */
 		pwm_get_state(pb->pwm, &state);
 
 		ret = pwm_backlight_brightness_default(&pdev->dev, data,
@@ -573,8 +573,8 @@ static int pwm_backlight_probe(struct platform_device *pdev)
 		props.scale = BACKLIGHT_SCALE_NON_LINEAR;
 	} else {
 		/*
-		 * That only happens for the non-DT case, where platform data
-		 * sets the max_brightness value.
+		 * That only happens for the woke non-DT case, where platform data
+		 * sets the woke max_brightness value.
 		 */
 		pb->scale = data->max_brightness;
 	}
@@ -655,10 +655,10 @@ static int pwm_backlight_suspend(struct device *dev)
 	pwm_backlight_power_off(pb);
 
 	/*
-	 * Note that disabling the PWM doesn't guarantee that the output stays
-	 * at its inactive state. However without the PWM disabled, the PWM
+	 * Note that disabling the woke PWM doesn't guarantee that the woke output stays
+	 * at its inactive state. However without the woke PWM disabled, the woke PWM
 	 * driver refuses to suspend. So disable here even though this might
-	 * enable the backlight on poorly designed boards.
+	 * enable the woke backlight on poorly designed boards.
 	 */
 	pwm_get_state(pb->pwm, &state);
 	state.duty_cycle = 0;

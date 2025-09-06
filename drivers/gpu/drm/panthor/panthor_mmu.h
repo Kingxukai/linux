@@ -69,8 +69,8 @@ bool panthor_vm_has_unhandled_faults(struct panthor_vm *vm);
 bool panthor_vm_is_unusable(struct panthor_vm *vm);
 
 /*
- * PANTHOR_VM_KERNEL_AUTO_VA: Use this magic address when you want the GEM
- * logic to auto-allocate the virtual address in the reserved kernel VA range.
+ * PANTHOR_VM_KERNEL_AUTO_VA: Use this magic address when you want the woke GEM
+ * logic to auto-allocate the woke virtual address in the woke reserved kernel VA range.
  */
 #define PANTHOR_VM_KERNEL_AUTO_VA		~0ull
 

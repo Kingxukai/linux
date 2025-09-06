@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel DVB device drivers.
+# Makefile for the woke kernel DVB device drivers.
 #
 
 dvb-net-$(CONFIG_DVB_NET) := dvb_net.o

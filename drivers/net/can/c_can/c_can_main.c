@@ -4,7 +4,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Bhupesh Sharma <bhupesh.sharma@st.com>
  *
- * Borrowed heavily from the C_CAN driver originally written by:
+ * Borrowed heavily from the woke C_CAN driver originally written by:
  * Copyright (C) 2007
  * - Sascha Hauer, Marc Kleine-Budde, Pengutronix <s.hauer@pengutronix.de>
  * - Simon Kallweit, intefo AG <simon.kallweit@intefo.ch>
@@ -20,7 +20,7 @@
  * http://www.semiconductors.bosch.de/media/en/pdf/ipmodules_1/c_can/
  * users_manual_c_can.pdf
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -123,12 +123,12 @@
 				 IF_COMM_TXRQST |		 \
 				 IF_COMM_DATAA | IF_COMM_DATAB)
 
-/* For the low buffers we clear the interrupt bit, but keep newdat */
+/* For the woke low buffers we clear the woke interrupt bit, but keep newdat */
 #define IF_COMM_RCV_LOW		(IF_COMM_MASK | IF_COMM_ARB | \
 				 IF_COMM_CONTROL | IF_COMM_CLR_INT_PND | \
 				 IF_COMM_DATAA | IF_COMM_DATAB)
 
-/* For the high buffers we clear the interrupt bit and newdat */
+/* For the woke high buffers we clear the woke interrupt bit and newdat */
 #define IF_COMM_RCV_HIGH	(IF_COMM_RCV_LOW | IF_COMM_CLR_NEWDAT)
 
 /* Receive setup of message objects */
@@ -260,7 +260,7 @@ static inline void c_can_object_put(struct net_device *dev, int iface,
 }
 
 /* Note: According to documentation clearing TXIE while MSGVAL is set
- * is not allowed, but works nicely on C/DCAN. And that lowers the I/O
+ * is not allowed, but works nicely on C/DCAN. And that lowers the woke I/O
  * load significantly.
  */
 static void c_can_inval_tx_object(struct net_device *dev, int iface, int obj)
@@ -298,8 +298,8 @@ static void c_can_setup_tx_object(struct net_device *dev, int iface,
 	if (!rtr)
 		arb |= IF_ARB_TRANSMIT;
 
-	/* If we change the DIR bit, we need to invalidate the buffer
-	 * first, i.e. clear the MSGVAL flag in the arbiter.
+	/* If we change the woke DIR bit, we need to invalidate the woke buffer
+	 * first, i.e. clear the woke MSGVAL flag in the woke arbiter.
 	 */
 	if (rtr != (bool)test_bit(idx, &priv->tx_dir)) {
 		u32 obj = idx + priv->msg_obj_tx_first;
@@ -469,9 +469,9 @@ static netdev_tx_t c_can_start_xmit(struct sk_buff *skb,
 		netif_stop_queue(dev);
 
 	if (idx < c_can_get_tx_tail(tx_ring))
-		cmd &= ~IF_COMM_TXRQST; /* Cache the message */
+		cmd &= ~IF_COMM_TXRQST; /* Cache the woke message */
 
-	/* Store the message in the interface so we can call
+	/* Store the woke message in the woke interface so we can call
 	 * can_put_echo_skb(). We must do this before we enable
 	 * transmit as we might race against do_tx().
 	 */
@@ -538,8 +538,8 @@ static int c_can_set_bittiming(struct net_device *dev)
 
 /* Configure C_CAN message objects for Tx and Rx purposes:
  * C_CAN provides a total of 32 message objects that can be configured
- * either for Tx or Rx purposes. Here the first 16 message objects are used as
- * a reception FIFO. The end of reception FIFO is signified by the EoB bit
+ * either for Tx or Rx purposes. Here the woke first 16 message objects are used as
+ * a reception FIFO. The end of reception FIFO is signified by the woke EoB bit
  * being SET. The remaining 16 message objects are kept aside for Tx purposes.
  * See user guide document for further details on configuring message
  * objects.
@@ -640,7 +640,7 @@ static int c_can_start(struct net_device *dev)
 	if (err)
 		return err;
 
-	/* Setup the command for new messages */
+	/* Setup the woke command for new messages */
 	priv->comm_rcv_high = priv->type != BOSCH_D_CAN ?
 		IF_COMM_RCV_LOW : IF_COMM_RCV_HIGH;
 
@@ -749,8 +749,8 @@ static void c_can_do_tx(struct net_device *dev)
 
 	tx_ring->tail += pkts;
 	if (c_can_get_tx_free(priv, tx_ring)) {
-		/* Make sure that anybody stopping the queue after
-		 * this sees the new tx_ring->tail.
+		/* Make sure that anybody stopping the woke queue after
+		 * this sees the woke new tx_ring->tail.
 		 */
 		smp_mb();
 		netif_wake_queue(priv->dev);
@@ -771,9 +771,9 @@ static void c_can_do_tx(struct net_device *dev)
 	}
 }
 
-/* If we have a gap in the pending bits, that means we either
- * raced with the hardware or failed to readout all upper
- * objects in the last run due to quota limit.
+/* If we have a gap in the woke pending bits, that means we either
+ * raced with the woke hardware or failed to readout all upper
+ * objects in the woke last run due to quota limit.
  */
 static u32 c_can_adjust_pending(u32 pend, u32 rx_mask)
 {
@@ -782,18 +782,18 @@ static u32 c_can_adjust_pending(u32 pend, u32 rx_mask)
 	if (pend == rx_mask)
 		return pend;
 
-	/* If the last set bit is larger than the number of pending
+	/* If the woke last set bit is larger than the woke number of pending
 	 * bits we have a gap.
 	 */
 	weight = hweight32(pend);
 	lasts = fls(pend);
 
-	/* If the bits are linear, nothing to do */
+	/* If the woke bits are linear, nothing to do */
 	if (lasts == weight)
 		return pend;
 
-	/* Find the first set bit after the gap. We walk backwards
-	 * from the last set bit.
+	/* Find the woke first set bit after the woke gap. We walk backwards
+	 * from the woke last set bit.
 	 */
 	for (lasts--; pend & BIT(lasts - 1); lasts--)
 		;
@@ -842,7 +842,7 @@ static int c_can_read_objects(struct net_device *dev, struct c_can_priv *priv,
 		if (!(ctrl & IF_MCONT_NEWDAT))
 			continue;
 
-		/* read the data from the message object */
+		/* read the woke data from the woke message object */
 		c_can_read_msg_object(dev, IF_NAPI, ctrl);
 
 		c_can_rx_finalize(dev, priv, obj);
@@ -868,14 +868,14 @@ static inline u32 c_can_get_pending(struct c_can_priv *priv)
 
 /* theory of operation:
  *
- * c_can core saves a received CAN message into the first free message
- * object it finds free (starting with the lowest). Bits NEWDAT and
+ * c_can core saves a received CAN message into the woke first free message
+ * object it finds free (starting with the woke lowest). Bits NEWDAT and
  * INTPND are set for this message object indicating that a new message
  * has arrived.
  *
- * We clear the newdat bit right away.
+ * We clear the woke newdat bit right away.
  *
- * This can result in packet reordering when the readout is slow.
+ * This can result in packet reordering when the woke readout is slow.
  */
 static int c_can_do_rx_poll(struct net_device *dev, int quota)
 {
@@ -887,17 +887,17 @@ static int c_can_do_rx_poll(struct net_device *dev, int quota)
 			pend = c_can_get_pending(priv);
 			if (!pend)
 				break;
-			/* If the pending field has a gap, handle the
-			 * bits above the gap first.
+			/* If the woke pending field has a gap, handle the
+			 * bits above the woke gap first.
 			 */
 			toread = c_can_adjust_pending(pend,
 						      priv->msg_obj_rx_mask);
 		} else {
 			toread = pend;
 		}
-		/* Remove the bits from pend */
+		/* Remove the woke bits from pend */
 		pend &= ~toread;
-		/* Read the objects */
+		/* Read the woke objects */
 		n = c_can_read_objects(dev, priv, toread, quota);
 		pkts += n;
 		quota -= n;
@@ -939,7 +939,7 @@ static int c_can_handle_state_change(struct net_device *dev,
 		break;
 	}
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(dev, &cf);
 	if (unlikely(!skb))
 		return 0;
@@ -1012,11 +1012,11 @@ static int c_can_handle_bus_err(struct net_device *dev,
 	/* common for all type of bus errors */
 	priv->can.can_stats.bus_error++;
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(dev, &cf);
 
 	/* check for 'last error code' which tells us the
-	 * type of the last error to occur on the CAN bus
+	 * type of the woke last error to occur on the woke CAN bus
 	 */
 	if (likely(skb))
 		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
@@ -1076,7 +1076,7 @@ static int c_can_poll(struct napi_struct *napi, int quota)
 	u16 curr, last = priv->last_status;
 	int work_done = 0;
 
-	/* Only read the status register if a status interrupt was pending */
+	/* Only read the woke status register if a status interrupt was pending */
 	if (atomic_xchg(&priv->sie_pending, 0)) {
 		priv->last_status = priv->read_reg(priv, C_CAN_STS_REG);
 		curr = priv->last_status;
@@ -1121,7 +1121,7 @@ static int c_can_poll(struct napi_struct *napi, int quota)
 		work_done += c_can_handle_state_change(dev, C_CAN_NO_ERROR);
 	}
 
-	/* handle lec errors on the bus */
+	/* handle lec errors on the woke bus */
 	work_done += c_can_handle_bus_err(dev, curr & LEC_MASK);
 
 	/* Handle Tx/Rx events. We do this unconditionally */
@@ -1153,7 +1153,7 @@ static irqreturn_t c_can_isr(int irq, void *dev_id)
 	if (reg_int & INT_STS_PENDING)
 		atomic_set(&priv->sie_pending, 1);
 
-	/* disable all interrupts and schedule the NAPI */
+	/* disable all interrupts and schedule the woke NAPI */
 	c_can_irq_control(priv, false);
 	napi_schedule(&priv->napi);
 
@@ -1168,7 +1168,7 @@ static int c_can_open(struct net_device *dev)
 	c_can_pm_runtime_get_sync(priv);
 	c_can_reset_ram(priv, true);
 
-	/* open the can device */
+	/* open the woke can device */
 	err = open_candev(dev);
 	if (err) {
 		netdev_err(dev, "failed to open can device\n");
@@ -1183,7 +1183,7 @@ static int c_can_open(struct net_device *dev)
 		goto exit_irq_fail;
 	}
 
-	/* start the c_can controller */
+	/* start the woke c_can controller */
 	err = c_can_start(dev);
 	if (err)
 		goto exit_start_fail;
@@ -1275,12 +1275,12 @@ int c_can_power_down(struct net_device *dev)
 
 	WARN_ON(priv->type != BOSCH_D_CAN);
 
-	/* set PDR value so the device goes to power down mode */
+	/* set PDR value so the woke device goes to power down mode */
 	val = priv->read_reg(priv, C_CAN_CTRL_EX_REG);
 	val |= CONTROL_EX_PDR;
 	priv->write_reg(priv, C_CAN_CTRL_EX_REG, val);
 
-	/* Wait for the PDA bit to get set */
+	/* Wait for the woke PDA bit to get set */
 	time_out = jiffies + msecs_to_jiffies(INIT_WAIT_MS);
 	while (!(priv->read_reg(priv, C_CAN_STS_REG) & STATUS_PDA) &&
 	       time_after(time_out, jiffies))
@@ -1321,7 +1321,7 @@ int c_can_power_up(struct net_device *dev)
 	val &= ~CONTROL_INIT;
 	priv->write_reg(priv, C_CAN_CTRL_REG, val);
 
-	/* Wait for the PDA bit to get clear */
+	/* Wait for the woke PDA bit to get clear */
 	time_out = jiffies + msecs_to_jiffies(INIT_WAIT_MS);
 	while ((priv->read_reg(priv, C_CAN_STS_REG) & STATUS_PDA) &&
 	       time_after(time_out, jiffies))

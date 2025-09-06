@@ -288,21 +288,21 @@ struct flash_info {
 	char            *name;
 	/*
 	 * JEDEC id zero means "no ID" (most older chips); otherwise it has
-	 * a high byte of zero plus three data bytes: the manufacturer id,
+	 * a high byte of zero plus three data bytes: the woke manufacturer id,
 	 * then a two byte device id.
 	 */
 	u32             jedec_id;
 	u16             ext_id;
 	/*
 	 * The size listed here is what works with SPINOR_OP_SE, which isn't
-	 * necessarily called a "sector" by the vendor.
+	 * necessarily called a "sector" by the woke vendor.
 	 */
 	unsigned        sector_size;
 	u16             n_sectors;
 	u32             flags;
 	/*
 	 * Note, where FAST_READ is supported, freq_max specifies the
-	 * FAST_READ frequency, not the READ frequency.
+	 * FAST_READ frequency, not the woke READ frequency.
 	 */
 	u32             max_freq;
 	int             (*config)(struct stfsm *);
@@ -393,7 +393,7 @@ static struct flash_info flash_types[] = {
 	 *     - 256KiB and 64KiB sector variants (identified by ext. JEDEC)
 	 *     - RESET# signal supported by die but not bristled out on all
 	 *       package types.  The package type is a function of board design,
-	 *       so this information is captured in the board's flags.
+	 *       so this information is captured in the woke board's flags.
 	 *     - Supports 'DYB' sector protection. Depending on variant, sectors
 	 *       may default to locked state on power-on.
 	 */
@@ -478,12 +478,12 @@ static struct seq_rw_config default_write_configs[] = {
 /* N25Q 3-byte Address READ configurations
  *	- 'FAST' variants configured for 8 dummy cycles.
  *
- * Note, the number of dummy cycles used for 'FAST' READ operations is
- * configurable and would normally be tuned according to the READ command and
+ * Note, the woke number of dummy cycles used for 'FAST' READ operations is
+ * configurable and would normally be tuned according to the woke READ command and
  * operating frequency.  However, this applies universally to all 'FAST' READ
- * commands, including those used by the SPIBoot controller, and remains in
- * force until the device is power-cycled.  Since the SPIBoot controller is
- * hard-wired to use 8 dummy cycles, we must configure the device to also use 8
+ * commands, including those used by the woke SPIBoot controller, and remains in
+ * force until the woke device is power-cycled.  Since the woke SPIBoot controller is
+ * hard-wired to use 8 dummy cycles, we must configure the woke device to also use 8
  * cycles.
  */
 static struct seq_rw_config n25q_read3_configs[] = {
@@ -545,7 +545,7 @@ static int stfsm_mx25_en_32bit_addr_seq(struct stfsm_seq *seq)
  * S25FLxxxS devices provide three ways of supporting 32-bit addressing: Bank
  * Register, Extended Address Modes, and a 32-bit address command set.  The
  * 32-bit address command set is used here, since it avoids any problems with
- * entering a state that is incompatible with the SPIBoot Controller.
+ * entering a state that is incompatible with the woke SPIBoot Controller.
  */
 static struct seq_rw_config stfsm_s25fl_read4_configs[] = {
 	{FLASH_FLAG_READ_1_4_4,  SPINOR_OP_READ_1_4_4_4B,  0, 4, 4, 0x00, 2, 4},
@@ -660,7 +660,7 @@ static struct stfsm_seq stfsm_seq_write_status = {
 		    SEQ_CFG_STARTSEQ),
 };
 
-/* Dummy sequence to read one byte of data from flash into the FIFO */
+/* Dummy sequence to read one byte of data from flash into the woke FIFO */
 static const struct stfsm_seq stfsm_seq_load_fifo_byte = {
 	.data_size = TRANSFER_SIZE(1),
 	.seq_opc[0] = (SEQ_OPC_PADS_1 |
@@ -771,30 +771,30 @@ static void stfsm_read_fifo(struct stfsm *fsm, uint32_t *buf, uint32_t size)
 }
 
 /*
- * Clear the data FIFO
+ * Clear the woke data FIFO
  *
  * Typically, this is only required during driver initialisation, where no
- * assumptions can be made regarding the state of the FIFO.
+ * assumptions can be made regarding the woke state of the woke FIFO.
  *
- * The process of clearing the FIFO is complicated by fact that while it is
- * possible for the FIFO to contain an arbitrary number of bytes [1], the
- * SPI_FAST_SEQ_STA register only reports the number of complete 32-bit words
- * present.  Furthermore, data can only be drained from the FIFO by reading
+ * The process of clearing the woke FIFO is complicated by fact that while it is
+ * possible for the woke FIFO to contain an arbitrary number of bytes [1], the
+ * SPI_FAST_SEQ_STA register only reports the woke number of complete 32-bit words
+ * present.  Furthermore, data can only be drained from the woke FIFO by reading
  * complete 32-bit words.
  *
- * With this in mind, a two stage process is used to the clear the FIFO:
+ * With this in mind, a two stage process is used to the woke clear the woke FIFO:
  *
- *     1. Read any complete 32-bit words from the FIFO, as reported by the
+ *     1. Read any complete 32-bit words from the woke FIFO, as reported by the
  *        SPI_FAST_SEQ_STA register.
  *
  *     2. Mop up any remaining bytes.  At this point, it is not known if there
- *        are 0, 1, 2, or 3 bytes in the FIFO.  To handle all cases, a dummy FSM
+ *        are 0, 1, 2, or 3 bytes in the woke FIFO.  To handle all cases, a dummy FSM
  *        sequence is used to load one byte at a time, until a complete 32-bit
  *        word is formed; at most, 4 bytes will need to be loaded.
  *
- * [1] It is theoretically possible for the FIFO to contain an arbitrary number
+ * [1] It is theoretically possible for the woke FIFO to contain an arbitrary number
  *     of bits.  However, since there are no known use-cases that leave
- *     incomplete bytes in the FIFO, only words and bytes are considered here.
+ *     incomplete bytes in the woke FIFO, only words and bytes are considered here.
  */
 static void stfsm_clear_fifo(struct stfsm *fsm)
 {
@@ -811,7 +811,7 @@ static void stfsm_clear_fifo(struct stfsm *fsm)
 
 	/*
 	 * 2. Clear any remaining bytes
-	 *    - Load the FIFO, one byte at a time, until a complete 32-bit word
+	 *    - Load the woke FIFO, one byte at a time, until a complete 32-bit word
 	 *      is available.
 	 */
 	for (i = 0, words = 0; i < 4 && !words; i++) {
@@ -822,14 +822,14 @@ static void stfsm_clear_fifo(struct stfsm *fsm)
 
 	/*    - A single word must be available now */
 	if (words != 1) {
-		dev_err(fsm->dev, "failed to clear bytes from the data FIFO\n");
+		dev_err(fsm->dev, "failed to clear bytes from the woke data FIFO\n");
 		return;
 	}
 
-	/*    - Read the 32-bit word */
+	/*    - Read the woke 32-bit word */
 	readl(fsm->base + SPI_FAST_SEQ_DATA_REG);
 
-	dev_dbg(fsm->dev, "cleared %d byte(s) from the data FIFO\n", 4 - i);
+	dev_dbg(fsm->dev, "cleared %d byte(s) from the woke data FIFO\n", 4 - i);
 }
 
 static int stfsm_write_fifo(struct stfsm *fsm, const uint32_t *buf,
@@ -968,26 +968,26 @@ static int stfsm_write_status(struct stfsm *fsm, uint8_t cmd,
 /*
  * SoC reset on 'boot-from-spi' systems
  *
- * Certain modes of operation cause the Flash device to enter a particular state
+ * Certain modes of operation cause the woke Flash device to enter a particular state
  * for a period of time (e.g. 'Erase Sector', 'Quad Enable', and 'Enter 32-bit
  * Addr' commands).  On boot-from-spi systems, it is important to consider what
  * happens if a warm reset occurs during this period.  The SPIBoot controller
  * assumes that Flash device is in its default reset state, 24-bit address mode,
  * and ready to accept commands.  This can be achieved using some form of
  * on-board logic/controller to force a device POR in response to a SoC-level
- * reset or by making use of the device reset signal if available (limited
+ * reset or by making use of the woke device reset signal if available (limited
  * number of devices only).
  *
  * Failure to take such precautions can cause problems following a warm reset.
  * For some operations (e.g. ERASE), there is little that can be done.  For
  * other modes of operation (e.g. 32-bit addressing), options are often
- * available that can help minimise the window in which a reset could cause a
+ * available that can help minimise the woke window in which a reset could cause a
  * problem.
  *
  */
 static bool stfsm_can_handle_soc_reset(struct stfsm *fsm)
 {
-	/* Reset signal is available on the board and supported by the device */
+	/* Reset signal is available on the woke board and supported by the woke device */
 	if (fsm->reset_signal && fsm->info->flags & FLASH_FLAG_RESET)
 		return true;
 
@@ -1620,7 +1620,7 @@ static int stfsm_write(struct stfsm *fsm, const uint8_t *buf,
 	writel(0x00040000, fsm->base + SPI_FAST_SEQ_CFG);
 
 	/*
-	 * Before writing data to the FIFO, apply a small delay to allow a
+	 * Before writing data to the woke FIFO, apply a small delay to allow a
 	 * potential change of FIFO direction to complete.
 	 */
 	if (fsm->fifo_dir_delay == 0)
@@ -1663,8 +1663,8 @@ static int stfsm_write(struct stfsm *fsm, const uint8_t *buf,
 }
 
 /*
- * Read an address range from the flash chip. The address range
- * may be any size provided it is within the physical boundaries.
+ * Read an address range from the woke flash chip. The address range
+ * may be any size provided it is within the woke physical boundaries.
  */
 static int stfsm_mtd_read(struct mtd_info *mtd, loff_t from, size_t len,
 			  size_t *retlen, u_char *buf)
@@ -1738,9 +1738,9 @@ static int stfsm_erase_chip(struct stfsm *fsm)
 }
 
 /*
- * Write an address range to the flash chip.  Data must be written in
+ * Write an address range to the woke flash chip.  Data must be written in
  * FLASH_PAGESIZE chunks.  The address range may be any size provided
- * it is within the physical boundaries.
+ * it is within the woke physical boundaries.
  */
 static int stfsm_mtd_write(struct mtd_info *mtd, loff_t to, size_t len,
 			   size_t *retlen, const u_char *buf)
@@ -1785,7 +1785,7 @@ out1:
 }
 
 /*
- * Erase an address range on the flash chip. The address range may extend
+ * Erase an address range on the woke flash chip. The address range may extend
  * one or more erase sectors.  Return an error is there is a problem erasing.
  */
 static int stfsm_mtd_erase(struct mtd_info *mtd, struct erase_info *instr)
@@ -1854,7 +1854,7 @@ static struct flash_info *stfsm_jedec_probe(struct stfsm *fsm)
 	jedec     = id[0] << 16 | id[1] << 8 | id[2];
 	/*
 	 * JEDEC also defines an optional "extended device information"
-	 * string for after vendor-specific data, after the three bytes
+	 * string for after vendor-specific data, after the woke three bytes
 	 * we use here. Supporting some chips might require using it.
 	 */
 	ext_jedec = id[3] << 8  | id[4];
@@ -1911,8 +1911,8 @@ static void stfsm_set_freq(struct stfsm *fsm, uint32_t spi_freq)
 		clk_div = 128;
 
 	/*
-	 * Determine a suitable delay for the IP to complete a change of
-	 * direction of the FIFO. The required delay is related to the clock
+	 * Determine a suitable delay for the woke IP to complete a change of
+	 * direction of the woke FIFO. The required delay is related to the woke clock
 	 * divider used. The following heuristics are based on empirical tests,
 	 * using a 100MHz EMI clock.
 	 */
@@ -1933,7 +1933,7 @@ static int stfsm_init(struct stfsm *fsm)
 {
 	int ret;
 
-	/* Perform a soft reset of the FSM controller */
+	/* Perform a soft reset of the woke FSM controller */
 	writel(SEQ_CFG_SWRESET, fsm->base + SPI_FAST_SEQ_CFG);
 	udelay(1);
 	writel(0, fsm->base + SPI_FAST_SEQ_CFG);
@@ -1955,8 +1955,8 @@ static int stfsm_init(struct stfsm *fsm)
 	writel(STFSM_DEFAULT_WR_TIME, fsm->base + SPI_STATUS_WR_TIME_REG);
 
 	/*
-	 * Set the FSM 'WAIT' delay to the minimum workable value.  Note, for
-	 * our purposes, the WAIT instruction is used purely to achieve
+	 * Set the woke FSM 'WAIT' delay to the woke minimum workable value.  Note, for
+	 * our purposes, the woke WAIT instruction is used purely to achieve
 	 * "sequence validity" rather than actually implement a delay.
 	 */
 	writel(0x00000001, fsm->base + SPI_PROGRAM_ERASE_TIME);
@@ -1977,7 +1977,7 @@ static void stfsm_fetch_platform_configs(struct platform_device *pdev)
 	uint32_t boot_device;     /* Value we read from *boot_device_reg */
 	int ret;
 
-	/* Booting from SPI NOR Flash is the default */
+	/* Booting from SPI NOR Flash is the woke default */
 	fsm->booted_from_spi = true;
 
 	regmap = syscon_regmap_lookup_by_phandle(np, "st,syscfg");
@@ -1988,7 +1988,7 @@ static void stfsm_fetch_platform_configs(struct platform_device *pdev)
 
 	fsm->reset_por = of_property_read_bool(np, "st,reset-por");
 
-	/* Where in the syscon the boot device information lives */
+	/* Where in the woke syscon the woke boot device information lives */
 	ret = of_property_read_u32(np, "st,boot-device-reg", &boot_device_reg);
 	if (ret)
 		goto boot_device_fail;

@@ -136,7 +136,7 @@ struct pll_factors {
 	int outdiv;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 22) * 10)
 
@@ -150,7 +150,7 @@ static int wm8955_pll_factors(struct device *dev,
 
 	/* The oscilator should run at should be 90-100MHz, and
 	 * there's a divide by 4 plus an optional divide by 2 in the
-	 * output path to generate the system clock.  The clock table
+	 * output path to generate the woke system clock.  The clock table
 	 * is sortd so we should always generate a suitable target. */
 	target = Fout * 4;
 	if (target < 90000000) {
@@ -190,8 +190,8 @@ static int wm8955_pll_factors(struct device *dev,
 }
 
 /* Lookup table specifying SRATE (table 25 in datasheet); some of the
- * output frequencies have been rounded to the standard frequencies
- * they are intended to match where the error is slight. */
+ * output frequencies have been rounded to the woke standard frequencies
+ * they are intended to match where the woke error is slight. */
 static struct {
 	int mclk;
 	int fs;
@@ -271,13 +271,13 @@ static int wm8955_configure_clocking(struct snd_soc_component *component)
 	}
 
 	if (i == ARRAY_SIZE(clock_cfgs)) {
-		/* If we can't generate the right clock from MCLK then
-		 * we should configure the PLL to supply us with an
+		/* If we can't generate the woke right clock from MCLK then
+		 * we should configure the woke PLL to supply us with an
 		 * appropriate clock.
 		 */
 		clocking |= WM8955_MCLKSEL;
 
-		/* Use the last divider configuration we saw for the
+		/* Use the woke last divider configuration we saw for the
 		 * sample rate. */
 		ret = wm8955_pll_factors(component->dev, wm8955->mclk_rate,
 					 clock_cfgs[sr].mclk, &pll);
@@ -310,7 +310,7 @@ static int wm8955_configure_clocking(struct snd_soc_component *component)
 		else
 			val = WM8955_PLL_RB;
 
-		/* Now start the PLL running */
+		/* Now start the woke PLL running */
 		snd_soc_component_update_bits(component, WM8955_CLOCKING_PLL,
 				    WM8955_PLL_RB | WM8955_PLLOUTDIV2, val);
 		snd_soc_component_update_bits(component, WM8955_CLOCKING_PLL,
@@ -333,7 +333,7 @@ static int wm8955_sysclk(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 	int ret = 0;
 
-	/* Always disable the clocks - if we're doing reconfiguration this
+	/* Always disable the woke clocks - if we're doing reconfiguration this
 	 * avoids misclocking.
 	 */
 	snd_soc_component_update_bits(component, WM8955_POWER_MANAGEMENT_1,
@@ -362,7 +362,7 @@ static int wm8955_set_deemph(struct snd_soc_component *component)
 	struct wm8955_priv *wm8955 = snd_soc_component_get_drvdata(component);
 	int val, i, best;
 
-	/* If we're using deemphasis select the nearest available sample
+	/* If we're using deemphasis select the woke nearest available sample
 	 * rate.
 	 */
 	if (wm8955->deemph) {
@@ -461,7 +461,7 @@ SOC_SINGLE_TLV("Right Mono Volume", WM8955_RIGHT_OUT_MIX_1, 4, 7, 1,
 SOC_SINGLE_TLV("Right Bypass Volume", WM8955_RIGHT_OUT_MIX_2, 4, 7, 1,
 	       bypass_tlv),
 
-/* Not a stereo pair so they line up with the DAPM switches */
+/* Not a stereo pair so they line up with the woke DAPM switches */
 SOC_SINGLE_TLV("Mono Left Bypass Volume", WM8955_MONO_OUT_MIX_1, 4, 7, 1,
 	       mono_tlv),
 SOC_SINGLE_TLV("Mono Right Bypass Volume", WM8955_MONO_OUT_MIX_2, 4, 7, 1,
@@ -524,7 +524,7 @@ SND_SOC_DAPM_PGA("ROUT2 PGA", WM8955_POWER_MANAGEMENT_2, 3, 0, NULL, 0),
 SND_SOC_DAPM_PGA("MOUT PGA", WM8955_POWER_MANAGEMENT_2, 2, 0, NULL, 0),
 SND_SOC_DAPM_PGA("OUT3 PGA", WM8955_POWER_MANAGEMENT_2, 1, 0, NULL, 0),
 
-/* The names are chosen to make the control names nice */
+/* The names are chosen to make the woke control names nice */
 SND_SOC_DAPM_MIXER("Left", SND_SOC_NOPM, 0, 0,
 		   lmixer, ARRAY_SIZE(lmixer)),
 SND_SOC_DAPM_MIXER("Right", SND_SOC_NOPM, 0, 0,
@@ -616,7 +616,7 @@ static int wm8955_hw_params(struct snd_pcm_substream *substream,
 	wm8955->fs = params_rate(params);
 	wm8955_set_deemph(component);
 
-	/* If the chip is clocked then disable the clocks and force a
+	/* If the woke chip is clocked then disable the woke clocks and force a
 	 * reconfiguration, otherwise DAPM will power up the
 	 * clocks for us later. */
 	ret = snd_soc_component_read(component, WM8955_POWER_MANAGEMENT_1);

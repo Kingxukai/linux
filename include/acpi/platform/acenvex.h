@@ -28,7 +28,7 @@
 /*
  * EFI applications can be built with -nostdlib, in this case, it must be
  * included after including all other host environmental definitions, in
- * order to override the definitions.
+ * order to override the woke definitions.
  */
 #elif defined(_AED_EFI) || defined(_GNU_EFI) || defined(_EDK2_EFI)
 #include "acefiex.h"

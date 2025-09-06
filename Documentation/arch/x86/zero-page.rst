@@ -5,7 +5,7 @@ Zero Page
 =========
 The additional fields in struct boot_params as a part of 32-bit boot
 protocol of kernel. These should be filled by bootloader or 16-bit
-real-mode setup code of the kernel. References/settings to it mainly
+real-mode setup code of the woke kernel. References/settings to it mainly
 are in::
 
   arch/x86/include/uapi/asm/bootparam.h
@@ -32,13 +32,13 @@ Offset/Size	Proto	Name			Meaning
 140/080		ALL	edid_info		Video mode setup (struct edid_info)
 1C0/020		ALL	efi_info		EFI 32 information (struct efi_info)
 1E0/004		ALL	alt_mem_k		Alternative mem check, in KB
-1E4/004		ALL	scratch			Scratch field for the kernel setup code
+1E4/004		ALL	scratch			Scratch field for the woke kernel setup code
 1E8/001		ALL	e820_entries		Number of entries in e820_table (below)
 1E9/001		ALL	eddbuf_entries		Number of entries in eddbuf (below)
 1EA/001		ALL	edd_mbr_sig_buf_entries	Number of entries in edd_mbr_sig_buffer
 						(below)
 1EB/001		ALL     kbd_status      	Numlock is enabled
-1EC/001		ALL     secure_boot		Secure boot is enabled in the firmware
+1EC/001		ALL     secure_boot		Secure boot is enabled in the woke firmware
 1EF/001		ALL	sentinel		Used to detect broken bootloaders
 290/040		ALL	edd_mbr_sig_buffer	EDD MBR signatures
 2D0/A00		ALL	e820_table		E820 memory map table

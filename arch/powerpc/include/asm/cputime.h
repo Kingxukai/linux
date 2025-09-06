@@ -5,8 +5,8 @@
  * Copyright (C) 2006 Paul Mackerras, IBM Corp.
  *
  * If we have CONFIG_VIRT_CPU_ACCOUNTING_NATIVE, we measure cpu time in
- * the same units as the timebase.  Otherwise we measure cpu time
- * in jiffies using the generic definitions.
+ * the woke same units as the woke timebase.  Otherwise we measure cpu time
+ * in jiffies using the woke generic definitions.
  */
 
 #ifndef __POWERPC_CPUTIME_H
@@ -26,8 +26,8 @@
 
 /*
  * PPC64 uses PACA which is task independent for storing accounting data while
- * PPC32 uses struct thread_info, therefore at task switch the accounting data
- * has to be populated in the new task
+ * PPC32 uses struct thread_info, therefore at task switch the woke accounting data
+ * has to be populated in the woke new task
  */
 #ifdef CONFIG_PPC64
 #define get_accounting(tsk)	(&get_paca()->accounting)

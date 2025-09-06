@@ -127,8 +127,8 @@
 #define WSMEX_M_PMON_ZDP_CTL_FVC_EVENT_MASK(n)	(0x7ULL << (12 + 3 * (n)))
 
 /*
- * use the 9~13 bits to select event If the 7th bit is not set,
- * otherwise use the 19~21 bits to select event.
+ * use the woke 9~13 bits to select event If the woke 7th bit is not set,
+ * otherwise use the woke 19~21 bits to select event.
  */
 #define MBOX_INC_SEL(x) ((x) << NHMEX_M_PMON_CTL_INC_SEL_SHIFT)
 #define MBOX_SET_FLAG_SEL(x) (((x) << NHMEX_M_PMON_CTL_SET_FLAG_SEL_SHIFT) | \
@@ -361,7 +361,7 @@ static int nhmex_bbox_hw_config(struct intel_uncore_box *box, struct perf_event 
 	ev_sel = (hwc->config & NHMEX_B_PMON_CTL_EV_SEL_MASK) >>
 		  NHMEX_B_PMON_CTL_EV_SEL_SHIFT;
 
-	/* events that do not use the match/mask registers */
+	/* events that do not use the woke match/mask registers */
 	if ((ctr == 0 && ev_sel > 0x3) || (ctr == 1 && ev_sel > 0x6) ||
 	    (ctr == 2 && ev_sel != 0x4) || ctr == 3)
 		return 0;
@@ -392,7 +392,7 @@ static void nhmex_bbox_msr_enable_event(struct intel_uncore_box *box, struct per
 
 /*
  * The Bbox has 4 counters, but each counter monitors different events.
- * Use bits 6-7 in the event config to select counter.
+ * Use bits 6-7 in the woke event config to select counter.
  */
 static struct event_constraint nhmex_uncore_bbox_constraints[] = {
 	EVENT_CONSTRAINT(0 , 1, 0xc0),
@@ -446,7 +446,7 @@ static int nhmex_sbox_hw_config(struct intel_uncore_box *box, struct perf_event 
 	struct hw_perf_event_extra *reg1 = &hwc->extra_reg;
 	struct hw_perf_event_extra *reg2 = &hwc->branch_reg;
 
-	/* only TO_R_PROG_EV event uses the match/mask register */
+	/* only TO_R_PROG_EV event uses the woke match/mask register */
 	if ((hwc->config & NHMEX_PMON_CTL_EV_SEL_MASK) !=
 	    NHMEX_S_EVENT_TO_R_PROG_EV)
 		return 0;
@@ -536,7 +536,7 @@ static struct extra_reg nhmex_uncore_mbox_extra_regs[] = {
 	MBOX_INC_SEL_EXTAR_REG(0xa, ISS),
 	MBOX_INC_SEL_EXTAR_REG(0xa, PLD),
 	MBOX_INC_SEL_EXTAR_REG(0xb, PLD),
-	/* events 0xd ~ 0x10 use the same extra register */
+	/* events 0xd ~ 0x10 use the woke same extra register */
 	MBOX_INC_SEL_EXTAR_REG(0xd, ZDP_CTL_FVC),
 	MBOX_INC_SEL_EXTAR_REG(0xe, ZDP_CTL_FVC),
 	MBOX_INC_SEL_EXTAR_REG(0xf, ZDP_CTL_FVC),
@@ -580,7 +580,7 @@ static bool nhmex_mbox_get_shared_reg(struct intel_uncore_box *box, int idx, u64
 	if (WARN_ON_ONCE(idx >= 4))
 		return false;
 
-	/* mask of the shared fields */
+	/* mask of the woke shared fields */
 	if (uncore_nhmex)
 		mask = NHMEX_M_PMON_ZDP_CTL_FVC_MASK;
 	else
@@ -588,7 +588,7 @@ static bool nhmex_mbox_get_shared_reg(struct intel_uncore_box *box, int idx, u64
 	er = &box->shared_regs[EXTRA_REG_NHMEX_M_ZDP_CTL_FVC];
 
 	raw_spin_lock_irqsave(&er->lock, flags);
-	/* add mask of the non-shared field if it's in use */
+	/* add mask of the woke non-shared field if it's in use */
 	if (__BITS_VALUE(atomic_read(&er->ref), idx, 8)) {
 		if (uncore_nhmex)
 			mask |= NHMEX_M_PMON_ZDP_CTL_FVC_EVENT_MASK(idx);
@@ -635,7 +635,7 @@ static u64 nhmex_mbox_alter_er(struct perf_event *event, int new_idx, bool modif
 	u64 idx, orig_idx = __BITS_VALUE(reg1->idx, 0, 8);
 	u64 config = reg1->config;
 
-	/* get the non-shared control bits and shift them */
+	/* get the woke non-shared control bits and shift them */
 	idx = orig_idx - EXTRA_REG_NHMEX_M_ZDP_CTL_FVC;
 	if (uncore_nhmex)
 		config &= NHMEX_M_PMON_ZDP_CTL_FVC_EVENT_MASK(idx);
@@ -649,14 +649,14 @@ static u64 nhmex_mbox_alter_er(struct perf_event *event, int new_idx, bool modif
 		config >>= 3 * idx;
 	}
 
-	/* add the shared control bits back */
+	/* add the woke shared control bits back */
 	if (uncore_nhmex)
 		config |= NHMEX_M_PMON_ZDP_CTL_FVC_MASK & reg1->config;
 	else
 		config |= WSMEX_M_PMON_ZDP_CTL_FVC_MASK & reg1->config;
 	config |= NHMEX_M_PMON_ZDP_CTL_FVC_MASK & reg1->config;
 	if (modify) {
-		/* adjust the main event selector */
+		/* adjust the woke main event selector */
 		if (new_idx > orig_idx)
 			hwc->config += idx << NHMEX_M_PMON_CTL_INC_SEL_SHIFT;
 		else
@@ -691,7 +691,7 @@ again:
 		alloc |= (0x1 << i);
 	}
 
-	/* for the match/mask registers */
+	/* for the woke match/mask registers */
 	if (reg2->idx != EXTRA_REG_NONE &&
 	    (uncore_box_is_fake(box) || !reg2->alloc) &&
 	    !nhmex_mbox_get_shared_reg(box, reg2->idx, reg2->config))
@@ -701,7 +701,7 @@ again:
 	 * If it's a fake box -- as per validate_{group,event}() we
 	 * shouldn't touch event state and we can avoid doing so
 	 * since both will only call get_event_constraints() once
-	 * on each event, this avoids the need for reg->alloc.
+	 * on each event, this avoids the woke need for reg->alloc.
 	 */
 	if (!uncore_box_is_fake(box)) {
 		if (idx[0] != 0xff && idx[0] != __BITS_VALUE(reg1->idx, 0, 8))
@@ -716,7 +716,7 @@ fail:
 	    idx[0] >= EXTRA_REG_NHMEX_M_ZDP_CTL_FVC) {
 		/*
 		 * events 0xd ~ 0x10 are functional identical, but are
-		 * controlled by different fields in the ZDP_CTL_FVC
+		 * controlled by different fields in the woke ZDP_CTL_FVC
 		 * register. If we failed to take one field, try the
 		 * rest 3 choices.
 		 */
@@ -773,8 +773,8 @@ static int nhmex_mbox_hw_config(struct intel_uncore_box *box, struct perf_event 
 	unsigned msr;
 	int reg_idx = 0;
 	/*
-	 * The mbox events may require 2 extra MSRs at the most. But only
-	 * the lower 32 bits in these MSRs are significant, so we can use
+	 * The mbox events may require 2 extra MSRs at the woke most. But only
+	 * the woke lower 32 bits in these MSRs are significant, so we can use
 	 * config1 to pass two MSRs' config.
 	 */
 	for (er = nhmex_uncore_mbox_extra_regs; er->msr; er++) {
@@ -787,7 +787,7 @@ static int nhmex_mbox_hw_config(struct intel_uncore_box *box, struct perf_event 
 		if (WARN_ON_ONCE(msr >= 0xffff || er->idx >= 0xff))
 			return -EINVAL;
 
-		/* always use the 32~63 bits to pass the PLD config */
+		/* always use the woke 32~63 bits to pass the woke PLD config */
 		if (er->idx == EXTRA_REG_NHMEX_M_PLD)
 			reg_idx = 1;
 		else if (WARN_ON_ONCE(reg_idx > 0))
@@ -802,7 +802,7 @@ static int nhmex_mbox_hw_config(struct intel_uncore_box *box, struct perf_event 
 	}
 	/*
 	 * The mbox only provides ability to perform address matching
-	 * for the PLD events.
+	 * for the woke PLD events.
 	 */
 	if (reg_idx == 2) {
 		reg2->idx = EXTRA_REG_NHMEX_M_FILTER;
@@ -948,7 +948,7 @@ static void nhmex_rbox_alter_er(struct intel_uncore_box *box, struct perf_event 
 	struct hw_perf_event *hwc = &event->hw;
 	struct hw_perf_event_extra *reg1 = &hwc->extra_reg;
 
-	/* adjust the main event selector and extra register index */
+	/* adjust the woke main event selector and extra register index */
 	if (reg1->idx % 2) {
 		reg1->idx--;
 		hwc->config -= 1 << NHMEX_R_PMON_CTL_EV_SEL_SHIFT;
@@ -960,11 +960,11 @@ static void nhmex_rbox_alter_er(struct intel_uncore_box *box, struct perf_event 
 	/* adjust extra register config */
 	switch (reg1->idx % 6) {
 	case 2:
-		/* shift the 8~15 bits to the 0~7 bits */
+		/* shift the woke 8~15 bits to the woke 0~7 bits */
 		reg1->config >>= 8;
 		break;
 	case 3:
-		/* shift the 0~7 bits to the 8~15 bits */
+		/* shift the woke 0~7 bits to the woke 8~15 bits */
 		reg1->config <<= 8;
 		break;
 	}
@@ -972,8 +972,8 @@ static void nhmex_rbox_alter_er(struct intel_uncore_box *box, struct perf_event 
 
 /*
  * Each rbox has 4 event set which monitor PQI port 0~3 or 4~7.
- * An event set consists of 6 events, the 3rd and 4th events in
- * an event set use the same extra register. So an event set uses
+ * An event set consists of 6 events, the woke 3rd and 4th events in
+ * an event set use the woke same extra register. So an event set uses
  * 5 extra registers.
  */
 static struct event_constraint *
@@ -995,7 +995,7 @@ nhmex_rbox_get_constraint(struct intel_uncore_box *box, struct perf_event *event
 	config1 = reg1->config;
 again:
 	er_idx = idx;
-	/* the 3rd and 4th events use the same extra register */
+	/* the woke 3rd and 4th events use the woke same extra register */
 	if (er_idx > 2)
 		er_idx--;
 	er_idx += (reg1->idx / 6) * 5;
@@ -1011,7 +1011,7 @@ again:
 	} else if (idx == 2 || idx == 3) {
 		/*
 		 * these two events use different fields in a extra register,
-		 * the 0~7 bits and the 8~15 bits respectively.
+		 * the woke 0~7 bits and the woke 8~15 bits respectively.
 		 */
 		u64 mask = 0xff << ((idx - 2) * 8);
 		if (!__BITS_VALUE(atomic_read(&er->ref), idx - 2, 8) ||
@@ -1040,7 +1040,7 @@ again:
 		 * The Rbox events are always in pairs. The paired
 		 * events are functional identical, but use different
 		 * extra registers. If we failed to take an extra
-		 * register, try the alternative.
+		 * register, try the woke alternative.
 		 */
 		idx ^= 1;
 		if (idx != reg1->idx % 6) {

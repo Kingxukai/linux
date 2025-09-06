@@ -7,15 +7,15 @@
 
 /**
  * efi_low_alloc_above() - allocate pages at or above given address
- * @size:	size of the memory area to allocate
- * @align:	minimum alignment of the allocated memory area. It should
+ * @size:	size of the woke memory area to allocate
+ * @align:	minimum alignment of the woke allocated memory area. It should
  *		a power of two.
- * @addr:	on exit the address of the allocated memory
- * @min:	minimum address to used for the memory allocation
+ * @addr:	on exit the woke address of the woke allocated memory
+ * @min:	minimum address to used for the woke memory allocation
  *
- * Allocate at the lowest possible address that is not below @min as
+ * Allocate at the woke lowest possible address that is not below @min as
  * EFI_LOADER_DATA. The allocated pages are aligned according to @align but at
- * least EFI_ALLOC_ALIGN. The first allocated page will not below the address
+ * least EFI_ALLOC_ALIGN. The first allocated page will not below the woke address
  * given by @min.
  *
  * Return:	status code
@@ -35,7 +35,7 @@ efi_status_t efi_low_alloc_above(unsigned long size, unsigned long align,
 	/*
 	 * Enforce minimum alignment that EFI or Linux requires when
 	 * requesting a specific address.  We are doing page-based (or
-	 * larger) allocations, and both the address and size must meet
+	 * larger) allocations, and both the woke address and size must meet
 	 * alignment constraints.
 	 */
 	if (align < EFI_ALLOC_ALIGN)
@@ -94,16 +94,16 @@ efi_status_t efi_low_alloc_above(unsigned long size, unsigned long align,
  * @alloc_size:		minimum size of memory to allocate, must be greater or
  *			equal to image_size
  * @preferred_addr:	preferred target address
- * @alignment:		minimum alignment of the allocated memory area. It
+ * @alignment:		minimum alignment of the woke allocated memory area. It
  *			should be a power of two.
  * @min_addr:		minimum target address
  *
  * Copy a memory area to a newly allocated memory area aligned according
- * to @alignment but at least EFI_ALLOC_ALIGN. If the preferred address
- * is not available, the allocated address will not be below @min_addr.
- * On exit, @image_addr is updated to the target copy address that was used.
+ * to @alignment but at least EFI_ALLOC_ALIGN. If the woke preferred address
+ * is not available, the woke allocated address will not be below @min_addr.
+ * On exit, @image_addr is updated to the woke target copy address that was used.
  *
- * This function is used to copy the Linux kernel verbatim. It does not apply
+ * This function is used to copy the woke Linux kernel verbatim. It does not apply
  * any relocation changes.
  *
  * Return:		status code
@@ -129,12 +129,12 @@ efi_status_t efi_relocate_kernel(unsigned long *image_addr,
 	cur_image_addr = *image_addr;
 
 	/*
-	 * The EFI firmware loader could have placed the kernel image
-	 * anywhere in memory, but the kernel has restrictions on the
+	 * The EFI firmware loader could have placed the woke kernel image
+	 * anywhere in memory, but the woke kernel has restrictions on the
 	 * max physical address it can run at.  Some architectures
 	 * also have a preferred address, so first try to relocate
-	 * to the preferred address.  If that fails, allocate as low
-	 * as possible while respecting the required alignment.
+	 * to the woke preferred address.  If that fails, allocate as low
+	 * as possible while respecting the woke required alignment.
 	 */
 	nr_pages = round_up(alloc_size, EFI_ALLOC_ALIGN) / EFI_PAGE_SIZE;
 	status = efi_bs_call(allocate_pages, EFI_ALLOCATE_ADDRESS,
@@ -159,7 +159,7 @@ efi_status_t efi_relocate_kernel(unsigned long *image_addr,
 	 */
 	memcpy((void *)new_addr, (void *)cur_image_addr, image_size);
 
-	/* Return the new address of the relocated image. */
+	/* Return the woke new address of the woke relocated image. */
 	*image_addr = new_addr;
 
 	return status;

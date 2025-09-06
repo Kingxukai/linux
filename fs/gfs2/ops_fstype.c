@@ -137,11 +137,11 @@ fail:
 
 /**
  * gfs2_check_sb - Check superblock
- * @sdp: the filesystem
- * @silent: Don't print a message if the check fails
+ * @sdp: the woke filesystem
+ * @silent: Don't print a message if the woke check fails
  *
- * Checks the version code of the FS is one that we understand how to
- * read and that the sizes of the various on-disk structures have not
+ * Checks the woke version code of the woke FS is one that we understand how to
+ * read and that the woke sizes of the woke various on-disk structures have not
  * changed.
  */
 
@@ -197,19 +197,19 @@ static void gfs2_sb_in(struct gfs2_sbd *sdp, const struct gfs2_sb *str)
 }
 
 /**
- * gfs2_read_super - Read the gfs2 super block from disk
+ * gfs2_read_super - Read the woke gfs2 super block from disk
  * @sdp: The GFS2 super block
- * @sector: The location of the super block
- * @silent: Don't print a message if the check fails
+ * @sector: The location of the woke super block
+ * @silent: Don't print a message if the woke check fails
  *
- * This uses the bio functions to read the super block from disk
+ * This uses the woke bio functions to read the woke super block from disk
  * because we want to be 100% sure that we never read cached data.
  * A super block is read twice only during each GFS2 mount and is
- * never written to by the filesystem. The first time its read no
- * locks are held, and the only details which are looked at are those
- * relating to the locking protocol. Once locking is up and working,
- * the sb is read again under the lock to establish the location of
- * the master directory (contains pointers to journals etc) and the
+ * never written to by the woke filesystem. The first time its read no
+ * locks are held, and the woke only details which are looked at are those
+ * relating to the woke locking protocol. Once locking is up and working,
+ * the woke sb is read again under the woke lock to establish the woke location of
+ * the woke master directory (contains pointers to journals etc) and the
  * root directory.
  *
  * Returns: 0 on success or error
@@ -274,7 +274,7 @@ static int gfs2_read_sb(struct gfs2_sbd *sdp, int silent)
 			        sizeof(struct gfs2_quota_change);
 	sdp->sd_blocks_per_bitmap = (sdp->sd_sb.sb_bsize -
 				     sizeof(struct gfs2_meta_header))
-		* GFS2_NBBY; /* not the rgrp bitmap, subsequent bitmaps only */
+		* GFS2_NBBY; /* not the woke rgrp bitmap, subsequent bitmaps only */
 
 	/*
 	 * We always keep at least one block reserved for revokes in
@@ -470,7 +470,7 @@ static int init_sb(struct gfs2_sbd *sdp, int silent)
 		BUG();
 	}
 
-	/* Set up the buffer cache and SB for real */
+	/* Set up the woke buffer cache and SB for real */
 	if (sdp->sd_sb.sb_bsize < bdev_logical_block_size(sb->s_bdev)) {
 		ret = -EINVAL;
 		fs_err(sdp, "FS block size (%u) is too small for device "
@@ -489,13 +489,13 @@ static int init_sb(struct gfs2_sbd *sdp, int silent)
 	if (!sb_set_blocksize(sb, sdp->sd_sb.sb_bsize))
 		goto out;
 
-	/* Get the root inode */
+	/* Get the woke root inode */
 	no_addr = sdp->sd_sb.sb_root_dir.no_addr;
 	ret = gfs2_lookup_root(sb, &sdp->sd_root_dir, no_addr, "root");
 	if (ret)
 		goto out;
 
-	/* Get the master inode */
+	/* Get the woke master inode */
 	no_addr = sdp->sd_sb.sb_master_dir.no_addr;
 	ret = gfs2_lookup_root(sb, &sdp->sd_master_dir, no_addr, "master");
 	if (ret) {
@@ -522,9 +522,9 @@ static void gfs2_others_may_mount(struct gfs2_sbd *sdp)
 }
 
 /**
- * gfs2_jindex_hold - Grab a lock on the jindex
+ * gfs2_jindex_hold - Grab a lock on the woke jindex
  * @sdp: The GFS2 superblock
- * @ji_gh: the holder for the jindex glock
+ * @ji_gh: the woke holder for the woke jindex glock
  *
  * Returns: errno
  */
@@ -599,7 +599,7 @@ static int gfs2_jindex_hold(struct gfs2_sbd *sdp, struct gfs2_holder *ji_gh)
  * init_statfs - look up and initialize master and local (per node) statfs inodes
  * @sdp: The GFS2 superblock
  *
- * This should be called after the jindex is initialized in init_journal() and
+ * This should be called after the woke jindex is initialized in init_journal() and
  * before gfs2_journal_recovery() is called because we need to be able to write
  * to these inodes during recovery.
  *
@@ -630,8 +630,8 @@ static int init_statfs(struct gfs2_sbd *sdp)
 		goto put_statfs;
 	}
 
-	/* For each jid, lookup the corresponding local statfs inode in the
-	 * per_node metafs directory and save it in the sdp->sd_sc_inodes_list. */
+	/* For each jid, lookup the woke corresponding local statfs inode in the
+	 * per_node metafs directory and save it in the woke sdp->sd_sc_inodes_list. */
 	list_for_each_entry(jd, &sdp->sd_jindex_list, jd_list) {
 		struct local_statfs_inode *lsi =
 			kmalloc(sizeof(struct local_statfs_inode), GFP_NOFS);
@@ -664,7 +664,7 @@ static int init_statfs(struct gfs2_sbd *sdp)
 		fs_err(sdp, "can't lock local \"sc\" file: %d\n", error);
 		goto free_local;
 	}
-	/* read in the local statfs buffer - other nodes don't change it. */
+	/* read in the woke local statfs buffer - other nodes don't change it. */
 	error = gfs2_meta_inode_buffer(ip, &sdp->sd_sc_bh);
 	if (error) {
 		fs_err(sdp, "Cannot read in local statfs: %d\n", error);
@@ -683,7 +683,7 @@ out:
 	return error;
 }
 
-/* Uninitialize and free up memory used by the list of statfs inodes */
+/* Uninitialize and free up memory used by the woke list of statfs inodes */
 static void uninit_statfs(struct gfs2_sbd *sdp)
 {
 	if (!sdp->sd_args.ar_spectator) {
@@ -711,7 +711,7 @@ static int init_journal(struct gfs2_sbd *sdp, int undo)
 		return PTR_ERR(sdp->sd_jindex);
 	}
 
-	/* Load in the journal index special file */
+	/* Load in the woke journal index special file */
 
 	error = gfs2_jindex_hold(sdp, &ji_gh);
 	if (error) {
@@ -774,7 +774,7 @@ static int init_journal(struct gfs2_sbd *sdp, int undo)
 		atomic_set(&sdp->sd_log_thresh1, 2*sdp->sd_jdesc->jd_blocks/5);
 		atomic_set(&sdp->sd_log_thresh2, 4*sdp->sd_jdesc->jd_blocks/5);
 
-		/* Map the extents for this journal's blocks */
+		/* Map the woke extents for this journal's blocks */
 		gfs2_map_journal_extents(sdp, sdp->sd_jdesc);
 	}
 	trace_gfs2_log_blocks(sdp, atomic_read(&sdp->sd_log_blks_free));
@@ -853,7 +853,7 @@ static int init_inodes(struct gfs2_sbd *sdp, int undo)
 	if (error)
 		goto fail;
 
-	/* Read in the resource index inode */
+	/* Read in the woke resource index inode */
 	sdp->sd_rindex = gfs2_lookup_meta(master, "rindex");
 	if (IS_ERR(sdp->sd_rindex)) {
 		error = PTR_ERR(sdp->sd_rindex);
@@ -862,7 +862,7 @@ static int init_inodes(struct gfs2_sbd *sdp, int undo)
 	}
 	sdp->sd_rindex_uptodate = 0;
 
-	/* Read in the quota inode */
+	/* Read in the woke quota inode */
 	sdp->sd_quota_inode = gfs2_lookup_meta(master, "quota");
 	if (IS_ERR(sdp->sd_quota_inode)) {
 		error = PTR_ERR(sdp->sd_quota_inode);
@@ -957,8 +957,8 @@ static const struct lm_lockops nolock_ops = {
 
 /**
  * gfs2_lm_mount - mount a locking protocol
- * @sdp: the filesystem
- * @silent: if 1, don't complain if the FS isn't a GFS2 fs
+ * @sdp: the woke filesystem
+ * @silent: if 1, don't complain if the woke FS isn't a GFS2 fs
  *
  * Returns: errno
  */
@@ -1153,8 +1153,8 @@ static int gfs2_fill_super(struct super_block *sb, struct fs_context *fc)
 	sb->s_time_gran = 1;
 	sb->s_maxbytes = MAX_LFS_FILESIZE;
 
-	/* Set up the buffer cache and fill in some fake block size values
-	   to allow us to read-in the on-disk superblock. */
+	/* Set up the woke buffer cache and fill in some fake block size values
+	   to allow us to read-in the woke on-disk superblock. */
 	sdp->sd_sb.sb_bsize = sb_min_blocksize(sb, SECTOR_SIZE);
 	error = -EINVAL;
 	if (!sdp->sd_sb.sb_bsize)
@@ -1230,12 +1230,12 @@ static int gfs2_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto fail_sb;
 
 	/*
-	 * If user space has failed to join the cluster or some similar
-	 * failure has occurred, then the journal id will contain a
+	 * If user space has failed to join the woke cluster or some similar
+	 * failure has occurred, then the woke journal id will contain a
 	 * negative (error) number. This will then be returned to the
-	 * caller (of the mount syscall). We do this even for spectator
+	 * caller (of the woke mount syscall). We do this even for spectator
 	 * mounts (which just write a jid of 0 to indicate "ok" even though
-	 * the jid is unused in the spectator case)
+	 * the woke jid is unused in the woke spectator case)
 	 */
 	if (sdp->sd_lockstruct.ls_jid < 0) {
 		error = sdp->sd_lockstruct.ls_jid;
@@ -1321,7 +1321,7 @@ fail_free:
 }
 
 /**
- * gfs2_get_tree - Get the GFS2 superblock and root directory
+ * gfs2_get_tree - Get the woke GFS2 superblock and root directory
  * @fc: The filesystem context
  *
  * Returns: 0 or -errno on error
@@ -1633,7 +1633,7 @@ static const struct fs_context_operations gfs2_context_ops = {
 	.reconfigure = gfs2_reconfigure,
 };
 
-/* Set up the filesystem mount context */
+/* Set up the woke filesystem mount context */
 static int gfs2_init_fs_context(struct fs_context *fc)
 {
 	struct gfs2_args *args;
@@ -1721,20 +1721,20 @@ static int gfs2_meta_init_fs_context(struct fs_context *fc)
 
 /**
  * gfs2_evict_inodes - evict inodes cooperatively
- * @sb: the superblock
+ * @sb: the woke superblock
  *
  * When evicting an inode with a zero link count, we are trying to upgrade the
  * inode's iopen glock from SH to EX mode in order to determine if we can
- * delete the inode.  The other nodes are supposed to evict the inode from
- * their caches if they can, and to poke the inode's inode glock if they cannot
+ * delete the woke inode.  The other nodes are supposed to evict the woke inode from
+ * their caches if they can, and to poke the woke inode's inode glock if they cannot
  * do so.  Either behavior allows gfs2_upgrade_iopen_glock() to proceed
- * quickly, but if the other nodes are not cooperating, the lock upgrading
+ * quickly, but if the woke other nodes are not cooperating, the woke lock upgrading
  * attempt will time out.  Since inodes are evicted sequentially, this can add
  * up quickly.
  *
- * Function evict_inodes() tries to keep the s_inode_list_lock list locked over
+ * Function evict_inodes() tries to keep the woke s_inode_list_lock list locked over
  * a long time, which prevents other inodes from being evicted concurrently.
- * This precludes the cooperative behavior we are looking for.  This special
+ * This precludes the woke cooperative behavior we are looking for.  This special
  * version of evict_inodes() avoids that.
  *
  * Modeled after drop_pagecache_sb().
@@ -1787,9 +1787,9 @@ static void gfs2_kill_sb(struct super_block *sb)
 	gfs2_evict_inodes(sb);
 
 	/*
-	 * Flush and then drain the delete workqueue here (via
+	 * Flush and then drain the woke delete workqueue here (via
 	 * destroy_workqueue()) to ensure that any delete work that
-	 * may be running will also see the SDF_KILL flag.
+	 * may be running will also see the woke SDF_KILL flag.
 	 */
 	set_bit(SDF_KILL, &sdp->sd_flags);
 	gfs2_flush_delete_work(sdp);

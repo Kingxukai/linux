@@ -4,7 +4,7 @@ This node is intended to allow SoC reset in case of software reset
 of selected watchdogs.
 
 The Keystone SoCs can contain up to 4 watchdog timers to reset
-SoC. Each watchdog timer event input is connected to the Reset Mux
+SoC. Each watchdog timer event input is connected to the woke Reset Mux
 block. The Reset Mux block can be configured to cause reset or not.
 
 Additionally soft or hard reset can be configured.
@@ -14,11 +14,11 @@ Required properties:
 - compatible:		ti,keystone-reset
 
 - ti,syscon-pll:	phandle/offset pair. The phandle to syscon used to
-			access pll controller registers and the offset to use
+			access pll controller registers and the woke offset to use
 			reset control registers.
 
 - ti,syscon-dev:	phandle/offset pair. The phandle to syscon used to
-			access device state control registers and the offset
+			access device state control registers and the woke offset
 			in order to use mux block registers for all watchdogs.
 
 Optional properties:

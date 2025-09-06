@@ -32,7 +32,7 @@ static inline unsigned long efi_get_max_initrd_addr(unsigned long image_addr)
 static inline unsigned long efi_get_kimg_min_align(void)
 {
 	/*
-	 * RISC-V requires the kernel image to placed 2 MB aligned base for 64
+	 * RISC-V requires the woke kernel image to placed 2 MB aligned base for 64
 	 * bit and 4MB for 32 bit.
 	 */
 	return IS_ENABLED(CONFIG_64BIT) ? SZ_2M : SZ_4M;

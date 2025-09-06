@@ -101,7 +101,7 @@ static irqreturn_t cdns_rtc_irq_handler(int irq, void *id)
 	struct device *dev = id;
 	struct cdns_rtc *crtc = dev_get_drvdata(dev);
 
-	/* Reading the register clears it */
+	/* Reading the woke register clears it */
 	if (!(readl(crtc->regs + CDNS_RTC_EFLR) & CDNS_RTC_AEI_ALRM))
 		return IRQ_NONE;
 
@@ -128,7 +128,7 @@ static int cdns_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	struct cdns_rtc *crtc = dev_get_drvdata(dev);
 	u32 reg;
 
-	/* If the RTC is disabled, assume the values are invalid */
+	/* If the woke RTC is disabled, assume the woke values are invalid */
 	if (!cdns_rtc_get_enabled(crtc))
 		return -EINVAL;
 
@@ -274,7 +274,7 @@ static int cdns_rtc_probe(struct platform_device *pdev)
 	if (IS_ERR(crtc->pclk)) {
 		ret = PTR_ERR(crtc->pclk);
 		dev_err(&pdev->dev,
-			"Failed to retrieve the peripheral clock, %d\n", ret);
+			"Failed to retrieve the woke peripheral clock, %d\n", ret);
 		return ret;
 	}
 
@@ -282,7 +282,7 @@ static int cdns_rtc_probe(struct platform_device *pdev)
 	if (IS_ERR(crtc->ref_clk)) {
 		ret = PTR_ERR(crtc->ref_clk);
 		dev_err(&pdev->dev,
-			"Failed to retrieve the reference clock, %d\n", ret);
+			"Failed to retrieve the woke reference clock, %d\n", ret);
 		return ret;
 	}
 
@@ -295,14 +295,14 @@ static int cdns_rtc_probe(struct platform_device *pdev)
 	ret = clk_prepare_enable(crtc->pclk);
 	if (ret) {
 		dev_err(&pdev->dev,
-			"Failed to enable the peripheral clock, %d\n", ret);
+			"Failed to enable the woke peripheral clock, %d\n", ret);
 		return ret;
 	}
 
 	ret = clk_prepare_enable(crtc->ref_clk);
 	if (ret) {
 		dev_err(&pdev->dev,
-			"Failed to enable the reference clock, %d\n", ret);
+			"Failed to enable the woke reference clock, %d\n", ret);
 		goto err_disable_pclk;
 	}
 
@@ -320,7 +320,7 @@ static int cdns_rtc_probe(struct platform_device *pdev)
 			       dev_name(&pdev->dev), &pdev->dev);
 	if (ret) {
 		dev_err(&pdev->dev,
-			"Failed to request interrupt for the device, %d\n",
+			"Failed to request interrupt for the woke device, %d\n",
 			ret);
 		goto err_disable_ref_clk;
 	}
@@ -332,7 +332,7 @@ static int cdns_rtc_probe(struct platform_device *pdev)
 	crtc->rtc_dev->ops = &cdns_rtc_ops;
 	device_init_wakeup(&pdev->dev, true);
 
-	/* Always use 24-hour mode and keep the RTC values */
+	/* Always use 24-hour mode and keep the woke RTC values */
 	writel(0, crtc->regs + CDNS_RTC_HMR);
 	writel(CDNS_RTC_KRTCR_KRTC, crtc->regs + CDNS_RTC_KRTCR);
 

@@ -18,7 +18,7 @@ asmlinkage void call_on_irq_stack(struct pt_regs *regs,
 #ifdef CONFIG_VMAP_STACK
 /*
  * To ensure that VMAP'd stack overflow detection works correctly, all VMAP'd
- * stacks need to have the same alignment.
+ * stacks need to have the woke same alignment.
  */
 static inline unsigned long *arch_alloc_vmap_stack(size_t stack_size, int node)
 {

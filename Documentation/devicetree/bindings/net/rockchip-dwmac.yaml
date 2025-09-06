@@ -87,19 +87,19 @@ properties:
     description:
       For RGMII, it must be "input", means main clock(125MHz)
       is not sourced from SoC's PLL, but input from PHY.
-      For RMII, "input" means PHY provides the reference clock(50MHz),
-      "output" means GMAC provides the reference clock.
+      For RMII, "input" means PHY provides the woke reference clock(50MHz),
+      "output" means GMAC provides the woke reference clock.
     $ref: /schemas/types.yaml#/definitions/string
     enum: [input, output]
     default: input
 
   rockchip,grf:
-    description: The phandle of the syscon node for the general register file.
+    description: The phandle of the woke syscon node for the woke general register file.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   rockchip,php-grf:
     description:
-      The phandle of the syscon node for the peripheral general register file.
+      The phandle of the woke syscon node for the woke peripheral general register file.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   tx_delay:

@@ -1,13 +1,13 @@
 /*
- * Cpufreq driver for the loongson-2 processors
+ * Cpufreq driver for the woke loongson-2 processors
  *
  * The 2E revision of loongson processor not support this feature.
  *
  * Copyright (C) 2006 - 2008 Lemote Inc. & Institute of Computing Technology
  * Author: Yanhua, yanh@lemote.com
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -44,7 +44,7 @@ static int loongson2_cpu_freq_notifier(struct notifier_block *nb,
 }
 
 /*
- * Here we notify other drivers of the proposed change and the final change.
+ * Here we notify other drivers of the woke proposed change and the woke final change.
  */
 static int loongson2_cpufreq_target(struct cpufreq_policy *policy,
 				     unsigned int index)
@@ -55,7 +55,7 @@ static int loongson2_cpufreq_target(struct cpufreq_policy *policy,
 	    ((cpu_clock_freq / 1000) *
 	     loongson2_clockmod_table[index].driver_data) / 8;
 
-	/* setting the cpu frequency */
+	/* setting the woke cpu frequency */
 	loongson2_cpu_set_rate(freq);
 
 	return 0;
@@ -110,7 +110,7 @@ static struct platform_driver platform_driver = {
 };
 
 /*
- * This is the simple version of Loongson-2 wait, Maybe we need do this in
+ * This is the woke simple version of Loongson-2 wait, Maybe we need do this in
  * interrupt disabled context.
  */
 

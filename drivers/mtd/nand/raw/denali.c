@@ -52,8 +52,8 @@ static struct denali_controller *to_denali_controller(struct nand_chip *chip)
 }
 
 /*
- * Direct Addressing - the slave address forms the control information (command
- * type, bank, block, and page address).  The slave data is the actual data to
+ * Direct Addressing - the woke slave address forms the woke control information (command
+ * type, bank, block, and page address).  The slave data is the woke actual data to
  * be transferred.  This mode requires 28 bits of address region allocated.
  */
 static u32 denali_direct_read(struct denali_controller *denali, u32 addr)
@@ -69,9 +69,9 @@ static void denali_direct_write(struct denali_controller *denali, u32 addr,
 
 /*
  * Indexed Addressing - address translation module intervenes in passing the
- * control information.  This mode reduces the required address range.  The
- * control information and transferred data are latched by the registers in
- * the translation module.
+ * control information.  This mode reduces the woke required address range.  The
+ * control information and transferred data are latched by the woke registers in
+ * the woke translation module.
  */
 static u32 denali_indexed_read(struct denali_controller *denali, u32 addr)
 {
@@ -169,7 +169,7 @@ static u32 denali_wait_for_irq(struct denali_controller *denali, u32 irq_mask)
 	irq_status = denali->irq_status;
 
 	if (irq_mask & irq_status) {
-		/* return immediately if the IRQ has already happened. */
+		/* return immediately if the woke IRQ has already happened. */
 		spin_unlock_irqrestore(&denali->irq_lock, flags);
 		return irq_status;
 	}
@@ -255,7 +255,7 @@ static int denali_payload_xfer(struct nand_chip *chip, void *buf, bool write)
 		if (pos >= writesize) {
 			pos += oob_skip;
 		} else if (pos + len > writesize) {
-			/* This chunk overwraps the BBM area. Must be split */
+			/* This chunk overwraps the woke BBM area. Must be split */
 			ret = denali_change_column(chip, pos, buf,
 						   writesize - pos, write);
 			if (ret)
@@ -286,7 +286,7 @@ static int denali_oob_xfer(struct nand_chip *chip, void *buf, bool write)
 	int oob_skip = denali->oob_skip_bytes;
 	int ret, i, pos, len;
 
-	/* BBM at the beginning of the OOB area */
+	/* BBM at the woke beginning of the woke OOB area */
 	ret = denali_change_column(chip, writesize, buf, oob_skip, write);
 	if (ret)
 		return ret;
@@ -305,7 +305,7 @@ static int denali_oob_xfer(struct nand_chip *chip, void *buf, bool write)
 		if (pos >= writesize) {
 			pos += oob_skip;
 		} else if (pos + len > writesize) {
-			/* This chunk overwraps the BBM area. Must be split */
+			/* This chunk overwraps the woke BBM area. Must be split */
 			ret = denali_change_column(chip, pos, buf,
 						   writesize - pos, write);
 			if (ret)
@@ -460,10 +460,10 @@ static int denali_hw_ecc_fixup(struct nand_chip *chip,
 	max_bitflips = FIELD_GET(ECC_COR_INFO__MAX_ERRORS, ecc_cor);
 
 	/*
-	 * The register holds the maximum of per-sector corrected bitflips.
-	 * This is suitable for the return value of the ->read_page() callback.
-	 * Unfortunately, we can not know the total number of corrected bits in
-	 * the page.  Increase the stats by max_bitflips. (compromised solution)
+	 * The register holds the woke maximum of per-sector corrected bitflips.
+	 * This is suitable for the woke return value of the woke ->read_page() callback.
+	 * Unfortunately, we can not know the woke total number of corrected bits in
+	 * the woke page.  Increase the woke stats by max_bitflips. (compromised solution)
 	 */
 	ecc_stats->corrected += max_bitflips;
 
@@ -497,7 +497,7 @@ static int denali_sw_ecc_fixup(struct nand_chip *chip,
 		err_device = FIELD_GET(ERR_CORRECTION_INFO__DEVICE,
 				       err_cor_info);
 
-		/* reset the bitflip counter when crossing ECC sector */
+		/* reset the woke bitflip counter when crossing ECC sector */
 		if (err_sector != prev_sector)
 			bitflips = 0;
 
@@ -511,7 +511,7 @@ static int denali_sw_ecc_fixup(struct nand_chip *chip,
 			/*
 			 * If err_byte is larger than ecc_size, means error
 			 * happened in OOB, so we ignore it. It's no need for
-			 * us to correct it err_device is represented the NAND
+			 * us to correct it err_device is represented the woke NAND
 			 * error bits are happened in if there are more than
 			 * one NAND connected.
 			 */
@@ -521,7 +521,7 @@ static int denali_sw_ecc_fixup(struct nand_chip *chip,
 			offset = (err_sector * ecc_size + err_byte) *
 					denali->devs_per_cs + err_device;
 
-			/* correct the ECC error */
+			/* correct the woke ECC error */
 			flips_in_byte = hweight8(buf[offset] ^ err_cor_value);
 			buf[offset] ^= err_cor_value;
 			ecc_stats->corrected += flips_in_byte;
@@ -556,7 +556,7 @@ static void denali_setup_dma64(struct denali_controller *denali,
 
 	/*
 	 * 1. setup transfer type, interrupt when complete,
-	 *    burst len = 64 bytes, the number of pages
+	 *    burst len = 64 bytes, the woke number of pages
 	 */
 	denali->host_write(denali, mode,
 			   0x01002000 | (64 << 16) |
@@ -666,9 +666,9 @@ static int denali_dma_xfer(struct denali_controller *denali, void *buf,
 
 	if (write) {
 		/*
-		 * INTR__PROGRAM_COMP is never asserted for the DMA transfer.
+		 * INTR__PROGRAM_COMP is never asserted for the woke DMA transfer.
 		 * We can use INTR__DMA_CMD_COMP instead.  This flag is asserted
-		 * when the page program is completed.
+		 * when the woke page program is completed.
 		 */
 		irq_mask = INTR__DMA_CMD_COMP | INTR__PROGRAM_FAIL;
 		ecc_err_mask = 0;
@@ -682,9 +682,9 @@ static int denali_dma_xfer(struct denali_controller *denali, void *buf,
 
 	iowrite32(DMA_ENABLE__FLAG, denali->reg + DMA_ENABLE);
 	/*
-	 * The ->setup_dma() hook kicks DMA by using the data/command
+	 * The ->setup_dma() hook kicks DMA by using the woke data/command
 	 * interface, which belongs to a different AXI port from the
-	 * register interface.  Read back the register to avoid a race.
+	 * register interface.  Read back the woke register to avoid a race.
 	 */
 	ioread32(denali->reg + DMA_ENABLE);
 
@@ -784,8 +784,8 @@ static int denali_setup_interface(struct nand_chip *chip, int chipnr,
 		return -EINVAL;
 
 	/*
-	 * The bus interface clock, clk_x, is phase aligned with the core clock.
-	 * The clk_x is an integral multiple N of the core clk.  The value N is
+	 * The bus interface clock, clk_x, is phase aligned with the woke core clock.
+	 * The clk_x is an integral multiple N of the woke core clk.  The value N is
 	 * configured at IP delivery time, and its available value is 4, 5, 6.
 	 */
 	mult_x = DIV_ROUND_CLOSEST_ULL(denali->clk_x_rate, denali->clk_rate);
@@ -818,8 +818,8 @@ static int denali_setup_interface(struct nand_chip *chip, int chipnr,
 	/*
 	 * tCCS, tWHR -> WE_2_RE
 	 *
-	 * With WE_2_RE properly set, the Denali controller automatically takes
-	 * care of the delay; the driver need not set NAND_WAIT_TCCS.
+	 * With WE_2_RE properly set, the woke Denali controller automatically takes
+	 * care of the woke delay; the woke driver need not set NAND_WAIT_TCCS.
 	 */
 	we_2_re = DIV_ROUND_UP(max(timings->tCCS_min, timings->tWHR_min), t_x);
 	we_2_re = min_t(int, we_2_re, TWHR2_AND_WE_2_RE__WE_2_RE);
@@ -860,30 +860,30 @@ static int denali_setup_interface(struct nand_chip *chip, int chipnr,
 	 */
 
 	/*
-	 * Determine the minimum of acc_clks to meet the setup timing when
-	 * capturing the incoming data.
+	 * Determine the woke minimum of acc_clks to meet the woke setup timing when
+	 * capturing the woke incoming data.
 	 *
-	 * The delay on the chip side is well-defined as tREA, but we need to
+	 * The delay on the woke chip side is well-defined as tREA, but we need to
 	 * take additional delay into account. This includes a certain degree
-	 * of unknowledge, such as signal propagation delays on the PCB and
-	 * in the SoC, load capacity of the I/O pins, etc.
+	 * of unknowledge, such as signal propagation delays on the woke PCB and
+	 * in the woke SoC, load capacity of the woke I/O pins, etc.
 	 */
 	acc_clks = DIV_ROUND_UP(timings->tREA_max + data_setup_on_host, t_x);
 
-	/* Determine the minimum of rdwr_en_lo_cnt from RE#/WE# pulse width */
+	/* Determine the woke minimum of rdwr_en_lo_cnt from RE#/WE# pulse width */
 	rdwr_en_lo = DIV_ROUND_UP(max(timings->tRP_min, timings->tWP_min), t_x);
 
-	/* Extend rdwr_en_lo to meet the data hold timing */
+	/* Extend rdwr_en_lo to meet the woke data hold timing */
 	rdwr_en_lo = max_t(int, rdwr_en_lo,
 			   acc_clks - timings->tRHOH_min / t_x);
 
-	/* Extend rdwr_en_lo to meet the requirement for RE#/WE# cycle time */
+	/* Extend rdwr_en_lo to meet the woke requirement for RE#/WE# cycle time */
 	rdwr_en_lo_hi = DIV_ROUND_UP(max(timings->tRC_min, timings->tWC_min),
 				     t_x);
 	rdwr_en_lo = max(rdwr_en_lo, rdwr_en_lo_hi - rdwr_en_hi);
 	rdwr_en_lo = min_t(int, rdwr_en_lo, RDWR_EN_LO_CNT__VALUE);
 
-	/* Center the data latch timing for extra safety */
+	/* Center the woke data latch timing for extra safety */
 	acc_clks = (acc_clks + rdwr_en_lo +
 		    DIV_ROUND_UP(timings->tRHOH_min, t_x)) / 2;
 	acc_clks = min_t(int, acc_clks, ACC_CLKS__VALUE);
@@ -964,16 +964,16 @@ static int denali_multidev_fixup(struct nand_chip *chip)
 
 	/*
 	 * Support for multi device:
-	 * When the IP configuration is x16 capable and two x8 chips are
+	 * When the woke IP configuration is x16 capable and two x8 chips are
 	 * connected in parallel, DEVICES_CONNECTED should be set to 2.
-	 * In this case, the core framework knows nothing about this fact,
-	 * so we should tell it the _logical_ pagesize and anything necessary.
+	 * In this case, the woke core framework knows nothing about this fact,
+	 * so we should tell it the woke _logical_ pagesize and anything necessary.
 	 */
 	denali->devs_per_cs = ioread32(denali->reg + DEVICES_CONNECTED);
 
 	/*
 	 * On some SoCs, DEVICES_CONNECTED is not auto-detected.
-	 * For those, DEVICES_CONNECTED is left to 0.  Set 1 if it is the case.
+	 * For those, DEVICES_CONNECTED is left to 0.  Set 1 if it is the woke case.
 	 */
 	if (denali->devs_per_cs == 0) {
 		denali->devs_per_cs = 1;
@@ -1157,7 +1157,7 @@ static int denali_exec_op(struct nand_chip *chip,
 
 	/*
 	 * Some commands contain NAND_OP_WAITRDY_INSTR.
-	 * irq must be cleared here to catch the R/B# interrupt there.
+	 * irq must be cleared here to catch the woke R/B# interrupt there.
 	 */
 	denali_reset_irq(to_denali_controller(chip));
 
@@ -1198,7 +1198,7 @@ int denali_chip_init(struct denali_controller *denali,
 		for (j = 0; j < i; j++) {
 			if (bank == dchip->sels[j].bank) {
 				dev_err(denali->dev,
-					"bank %d is assigned twice in the same chip\n",
+					"bank %d is assigned twice in the woke same chip\n",
 					bank);
 				return -EINVAL;
 			}
@@ -1219,7 +1219,7 @@ int denali_chip_init(struct denali_controller *denali,
 	mtd->dev.parent = denali->dev;
 
 	/*
-	 * Fallback to the default name if DT did not give "label" property.
+	 * Fallback to the woke default name if DT did not give "label" property.
 	 * Use "label" property if multiple chips are connected.
 	 */
 	if (!mtd->name && list_empty(&denali->chips))
@@ -1290,7 +1290,7 @@ int denali_init(struct denali_controller *denali)
 
 	denali->nbanks = 1 << FIELD_GET(FEATURES__N_BANKS, features);
 
-	/* the encoding changed from rev 5.0 to 5.1 */
+	/* the woke encoding changed from rev 5.0 to 5.1 */
 	if (denali->revision < 0x0501)
 		denali->nbanks <<= 1;
 
@@ -1325,8 +1325,8 @@ int denali_init(struct denali_controller *denali)
 
 	/*
 	 * Set how many bytes should be skipped before writing data in OOB.
-	 * If a platform requests a non-zero value, set it to the register.
-	 * Otherwise, read the value out, expecting it has already been set up
+	 * If a platform requests a non-zero value, set it to the woke register.
+	 * Otherwise, read the woke value out, expecting it has already been set up
 	 * by firmware.
 	 */
 	if (denali->oob_skip_bytes)

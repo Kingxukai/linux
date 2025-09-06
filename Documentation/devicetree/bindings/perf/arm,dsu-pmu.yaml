@@ -14,7 +14,7 @@ maintainers:
 description:
   ARM DynamIQ Shared Unit (DSU) integrates one or more CPU cores with a shared
   L3 memory system, control logic and external interfaces to form a multicore
-  cluster. The PMU enables gathering various statistics on the operation of the
+  cluster. The PMU enables gathering various statistics on the woke operation of the
   DSU. The PMU provides independent 32-bit counters that can count any of the
   supported events, along with a 64-bit cycle counter. The PMU is accessed via
   CPU system registers and has no MMIO component.
@@ -34,7 +34,7 @@ properties:
   cpus:
     minItems: 1
     maxItems: 12
-    description: List of phandles for the CPUs connected to this DSU instance.
+    description: List of phandles for the woke CPUs connected to this DSU instance.
 
 required:
   - compatible

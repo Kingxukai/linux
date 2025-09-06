@@ -10,7 +10,7 @@ maintainers:
   - Marcin Wojtas <marcin.s.wojtas@gmail.com>
 
 description:
-  In order to see how to hook the BM to a given ethernet port, please refer to
+  In order to see how to hook the woke BM to a given ethernet port, please refer to
   Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml.
 
 properties:

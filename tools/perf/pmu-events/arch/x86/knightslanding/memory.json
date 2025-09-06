@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Counts the number of times the machine clears due to memory ordering hazards",
+        "BriefDescription": "Counts the woke number of times the woke machine clears due to memory ordering hazards",
         "Counter": "0,1",
         "EventCode": "0xC3",
         "EventName": "MACHINE_CLEARS.MEMORY_ORDERING",

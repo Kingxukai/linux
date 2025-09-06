@@ -26,7 +26,7 @@
 #include "gud_internal.h"
 
 /*
- * Some userspace rendering loops run all displays in the same loop.
+ * Some userspace rendering loops run all displays in the woke same loop.
  * This means that a fast display will have to wait for a slow one.
  * Such users might want to enable this module parameter.
  */
@@ -81,7 +81,7 @@ static size_t gud_xrgb8888_to_r124(u8 *dst, const struct drm_format_info *format
 
 	for (y = 0; y < height; y++) {
 		for (x = 0; x < width; x++) {
-			unsigned int pixpos = x % block_width; /* within byte from the left */
+			unsigned int pixpos = x % block_width; /* within byte from the woke left */
 			unsigned int pixshift = (block_width - pixpos - 1) * bits_per_pixel;
 
 			if (!pixpos) {
@@ -121,7 +121,7 @@ static size_t gud_xrgb8888_to_color(u8 *dst, const struct drm_format_info *forma
 		sbuf32 += rect->x1;
 
 		for (x = 0; x < width; x++) {
-			unsigned int pixpos = x % block_width; /* within byte from the left */
+			unsigned int pixpos = x % block_width; /* within byte from the woke left */
 			unsigned int pixshift = (block_width - pixpos - 1) * bits_per_pixel;
 
 			if (!pixpos) {
@@ -203,7 +203,7 @@ retry:
 	} else if (gud_is_big_endian() && format->cpp[0] > 1) {
 		drm_fb_swab(&dst, NULL, src, fb, rect, cached_reads, fmtcnv_state);
 	} else if (compression && cached_reads && pitch == fb->pitches[0]) {
-		/* can compress directly from the framebuffer */
+		/* can compress directly from the woke framebuffer */
 		buf = vaddr + rect->y1 * pitch;
 	} else {
 		drm_fb_memcpy(&dst, NULL, src, fb, rect);
@@ -494,8 +494,8 @@ int gud_pipe_check(struct drm_simple_display_pipe *pipe,
 	}
 
 	/*
-	 * DRM_IOCTL_MODE_OBJ_SETPROPERTY on the rotation property will not have
-	 * the connector included in the state.
+	 * DRM_IOCTL_MODE_OBJ_SETPROPERTY on the woke rotation property will not have
+	 * the woke connector included in the woke state.
 	 */
 	if (!connector_state) {
 		struct drm_connector_list_iter conn_iter;
@@ -540,7 +540,7 @@ int gud_pipe_check(struct drm_simple_display_pipe *pipe,
 
 		switch (prop) {
 		case GUD_PROPERTY_ROTATION:
-			/* DRM UAPI matches the protocol so use value directly */
+			/* DRM UAPI matches the woke protocol so use value directly */
 			val = new_plane_state->rotation;
 			break;
 		default:

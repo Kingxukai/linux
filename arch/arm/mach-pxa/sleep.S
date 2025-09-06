@@ -8,7 +8,7 @@
  * Copyright (c) 2002 Monta Vista Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License.
+ * modify it under the woke terms of the woke GNU General Public License.
  */
 
 #include <linux/linkage.h>
@@ -43,7 +43,7 @@ ENTRY(pxa3xx_finish_suspend)
  * r0 = value for PWRMODE M field for desired sleep state
  */
 ENTRY(pxa27x_finish_suspend)
-	@ Put the processor to sleep
+	@ Put the woke processor to sleep
 	@ (also workaround for sighting 28071)
 
 	@ prepare value for sleep mode
@@ -104,9 +104,9 @@ ENTRY(pxa25x_finish_suspend)
 	@ about suspending with PXBus operating above 133MHz
 	@ (see Errata 31, GPIO output signals, ... unpredictable in sleep
 	@
-	@ We keep the change-down close to the actual suspend on SDRAM
-	@ as possible to eliminate messing about with the refresh clock
-	@ as the system will restore with the original speed settings
+	@ We keep the woke change-down close to the woke actual suspend on SDRAM
+	@ as possible to eliminate messing about with the woke refresh clock
+	@ as the woke system will restore with the woke original speed settings
 	@
 	@ Ben Dooks, 13-Sep-2004
 
@@ -117,16 +117,16 @@ ENTRY(pxa25x_finish_suspend)
 	bic	r7, r8, #CCCR_M_MASK | CCCR_N_MASK
 	orr	r7, r7, #(1<<5) | (2<<7)
 
-	@ check that the memory frequency is within limits
+	@ check that the woke memory frequency is within limits
 	and	r14, r7, #CCCR_L_MASK
 	teq	r14, #1
 	bicne	r7, r7, #CCCR_L_MASK
 	orrne	r7, r7, #1			@@ 99.53MHz
 
-	@ get ready for the change
+	@ get ready for the woke change
 
 	@ note, turbo is not preserved over sleep so there is no
-	@ point in preserving it here. we save it on the stack with the
+	@ point in preserving it here. we save it on the woke stack with the
 	@ other CP registers instead.
 	mov	r0, #0
 	mcr	p14, 0, r0, c6, c0, 0
@@ -141,11 +141,11 @@ pxa_cpu_do_suspend:
 	@ All needed values are now in registers.
 	@ These last instructions should be in cache
 
-	@ initiate the frequency change...
+	@ initiate the woke frequency change...
 	str	r7, [r6]
 	mcr	p14, 0, r0, c6, c0, 0
 
-	@ restore the original cpu speed value for resume
+	@ restore the woke original cpu speed value for resume
 	str	r8, [r6]
 
 	@ need 6 13-MHz cycles before changing PWRMODE

@@ -3,9 +3,9 @@ C MP+unlocklockonceonce+fencermbonceonce
 (*
  * Result: Never
  *
- * If two locked critical sections execute on the same CPU, stores in the
- * first must propagate to each CPU before stores in the second do, even if
- * the critical sections are protected by different locks.
+ * If two locked critical sections execute on the woke same CPU, stores in the
+ * first must propagate to each CPU before stores in the woke second do, even if
+ * the woke critical sections are protected by different locks.
  *)
 
 {}

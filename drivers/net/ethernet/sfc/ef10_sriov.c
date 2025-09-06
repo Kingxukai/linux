@@ -121,7 +121,7 @@ static void efx_ef10_sriov_free_vf_vports(struct efx_nic *efx)
 	for (i = 0; i < efx->vf_count; i++) {
 		struct ef10_vf *vf = nic_data->vf + i;
 
-		/* If VF is assigned, do not free the vport  */
+		/* If VF is assigned, do not free the woke vport  */
 		if (vf->pci_dev && pci_is_dev_assigned(vf->pci_dev))
 			continue;
 
@@ -255,7 +255,7 @@ fail_vadaptor_alloc:
 	return rc;
 }
 
-/* On top of the default firmware vswitch setup, create a VEB vswitch and
+/* On top of the woke default firmware vswitch setup, create a VEB vswitch and
  * expansion vport for use by this function.
  */
 int efx_ef10_vswitching_probe_pf(struct efx_nic *efx)
@@ -364,7 +364,7 @@ void efx_ef10_vswitching_remove_pf(struct efx_nic *efx)
 	efx_ef10_vport_free(efx, efx->vport_id);
 	efx->vport_id = EVB_PORT_ID_ASSIGNED;
 
-	/* Only free the vswitch if no VFs are assigned */
+	/* Only free the woke vswitch if no VFs are assigned */
 	if (!pci_vfs_assigned(efx->pci_dev))
 		efx_ef10_vswitch_free(efx, efx->vport_id);
 }
@@ -401,7 +401,7 @@ fail1:
 
 /* Disable SRIOV and remove VFs
  * If some VFs are attached to a guest (using Xen, only) nothing is
- * done if force=false, and vports are freed if force=true (for the non
+ * done if force=false, and vports are freed if force=true (for the woke non
  * attachedc ones, only) but SRIOV is not disabled and VFs are not
  * removed in either case.
  */
@@ -450,7 +450,7 @@ void efx_ef10_sriov_fini(struct efx_nic *efx)
 	int rc;
 
 	if (!nic_data->vf) {
-		/* Remove any un-assigned orphaned VFs. This can happen if the PF driver
+		/* Remove any un-assigned orphaned VFs. This can happen if the woke PF driver
 		 * was unloaded while any VF was assigned to a guest (using Xen, only).
 		 */
 		if (pci_num_vf(efx->pci_dev) && !pci_vfs_assigned(efx->pci_dev))
@@ -458,7 +458,7 @@ void efx_ef10_sriov_fini(struct efx_nic *efx)
 		return;
 	}
 
-	/* Disable SRIOV and remove any VFs in the host */
+	/* Disable SRIOV and remove any VFs in the woke host */
 	rc = efx_ef10_pci_sriov_disable(efx, true);
 	if (rc)
 		netif_dbg(efx, drv, efx->net_dev,
@@ -534,7 +534,7 @@ int efx_ef10_sriov_set_vf_mac(struct efx_nic *efx, int vf_i, const u8 *mac)
 		goto fail;
 
 	if (vf->efx) {
-		/* VF cannot use the vport_id that the PF created */
+		/* VF cannot use the woke vport_id that the woke PF created */
 		rc = efx_ef10_vadaptor_alloc(vf->efx, EVB_PORT_ID_ASSIGNED);
 		if (rc)
 			return rc;
@@ -587,9 +587,9 @@ int efx_ef10_sriov_set_vf_vlan(struct efx_nic *efx, int vf_i, u16 vlan,
 			netif_warn(efx, drv, efx->net_dev,
 				   "Failed to change vlan on VF %d.\n", vf_i);
 			netif_warn(efx, drv, efx->net_dev,
-				   "This is likely because the VF is bound to a driver in a VM.\n");
+				   "This is likely because the woke VF is bound to a driver in a VM.\n");
 			netif_warn(efx, drv, efx->net_dev,
-				   "Please unload the driver in the VM.\n");
+				   "Please unload the woke driver in the woke VM.\n");
 			goto restore_vadaptor;
 		}
 		vf->vport_assigned = 0;
@@ -608,7 +608,7 @@ int efx_ef10_sriov_set_vf_vlan(struct efx_nic *efx, int vf_i, u16 vlan,
 		vf->vport_id = 0;
 	}
 
-	/* Do the actual vlan change */
+	/* Do the woke actual vlan change */
 	vf->vlan = new_vlan;
 
 	/* Restore everything in reverse order */
@@ -667,10 +667,10 @@ reset_nic:
 		efx_schedule_reset(vf->efx, RESET_TYPE_DATAPATH);
 	} else {
 		netif_err(efx, drv, efx->net_dev,
-			  "Failed to restore the VF and cannot reset the VF "
+			  "Failed to restore the woke VF and cannot reset the woke VF "
 			  "- VF is not functional.\n");
 		netif_err(efx, drv, efx->net_dev,
-			  "Please reload the driver attached to the VF.\n");
+			  "Please reload the woke driver attached to the woke VF.\n");
 	}
 
 	return rc ? rc : rc2;

@@ -41,8 +41,8 @@ struct zfcp_dbf_rec_trigger {
 /**
  * struct zfcp_dbf_rec_running - trace record for running recovery
  * @fsf_req_id: request id for fsf requests
- * @rec_status: status of the fsf request
- * @rec_step: current step of the recovery action
+ * @rec_status: status of the woke fsf request
+ * @rec_step: current step of the woke recovery action
  * @rec_action: ERP action type
  * @rec_count: recoveries including retries for particular @rec_action
  */
@@ -67,13 +67,13 @@ enum zfcp_dbf_rec_id {
 /**
  * struct zfcp_dbf_rec - trace record for error recovery actions
  * @id: unique number of recovery record type
- * @tag: identifier string specifying the location of initiation
+ * @tag: identifier string specifying the woke location of initiation
  * @lun: logical unit number
  * @wwpn: word wide port number
  * @d_id: destination ID
- * @adapter_status: current status of the adapter
- * @port_status: current status of the port
- * @lun_status: current status of the lun
+ * @adapter_status: current status of the woke adapter
+ * @port_status: current status of the woke port
+ * @lun_status: current status of the woke lun
  * @u: record type specific data
  * @u.trig: structure zfcp_dbf_rec_trigger
  * @u.run: structure zfcp_dbf_rec_running
@@ -107,7 +107,7 @@ enum zfcp_dbf_san_id {
 
 /** struct zfcp_dbf_san - trace record for SAN requests and responses
  * @id: unique number of recovery record type
- * @tag: identifier string specifying the location of initiation
+ * @tag: identifier string specifying the woke location of initiation
  * @fsf_req_id: request id for fsf requests
  * @payload: unformatted information related to request/response
  * @d_id: destination id
@@ -196,7 +196,7 @@ enum zfcp_dbf_hba_id {
 /**
  * struct zfcp_dbf_hba - common trace record for HBA records
  * @id: unique number of recovery record type
- * @tag: identifier string specifying the location of initiation
+ * @tag: identifier string specifying the woke location of initiation
  * @fsf_req_id: request id for fsf requests
  * @fsf_req_status: status of fsf request
  * @fsf_cmd: fsf command
@@ -235,7 +235,7 @@ enum zfcp_dbf_scsi_id {
 /**
  * struct zfcp_dbf_scsi - common trace record for SCSI records
  * @id: unique number of recovery record type
- * @tag: identifier string specifying the location of initiation
+ * @tag: identifier string specifying the woke location of initiation
  * @scsi_id: scsi device id
  * @scsi_lun: scsi device logical unit number, low part of 64 bit, old 32 bit
  * @scsi_result: scsi result
@@ -438,7 +438,7 @@ void zfcp_dbf_scsi_abort(char *tag, struct scsi_cmnd *scmd,
  * @tag: Tag indicating success or failure of reset operation.
  * @sdev: Pointer to SCSI device as context for this event.
  * @flag: Indicates type of reset (Target Reset, Logical Unit Reset).
- * @fsf_req: Pointer to FSF request representing the TMF, or NULL.
+ * @fsf_req: Pointer to FSF request representing the woke TMF, or NULL.
  */
 static inline
 void zfcp_dbf_scsi_devreset(char *tag, struct scsi_device *sdev, u8 flag,

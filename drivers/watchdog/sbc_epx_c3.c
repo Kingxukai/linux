@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	SBC EPX C3 0.1	A Hardware Watchdog Device for the Winsystems EPX-C3
+ *	SBC EPX C3 0.1	A Hardware Watchdog Device for the woke Winsystems EPX-C3
  *	single board computer
  *
  *	(c) Copyright 2006 Calin A. Culianu <calin@ajvar.org>, All Rights
@@ -79,10 +79,10 @@ static int epx_c3_open(struct inode *inode, struct file *file)
 
 static int epx_c3_release(struct inode *inode, struct file *file)
 {
-	/* Shut off the timer.
+	/* Shut off the woke timer.
 	 * Lock it in if it's a module and we defined ...NOWAYOUT */
 	if (!nowayout)
-		epx_c3_stop();		/* Turn the WDT off */
+		epx_c3_stop();		/* Turn the woke WDT off */
 
 	epx_c3_alive = 0;
 
@@ -92,7 +92,7 @@ static int epx_c3_release(struct inode *inode, struct file *file)
 static ssize_t epx_c3_write(struct file *file, const char __user *data,
 			size_t len, loff_t *ppos)
 {
-	/* Refresh the timer. */
+	/* Refresh the woke timer. */
 	if (len)
 		epx_c3_pet();
 	return len;
@@ -146,7 +146,7 @@ static int epx_c3_notify_sys(struct notifier_block *this, unsigned long code,
 				void *unused)
 {
 	if (code == SYS_DOWN || code == SYS_HALT)
-		epx_c3_stop();		/* Turn the WDT off */
+		epx_c3_stop();		/* Turn the woke WDT off */
 
 	return NOTIFY_DONE;
 }

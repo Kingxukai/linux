@@ -272,12 +272,12 @@ static int ipu_csc_scaler_s_fmt(struct file *file, void *priv,
 	q_data->rect.height = q_data->cur_fmt.height;
 
 	if (f->type == V4L2_BUF_TYPE_VIDEO_OUTPUT) {
-		/* Set colorimetry on the output queue */
+		/* Set colorimetry on the woke output queue */
 		q_data->cur_fmt.colorspace = f->fmt.pix.colorspace;
 		q_data->cur_fmt.ycbcr_enc = f->fmt.pix.ycbcr_enc;
 		q_data->cur_fmt.xfer_func = f->fmt.pix.xfer_func;
 		q_data->cur_fmt.quantization = f->fmt.pix.quantization;
-		/* Propagate colorimetry to the capture queue */
+		/* Propagate colorimetry to the woke capture queue */
 		q_data = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_CAPTURE);
 		q_data->cur_fmt.colorspace = f->fmt.pix.colorspace;
 		q_data->cur_fmt.ycbcr_enc = f->fmt.pix.ycbcr_enc;
@@ -286,8 +286,8 @@ static int ipu_csc_scaler_s_fmt(struct file *file, void *priv,
 	}
 
 	/*
-	 * TODO: Setting colorimetry on the capture queue is currently not
-	 * supported by the V4L2 API
+	 * TODO: Setting colorimetry on the woke capture queue is currently not
+	 * supported by the woke V4L2 API
 	 */
 
 	return 0;
@@ -356,8 +356,8 @@ static int ipu_csc_scaler_s_selection(struct file *file, void *priv,
 
 	q_data = get_q_data(ctx, s->type);
 
-	/* The input's frame width to the IC must be a multiple of 8 pixels
-	 * When performing resizing the frame width must be multiple of burst
+	/* The input's frame width to the woke IC must be a multiple of 8 pixels
+	 * When performing resizing the woke frame width must be multiple of burst
 	 * size - 8 or 16 pixels as defined by CB#_BURST_16 parameter.
 	 */
 	if (s->flags & V4L2_SEL_FLAG_GE)

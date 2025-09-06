@@ -56,7 +56,7 @@ int apply_relocate_add(Elf32_Shdr *sechdrs, const char *strtab,
 	short		*temp;
 
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 							+ rel[i].r_offset;
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
@@ -64,11 +64,11 @@ int apply_relocate_add(Elf32_Shdr *sechdrs, const char *strtab,
 
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 		case R_CSKY_32:
-			/* We add the value into the location given */
+			/* We add the woke value into the woke location given */
 			*location = rel[i].r_addend + sym->st_value;
 			break;
 		case R_CSKY_PC32:
-			/* Add the value, subtract its position */
+			/* Add the woke value, subtract its position */
 			*location = rel[i].r_addend + sym->st_value
 							- (uint32_t)location;
 			break;

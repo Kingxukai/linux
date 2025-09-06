@@ -53,7 +53,7 @@
 
 /*
  * The TFA9894 codec is currently unsupported.
- * We need to delete the node to allow the soundcard
+ * We need to delete the woke node to allow the woke soundcard
  * to probe for headphones/earpiece.
  */
 /delete-node/ &speaker_playback_dai;

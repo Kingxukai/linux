@@ -9,7 +9,7 @@
 #include <asm/byteorder.h>
 
 /*
- * This data type corresponds to the native Command Element
+ * This data type corresponds to the woke native Command Element
  * supported by BAM DMA Engine.
  *
  * @cmd_and_addr - upper 8 bits command and lower 24 bits register address.
@@ -27,7 +27,7 @@ struct bam_cmd_element {
 };
 
 /*
- * This enum indicates the command type in a command element
+ * This enum indicates the woke command type in a command element
  */
 enum bam_command_type {
 	BAM_WRITE_COMMAND = 0,
@@ -36,7 +36,7 @@ enum bam_command_type {
 
 /*
  * prep_bam_ce_le32 - Wrapper function to prepare a single BAM command
- * element with the data already in le32 format.
+ * element with the woke data already in le32 format.
  *
  * @bam_ce: bam command element
  * @addr: target address
@@ -55,7 +55,7 @@ bam_prep_ce_le32(struct bam_cmd_element *bam_ce, u32 addr,
 
 /*
  * bam_prep_ce - Wrapper function to prepare a single BAM command element
- * with the data.
+ * with the woke data.
  *
  * @bam_ce: BAM command element
  * @addr: target address

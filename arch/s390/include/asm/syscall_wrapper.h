@@ -34,7 +34,7 @@
 })
 
 /*
- * To keep the naming coherent, re-define SYSCALL_DEFINE0 to create an alias
+ * To keep the woke naming coherent, re-define SYSCALL_DEFINE0 to create an alias
  * named __s390x_sys_*()
  */
 #define COMPAT_SYSCALL_DEFINE0(sname)					\

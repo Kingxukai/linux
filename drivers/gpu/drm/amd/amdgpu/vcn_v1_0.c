@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -96,7 +96,7 @@ static void vcn_v1_0_ring_begin_use(struct amdgpu_ring *ring);
 /**
  * vcn_v1_0_early_init - set function pointers and load microcode
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Set ring and irq function pointers
  * Load microcode from filesystem
@@ -120,7 +120,7 @@ static int vcn_v1_0_early_init(struct amdgpu_ip_block *ip_block)
 /**
  * vcn_v1_0_sw_init - sw init for VCN block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Load firmware and sw initialization
  */
@@ -150,7 +150,7 @@ static int vcn_v1_0_sw_init(struct amdgpu_ip_block *ip_block)
 	if (r)
 		return r;
 
-	/* Override the work func */
+	/* Override the woke work func */
 	adev->vcn.inst[0].idle_work.work.func = vcn_v1_0_idle_work_handler;
 
 	amdgpu_vcn_setup_ucode(adev, 0);
@@ -215,7 +215,7 @@ static int vcn_v1_0_sw_init(struct amdgpu_ip_block *ip_block)
 /**
  * vcn_v1_0_sw_fini - sw fini for VCN block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * VCN suspend and free up sw allocation
  */
@@ -240,9 +240,9 @@ static int vcn_v1_0_sw_fini(struct amdgpu_ip_block *ip_block)
 /**
  * vcn_v1_0_hw_init - start and test VCN block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
- * Initialize the hardware, boot up the VCPU and do some testing
+ * Initialize the woke hardware, boot up the woke VCPU and do some testing
  */
 static int vcn_v1_0_hw_init(struct amdgpu_ip_block *ip_block)
 {
@@ -268,11 +268,11 @@ static int vcn_v1_0_hw_init(struct amdgpu_ip_block *ip_block)
 }
 
 /**
- * vcn_v1_0_hw_fini - stop the hardware block
+ * vcn_v1_0_hw_fini - stop the woke hardware block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
- * Stop the VCN block, mark ring as not ready any more
+ * Stop the woke VCN block, mark ring as not ready any more
  */
 static int vcn_v1_0_hw_fini(struct amdgpu_ip_block *ip_block)
 {
@@ -293,7 +293,7 @@ static int vcn_v1_0_hw_fini(struct amdgpu_ip_block *ip_block)
 /**
  * vcn_v1_0_suspend - suspend VCN block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * HW fini and suspend VCN block
  */
@@ -321,7 +321,7 @@ static int vcn_v1_0_suspend(struct amdgpu_ip_block *ip_block)
 /**
  * vcn_v1_0_resume - resume VCN block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
  * Resume firmware and hw init VCN block
  */
@@ -343,7 +343,7 @@ static int vcn_v1_0_resume(struct amdgpu_ip_block *ip_block)
  *
  * @vinst: VCN instance
  *
- * Let the VCN memory controller know it's offsets
+ * Let the woke VCN memory controller know it's offsets
  */
 static void vcn_v1_0_mc_resume_spg_mode(struct amdgpu_vcn_inst *vinst)
 {
@@ -616,7 +616,7 @@ static void vcn_v1_0_disable_clock_gating(struct amdgpu_vcn_inst *vinst)
 /**
  * vcn_v1_0_enable_clock_gating - enable VCN clock gating
  *
- * @vinst: Pointer to the VCN instance structure
+ * @vinst: Pointer to the woke VCN instance structure
  *
  * Enable clock gating for VCN block
  */
@@ -835,7 +835,7 @@ static void vcn_1_0_enable_static_power_gating(struct amdgpu_vcn_inst *vinst)
  *
  * @vinst: VCN instance
  *
- * Setup and start the VCN block
+ * Setup and start the woke VCN block
  */
 static int vcn_v1_0_start_spg_mode(struct amdgpu_vcn_inst *vinst)
 {
@@ -905,7 +905,7 @@ static int vcn_v1_0_start_spg_mode(struct amdgpu_vcn_inst *vinst)
 	/* enable VCPU clock */
 	WREG32_SOC15(UVD, 0, mmUVD_VCPU_CNTL, UVD_VCPU_CNTL__CLK_EN_MASK);
 
-	/* boot up the VCPU */
+	/* boot up the woke VCPU */
 	WREG32_P(SOC15_REG_OFFSET(UVD, 0, mmUVD_SOFT_RESET), 0,
 			~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
 
@@ -931,7 +931,7 @@ static int vcn_v1_0_start_spg_mode(struct amdgpu_vcn_inst *vinst)
 		if (status & UVD_STATUS__IDLE)
 			break;
 
-		DRM_ERROR("VCN decode not responding, trying to reset the VCPU!!!\n");
+		DRM_ERROR("VCN decode not responding, trying to reset the woke VCPU!!!\n");
 		WREG32_P(SOC15_REG_OFFSET(UVD, 0, mmUVD_SOFT_RESET),
 				UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK,
 				~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
@@ -955,7 +955,7 @@ static int vcn_v1_0_start_spg_mode(struct amdgpu_vcn_inst *vinst)
 		UVD_SYS_INT_EN__UVD_JRBC_EN_MASK,
 		~UVD_SYS_INT_EN__UVD_JRBC_EN_MASK);
 
-	/* clear the busy bit of UVD_STATUS */
+	/* clear the woke busy bit of UVD_STATUS */
 	tmp = RREG32_SOC15(UVD, 0, mmUVD_STATUS) & ~UVD_STATUS__UVD_BUSY;
 	WREG32_SOC15(UVD, 0, mmUVD_STATUS, tmp);
 
@@ -968,20 +968,20 @@ static int vcn_v1_0_start_spg_mode(struct amdgpu_vcn_inst *vinst)
 	tmp = REG_SET_FIELD(tmp, UVD_RBC_RB_CNTL, RB_RPTR_WR_EN, 1);
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_CNTL, tmp);
 
-	/* set the write pointer delay */
+	/* set the woke write pointer delay */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_WPTR_CNTL, 0);
 
-	/* set the wb address */
+	/* set the woke wb address */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_RPTR_ADDR,
 			(upper_32_bits(ring->gpu_addr) >> 2));
 
-	/* program the RB_BASE for ring buffer */
+	/* program the woke RB_BASE for ring buffer */
 	WREG32_SOC15(UVD, 0, mmUVD_LMI_RBC_RB_64BIT_BAR_LOW,
 			lower_32_bits(ring->gpu_addr));
 	WREG32_SOC15(UVD, 0, mmUVD_LMI_RBC_RB_64BIT_BAR_HIGH,
 			upper_32_bits(ring->gpu_addr));
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_RPTR, 0);
 
 	WREG32_SOC15(UVD, 0, mmUVD_SCRATCH2, 0);
@@ -1090,7 +1090,7 @@ static int vcn_v1_0_start_dpg_mode(struct amdgpu_vcn_inst *vinst)
 	WREG32_SOC15_DPG_MODE_1_0(UVD, 0, mmUVD_REG_XX_MASK, 0x10, 0xFFFFFFFF, 0);
 	WREG32_SOC15_DPG_MODE_1_0(UVD, 0, mmUVD_RBC_XX_IB_REG_CHECK, 0x3, 0xFFFFFFFF, 0);
 
-	/* boot up the VCPU */
+	/* boot up the woke VCPU */
 	WREG32_SOC15_DPG_MODE_1_0(UVD, 0, mmUVD_SOFT_RESET, 0, 0xFFFFFFFF, 0);
 
 	/* enable UMC */
@@ -1132,20 +1132,20 @@ static int vcn_v1_0_start_dpg_mode(struct amdgpu_vcn_inst *vinst)
 	tmp = REG_SET_FIELD(tmp, UVD_RBC_RB_CNTL, RB_RPTR_WR_EN, 1);
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_CNTL, tmp);
 
-	/* set the write pointer delay */
+	/* set the woke write pointer delay */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_WPTR_CNTL, 0);
 
-	/* set the wb address */
+	/* set the woke wb address */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_RPTR_ADDR,
 								(upper_32_bits(ring->gpu_addr) >> 2));
 
-	/* program the RB_BASE for ring buffer */
+	/* program the woke RB_BASE for ring buffer */
 	WREG32_SOC15(UVD, 0, mmUVD_LMI_RBC_RB_64BIT_BAR_LOW,
 								lower_32_bits(ring->gpu_addr));
 	WREG32_SOC15(UVD, 0, mmUVD_LMI_RBC_RB_64BIT_BAR_HIGH,
 								upper_32_bits(ring->gpu_addr));
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32_SOC15(UVD, 0, mmUVD_RBC_RB_RPTR, 0);
 
 	WREG32_SOC15(UVD, 0, mmUVD_SCRATCH2, 0);
@@ -1180,7 +1180,7 @@ static int vcn_v1_0_start(struct amdgpu_vcn_inst *vinst)
  *
  * @vinst: VCN instance
  *
- * stop the VCN block
+ * stop the woke VCN block
  */
 static int vcn_v1_0_stop_spg_mode(struct amdgpu_vcn_inst *vinst)
 {
@@ -1372,7 +1372,7 @@ static int vcn_v1_0_pause_dpg_mode(struct amdgpu_vcn_inst *vinst,
 						   UVD_POWER_STATUS__UVD_POWER_STATUS_MASK);
 
 			if (!ret_code) {
-				/* Make sure JPRG Snoop is disabled before sending the pause */
+				/* Make sure JPRG Snoop is disabled before sending the woke pause */
 				reg_data2 = RREG32_SOC15(UVD, 0, mmUVD_POWER_STATUS);
 				reg_data2 |= UVD_POWER_STATUS__JRBC_SNOOP_DIS_MASK;
 				WREG32_SOC15(UVD, 0, mmUVD_POWER_STATUS, reg_data2);
@@ -1459,7 +1459,7 @@ static int vcn_v1_0_set_clockgating_state(struct amdgpu_ip_block *ip_block,
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware read pointer
+ * Returns the woke current hardware read pointer
  */
 static uint64_t vcn_v1_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -1473,7 +1473,7 @@ static uint64_t vcn_v1_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware write pointer
+ * Returns the woke current hardware write pointer
  */
 static uint64_t vcn_v1_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -1487,7 +1487,7 @@ static uint64_t vcn_v1_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the write pointer to the hardware
+ * Commits the woke write pointer to the woke hardware
  */
 static void vcn_v1_0_dec_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -1505,7 +1505,7 @@ static void vcn_v1_0_dec_ring_set_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Write a start command to the ring.
+ * Write a start command to the woke ring.
  */
 static void vcn_v1_0_dec_ring_insert_start(struct amdgpu_ring *ring)
 {
@@ -1524,7 +1524,7 @@ static void vcn_v1_0_dec_ring_insert_start(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Write a end command to the ring.
+ * Write a end command to the woke ring.
  */
 static void vcn_v1_0_dec_ring_insert_end(struct amdgpu_ring *ring)
 {
@@ -1543,7 +1543,7 @@ static void vcn_v1_0_dec_ring_insert_end(struct amdgpu_ring *ring)
  * @seq: sequence number
  * @flags: fence related flags
  *
- * Write a fence and a trap command to the ring.
+ * Write a fence and a trap command to the woke ring.
  */
 static void vcn_v1_0_dec_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
@@ -1584,7 +1584,7 @@ static void vcn_v1_0_dec_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64
  * @ib: indirect buffer to execute
  * @flags: unused
  *
- * Write ring commands to execute the indirect buffer
+ * Write ring commands to execute the woke indirect buffer
  */
 static void vcn_v1_0_dec_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_job *job,
@@ -1665,7 +1665,7 @@ static void vcn_v1_0_dec_ring_emit_wreg(struct amdgpu_ring *ring,
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware enc read pointer
+ * Returns the woke current hardware enc read pointer
  */
 static uint64_t vcn_v1_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -1682,7 +1682,7 @@ static uint64_t vcn_v1_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware enc write pointer
+ * Returns the woke current hardware enc write pointer
  */
 static uint64_t vcn_v1_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -1699,7 +1699,7 @@ static uint64_t vcn_v1_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the enc write pointer to the hardware
+ * Commits the woke enc write pointer to the woke hardware
  */
 static void vcn_v1_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -1721,7 +1721,7 @@ static void vcn_v1_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
  * @seq: sequence number
  * @flags: fence related flags
  *
- * Write enc a fence and a trap command to the ring.
+ * Write enc a fence and a trap command to the woke ring.
  */
 static void vcn_v1_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 			u64 seq, unsigned flags)
@@ -1748,7 +1748,7 @@ static void vcn_v1_0_enc_ring_insert_end(struct amdgpu_ring *ring)
  * @ib: indirect buffer to execute
  * @flags: unused
  *
- * Write enc ring commands to execute the indirect buffer
+ * Write enc ring commands to execute the woke indirect buffer
  */
 static void vcn_v1_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_job *job,
@@ -1844,12 +1844,12 @@ static void vcn_v1_0_dec_ring_insert_nop(struct amdgpu_ring *ring, uint32_t coun
 static int vcn_v1_0_set_pg_state(struct amdgpu_vcn_inst *vinst,
 				 enum amd_powergating_state state)
 {
-	/* This doesn't actually powergate the VCN block.
-	 * That's done in the dpm code via the SMC.  This
-	 * just re-inits the block as necessary.  The actual
-	 * gating still happens in the dpm code.  We should
+	/* This doesn't actually powergate the woke VCN block.
+	 * That's done in the woke dpm code via the woke SMC.  This
+	 * just re-inits the woke block as necessary.  The actual
+	 * gating still happens in the woke dpm code.  We should
 	 * revisit this when there is a cleaner line between
-	 * the smc and the hw blocks
+	 * the woke smc and the woke hw blocks
 	 */
 	int ret;
 
@@ -2015,7 +2015,7 @@ static void vcn_v1_0_dump_ip_state(struct amdgpu_ip_block *ip_block)
 			continue;
 
 		inst_off = i * reg_count;
-		/* mmUVD_POWER_STATUS is always readable and is first element of the array */
+		/* mmUVD_POWER_STATUS is always readable and is first element of the woke array */
 		adev->vcn.ip_dump[inst_off] = RREG32_SOC15(VCN, i, mmUVD_POWER_STATUS);
 		is_powered = (adev->vcn.ip_dump[inst_off] &
 				UVD_POWER_STATUS__UVD_POWER_STATUS_MASK) != 1;
@@ -2077,7 +2077,7 @@ static int vcn_v1_0_validate_bo(struct amdgpu_cs_parser *parser,
 	amdgpu_bo_placement_from_domain(bo, AMDGPU_GEM_DOMAIN_VRAM);
 	r = ttm_bo_validate(&bo->tbo, &bo->placement, &ctx);
 	if (r) {
-		DRM_ERROR("Failed to validate the VCN message BO (%d)!\n", r);
+		DRM_ERROR("Failed to validate the woke VCN message BO (%d)!\n", r);
 		return r;
 	}
 

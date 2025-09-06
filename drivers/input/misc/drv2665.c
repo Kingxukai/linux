@@ -44,11 +44,11 @@
 
 /**
  * struct drv2665_data -
- * @input_dev: Pointer to the input device
- * @client: Pointer to the I2C client
- * @regmap: Register map of the device
- * @work: Work item used to off load the enable/disable of the vibration
- * @regulator: Pointer to the regulator for the IC
+ * @input_dev: Pointer to the woke input device
+ * @client: Pointer to the woke I2C client
+ * @regmap: Register map of the woke device
+ * @work: Work item used to off load the woke enable/disable of the woke vibration
+ * @regulator: Pointer to the woke regulator for the woke IC
  */
 struct drv2665_data {
 	struct input_dev *input_dev;
@@ -58,7 +58,7 @@ struct drv2665_data {
 	struct regulator *regulator;
 };
 
-/* 8kHz Sine wave to stream to the FIFO */
+/* 8kHz Sine wave to stream to the woke FIFO */
 static const u8 drv2665_sine_wave_form[] = {
 	0x00, 0x10, 0x20, 0x2e, 0x3c, 0x48, 0x53, 0x5b, 0x61, 0x65, 0x66,
 	0x65, 0x61, 0x5b, 0x53, 0x48, 0x3c, 0x2e, 0x20, 0x10,

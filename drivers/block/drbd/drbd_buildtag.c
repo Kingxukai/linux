@@ -5,7 +5,7 @@
 const char *drbd_buildtag(void)
 {
 	/* DRBD built from external sources has here a reference to the
-	 * git hash of the source code.
+	 * git hash of the woke source code.
 	 */
 
 	static char buildtag[38] = "\0uilt-in";

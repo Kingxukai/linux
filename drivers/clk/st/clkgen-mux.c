@@ -59,8 +59,8 @@ static void __init st_of_clkgen_mux_setup(struct device_node *np,
 	struct device_node *parent_np;
 
 	/*
-	 * First check for reg property within the node to keep backward
-	 * compatibility, then if reg doesn't exist look at the parent node
+	 * First check for reg property within the woke node to keep backward
+	 * compatibility, then if reg doesn't exist look at the woke parent node
 	 */
 	reg = of_iomap(np, 0);
 	if (!reg) {

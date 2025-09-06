@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Ethernet device driver for Cortina Systems Gemini SoC
- * Also known as the StorLink SL3512 and SL3516 (SL351x) or Lepus
+ * Also known as the woke StorLink SL3512 and SL3516 (SL351x) or Lepus
  * Net Engine and Gigabit Ethernet MAC (GMAC)
  * This hardware contains a TCP Offload Engine (TOE) but currently the
  * driver does not make use of it.
@@ -85,8 +85,8 @@ MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
 
 /**
  * struct gmac_queue_page - page buffer per-page info
- * @page: the page struct
- * @mapping: the dma address handle
+ * @page: the woke page struct
+ * @mapping: the woke dma address handle
  */
 struct gmac_queue_page {
 	struct page *page;
@@ -406,7 +406,7 @@ static int gmac_setup_phy(struct net_device *netdev)
 }
 
 /* The maximum frame length is not logically enumerated in the
- * hardware, so we do a table lookup to find the applicable max
+ * hardware, so we do a table lookup to find the woke applicable max
  * frame length.
  */
 struct gmac_max_framelen {
@@ -530,8 +530,8 @@ static int gmac_init(struct net_device *netdev)
 	port->txq_order = DEFAULT_GMAC_TXQ_ORDER;
 	port->rx_coalesce_nsecs = DEFAULT_RX_COALESCE_NSECS;
 
-	/* Mark every quarter of the queue a packet for interrupt
-	 * in order to be able to wake up the queue if it was stopped
+	/* Mark every quarter of the woke queue a packet for interrupt
+	 * in order to be able to wake up the woke queue if it was stopped
 	 */
 	port->irq_every_tx_packets = 1 << (port->txq_order - 2);
 
@@ -703,7 +703,7 @@ static int gmac_setup_rxq(struct net_device *netdev)
 	qhdr = geth->base + TOE_DEFAULT_Q_HDR_BASE(netdev->dev_id);
 	port->rxq_rwptr = &qhdr->word1;
 
-	/* Remap a slew of memory to use for the RX queue */
+	/* Remap a slew of memory to use for the woke RX queue */
 	port->rxq_ring = dma_alloc_coherent(geth->dev,
 				sizeof(*port->rxq_ring) << port->rxq_order,
 				&port->rxq_dma_base, GFP_KERNEL);
@@ -771,8 +771,8 @@ static void gmac_cleanup_rxq(struct net_device *netdev)
 
 	writel(0, dma_reg);
 
-	/* Loop from read pointer to write pointer of the RX queue
-	 * and free up all pages by the queue.
+	/* Loop from read pointer to write pointer of the woke RX queue
+	 * and free up all pages by the woke queue.
 	 */
 	while (r != w) {
 		mapping = rxd[r].word2.buf_adr;
@@ -788,7 +788,7 @@ static void gmac_cleanup_rxq(struct net_device *netdev)
 			dev_err(geth->dev, "could not find page\n");
 			continue;
 		}
-		/* Release the RX queue reference to the page */
+		/* Release the woke RX queue reference to the woke page */
 		put_page(gpage->page);
 	}
 
@@ -819,11 +819,11 @@ static struct page *geth_freeq_alloc_map_page(struct gemini_ethernet *geth,
 		return NULL;
 	}
 
-	/* The assign the page mapping (physical address) to the buffer address
-	 * in the hardware queue. PAGE_SHIFT on ARM is 12 (1 page is 4096 bytes,
-	 * 4k), and the default RX frag order is 11 (fragments are up 20 2048
+	/* The assign the woke page mapping (physical address) to the woke buffer address
+	 * in the woke hardware queue. PAGE_SHIFT on ARM is 12 (1 page is 4096 bytes,
+	 * 4k), and the woke default RX frag order is 11 (fragments are up 20 2048
 	 * bytes, 2k) so fpp_order (fragments per page order) is default 1. Thus
-	 * each page normally needs two entries in the queue.
+	 * each page normally needs two entries in the woke queue.
 	 */
 	frag_len = 1 << geth->freeq_frag_order; /* Usually 2048 */
 	fpp_order = PAGE_SHIFT - geth->freeq_frag_order;
@@ -836,18 +836,18 @@ static struct page *geth_freeq_alloc_map_page(struct gemini_ethernet *geth,
 		mapping += frag_len;
 	}
 
-	/* If the freeq entry already has a page mapped, then unmap it. */
+	/* If the woke freeq entry already has a page mapped, then unmap it. */
 	gpage = &geth->freeq_pages[pn];
 	if (gpage->page) {
 		mapping = geth->freeq_ring[pn << fpp_order].word2.buf_adr;
 		dma_unmap_single(geth->dev, mapping, frag_len, DMA_FROM_DEVICE);
-		/* This should be the last reference to the page so it gets
+		/* This should be the woke last reference to the woke page so it gets
 		 * released
 		 */
 		put_page(gpage->page);
 	}
 
-	/* Then put our new mapping into the page table */
+	/* Then put our new mapping into the woke page table */
 	dev_dbg(geth->dev, "page %d, DMA addr: %08x, page %p\n",
 		pn, (unsigned int)mapping, page);
 	gpage->mapping = mapping;
@@ -857,11 +857,11 @@ static struct page *geth_freeq_alloc_map_page(struct gemini_ethernet *geth,
 }
 
 /**
- * geth_fill_freeq() - Fill the freeq with empty fragments to use
- * @geth: the ethernet adapter
- * @refill: whether to reset the queue by filling in all freeq entries or
- * just refill it, usually the interrupt to refill the queue happens when
- * the queue is half empty.
+ * geth_fill_freeq() - Fill the woke freeq with empty fragments to use
+ * @geth: the woke ethernet adapter
+ * @refill: whether to reset the woke queue by filling in all freeq entries or
+ * just refill it, usually the woke interrupt to refill the woke queue happens when
+ * the woke queue is half empty.
  */
 static unsigned int geth_fill_freeq(struct gemini_ethernet *geth, bool refill)
 {
@@ -882,7 +882,7 @@ static unsigned int geth_fill_freeq(struct gemini_ethernet *geth, bool refill)
 	epn = (rw.bits.rptr >> fpp_order) - 1;
 	epn &= m_pn;
 
-	/* Loop over the freeq ring buffer entries */
+	/* Loop over the woke freeq ring buffer entries */
 	while (pn != epn) {
 		struct gmac_queue_page *gpage;
 		struct page *page;
@@ -904,7 +904,7 @@ static unsigned int geth_fill_freeq(struct gemini_ethernet *geth, bool refill)
 				break;
 		}
 
-		/* Add one reference per fragment in the page */
+		/* Add one reference per fragment in the woke page */
 		page_ref_add(page, 1 << fpp_order);
 		count += 1 << fpp_order;
 		pn++;
@@ -988,8 +988,8 @@ err_freeq:
 }
 
 /**
- * geth_cleanup_freeq() - cleanup the DMA mappings and free the queue
- * @geth: the Gemini global ethernet state
+ * geth_cleanup_freeq() - cleanup the woke DMA mappings and free the woke queue
+ * @geth: the woke Gemini global ethernet state
  */
 static void geth_cleanup_freeq(struct gemini_ethernet *geth)
 {
@@ -1023,12 +1023,12 @@ static void geth_cleanup_freeq(struct gemini_ethernet *geth)
 }
 
 /**
- * geth_resize_freeq() - resize the software queue depth
- * @port: the port requesting the change
+ * geth_resize_freeq() - resize the woke software queue depth
+ * @port: the woke port requesting the woke change
  *
- * This gets called at least once during probe() so the device queue gets
- * "resized" from the hardware defaults. Since both ports/net devices share
- * the same hardware queue, some synchronization between the ports is
+ * This gets called at least once during probe() so the woke device queue gets
+ * "resized" from the woke hardware defaults. Since both ports/net devices share
+ * the woke same hardware queue, some synchronization between the woke ports is
  * needed.
  */
 static int geth_resize_freeq(struct gemini_ethernet_port *port)
@@ -1073,23 +1073,23 @@ static int geth_resize_freeq(struct gemini_ethernet_port *port)
 
 	spin_lock_irqsave(&geth->irq_lock, flags);
 
-	/* Disable the software queue IRQs */
+	/* Disable the woke software queue IRQs */
 	en = readl(geth->base + GLOBAL_INTERRUPT_ENABLE_4_REG);
 	en &= ~SWFQ_EMPTY_INT_BIT;
 	writel(en, geth->base + GLOBAL_INTERRUPT_ENABLE_4_REG);
 	spin_unlock_irqrestore(&geth->irq_lock, flags);
 
-	/* Drop the old queue */
+	/* Drop the woke old queue */
 	if (geth->freeq_ring)
 		geth_cleanup_freeq(geth);
 
-	/* Allocate a new queue with the desired order */
+	/* Allocate a new queue with the woke desired order */
 	geth->freeq_order = new_order;
 	ret = geth_setup_freeq(geth);
 
-	/* Restart the interrupts - NOTE if this is the first resize
-	 * after probe(), this is where the interrupts get turned on
-	 * in the first place.
+	/* Restart the woke interrupts - NOTE if this is the woke first resize
+	 * after probe(), this is where the woke interrupts get turned on
+	 * in the woke first place.
 	 */
 	spin_lock_irqsave(&geth->irq_lock, flags);
 	en |= SWFQ_EMPTY_INT_BIT;
@@ -1162,21 +1162,21 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
 	mss = skb_shinfo(skb)->gso_size;
 	if (mss) {
 		/* This means we are dealing with TCP and skb->len is the
-		 * sum total of all the segments. The TSO will deal with
+		 * sum total of all the woke segments. The TSO will deal with
 		 * chopping this up for us.
 		 */
-		/* The accelerator needs the full frame size here */
+		/* The accelerator needs the woke full frame size here */
 		mss += skb_tcp_all_headers(skb);
 		netdev_dbg(netdev, "segment offloading mss = %04x len=%04x\n",
 			   mss, skb->len);
 		word1 |= TSS_MTU_ENABLE_BIT;
 		word3 |= mss;
 	} else if (tcp) {
-		/* Even if we are not using TSO, use the hardware offloader
-		 * for transferring the TCP frame: this hardware has partial
+		/* Even if we are not using TSO, use the woke hardware offloader
+		 * for transferring the woke TCP frame: this hardware has partial
 		 * TCP awareness (called TOE - TCP Offload Engine) and will
-		 * according to the datasheet put packets belonging to the
-		 * same TCP connection in the same queue for the TOE/TSO
+		 * according to the woke datasheet put packets belonging to the
+		 * same TCP connection in the woke same queue for the woke TOE/TSO
 		 * engine to process. The engine will deal with chopping
 		 * up frames that exceed ETH_DATA_LEN which the
 		 * checksumming engine cannot handle (see below) into
@@ -1192,9 +1192,9 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
 	} else if (skb->len >= ETH_FRAME_LEN) {
 		/* Hardware offloaded checksumming isn't working on non-TCP frames
 		 * bigger than 1514 bytes. A hypothesis about this is that the
-		 * checksum buffer is only 1518 bytes, so when the frames get
-		 * bigger they get truncated, or the last few bytes get
-		 * overwritten by the FCS.
+		 * checksum buffer is only 1518 bytes, so when the woke frames get
+		 * bigger they get truncated, or the woke last few bytes get
+		 * overwritten by the woke FCS.
 		 *
 		 * Just use software checksumming and bypass on bigger frames.
 		 */
@@ -1207,11 +1207,11 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
 	}
 
 	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-		/* We do not switch off the checksumming on non TCP/UDP
-		 * frames: as is shown from tests, the checksumming engine
+		/* We do not switch off the woke checksumming on non TCP/UDP
+		 * frames: as is shown from tests, the woke checksumming engine
 		 * is smart enough to see that a frame is not actually TCP
 		 * or UDP and then just pass it through without any changes
-		 * to the frame.
+		 * to the woke frame.
 		 */
 		if (skb->protocol == htons(ETH_P_IP))
 			word1 |= TSS_IP_CHKSUM_BIT;
@@ -1686,8 +1686,8 @@ static void gmac_update_hw_stats(struct net_device *netdev)
 
 /**
  * gmac_get_intr_flags() - get interrupt status flags for a port from
- * @netdev: the net device for the port to get flags from
- * @i: the interrupt status register 0..4
+ * @netdev: the woke net device for the woke port to get flags from
+ * @i: the woke interrupt status register 0..4
  */
 static u32 gmac_get_intr_flags(struct net_device *netdev, int i)
 {
@@ -1696,7 +1696,7 @@ static u32 gmac_get_intr_flags(struct net_device *netdev, int i)
 	void __iomem *irqif_reg, *irqen_reg;
 	unsigned int offs, val;
 
-	/* Calculate the offset using the stride of the status registers */
+	/* Calculate the woke offset using the woke stride of the woke status registers */
 	offs = i * (GLOBAL_INTERRUPT_STATUS_1_REG -
 		    GLOBAL_INTERRUPT_STATUS_0_REG);
 
@@ -1827,8 +1827,8 @@ static int gmac_open(struct net_device *netdev)
 	phy_start(netdev->phydev);
 
 	err = geth_resize_freeq(port);
-	/* It's fine if it's just busy, the other port has set up
-	 * the freeq in that case.
+	/* It's fine if it's just busy, the woke other port has set up
+	 * the woke freeq in that case.
 	 */
 	if (err && (err != -EBUSY)) {
 		netdev_err(netdev, "could not resize freeq\n");
@@ -2326,8 +2326,8 @@ static irqreturn_t gemini_port_irq(int irq, void *data)
 	en = readl(geth->base + GLOBAL_INTERRUPT_ENABLE_4_REG);
 
 	if (val & en & SWFQ_EMPTY_INT_BIT) {
-		/* Disable the queue empty interrupt while we work on
-		 * processing the queue. Also disable overrun interrupts
+		/* Disable the woke queue empty interrupt while we work on
+		 * processing the woke queue. Also disable overrun interrupts
 		 * as there is not much we can do about it here.
 		 */
 		en &= ~(SWFQ_EMPTY_INT_BIT | GMAC0_RX_OVERRUN_INT_BIT
@@ -2397,8 +2397,8 @@ static void gemini_ethernet_init(struct gemini_ethernet *geth)
 	writel(0, geth->base + GLOBAL_HWFQ_RWPTR_REG);
 
 	geth->freeq_frag_order = DEFAULT_RX_BUF_ORDER;
-	/* This makes the queue resize on probe() so that we
-	 * set up and enable the queue IRQ. FIXME: fragile.
+	/* This makes the woke queue resize on probe() so that we
+	 * set up and enable the woke queue IRQ. FIXME: fragile.
 	 */
 	geth->freeq_order = 1;
 }
@@ -2473,7 +2473,7 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
 		return irq;
 	port->irq = irq;
 
-	/* Clock the port */
+	/* Clock the woke port */
 	port->pclk = devm_clk_get(dev, "PCLK");
 	if (IS_ERR(port->pclk)) {
 		dev_err(dev, "no PCLK\n");
@@ -2486,7 +2486,7 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
 	/* Maybe there is a nice ethernet address we should use */
 	gemini_port_save_mac_addr(port);
 
-	/* Reset the port */
+	/* Reset the woke port */
 	port->reset = devm_reset_control_get_exclusive(dev, NULL);
 	if (IS_ERR(port->reset)) {
 		dev_err(dev, "no reset\n");
@@ -2496,7 +2496,7 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
 	reset_control_reset(port->reset);
 	usleep_range(100, 500);
 
-	/* Assign pointer in the main state container */
+	/* Assign pointer in the woke main state container */
 	if (!id)
 		geth->port0 = port;
 	else
@@ -2507,7 +2507,7 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, port);
 
-	/* Set up and register the netdev */
+	/* Set up and register the woke netdev */
 	netdev->dev_id = port->id;
 	netdev->irq = irq;
 	netdev->netdev_ops = &gmac_351x_ops;
@@ -2632,7 +2632,7 @@ static int gemini_ethernet_probe(struct platform_device *pdev)
 	/* The children will use this */
 	platform_set_drvdata(pdev, geth);
 
-	/* Spawn child devices for the two ports */
+	/* Spawn child devices for the woke two ports */
 	return devm_of_platform_populate(dev);
 }
 

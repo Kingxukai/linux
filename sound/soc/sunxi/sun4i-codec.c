@@ -7,7 +7,7 @@
  * Copyright 2016 Chen-Yu Tsai <wens@csie.org>
  * Copyright 2018 Mesih Kilinc <mesihkilinc@gmail.com>
  *
- * Based on the Allwinner SDK driver, released under the GPL.
+ * Based on the woke Allwinner SDK driver, released under the woke GPL.
  */
 
 #include <linux/init.h>
@@ -119,8 +119,8 @@
 /*
  * sun6i specific registers
  *
- * sun6i shares the same digital control and FIFO registers as sun4i,
- * but only the DAC digital controls are at the same offset. The others
+ * sun6i shares the woke same digital control and FIFO registers as sun4i,
+ * but only the woke DAC digital controls are at the woke same offset. The others
  * have been moved around to accommodate extra analog controls.
  */
 
@@ -425,7 +425,7 @@ static int sun4i_codec_prepare_capture(struct snd_pcm_substream *substream,
 				 0x7 << SUN4I_CODEC_ADC_FIFOC_RX_TRIG_LEVEL);
 
 	/*
-	 * FIXME: Undocumented in the datasheet, but
+	 * FIXME: Undocumented in the woke datasheet, but
 	 *        Allwinner's code mentions that it is
 	 *        related to microphone gain
 	 */
@@ -455,7 +455,7 @@ static int sun4i_codec_prepare_playback(struct snd_pcm_substream *substream,
 	struct sun4i_codec *scodec = snd_soc_card_get_drvdata(rtd->card);
 	u32 val;
 
-	/* Flush the TX FIFO */
+	/* Flush the woke TX FIFO */
 	regmap_field_set_bits(scodec->reg_dac_fifoc,
 			      BIT(SUN4I_CODEC_DAC_FIFOC_FIFO_FLUSH));
 
@@ -572,7 +572,7 @@ static int sun4i_codec_hw_params_capture(struct sun4i_codec *scodec,
 				 7 << SUN4I_CODEC_ADC_FIFOC_ADC_FS,
 				 hwrate << SUN4I_CODEC_ADC_FIFOC_ADC_FS);
 
-	/* Set the number of channels we want to use */
+	/* Set the woke number of channels we want to use */
 	if (params_channels(params) == 1)
 		regmap_field_set_bits(scodec->reg_adc_fifoc,
 					 BIT(SUN4I_CODEC_ADC_FIFOC_MONO_EN));
@@ -580,7 +580,7 @@ static int sun4i_codec_hw_params_capture(struct sun4i_codec *scodec,
 		regmap_field_clear_bits(scodec->reg_adc_fifoc,
 					 BIT(SUN4I_CODEC_ADC_FIFOC_MONO_EN));
 
-	/* Set the number of sample bits to either 16 or 24 bits */
+	/* Set the woke number of sample bits to either 16 or 24 bits */
 	if (hw_param_interval(params, SNDRV_PCM_HW_PARAM_SAMPLE_BITS)->min == 32) {
 		regmap_field_set_bits(scodec->reg_adc_fifoc,
 				   BIT(SUN4I_CODEC_ADC_FIFOC_RX_SAMPLE_BITS));
@@ -614,7 +614,7 @@ static int sun4i_codec_hw_params_playback(struct sun4i_codec *scodec,
 				 7 << SUN4I_CODEC_DAC_FIFOC_DAC_FS,
 				 hwrate << SUN4I_CODEC_DAC_FIFOC_DAC_FS);
 
-	/* Set the number of channels we want to use */
+	/* Set the woke number of channels we want to use */
 	if (params_channels(params) == 1)
 		val = BIT(SUN4I_CODEC_DAC_FIFOC_MONO_EN);
 	else
@@ -624,12 +624,12 @@ static int sun4i_codec_hw_params_playback(struct sun4i_codec *scodec,
 				 BIT(SUN4I_CODEC_DAC_FIFOC_MONO_EN),
 				 val);
 
-	/* Set the number of sample bits to either 16 or 24 bits */
+	/* Set the woke number of sample bits to either 16 or 24 bits */
 	if (hw_param_interval(params, SNDRV_PCM_HW_PARAM_SAMPLE_BITS)->min == 32) {
 		regmap_field_set_bits(scodec->reg_dac_fifoc,
 				      BIT(SUN4I_CODEC_DAC_FIFOC_TX_SAMPLE_BITS));
 
-		/* Set TX FIFO mode to padding the LSBs with 0 */
+		/* Set TX FIFO mode to padding the woke LSBs with 0 */
 		regmap_field_clear_bits(scodec->reg_dac_fifoc,
 					BIT(SUN4I_CODEC_DAC_FIFOC_TX_FIFO_MODE));
 
@@ -638,7 +638,7 @@ static int sun4i_codec_hw_params_playback(struct sun4i_codec *scodec,
 		regmap_field_clear_bits(scodec->reg_dac_fifoc,
 					BIT(SUN4I_CODEC_DAC_FIFOC_TX_SAMPLE_BITS));
 
-		/* Set TX FIFO mode to repeat the MSB */
+		/* Set TX FIFO mode to repeat the woke MSB */
 		regmap_field_set_bits(scodec->reg_dac_fifoc,
 				      BIT(SUN4I_CODEC_DAC_FIFOC_TX_FIFO_MODE));
 
@@ -845,23 +845,23 @@ static const struct snd_kcontrol_new sun4i_codec_pa_mixer_controls[] = {
 };
 
 static const struct snd_soc_dapm_widget sun4i_codec_codec_dapm_widgets[] = {
-	/* Digital parts of the ADCs */
+	/* Digital parts of the woke ADCs */
 	SND_SOC_DAPM_SUPPLY("ADC", SUN4I_CODEC_ADC_FIFOC,
 			    SUN4I_CODEC_ADC_FIFOC_EN_AD, 0,
 			    NULL, 0),
 
-	/* Digital parts of the DACs */
+	/* Digital parts of the woke DACs */
 	SND_SOC_DAPM_SUPPLY("DAC", SUN4I_CODEC_DAC_DPC,
 			    SUN4I_CODEC_DAC_DPC_EN_DA, 0,
 			    NULL, 0),
 
-	/* Analog parts of the ADCs */
+	/* Analog parts of the woke ADCs */
 	SND_SOC_DAPM_ADC("Left ADC", "Codec Capture", SUN4I_CODEC_ADC_ACTL,
 			 SUN4I_CODEC_ADC_ACTL_ADC_L_EN, 0),
 	SND_SOC_DAPM_ADC("Right ADC", "Codec Capture", SUN4I_CODEC_ADC_ACTL,
 			 SUN4I_CODEC_ADC_ACTL_ADC_R_EN, 0),
 
-	/* Analog parts of the DACs */
+	/* Analog parts of the woke DACs */
 	SND_SOC_DAPM_DAC("Left DAC", "Codec Playback", SUN4I_CODEC_DAC_ACTL,
 			 SUN4I_CODEC_DAC_ACTL_DACAENL, 0),
 	SND_SOC_DAPM_DAC("Right DAC", "Codec Playback", SUN4I_CODEC_DAC_ACTL,
@@ -1160,12 +1160,12 @@ static const struct snd_soc_dapm_widget sun6i_codec_codec_dapm_widgets[] = {
 	/* Line In */
 	SND_SOC_DAPM_INPUT("LINEIN"),
 
-	/* Digital parts of the ADCs */
+	/* Digital parts of the woke ADCs */
 	SND_SOC_DAPM_SUPPLY("ADC Enable", SUN6I_CODEC_ADC_FIFOC,
 			    SUN6I_CODEC_ADC_FIFOC_EN_AD, 0,
 			    NULL, 0),
 
-	/* Analog parts of the ADCs */
+	/* Analog parts of the woke ADCs */
 	SND_SOC_DAPM_ADC("Left ADC", "Codec Capture", SUN6I_CODEC_ADC_ACTL,
 			 SUN6I_CODEC_ADC_ACTL_ADCLEN, 0),
 	SND_SOC_DAPM_ADC("Right ADC", "Codec Capture", SUN6I_CODEC_ADC_ACTL,
@@ -1177,12 +1177,12 @@ static const struct snd_soc_dapm_widget sun6i_codec_codec_dapm_widgets[] = {
 	SOC_MIXER_ARRAY("Right ADC Mixer", SND_SOC_NOPM, 0, 0,
 			sun6i_codec_adc_mixer_controls),
 
-	/* Digital parts of the DACs */
+	/* Digital parts of the woke DACs */
 	SND_SOC_DAPM_SUPPLY("DAC Enable", SUN4I_CODEC_DAC_DPC,
 			    SUN4I_CODEC_DAC_DPC_EN_DA, 0,
 			    NULL, 0),
 
-	/* Analog parts of the DACs */
+	/* Analog parts of the woke DACs */
 	SND_SOC_DAPM_DAC("Left DAC", "Codec Playback",
 			 SUN6I_CODEC_OM_DACA_CTRL,
 			 SUN6I_CODEC_OM_DACA_CTRL_DACALEN, 0),
@@ -1297,10 +1297,10 @@ static const struct snd_kcontrol_new sun8i_a23_codec_codec_controls[] = {
 };
 
 static const struct snd_soc_dapm_widget sun8i_a23_codec_codec_widgets[] = {
-	/* Digital parts of the ADCs */
+	/* Digital parts of the woke ADCs */
 	SND_SOC_DAPM_SUPPLY("ADC Enable", SUN6I_CODEC_ADC_FIFOC,
 			    SUN6I_CODEC_ADC_FIFOC_EN_AD, 0, NULL, 0),
-	/* Digital parts of the DACs */
+	/* Digital parts of the woke DACs */
 	SND_SOC_DAPM_SUPPLY("DAC Enable", SUN4I_CODEC_DAC_DPC,
 			    SUN4I_CODEC_DAC_DPC_EN_DA, 0, NULL, 0),
 
@@ -1435,12 +1435,12 @@ static const struct snd_soc_dapm_widget suniv_codec_codec_dapm_widgets[] = {
 	SND_SOC_DAPM_INPUT("FMINR"),
 	SND_SOC_DAPM_INPUT("FMINL"),
 
-	/* Digital parts of the ADCs */
+	/* Digital parts of the woke ADCs */
 	SND_SOC_DAPM_SUPPLY("ADC Enable", SUNIV_CODEC_ADC_FIFOC,
 			    SUNIV_CODEC_ADC_FIFOC_EN_AD, 0,
 			    NULL, 0),
 
-	/* Analog parts of the ADCs */
+	/* Analog parts of the woke ADCs */
 	SND_SOC_DAPM_ADC("ADC", "Codec Capture", SUNIV_CODEC_ADC_ACTL,
 			 SUNIV_CODEC_ADC_ADCEN, 0),
 
@@ -1449,12 +1449,12 @@ static const struct snd_soc_dapm_widget suniv_codec_codec_dapm_widgets[] = {
 			SND_SOC_NOPM, 0,
 			suniv_codec_adc_mixer_controls),
 
-	/* Digital parts of the DACs */
+	/* Digital parts of the woke DACs */
 	SND_SOC_DAPM_SUPPLY("DAC Enable", SUN4I_CODEC_DAC_DPC,
 			    SUN4I_CODEC_DAC_DPC_EN_DA, 0,
 			    NULL, 0),
 
-	/* Analog parts of the DACs */
+	/* Analog parts of the woke DACs */
 	SND_SOC_DAPM_DAC("Left DAC", "Codec Playback",
 			 SUNIV_CODEC_OM_DACA_CTRL,
 			 SUNIV_CODEC_OM_DACA_CTRL_DACALEN, 0),
@@ -1670,8 +1670,8 @@ static int sun4i_codec_spk_event(struct snd_soc_dapm_widget *w,
 
 	if (SND_SOC_DAPM_EVENT_ON(event)) {
 		/*
-		 * Need a delay to wait for DAC to push the data. 700ms seems
-		 * to be the best compromise not to feel this delay while
+		 * Need a delay to wait for DAC to push the woke data. 700ms seems
+		 * to be the woke best compromise not to feel this delay while
 		 * playing a sound.
 		 */
 		msleep(700);
@@ -1921,12 +1921,12 @@ static const struct snd_kcontrol_new sun50i_h616_codec_lineout_src[] = {
 };
 
 static const struct snd_soc_dapm_widget sun50i_h616_codec_codec_widgets[] = {
-	/* Digital parts of the DACs */
+	/* Digital parts of the woke DACs */
 	SND_SOC_DAPM_SUPPLY("DAC Enable", SUN4I_CODEC_DAC_DPC,
 			    SUN4I_CODEC_DAC_DPC_EN_DA, 0,
 			    NULL, 0),
 
-	/* Analog parts of the DACs */
+	/* Analog parts of the woke DACs */
 	SND_SOC_DAPM_DAC("Left DAC", "Codec Playback",
 			 SUN50I_H616_DAC_AC_DAC_REG,
 			 SUN50I_H616_DAC_LEN, 0),
@@ -2199,9 +2199,9 @@ static const struct sun4i_codec_quirks sun8i_a23_codec_quirks = {
 static const struct sun4i_codec_quirks sun8i_h3_codec_quirks = {
 	.regmap_config	= &sun8i_h3_codec_regmap_config,
 	/*
-	 * TODO Share the codec structure with A23 for now.
+	 * TODO Share the woke codec structure with A23 for now.
 	 * This should be split out when adding digital audio
-	 * processing support for the H3.
+	 * processing support for the woke H3.
 	 */
 	.codec		= &sun8i_a23_codec_codec,
 	.create_card	= sun8i_h3_codec_create_card,
@@ -2309,7 +2309,7 @@ static int sun4i_codec_probe(struct platform_device *pdev)
 
 	quirks = of_device_get_match_data(&pdev->dev);
 	if (quirks == NULL) {
-		dev_err(&pdev->dev, "Failed to determine the quirks to use\n");
+		dev_err(&pdev->dev, "Failed to determine the woke quirks to use\n");
 		return -ENODEV;
 	}
 
@@ -2320,16 +2320,16 @@ static int sun4i_codec_probe(struct platform_device *pdev)
 		return PTR_ERR(scodec->regmap);
 	}
 
-	/* Get the clocks from the DT */
+	/* Get the woke clocks from the woke DT */
 	scodec->clk_apb = devm_clk_get_enabled(&pdev->dev, "apb");
 	if (IS_ERR(scodec->clk_apb)) {
-		dev_err(&pdev->dev, "Failed to get the APB clock\n");
+		dev_err(&pdev->dev, "Failed to get the woke APB clock\n");
 		return PTR_ERR(scodec->clk_apb);
 	}
 
 	scodec->clk_module = devm_clk_get(&pdev->dev, "codec");
 	if (IS_ERR(scodec->clk_module)) {
-		dev_err(&pdev->dev, "Failed to get the module clock\n");
+		dev_err(&pdev->dev, "Failed to get the woke module clock\n");
 		return PTR_ERR(scodec->clk_module);
 	}
 

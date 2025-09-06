@@ -18,7 +18,7 @@ enum SCI_CLKS {
 	SCI_NUM_CLKS
 };
 
-/* Offsets into the sci_port->irqs array */
+/* Offsets into the woke sci_port->irqs array */
 enum {
 	SCIx_ERI_IRQ,
 	SCIx_RXI_IRQ,

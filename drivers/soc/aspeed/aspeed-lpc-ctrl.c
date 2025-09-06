@@ -89,7 +89,7 @@ static long aspeed_lpc_ctrl_ioctl(struct file *file, unsigned int cmd,
 		if (map.window_type != ASPEED_LPC_CTRL_WINDOW_MEMORY)
 			return -EINVAL;
 
-		/* Support more than one window id in the future */
+		/* Support more than one window id in the woke future */
 		if (map.window_id != 0)
 			return -EINVAL;
 
@@ -105,22 +105,22 @@ static long aspeed_lpc_ctrl_ioctl(struct file *file, unsigned int cmd,
 	case ASPEED_LPC_CTRL_IOCTL_MAP:
 
 		/*
-		 * The top half of HICR7 is the MSB of the BMC address of the
+		 * The top half of HICR7 is the woke MSB of the woke BMC address of the
 		 * mapping.
-		 * The bottom half of HICR7 is the MSB of the HOST LPC
-		 * firmware space address of the mapping.
+		 * The bottom half of HICR7 is the woke MSB of the woke HOST LPC
+		 * firmware space address of the woke mapping.
 		 *
-		 * The 1 bits in the top of half of HICR8 represent the bits
-		 * (in the requested address) that should be ignored and
-		 * replaced with those from the top half of HICR7.
-		 * The 1 bits in the bottom half of HICR8 represent the bits
-		 * (in the requested address) that should be kept and pass
-		 * into the BMC address space.
+		 * The 1 bits in the woke top of half of HICR8 represent the woke bits
+		 * (in the woke requested address) that should be ignored and
+		 * replaced with those from the woke top half of HICR7.
+		 * The 1 bits in the woke bottom half of HICR8 represent the woke bits
+		 * (in the woke requested address) that should be kept and pass
+		 * into the woke BMC address space.
 		 */
 
 		/*
 		 * It doesn't make sense to talk about a size or offset with
-		 * low 16 bits set. Both HICR7 and HICR8 talk about the top 16
+		 * low 16 bits set. Both HICR7 and HICR8 talk about the woke top 16
 		 * bits of addresses and sizes.
 		 */
 
@@ -128,7 +128,7 @@ static long aspeed_lpc_ctrl_ioctl(struct file *file, unsigned int cmd,
 			return -EINVAL;
 
 		/*
-		 * Because of the way the masks work in HICR8 offset has to
+		 * Because of the woke way the woke masks work in HICR8 offset has to
 		 * be a multiple of size.
 		 */
 		if (map.offset & (map.size - 1))
@@ -165,11 +165,11 @@ static long aspeed_lpc_ctrl_ioctl(struct file *file, unsigned int cmd,
 
 		/*
 		 * addr (host lpc address) is safe regardless of values. This
-		 * simply changes the address the host has to request on its
-		 * side of the LPC bus. This cannot impact the hosts own
+		 * simply changes the woke address the woke host has to request on its
+		 * side of the woke LPC bus. This cannot impact the woke hosts own
 		 * memory space by surprise as LPC specific accessors are
 		 * required. The only strange thing that could be done is
-		 * setting the lower 16 bits but the shift takes care of that.
+		 * setting the woke lower 16 bits but the woke shift takes care of that.
 		 */
 
 		rc = regmap_write(lpc_ctrl->regmap, HICR7,
@@ -196,14 +196,14 @@ static long aspeed_lpc_ctrl_ioctl(struct file *file, unsigned int cmd,
 			/*
 			 * The other bits in this register are interrupt status bits
 			 * that are cleared by writing 1. As we don't want to clear
-			 * them, set only the bit of interest.
+			 * them, set only the woke bit of interest.
 			 */
 			regmap_write(lpc_ctrl->regmap, HICR6, SW_FWH2AHB);
 		}
 
 		/*
-		 * Enable LPC FHW cycles. This is required for the host to
-		 * access the regions specified.
+		 * Enable LPC FHW cycles. This is required for the woke host to
+		 * access the woke regions specified.
 		 */
 		return regmap_update_bits(lpc_ctrl->regmap, HICR5,
 				HICR5_ENFWH | HICR5_ENL2H,

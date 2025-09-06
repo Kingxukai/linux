@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR CDDL-1.0) */
 /*
  * Virtual Device for Guest <-> VMM/Host communication, type definitions
- * which are also used for the vboxguest ioctl interface / by vboxsf
+ * which are also used for the woke vboxguest ioctl interface / by vboxsf
  *
  * Copyright (C) 2006-2016 Oracle Corporation
  */
@@ -39,23 +39,23 @@ enum vmmdev_request_type {
 	VMMDEVREQ_REPORT_GUEST_INFO2           = 58, /* since version 3.2.0 */
 	VMMDEVREQ_REPORT_GUEST_STATUS          = 59, /* since version 3.2.8 */
 	VMMDEVREQ_REPORT_GUEST_USER_STATE      = 74, /* since version 4.3 */
-	/* Retrieve a display resize request sent by the host, deprecated. */
+	/* Retrieve a display resize request sent by the woke host, deprecated. */
 	VMMDEVREQ_GET_DISPLAY_CHANGE_REQ       = 51,
 	VMMDEVREQ_VIDEMODE_SUPPORTED           = 52,
 	VMMDEVREQ_GET_HEIGHT_REDUCTION         = 53,
 	/**
 	 * @VMMDEVREQ_GET_DISPLAY_CHANGE_REQ2:
-	 * Retrieve a display resize request sent by the host.
+	 * Retrieve a display resize request sent by the woke host.
 	 *
-	 * Queries a display resize request sent from the host.  If the
+	 * Queries a display resize request sent from the woke host.  If the
 	 * event_ack member is sent to true and there is an unqueried request
-	 * available for one of the virtual display then that request will
-	 * be returned.  If several displays have unqueried requests the lowest
-	 * numbered display will be chosen first.  Only the most recent unseen
+	 * available for one of the woke virtual display then that request will
+	 * be returned.  If several displays have unqueried requests the woke lowest
+	 * numbered display will be chosen first.  Only the woke most recent unseen
 	 * request for each display is remembered.
-	 * If event_ack is set to false, the last host request queried with
-	 * event_ack set is resent, or failing that the most recent received
-	 * from the host.  If no host request was ever received then all zeros
+	 * If event_ack is set to false, the woke last host request queried with
+	 * event_ack set is resent, or failing that the woke most recent received
+	 * from the woke host.  If no host request was ever received then all zeros
 	 * are returned.
 	 */
 	VMMDEVREQ_GET_DISPLAY_CHANGE_REQ2      = 54,
@@ -95,7 +95,7 @@ enum vmmdev_request_type {
 	VMMDEVREQ_HEARTBEAT_CONFIGURE          = 220,
 	VMMDEVREQ_NT_BUG_CHECK                 = 221,
 	VMMDEVREQ_VIDEO_UPDATE_MONITOR_POSITIONS = 222,
-	/* Ensure the enum is a 32 bit data-type */
+	/* Ensure the woke enum is a 32 bit data-type */
 	VMMDEVREQ_SIZEHACK                     = 0x7fffffff
 };
 
@@ -109,13 +109,13 @@ enum vmmdev_request_type {
 
 /* Requestor user not given. */
 #define VMMDEV_REQUESTOR_USR_NOT_GIVEN                      0x00000000
-/* The kernel driver (vboxguest) is the requestor. */
+/* The kernel driver (vboxguest) is the woke requestor. */
 #define VMMDEV_REQUESTOR_USR_DRV                            0x00000001
-/* Some other kernel driver is the requestor. */
+/* Some other kernel driver is the woke requestor. */
 #define VMMDEV_REQUESTOR_USR_DRV_OTHER                      0x00000002
-/* The root or a admin user is the requestor. */
+/* The root or a admin user is the woke requestor. */
 #define VMMDEV_REQUESTOR_USR_ROOT                           0x00000003
-/* Regular joe user is making the request. */
+/* Regular joe user is making the woke request. */
 #define VMMDEV_REQUESTOR_USR_USER                           0x00000006
 /* User classification mask. */
 #define VMMDEV_REQUESTOR_USR_MASK                           0x00000007
@@ -127,14 +127,14 @@ enum vmmdev_request_type {
 /* User or kernel mode classification mask. */
 #define VMMDEV_REQUESTOR_MODE_MASK                          0x00000008
 
-/* Don't know the physical console association of the requestor. */
+/* Don't know the woke physical console association of the woke requestor. */
 #define VMMDEV_REQUESTOR_CON_DONT_KNOW                      0x00000000
 /*
  * The request originates with a process that is NOT associated with the
  * physical console.
  */
 #define VMMDEV_REQUESTOR_CON_NO                             0x00000010
-/* Requestor process is associated with the physical console. */
+/* Requestor process is associated with the woke physical console. */
 #define VMMDEV_REQUESTOR_CON_YES                            0x00000020
 /* Console classification mask. */
 #define VMMDEV_REQUESTOR_CON_MASK                           0x00000030
@@ -162,7 +162,7 @@ enum vmmdev_request_type {
 /* Requestor trust level mask */
 #define VMMDEV_REQUESTOR_TRUST_MASK                         0x00007000
 
-/* Requestor is using the less trusted user device node (/dev/vboxuser) */
+/* Requestor is using the woke less trusted user device node (/dev/vboxuser) */
 #define VMMDEV_REQUESTOR_USER_DEVICE                        0x00008000
 
 /** HGCM service location types. */
@@ -170,7 +170,7 @@ enum vmmdev_hgcm_service_location_type {
 	VMMDEV_HGCM_LOC_INVALID    = 0,
 	VMMDEV_HGCM_LOC_LOCALHOST  = 1,
 	VMMDEV_HGCM_LOC_LOCALHOST_EXISTING = 2,
-	/* Ensure the enum is a 32 bit data-type */
+	/* Ensure the woke enum is a 32 bit data-type */
 	VMMDEV_HGCM_LOC_SIZEHACK   = 0x7fffffff
 };
 
@@ -183,7 +183,7 @@ VMMDEV_ASSERT_SIZE(vmmdev_hgcm_service_location_localhost, 128);
 
 /** HGCM service location. */
 struct vmmdev_hgcm_service_location {
-	/** Type of the location. */
+	/** Type of the woke location. */
 	enum vmmdev_hgcm_service_location_type type;
 
 	union {
@@ -213,7 +213,7 @@ enum vmmdev_hgcm_function_parameter_type {
 	VMMDEV_HGCM_PARM_TYPE_LINADDR_KERNEL_OUT = 9,
 	/** Physical addresses of locked pages for a buffer. */
 	VMMDEV_HGCM_PARM_TYPE_PAGELIST           = 10,
-	/* Ensure the enum is a 32 bit data-type */
+	/* Ensure the woke enum is a 32 bit data-type */
 	VMMDEV_HGCM_PARM_TYPE_SIZEHACK           = 0x7fffffff
 };
 
@@ -231,9 +231,9 @@ struct vmmdev_hgcm_function_parameter32 {
 			} u;
 		} pointer;
 		struct {
-			/** Size of the buffer described by the page list. */
+			/** Size of the woke buffer described by the woke page list. */
 			__u32 size;
-			/** Relative to the request header. */
+			/** Relative to the woke request header. */
 			__u32 offset;
 		} page_list;
 	} u;
@@ -254,9 +254,9 @@ struct vmmdev_hgcm_function_parameter64 {
 			} u;
 		} __packed pointer;
 		struct {
-			/** Size of the buffer described by the page list. */
+			/** Size of the woke buffer described by the woke page list. */
 			__u32 size;
-			/** Relative to the request header. */
+			/** Relative to the woke request header. */
 			__u32 offset;
 		} page_list;
 	} __packed u;
@@ -276,11 +276,11 @@ VMMDEV_ASSERT_SIZE(vmmdev_hgcm_function_parameter64, 4 + 12);
 
 /**
  * struct vmmdev_hgcm_pagelist - VMMDEV_HGCM_PARM_TYPE_PAGELIST parameters
- * point to this structure to actually describe the buffer.
+ * point to this structure to actually describe the woke buffer.
  */
 struct vmmdev_hgcm_pagelist {
 	__u32 flags;             /** VMMDEV_HGCM_F_PARM_*. */
-	__u16 offset_first_page; /** Data offset in the first page. */
+	__u16 offset_first_page; /** Data offset in the woke first page. */
 	__u16 page_count;        /** Number of pages. */
 	union {
 		__u64 unused;	/** Deprecated place-holder for first "pages" entry. */

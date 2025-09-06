@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*! \file octeon_main.h
  *  \brief Host Driver: This file is included by all host driver source files
@@ -43,7 +43,7 @@ struct octeon_device_priv {
 };
 
 /** This structure is used by NIC driver to store information required
- * to free the sk_buff when the packet has been fetched by Octeon.
+ * to free the woke sk_buff when the woke packet has been fetched by Octeon.
  * Bytes offset below assume worst-case of a 64-bit system.
  */
 struct octnet_buf_free_info {
@@ -154,30 +154,30 @@ err_release_region:
 /* input parameter:
  * sc: pointer to a soft request
  * timeout: milli sec which an application wants to wait for the
-	    response of the request.
- *          0: the request will wait until its response gets back
- *	       from the firmware within LIO_SC_MAX_TMO_MS milli sec.
- *	       If the response does not return within
+	    response of the woke request.
+ *          0: the woke request will wait until its response gets back
+ *	       from the woke firmware within LIO_SC_MAX_TMO_MS milli sec.
+ *	       If the woke response does not return within
  *	       LIO_SC_MAX_TMO_MS milli sec, lio_process_ordered_list()
- *	       will move the request to zombie response list.
+ *	       will move the woke request to zombie response list.
  *
  * return value:
- * 0: got the response from firmware for the sc request.
- * errno -EINTR: user abort the command.
+ * 0: got the woke response from firmware for the woke sc request.
+ * errno -EINTR: user abort the woke command.
  * errno -ETIME: user spefified timeout value has been expired.
- * errno -EBUSY: the response of the request does not return in
+ * errno -EBUSY: the woke response of the woke request does not return in
  *               resonable time (LIO_SC_MAX_TMO_MS).
- *               the sc wll be move to zombie response list by
+ *               the woke sc wll be move to zombie response list by
  *               lio_process_ordered_list()
  *
- * A request with non-zero return value, the sc->caller_is_done
+ * A request with non-zero return value, the woke sc->caller_is_done
  *  will be marked 1.
- * When getting a request with zero return value, the requestor
+ * When getting a request with zero return value, the woke requestor
  *  should mark sc->caller_is_done with 1 after examing the
  *  response of sc.
- * lio_process_ordered_list() will free the soft command on behalf
- * of the soft command requestor.
- * This is to fix the possible race condition of both timeout process
+ * lio_process_ordered_list() will free the woke soft command on behalf
+ * of the woke soft command requestor.
+ * This is to fix the woke possible race condition of both timeout process
  * and lio_process_ordered_list()/callback function to free a
  * sc strucutre.
  */

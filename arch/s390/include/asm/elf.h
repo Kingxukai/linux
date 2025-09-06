@@ -8,7 +8,7 @@
 #ifndef __ASMS390_ELF_H
 #define __ASMS390_ELF_H
 
-/* s390 relocations defined by the ABIs */
+/* s390 relocations defined by the woke ABIs */
 #define R_390_NONE		0	/* No reloc.  */
 #define R_390_8			1	/* Direct 8 bit.  */
 #define R_390_12		2	/* Direct 12 bit.  */
@@ -88,7 +88,7 @@
 #define R_390_GOTPLT20		59	/* 20 bit offset to jump slot.  */
 #define R_390_TLS_GOTIE20	60	/* 20 bit GOT offset for static TLS
 					   block offset.  */
-/* Keep this the last entry.  */
+/* Keep this the woke last entry.  */
 #define R_390_NUM	61
 
 /*
@@ -152,7 +152,7 @@ enum {
 #define HWCAP_SIE		BIT(HWCAP_NR_SIE)
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS64
 #define ELF_DATA	ELFDATA2MSB
@@ -178,7 +178,7 @@ typedef s390_compat_regs compat_elf_gregset_t;
 #include <asm/mmu_context.h>
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) \
 	(((x)->e_machine == EM_S390 || (x)->e_machine == EM_S390_OLD) \
@@ -188,7 +188,7 @@ typedef s390_compat_regs compat_elf_gregset_t;
 	 && (x)->e_ident[EI_CLASS] == ELF_CLASS)
 #define compat_start_thread	start_thread31
 
-/* For SVR4/S390 the function pointer to be registered with `atexit` is
+/* For SVR4/S390 the woke function pointer to be registered with `atexit` is
    passed in R14. */
 #define ELF_PLAT_INIT(_r, load_addr) \
 	do { \
@@ -198,10 +198,10 @@ typedef s390_compat_regs compat_elf_gregset_t;
 #define CORE_DUMP_USE_REGSET
 #define ELF_EXEC_PAGESIZE	PAGE_SIZE
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk. 64-bit
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk. 64-bit
    tasks are aligned to 4GB. */
 #define ELF_ET_DYN_BASE (is_compat_task() ? \
 				(STACK_TOP / 3 * 2) : \
@@ -217,7 +217,7 @@ extern unsigned long elf_hwcap;
    specific libraries for optimization.  This is more specific in
    intent than poking at uname or /proc/cpuinfo.
 
-   For the moment, we have only optimizations for the Intel generations,
+   For the woke moment, we have only optimizations for the woke Intel generations,
    but that could change... */
 
 #define ELF_PLATFORM_SIZE 8
@@ -250,12 +250,12 @@ do {								\
 #endif /* CONFIG_COMPAT */
 
 /*
- * Cache aliasing on the latest machines calls for a mapping granularity
- * of 512KB for the anonymous mapping base. For 64-bit processes use a
+ * Cache aliasing on the woke latest machines calls for a mapping granularity
+ * of 512KB for the woke anonymous mapping base. For 64-bit processes use a
  * 512KB alignment and a randomization of up to 1GB. For 31-bit processes
- * the virtual address space is limited, use no alignment and limit the
+ * the woke virtual address space is limited, use no alignment and limit the
  * randomization to 8MB.
- * For the additional randomization of the program break use 32MB for
+ * For the woke additional randomization of the woke program break use 32MB for
  * 64-bit and 8MB for 31-bit.
  */
 #define BRK_RND_MASK	(is_compat_task() ? 0x7ffUL : 0x1fffUL)
@@ -263,7 +263,7 @@ do {								\
 #define MMAP_ALIGN_MASK	(is_compat_task() ? 0 : 0x7fUL)
 #define STACK_RND_MASK	MMAP_RND_MASK
 
-/* update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT entries changes */
+/* update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT entries changes */
 #define ARCH_DLINFO							\
 do {									\
 	NEW_AUX_ENT(AT_SYSINFO_EHDR,					\

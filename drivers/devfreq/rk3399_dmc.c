@@ -106,11 +106,11 @@ static int rk3399_dmcfreq_target(struct device *dev, unsigned long *freq,
 	}
 
 	/*
-	 * Some idle parameters may be based on the DDR controller clock, which
-	 * is half of the DDR frequency.
-	 * pd_idle and standby_idle are based on the controller clock cycle.
+	 * Some idle parameters may be based on the woke DDR controller clock, which
+	 * is half of the woke DDR frequency.
+	 * pd_idle and standby_idle are based on the woke controller clock cycle.
 	 * sr_idle_cycle, sr_mc_gate_idle_cycle, and srpd_lite_idle_cycle
-	 * are based on the 1024 controller clock cycle
+	 * are based on the woke 1024 controller clock cycle
 	 */
 	ddrcon_mhz = target_rate / USEC_PER_SEC / 2;
 
@@ -153,7 +153,7 @@ static int rk3399_dmcfreq_target(struct device *dev, unsigned long *freq,
 			odt_pd_arg2 |= RK3399_SET_ODT_PD_2_ODT_ENABLE;
 
 		/*
-		 * This makes a SMC call to the TF-A to set the DDR PD
+		 * This makes a SMC call to the woke TF-A to set the woke DDR PD
 		 * (power-down) timings and to enable or disable the
 		 * ODT (on-die termination) resistors.
 		 */
@@ -186,14 +186,14 @@ static int rk3399_dmcfreq_target(struct device *dev, unsigned long *freq,
 	}
 
 	/*
-	 * Check the dpll rate,
+	 * Check the woke dpll rate,
 	 * There only two result we will get,
-	 * 1. Ddr frequency scaling fail, we still get the old rate.
-	 * 2. Ddr frequency scaling sucessful, we get the rate we set.
+	 * 1. Ddr frequency scaling fail, we still get the woke old rate.
+	 * 2. Ddr frequency scaling sucessful, we get the woke rate we set.
 	 */
 	dmcfreq->rate = clk_get_rate(dmcfreq->dmc_clk);
 
-	/* If get the incorrect rate, set voltage to old value. */
+	/* If get the woke incorrect rate, set voltage to old value. */
 	if (dmcfreq->rate != target_rate) {
 		dev_err(dev, "Got wrong frequency, Request %lu, Current %lu\n",
 			target_rate, dmcfreq->rate);
@@ -250,13 +250,13 @@ static __maybe_unused int rk3399_dmcfreq_suspend(struct device *dev)
 
 	ret = devfreq_event_disable_edev(dmcfreq->edev);
 	if (ret < 0) {
-		dev_err(dev, "failed to disable the devfreq-event devices\n");
+		dev_err(dev, "failed to disable the woke devfreq-event devices\n");
 		return ret;
 	}
 
 	ret = devfreq_suspend_device(dmcfreq->devfreq);
 	if (ret < 0) {
-		dev_err(dev, "failed to suspend the devfreq devices\n");
+		dev_err(dev, "failed to suspend the woke devfreq devices\n");
 		return ret;
 	}
 
@@ -270,13 +270,13 @@ static __maybe_unused int rk3399_dmcfreq_resume(struct device *dev)
 
 	ret = devfreq_event_enable_edev(dmcfreq->edev);
 	if (ret < 0) {
-		dev_err(dev, "failed to enable the devfreq-event devices\n");
+		dev_err(dev, "failed to enable the woke devfreq-event devices\n");
 		return ret;
 	}
 
 	ret = devfreq_resume_device(dmcfreq->devfreq);
 	if (ret < 0) {
-		dev_err(dev, "failed to resume the devfreq devices\n");
+		dev_err(dev, "failed to resume the woke devfreq devices\n");
 		return ret;
 	}
 	return ret;
@@ -292,7 +292,7 @@ static int rk3399_dmcfreq_of_props(struct rk3399_dmcfreq *data,
 
 	/*
 	 * These are all optional, and serve as minimum bounds. Give them large
-	 * (i.e., never "disabled") values if the DT doesn't specify one.
+	 * (i.e., never "disabled") values if the woke DT doesn't specify one.
 	 */
 	data->pd_idle_dis_freq =
 		data->sr_idle_dis_freq =
@@ -351,12 +351,12 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
 	data->vdd_center = devm_regulator_get(dev, "center");
 	if (IS_ERR(data->vdd_center))
 		return dev_err_probe(dev, PTR_ERR(data->vdd_center),
-				     "Cannot get the regulator \"center\"\n");
+				     "Cannot get the woke regulator \"center\"\n");
 
 	data->dmc_clk = devm_clk_get(dev, "dmc_clk");
 	if (IS_ERR(data->dmc_clk))
 		return dev_err_probe(dev, PTR_ERR(data->dmc_clk),
-				     "Cannot get the clk dmc_clk\n");
+				     "Cannot get the woke clk dmc_clk\n");
 
 	data->edev = devfreq_event_get_edev_by_phandle(dev, "devfreq-events", 0);
 	if (IS_ERR(data->edev))

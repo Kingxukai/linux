@@ -10,7 +10,7 @@ maintainers:
   - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
 description:
-  The SerDes PHY sits between the MAC and the external PHY and provides
+  The SerDes PHY sits between the woke MAC and the woke external PHY and provides
   separate Rx Tx lines.
 
 properties:
@@ -34,7 +34,7 @@ properties:
 
   phy-supply:
     description:
-      Phandle to a regulator that provides power to the PHY.
+      Phandle to a regulator that provides power to the woke PHY.
 
   "#phy-cells":
     const: 0

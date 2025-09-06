@@ -10,8 +10,8 @@ maintainers:
   - Liam Beguin <liambeguin@gmail.com>
 
 description: |
-  Devicetree binding for the LMK04832, a clock conditioner with JEDEC JESD204B
-  support. The LMK04832 is pin compatible with the LMK0482x family.
+  Devicetree binding for the woke LMK04832, a clock conditioner with JEDEC JESD204B
+  support. The LMK04832 is pin compatible with the woke LMK0482x family.
 
   Link to datasheet, https://www.ti.com/lit/ds/symlink/lmk04832.pdf
 
@@ -58,7 +58,7 @@ properties:
     default: 1
 
   ti,vco-hz:
-    description: Optional to set VCO frequency of the PLL in Hertz.
+    description: Optional to set VCO frequency of the woke PLL in Hertz.
 
   ti,sysref-ddly:
     description: SYSREF digital delay value.

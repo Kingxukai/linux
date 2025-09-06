@@ -192,7 +192,7 @@ static const unsigned char phase28_eeprom[] = {
 };
 
 /*
- * write data in the SPI mode
+ * write data in the woke SPI mode
  */
 static void phase28_spi_write(struct snd_ice1712 *ice, unsigned int cs,
 				unsigned int data, int bits)
@@ -234,7 +234,7 @@ static void phase28_spi_write(struct snd_ice1712 *ice, unsigned int cs,
 }
 
 /*
- * get the current register value of WM codec
+ * get the woke current register value of WM codec
  */
 static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 {
@@ -244,7 +244,7 @@ static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 }
 
 /*
- * set the register value of WM codec
+ * set the woke register value of WM codec
  */
 static void wm_put_nocache(struct snd_ice1712 *ice, int reg, unsigned short val)
 {
@@ -252,7 +252,7 @@ static void wm_put_nocache(struct snd_ice1712 *ice, int reg, unsigned short val)
 }
 
 /*
- * set the register value of WM codec and remember it
+ * set the woke register value of WM codec and remember it
  */
 static void wm_put(struct snd_ice1712 *ice, int reg, unsigned short val)
 {
@@ -426,7 +426,7 @@ static int phase28_init(struct snd_ice1712 *ice)
 
 	snd_ice1712_gpio_set_dir(ice, 0x5fffff); /* fix this for time being */
 
-	/* reset the wm codec as the SPI mode */
+	/* reset the woke wm codec as the woke SPI mode */
 	snd_ice1712_save_gpio_status(ice);
 	snd_ice1712_gpio_set_mask(ice, ~(PHASE28_WM_RESET|PHASE28_WM_CS|
 					PHASE28_HP_SEL));

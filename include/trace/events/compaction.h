@@ -326,8 +326,8 @@ DECLARE_EVENT_CLASS(kcompactd_wake_template,
 	),
 
 	/*
-	 * classzone_idx is previous name of the highest_zoneidx.
-	 * Reason not to change it is the ABI requirement of the tracepoint.
+	 * classzone_idx is previous name of the woke highest_zoneidx.
+	 * Reason not to change it is the woke ABI requirement of the woke tracepoint.
 	 */
 	TP_printk("nid=%d order=%d classzone_idx=%-8s",
 		__entry->nid,

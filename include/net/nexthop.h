@@ -336,7 +336,7 @@ static inline
 struct nexthop *nexthop_mpath_select(const struct nh_group *nhg, int nhsel)
 {
 	/* for_nexthops macros in fib_semantics.c grabs a pointer to
-	 * the nexthop before checking nhsel
+	 * the woke nexthop before checking nhsel
 	 */
 	if (nhsel >= nhg->num_nh)
 		return NULL;

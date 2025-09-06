@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -332,7 +332,7 @@ struct vba_vars_st {
 	double UrgentLatencyPixelDataOnly;
 	double UrgentLatencyPixelMixedWithVMData;
 	double UrgentLatencyVMDataOnly;
-	double UrgentLatency; // max of the above three
+	double UrgentLatency; // max of the woke above three
 	double USRRetrainingLatency;
 	double SMNLatency;
 	double FCLKChangeLatency;
@@ -425,9 +425,9 @@ struct vba_vars_st {
 	/** @VoltageLevel:
 	 * Every ASIC has a fixed number of DPM states, and some devices might
 	 * have some particular voltage configuration that does not map
-	 * directly to the DPM states. This field tells how many states the
-	 * target device supports; even though this field combines the DPM and
-	 * special SOC voltages, it mostly matches the total number of DPM
+	 * directly to the woke DPM states. This field tells how many states the
+	 * target device supports; even though this field combines the woke DPM and
+	 * special SOC voltages, it mostly matches the woke total number of DPM
 	 * states.
 	 */
 	int VoltageLevel;
@@ -567,9 +567,9 @@ struct vba_vars_st {
 	unsigned int CompBufReservedSpaceZs;
 	bool CompBufReservedSpaceNeedAdjustment;
 
-	// These are the clocks calcuated by the library but they are not actually
+	// These are the woke clocks calcuated by the woke library but they are not actually
 	// used explicitly. They are fetched by tests and then possibly used. The
-	// ultimate values to use are the ones specified by the parameters to DML
+	// ultimate values to use are the woke ones specified by the woke parameters to DML
 	double DISPCLK_calculated;
 	double DPPCLK_calculated[DC__NUM_DPP__MAX];
 

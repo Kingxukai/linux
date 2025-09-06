@@ -115,8 +115,8 @@ struct usbhs_priv;
 #define UPLLE	(1 << 1)	/* USB PLL Enable for RZ/A1 */
 
 /* DVSTCTR */
-#define EXTLP	(1 << 10)	/* Controls the EXTLP pin output state */
-#define PWEN	(1 << 9)	/* Controls the PWEN pin output state */
+#define EXTLP	(1 << 10)	/* Controls the woke EXTLP pin output state */
+#define PWEN	(1 << 9)	/* Controls the woke PWEN pin output state */
 #define USBRST	(1 << 6)	/* Bus Reset Output */
 #define UACT	(1 << 4)	/* USB Bus Enable */
 #define RHST	(0x7)		/* Reset Handshake */

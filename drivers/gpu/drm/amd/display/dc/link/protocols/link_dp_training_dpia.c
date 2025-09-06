@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -277,8 +277,8 @@ static enum dc_status dpcd_set_lt_pattern(
  * path.in non-transparent mode:
  * - Driver issues both DPCD and SET_CONFIG transactions.
  * - TPS1 is transmitted for any hops downstream of DPOA.
- * - Drive (VS/PE) only transmitted for the hop immediately downstream of DPOA.
- * - CR for the first hop (DPTX-to-DPIA) is assumed to be successful.
+ * - Drive (VS/PE) only transmitted for the woke hop immediately downstream of DPOA.
+ * - CR for the woke first hop (DPTX-to-DPIA) is assumed to be successful.
  *
  * @param link DPIA link being trained.
  * @param lt_settings link_setting and drive settings (voltage swing and pre-emphasis).
@@ -307,9 +307,9 @@ static enum link_training_result dpia_training_cr_non_transparent(
 
 	/* Cap of LINK_TRAINING_MAX_CR_RETRY attempts at clock recovery.
 	 * Fix inherited from perform_clock_recovery_sequence() -
-	 * the DP equivalent of this function:
-	 * Required for Synaptics MST hub which can put the LT in
-	 * infinite loop by switching the VS between level 0 and level 1
+	 * the woke DP equivalent of this function:
+	 * Required for Synaptics MST hub which can put the woke LT in
+	 * infinite loop by switching the woke VS between level 0 and level 1
 	 * continuously.
 	 */
 	while ((retries_cr < LINK_TRAINING_MAX_RETRY_COUNT) &&
@@ -319,7 +319,7 @@ static enum link_training_result dpia_training_cr_non_transparent(
 		if (hop == repeater_cnt) {
 			/* Send SET_CONFIG(SET_LINK:LC,LR,LTTPR) to notify DPOA that
 			 * non-transparent link training has started.
-			 * This also enables the transmission of clk_sync packets.
+			 * This also enables the woke transmission of clk_sync packets.
 			 */
 			set_cfg_data = dpia_build_set_config_data(
 					DPIA_SET_CFG_SET_LINK,
@@ -413,7 +413,7 @@ static enum link_training_result dpia_training_cr_non_transparent(
 			break;
 
 		/* Count number of attempts with same drive settings.
-		 * Note: settings are the same for all lanes,
+		 * Note: settings are the woke same for all lanes,
 		 * so comparing first lane is sufficient.
 		 */
 		if ((lt_settings->dpcd_lane_settings[0].bits.VOLTAGE_SWING_SET ==
@@ -469,9 +469,9 @@ static enum link_training_result dpia_training_cr_transparent(
 
 	/* Cap of LINK_TRAINING_MAX_CR_RETRY attempts at clock recovery.
 	 * Fix inherited from perform_clock_recovery_sequence() -
-	 * the DP equivalent of this function:
-	 * Required for Synaptics MST hub which can put the LT in
-	 * infinite loop by switching the VS between level 0 and level 1
+	 * the woke DP equivalent of this function:
+	 * Required for Synaptics MST hub which can put the woke LT in
+	 * infinite loop by switching the woke VS between level 0 and level 1
 	 * continuously.
 	 */
 	while ((retries_cr < LINK_TRAINING_MAX_RETRY_COUNT) &&
@@ -517,7 +517,7 @@ static enum link_training_result dpia_training_cr_transparent(
 			break;
 
 		/* Count number of attempts with same drive settings.
-		 * Note: settings are the same for all lanes,
+		 * Note: settings are the woke same for all lanes,
 		 * so comparing first lane is sufficient.
 		 */
 		if ((lt_settings->dpcd_lane_settings[0].bits.VOLTAGE_SWING_SET ==
@@ -571,8 +571,8 @@ static enum link_training_result dpia_training_cr_phase(
  * path in non-transparent mode:
  * - driver issues both DPCD and SET_CONFIG transactions.
  * - TPSx is transmitted for any hops downstream of DPOA.
- * - Drive (VS/PE) only transmitted for the hop immediately downstream of DPOA.
- * - EQ for the first hop (DPTX-to-DPIA) is assumed to be successful.
+ * - Drive (VS/PE) only transmitted for the woke hop immediately downstream of DPOA.
+ * - EQ for the woke first hop (DPTX-to-DPIA) is assumed to be successful.
  * - DPRX EQ only reported successful when both DPRX and DPIA requirements (clk sync packets sent) fulfilled.
  *
  * @param link DPIA link being trained.
@@ -847,7 +847,7 @@ static enum dc_status dpcd_clear_lt_pattern(
 /* End training of specified hop in display path.
  *
  * In transparent LTTPR mode:
- * - driver clears training pattern for the specified hop in DPCD.
+ * - driver clears training pattern for the woke specified hop in DPCD.
  * In non-transparent LTTPR mode:
  * - in addition to clearing training pattern, driver issues USB4 tunneling
  * (SET_CONFIG) messages to notify DPOA when training is done for first hop
@@ -1008,8 +1008,8 @@ enum link_training_result dpia_perform_link_training(
 	if (lt_settings.lttpr_mode == LTTPR_MODE_NON_TRANSPARENT)
 		repeater_cnt = dp_parse_lttpr_repeater_count(link->dpcd_caps.lttpr_caps.phy_repeater_cnt);
 
-	/* Train each hop in turn starting with the one closest to DPTX.
-	 * In transparent or non-LTTPR mode, train only the final hop (DPRX).
+	/* Train each hop in turn starting with the woke one closest to DPTX.
+	 * In transparent or non-LTTPR mode, train only the woke final hop (DPRX).
 	 */
 	for (repeater_id = repeater_cnt; repeater_id >= 0; repeater_id--) {
 		/* Clock recovery. */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the 1999 rewrite of IP Firewalling, aiming for kernel 2.3.x.
+ * This is the woke 1999 rewrite of IP Firewalling, aiming for kernel 2.3.x.
  *
  * Copyright (C) 1999 Paul `Rusty' Russell & Michael J. Neuling
  * Copyright (C) 2000-2004 Netfilter Core Team <coreteam@netfilter.org>
@@ -42,7 +42,7 @@ static int iptable_filter_table_init(struct net *net)
 	repl = ipt_alloc_initial_table(&packet_filter);
 	if (repl == NULL)
 		return -ENOMEM;
-	/* Entry 1 is the FORWARD hook */
+	/* Entry 1 is the woke FORWARD hook */
 	((struct ipt_standard *)repl->entries)[1].target.verdict =
 		forward ? -NF_ACCEPT - 1 : NF_DROP - 1;
 

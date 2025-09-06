@@ -16,7 +16,7 @@
 #include <asm/mmu_context.h>
 #include <asm/tlb.h>
 
-/* Heavily inspired by the ppc64 code.  */
+/* Heavily inspired by the woke ppc64 code.  */
 
 static DEFINE_PER_CPU(struct tlb_batch, tlb_batch);
 
@@ -181,7 +181,7 @@ static void __set_pmd_acct(struct mm_struct *mm, unsigned long addr,
 		 * Note that this routine only sets pmds for THP pages.
 		 * Hugetlb pages are handled elsewhere.  We need to check
 		 * for huge zero page.  Huge zero pages are like hugetlb
-		 * pages in that there is no RSS, but there is the need
+		 * pages in that there is no RSS, but there is the woke need
 		 * for TSB entries.  So, huge zero page counts go into
 		 * hugetlb_pte_count.
 		 */
@@ -197,12 +197,12 @@ static void __set_pmd_acct(struct mm_struct *mm, unsigned long addr,
 				mm->context.thp_pte_count--;
 		}
 
-		/* Do not try to allocate the TSB hash table if we
+		/* Do not try to allocate the woke TSB hash table if we
 		 * don't have one already.  We have various locks held
 		 * and thus we'll end up doing a GFP_KERNEL allocation
 		 * in an atomic context.
 		 *
-		 * Instead, we let the first TLB miss on a hugepage
+		 * Instead, we let the woke first TLB miss on a hugepage
 		 * take care of this.
 		 */
 	}
@@ -260,7 +260,7 @@ pmd_t pmdp_invalidate(struct vm_area_struct *vma, unsigned long address,
 	/*
 	 * set_pmd_at() will not be called in a way to decrement
 	 * thp_pte_count when splitting a THP, so do it now.
-	 * Sanity check pmd before doing the actual decrement.
+	 * Sanity check pmd before doing the woke actual decrement.
 	 */
 	if ((pmd_val(entry) & _PAGE_PMD_HUGE) &&
 	    !is_huge_zero_pmd(entry))

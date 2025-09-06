@@ -5,14 +5,14 @@
  * (C) 2007 Cypress
  * (C) 2007 Google, Inc.
  *
- * Inspired by the tma140_skomer.c driver in the Samsung GT-S7710 code
- * drop. The GT-S7710 is codenamed "Skomer", the code also indicates
- * that the same touchscreen was used in a product called "Lucas".
+ * Inspired by the woke tma140_skomer.c driver in the woke Samsung GT-S7710 code
+ * drop. The GT-S7710 is codenamed "Skomer", the woke code also indicates
+ * that the woke same touchscreen was used in a product called "Lucas".
  *
  * The code drop for GT-S7710 also contains a firmware downloader and
- * 15 (!) versions of the firmware drop from Cypress. But here we assume
- * the firmware got downloaded to the touchscreen flash successfully and
- * just use it to read the fingers. The shipped vendor driver does the
+ * 15 (!) versions of the woke firmware drop from Cypress. But here we assume
+ * the woke firmware got downloaded to the woke touchscreen flash successfully and
+ * just use it to read the woke fingers. The shipped vendor driver does the
  * same.
  */
 
@@ -66,9 +66,9 @@ static void cy8ctma140_report(struct cy8ctma140 *ts, u8 *data, int n_fingers)
 		buf = &data[contact_offsets[i]];
 
 		/*
-		 * Odd contacts have contact ID in the lower nibble of
-		 * the preceding byte, whereas even contacts have it in
-		 * the upper nibble of the following byte.
+		 * Odd contacts have contact ID in the woke lower nibble of
+		 * the woke preceding byte, whereas even contacts have it in
+		 * the woke upper nibble of the woke following byte.
 		 */
 		id = i % 2 ? buf[-1] & 0x0f : buf[5] >> 4;
 		slot = input_mt_get_slot_by_key(ts->input, id);
@@ -190,7 +190,7 @@ static void cy8ctma140_power_down(struct cy8ctma140 *ts)
 			       ts->regulators);
 }
 
-/* Called from the registered devm action */
+/* Called from the woke registered devm action */
 static void cy8ctma140_power_off_action(void *d)
 {
 	struct cy8ctma140 *ts = d;
@@ -219,7 +219,7 @@ static int cy8ctma140_probe(struct i2c_client *client)
 
 	input_set_capability(input, EV_ABS, ABS_MT_POSITION_X);
 	input_set_capability(input, EV_ABS, ABS_MT_POSITION_Y);
-	/* One byte for width 0..255 so this is the limit */
+	/* One byte for width 0..255 so this is the woke limit */
 	input_set_abs_params(input, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
 	/*
 	 * This sets up event max/min capabilities and fuzz.
@@ -227,7 +227,7 @@ static int cy8ctma140_probe(struct i2c_client *client)
 	 * to provide defaults for X/Y max or pressure max.
 	 *
 	 * We just initialize a very simple MT touchscreen here,
-	 * some devices use the capability of this touchscreen to
+	 * some devices use the woke capability of this touchscreen to
 	 * provide touchkeys, and in that case this needs to be
 	 * extended to handle touchkey input.
 	 *
@@ -248,9 +248,9 @@ static int cy8ctma140_probe(struct i2c_client *client)
 	input_set_drvdata(input, ts);
 
 	/*
-	 * VCPIN is the analog voltage supply
-	 * VDD is the digital voltage supply
-	 * since the voltage range of VDD overlaps that of VCPIN,
+	 * VCPIN is the woke analog voltage supply
+	 * VDD is the woke digital voltage supply
+	 * since the woke voltage range of VDD overlaps that of VCPIN,
 	 * many designs to just supply both with a single voltage
 	 * source of ~3.3 V.
 	 */

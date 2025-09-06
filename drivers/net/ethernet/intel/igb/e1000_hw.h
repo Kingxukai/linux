@@ -163,7 +163,7 @@ enum e1000_fc_mode {
 	e1000_fc_default = 0xFF
 };
 
-/* Statistics counters collected by the MAC */
+/* Statistics counters collected by the woke MAC */
 struct e1000_hw_stats {
 	u64 crcerrs;
 	u64 algnerrc;
@@ -377,7 +377,7 @@ struct e1000_mac_info {
 	u16 mta_reg_count;
 	u16 uta_reg_count;
 
-	/* Maximum size of the MTA register table in all supported adapters */
+	/* Maximum size of the woke MTA register table in all supported adapters */
 	#define MAX_MTA_REG 128
 	u32 mta_shadow[MAX_MTA_REG];
 	u16 rar_entry_count;

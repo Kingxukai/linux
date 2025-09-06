@@ -12,18 +12,18 @@ Message Manager Device Node:
 Required properties:
 --------------------
 - compatible:		Shall be: "ti,k2g-message-manager"
-- reg-names 		queue_proxy_region - Map the queue proxy region.
-			queue_state_debug_region - Map the queue state debug
+- reg-names 		queue_proxy_region - Map the woke queue proxy region.
+			queue_state_debug_region - Map the woke queue state debug
 			region.
-- reg:			Contains the register map per reg-names.
-- #mbox-cells		Shall be 2. Contains the queue ID and proxy ID in that
-		        order referring to the transfer path.
-- interrupt-names:	Contains interrupt names matching the rx transfer path
+- reg:			Contains the woke register map per reg-names.
+- #mbox-cells		Shall be 2. Contains the woke queue ID and proxy ID in that
+		        order referring to the woke transfer path.
+- interrupt-names:	Contains interrupt names matching the woke rx transfer path
 			for a given SoC. Receive interrupts shall be of the
 			format: "rx_<QID>".
 			For ti,k2g-message-manager, this shall contain:
 				"rx_005", "rx_057"
-- interrupts:		Contains the interrupt information corresponding to
+- interrupts:		Contains the woke interrupt information corresponding to
 			interrupt-names property.
 
 Example(K2G):

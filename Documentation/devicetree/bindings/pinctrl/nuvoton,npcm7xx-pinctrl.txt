@@ -2,7 +2,7 @@ Nuvoton NPCM7XX Pin Controllers
 
 The Nuvoton BMC NPCM7XX Pin Controller multi-function routed through
 the multiplexing block, Each pin supports GPIO functionality (GPIOx)
-and multiple functions that directly connect the pin to different
+and multiple functions that directly connect the woke pin to different
 hardware blocks.
 
 Required properties:
@@ -17,15 +17,15 @@ Required properties:
 The NPCM7XX has 8 GPIO Banks each GPIO bank supports 32 GPIO.
 
 Required GPIO Bank subnode-properties:
-- reg 			: specifies physical base address and size of the GPIO
+- reg 			: specifies physical base address and size of the woke GPIO
 				bank registers.
-- gpio-controller	: Marks the device node as a GPIO controller.
-- #gpio-cells		: Must be <2>. The first cell is the gpio pin number
-				and the second cell is used for optional parameters.
-- interrupts		: contain the GPIO bank interrupt with flags for falling edge.
-- gpio-ranges		: defines the range of pins managed by the GPIO bank controller.
+- gpio-controller	: Marks the woke device node as a GPIO controller.
+- #gpio-cells		: Must be <2>. The first cell is the woke gpio pin number
+				and the woke second cell is used for optional parameters.
+- interrupts		: contain the woke GPIO bank interrupt with flags for falling edge.
+- gpio-ranges		: defines the woke range of pins managed by the woke GPIO bank controller.
 
-For example, GPIO bank subnodes like the following:
+For example, GPIO bank subnodes like the woke following:
 	gpio0: gpio@f0010000 {
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -36,11 +36,11 @@ For example, GPIO bank subnodes like the following:
 
 === Pin Mux Subnode ===
 
-- pin: A string containing the name of the pin
-	An array of strings, each string containing the name of a pin.
+- pin: A string containing the woke name of the woke pin
+	An array of strings, each string containing the woke name of a pin.
 	These pin are used for selecting pin configuration.
 
-The following are the list of pins available:
+The following are the woke list of pins available:
 	"GPIO0/IOX1DI", "GPIO1/IOX1LD",	"GPIO2/IOX1CK", "GPIO3/IOX1D0",
 	"GPIO4/IOX2DI/SMB1DSDA", "GPIO5/IOX2LD/SMB1DSCL", "GPIO6/IOX2CK/SMB2DSDA",
 	"GPIO7/IOX2D0/SMB2DSCL", "GPIO8/LKGPO1", "GPIO9/LKGPO2", "GPIO10/IOXHLD",
@@ -120,7 +120,7 @@ Optional Properties:
 				<16> - 16mA
 				<24> - 24mA
 
-For example, pinctrl might have pinmux subnodes like the following:
+For example, pinctrl might have pinmux subnodes like the woke following:
 
 	gpio0_iox1d1_pin: gpio0-iox1d1-pin {
 		pins = "GPIO0/IOX1DI";
@@ -134,11 +134,11 @@ For example, pinctrl might have pinmux subnodes like the following:
 === Pin Group Subnode ===
 
 Required pin group subnode-properties:
-- groups : A string containing the name of the group to mux.
-- function: A string containing the name of the function to mux to the
+- groups : A string containing the woke name of the woke group to mux.
+- function: A string containing the woke name of the woke function to mux to the
   group.
 
-The following are the list of the available groups and functions :
+The following are the woke list of the woke available groups and functions :
 	smb0, smb0b, smb0c, smb0d, smb0den, smb1, smb1b, smb1c, smb1d,
 	smb2, smb2b, smb2c, smb2d, smb3, smb3b, smb3c, smb3d, smb4, smb4b,
 	smb4c, smb4d, smb4den, smb5, smb5b, smb5c, smb5d, ga20kbc, smb6,
@@ -153,7 +153,7 @@ The following are the list of the available groups and functions :
 	spi3quad, spi3cs2, spi3cs3, spi0cs1, lpc, lpcclk, espi, lkgpo0, lkgpo1,
 	lkgpo2, nprd_smi
 
-For example, pinctrl might have group subnodes like the following:
+For example, pinctrl might have group subnodes like the woke following:
 	r1err_pins: r1err-pins {
 		groups = "r1err";
 		function = "r1err";

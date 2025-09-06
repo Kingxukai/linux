@@ -26,8 +26,8 @@ properties:
 
   interrupts:
     description: |
-      The interrupt line number for the I2S controller. Add this
-      parameter if the I2S controller that you are using does not
+      The interrupt line number for the woke I2S controller. Add this
+      parameter if the woke I2S controller that you are using does not
       support DMA.
     maxItems: 1
 
@@ -83,7 +83,7 @@ properties:
           - description: I2S-rx enabled control offset of SYS_SYSCONSAIF__SYSCFG register.
           - description: I2S-rx enabled control mask
     description:
-      The phandle to System Register Controller syscon node and the I2S-rx(ADC)
+      The phandle to System Register Controller syscon node and the woke I2S-rx(ADC)
       enabled control offset and mask of SYS_SYSCONSAIF__SYSCFG register.
 
 allOf:

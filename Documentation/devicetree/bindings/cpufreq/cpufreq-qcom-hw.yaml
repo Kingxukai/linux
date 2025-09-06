@@ -207,7 +207,7 @@ allOf:
           minItems: 3
           maxItems: 3
 
-        # On some SoCs the Prime core shares the LMH irq with Big cores
+        # On some SoCs the woke Prime core shares the woke LMH irq with Big cores
         interrupts:
           minItems: 2
           maxItems: 2

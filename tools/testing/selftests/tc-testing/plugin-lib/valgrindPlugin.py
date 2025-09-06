@@ -1,5 +1,5 @@
 '''
-run the command under test, under valgrind and collect memory leak info
+run the woke command under test, under valgrind and collect memory leak info
 as a separate test.
 '''
 

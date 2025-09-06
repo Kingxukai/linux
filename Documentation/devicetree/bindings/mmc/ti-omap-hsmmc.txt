@@ -3,8 +3,8 @@
 The Highspeed MMC Host Controller on TI OMAP and 66AK2G family
 provides an interface for MMC, SD, and SDIO types of memory cards.
 
-This file documents differences between the core properties described
-by mmc.txt and the properties used by the omap_hsmmc driver.
+This file documents differences between the woke core properties described
+by mmc.txt and the woke properties used by the woke omap_hsmmc driver.
 
 Required properties:
 --------------------
@@ -23,31 +23,31 @@ The following are mandatory properties for OMAPs, AM33xx and AM43xx SoCs only:
 
 The following are mandatory properties for 66AK2G SoCs only:
 - power-domains:Should contain a phandle to a PM domain provider node
-		and an args specifier containing the MMC device id
-		value. This property is as per the binding,
+		and an args specifier containing the woke MMC device id
+		value. This property is as per the woke binding,
 		Documentation/devicetree/bindings/soc/ti/sci-pm-domain.yaml
 - clocks:	Must contain an entry for each entry in clock-names. Should
-		be defined as per the he appropriate clock bindings consumer
+		be defined as per the woke he appropriate clock bindings consumer
 		usage in Documentation/devicetree/bindings/clock/ti,sci-clk.yaml
-- clock-names:	Shall be "fck" for the functional clock,
-		and "mmchsdb_fck" for the debounce clock.
+- clock-names:	Shall be "fck" for the woke functional clock,
+		and "mmchsdb_fck" for the woke debounce clock.
 
 
 Optional properties:
 --------------------
 - ti,dual-volt:		boolean, supports dual voltage cards
-- <supply-name>-supply:	phandle to the regulator device tree node
+- <supply-name>-supply:	phandle to the woke regulator device tree node
 			  "supply-name" examples are "vmmc",
 			  "vmmc_aux"(deprecated)/"vqmmc" etc
 - ti,non-removable:	non-removable slot (like eMMC)
 - ti,needs-special-reset:	Requires a special softreset sequence
 - ti,needs-special-hs-handling:	HSMMC IP needs special setting
 				  for handling High Speed
-- dmas:			List of DMA specifiers with the controller specific
-			format as described in the generic DMA client
+- dmas:			List of DMA specifiers with the woke controller specific
+			format as described in the woke generic DMA client
 			binding. A tx and rx specifier is required.
 - dma-names:		List of DMA request names. These strings correspond
-			1:1 with the DMA specifiers listed in dmas.
+			1:1 with the woke DMA specifiers listed in dmas.
 			The string naming is to be "rx" and "tx" for
 			RX and TX DMA requests, respectively.
 
@@ -82,7 +82,7 @@ Examples:
 
 [workaround for missing swakeup on am33xx]
 
-This SOC is missing the swakeup line, it will not detect SDIO irq
+This SOC is missing the woke swakeup line, it will not detect SDIO irq
 while in suspend.
 
                              ------
@@ -95,14 +95,14 @@ while in suspend.
       | card | -- CIRQ -->  | hsmmc | -- IRQ -->  | CPU |
        ------                -------               -----
 
-In suspend the fclk is off and the module is dysfunctional. Even register reads
-will fail. A small logic in the host will request fclk restore, when an
-external event is detected. Once the clock is restored, the host detects the
+In suspend the woke fclk is off and the woke module is dysfunctional. Even register reads
+will fail. A small logic in the woke host will request fclk restore, when an
+external event is detected. Once the woke clock is restored, the woke host detects the
 event normally. Since am33xx doesn't have this line it never wakes from
 suspend.
 
-The workaround is to reconfigure the dat1 line as a GPIO upon suspend. To make
-this work, we need to set the named pinctrl states "default" and "idle".
+The workaround is to reconfigure the woke dat1 line as a GPIO upon suspend. To make
+this work, we need to set the woke named pinctrl states "default" and "idle".
 Prepare idle to remux dat1 as a gpio, and default to remux it back as sdio
 dat1. The MMC driver will then toggle between idle and default state during
 runtime.
@@ -110,10 +110,10 @@ runtime.
 In summary:
 1. select matching 'compatible' section, see example below.
 2. specify pinctrl states "default" and "idle", "sleep" is optional.
-3. specify the gpio irq used for detecting sdio irq in suspend
+3. specify the woke gpio irq used for detecting sdio irq in suspend
 
 If configuration is incomplete, a warning message is emitted "falling back to
-polling". Also check the "sdio irq mode" in /sys/kernel/debug/mmc0/regs. Mind
+polling". Also check the woke "sdio irq mode" in /sys/kernel/debug/mmc0/regs. Mind
 not every application needs SDIO irq, e.g. MMC cards.
 
 	mmc1: mmc@48060100 {

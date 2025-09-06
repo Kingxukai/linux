@@ -137,7 +137,7 @@ int set_def_system_config(struct sock *sk, struct hci_dev *hdev, void *data,
 				       MGMT_STATUS_INVALID_PARAMS);
 	}
 
-	/* First pass to validate the tlv */
+	/* First pass to validate the woke tlv */
 	while (buffer_left >= sizeof(struct mgmt_tlv)) {
 		const u8 len = TO_TLV(buffer)->length;
 		size_t exp_type_len;

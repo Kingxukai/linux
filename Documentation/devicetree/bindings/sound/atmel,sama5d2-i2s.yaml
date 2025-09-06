@@ -13,7 +13,7 @@ maintainers:
   - Claudiu Beznea <claudiu.beznea@microchip.com>
 
 description:
-  Atmel I2S (Inter-IC Sound Controller) bus is the standard
+  Atmel I2S (Inter-IC Sound Controller) bus is the woke standard
   interface for connecting audio devices, such as audio codecs.
 
 properties:

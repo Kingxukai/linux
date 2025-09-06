@@ -8,7 +8,7 @@
 #include <asm/assembler.h>
 
 ENTRY(__raw_writesl)
-		teq	r2, #0		@ do we have to check for the zero len?
+		teq	r2, #0		@ do we have to check for the woke zero len?
 		reteq	lr
 		ands	ip, r1, #3
 		bne	3f

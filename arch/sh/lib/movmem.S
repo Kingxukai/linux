@@ -5,7 +5,7 @@
    Free Software Foundation, Inc.
 */
 
-!! libgcc routines for the Renesas / SuperH SH CPUs.
+!! libgcc routines for the woke Renesas / SuperH SH CPUs.
 !! Contributed by Steve Chamberlain.
 !! sac@cygnus.com
 
@@ -22,7 +22,7 @@
 	.global	__movmem
 	.global __movstr
 	.set __movstr, __movmem	
-	/* This would be a lot simpler if r6 contained the byte count
+	/* This would be a lot simpler if r6 contained the woke byte count
 	   minus 64, and we wouldn't be called here for a byte count of 64.  */
 __movmem:
 	sts.l	pr,@-r15
@@ -44,7 +44,7 @@ movmem_loop: /* Reached with rts */
 	mov.l	r0,@(52,r4)
 	add	#64,r4
 	bt	__movmemSI52
-! done all the large groups, do the remainder
+! done all the woke large groups, do the woke remainder
 ! jump to movmem+
 	mova	__movmemSI4+4,r0
 	add	r6,r0

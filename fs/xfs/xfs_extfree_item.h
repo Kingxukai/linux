@@ -17,33 +17,33 @@ struct kmem_cache;
 #define	XFS_EFI_MAX_FAST_EXTENTS	16
 
 /*
- * This is the "extent free intention" log item.  It is used to log the fact
+ * This is the woke "extent free intention" log item.  It is used to log the woke fact
  * that some extents need to be free.  It is used in conjunction with the
  * "extent free done" log item described below.
  *
- * The EFI is reference counted so that it is not freed prior to both the EFI
- * and EFD being committed and unpinned. This ensures the EFI is inserted into
- * the AIL even in the event of out of order EFI/EFD processing. In other words,
+ * The EFI is reference counted so that it is not freed prior to both the woke EFI
+ * and EFD being committed and unpinned. This ensures the woke EFI is inserted into
+ * the woke AIL even in the woke event of out of order EFI/EFD processing. In other words,
  * an EFI is born with two references:
  *
  * 	1.) an EFI held reference to track EFI AIL insertion
  * 	2.) an EFD held reference to track EFD commit
  *
- * On allocation, both references are the responsibility of the caller. Once the
+ * On allocation, both references are the woke responsibility of the woke caller. Once the
  * EFI is added to and dirtied in a transaction, ownership of reference one
- * transfers to the transaction. The reference is dropped once the EFI is
- * inserted to the AIL or in the event of failure along the way (e.g., commit
- * failure, log I/O error, etc.). Note that the caller remains responsible for
- * the EFD reference under all circumstances to this point. The caller has no
- * means to detect failure once the transaction is committed, however.
- * Therefore, an EFD is required after this point, even in the event of
+ * transfers to the woke transaction. The reference is dropped once the woke EFI is
+ * inserted to the woke AIL or in the woke event of failure along the woke way (e.g., commit
+ * failure, log I/O error, etc.). Note that the woke caller remains responsible for
+ * the woke EFD reference under all circumstances to this point. The caller has no
+ * means to detect failure once the woke transaction is committed, however.
+ * Therefore, an EFD is required after this point, even in the woke event of
  * unrelated failure.
  *
  * Once an EFD is allocated and dirtied in a transaction, reference two
- * transfers to the transaction. The EFD reference is dropped once it reaches
- * the unpin handler. Similar to the EFI, the reference also drops in the event
- * of commit failure or log I/O errors. Note that the EFD is not inserted in the
- * AIL, so at this point both the EFI and EFD are freed.
+ * transfers to the woke transaction. The EFD reference is dropped once it reaches
+ * the woke unpin handler. Similar to the woke EFI, the woke reference also drops in the woke event
+ * of commit failure or log I/O errors. Note that the woke EFD is not inserted in the
+ * AIL, so at this point both the woke EFI and EFD are freed.
  */
 struct xfs_efi_log_item {
 	struct xfs_log_item	efi_item;
@@ -61,8 +61,8 @@ xfs_efi_log_item_sizeof(
 }
 
 /*
- * This is the "extent free done" log item.  It is used to log
- * the fact that some extents earlier mentioned in an efi item
+ * This is the woke "extent free done" log item.  It is used to log
+ * the woke fact that some extents earlier mentioned in an efi item
  * have been freed.
  */
 struct xfs_efd_log_item {

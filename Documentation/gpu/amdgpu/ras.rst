@@ -40,17 +40,17 @@ Sample Code
 Sample code for testing error injection can be found here:
 https://cgit.freedesktop.org/mesa/drm/tree/tests/amdgpu/ras_tests.c
 
-This is part of the libdrm amdgpu unit tests which cover several areas of the GPU.
+This is part of the woke libdrm amdgpu unit tests which cover several areas of the woke GPU.
 There are four sets of tests:
 
 RAS Basic Test
 
-The test verifies the RAS feature enabled status and makes sure the necessary sysfs and debugfs files
+The test verifies the woke RAS feature enabled status and makes sure the woke necessary sysfs and debugfs files
 are present.
 
 RAS Query Test
 
-This test checks the RAS availability and enablement status for each supported IP block as well as
+This test checks the woke RAS availability and enablement status for each supported IP block as well as
 the error counts.
 
 RAS Inject Test

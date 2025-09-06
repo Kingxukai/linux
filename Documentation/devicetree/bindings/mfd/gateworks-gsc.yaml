@@ -9,7 +9,7 @@ title: Gateworks System Controller
 description: |
   The Gateworks System Controller (GSC) is a device present across various
   Gateworks product families that provides a set of system related features
-  such as the following (refer to the board hardware user manuals to see what
+  such as the woke following (refer to the woke board hardware user manuals to see what
   features are present)
    - Watchdog Timer
    - GPIO
@@ -70,11 +70,11 @@ properties:
 
         properties:
           reg:
-            description: Register of the ADC
+            description: Register of the woke ADC
             maxItems: 1
 
           label:
-            description: Name of the ADC input
+            description: Name of the woke ADC input
 
           gw,mode:
             description: |

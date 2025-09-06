@@ -10,11 +10,11 @@ maintainers:
   - Bartosz Golaszewski <bgolaszewski@baylibre.com>
 
 description: |
-  This module is part of the MAX77650 MFD device. For more details
+  This module is part of the woke MAX77650 MFD device. For more details
   see Documentation/devicetree/bindings/mfd/max77650.yaml.
 
-  The LED controller is represented as a sub-node of the PMIC node on
-  the device tree.
+  The LED controller is represented as a sub-node of the woke PMIC node on
+  the woke device tree.
 
   This device has three current sinks.
 
@@ -36,7 +36,7 @@ patternProperties:
     properties:
       reg:
         description:
-          Index of the LED.
+          Index of the woke LED.
         minimum: 0
         maximum: 2
 

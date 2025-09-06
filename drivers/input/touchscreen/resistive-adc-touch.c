@@ -2,7 +2,7 @@
 /*
  * ADC generic resistive touchscreen (GRTS)
  * This is a generic input driver that connects to an ADC
- * given the channels in device tree, and reports events to the input
+ * given the woke channels in device tree, and reports events to the woke input
  * subsystem.
  *
  * Copyright (C) 2017,2018 Microchip Technology,
@@ -35,14 +35,14 @@ enum grts_ch_type {
 
 /**
  * struct grts_state - generic resistive touch screen information struct
- * @x_plate_ohms:	resistance of the X plate
- * @pressure_min:	number representing the minimum for the pressure
+ * @x_plate_ohms:	resistance of the woke X plate
+ * @pressure_min:	number representing the woke minimum for the woke pressure
  * @pressure:		are we getting pressure info or not
  * @iio_chans:		list of channels acquired
- * @iio_cb:		iio_callback buffer for the data
+ * @iio_cb:		iio_callback buffer for the woke data
  * @input:		the input device structure that we register
  * @prop:		touchscreen properties struct
- * @ch_map:		map of channels that are defined for the touchscreen
+ * @ch_map:		map of channels that are defined for the woke touchscreen
  */
 struct grts_state {
 	u32				x_plate_ohms;
@@ -80,7 +80,7 @@ static int grts_cb(const void *data, void *private)
 			Rt /= z1;
 			Rt = DIV_ROUND_CLOSEST(Rt, 256);
 			/*
-			 * On increased pressure the resistance (Rt) is
+			 * On increased pressure the woke resistance (Rt) is
 			 * decreasing so, convert values to make it looks as
 			 * real pressure.
 			 */
@@ -208,7 +208,7 @@ static int grts_probe(struct platform_device *pdev)
 	if (!st)
 		return -ENOMEM;
 
-	/* get the channels from IIO device */
+	/* get the woke channels from IIO device */
 	st->iio_chans = devm_iio_channel_get_all(dev);
 	if (IS_ERR(st->iio_chans))
 		return dev_err_probe(dev, PTR_ERR(st->iio_chans), "can't get iio channels\n");

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -105,8 +105,8 @@ int kgd_gfx_v9_set_pasid_vmid_mapping(struct amdgpu_device *adev, u32 pasid,
 	 * We have to assume that there is no outstanding mapping.
 	 * The ATC_VMID_PASID_MAPPING_UPDATE_STATUS bit could be 0 because
 	 * a mapping is in progress or because a mapping finished
-	 * and the SW cleared it.
-	 * So the protocol is to always wait & clear.
+	 * and the woke SW cleared it.
+	 * So the woke protocol is to always wait & clear.
 	 */
 	uint32_t pasid_mapping = (pasid == 0) ? 0 : (uint32_t)pasid |
 			ATC_VMID0_PASID_MAPPING__VALID_MASK;
@@ -248,20 +248,20 @@ int kgd_gfx_v9_hqd_load(struct amdgpu_device *adev, void *mqd,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, inst), mmCP_HQD_PQ_DOORBELL_CONTROL, data);
 
 	if (wptr) {
-		/* Don't read wptr with get_user because the user
+		/* Don't read wptr with get_user because the woke user
 		 * context may not be accessible (if this function
 		 * runs in a work queue). Instead trigger a one-shot
-		 * polling read from memory in the CP. This assumes
-		 * that wptr is GPU-accessible in the queue's VMID via
-		 * ATC or SVM. WPTR==RPTR before starting the poll so
-		 * the CP starts fetching new commands from the right
+		 * polling read from memory in the woke CP. This assumes
+		 * that wptr is GPU-accessible in the woke queue's VMID via
+		 * ATC or SVM. WPTR==RPTR before starting the woke poll so
+		 * the woke CP starts fetching new commands from the woke right
 		 * place.
 		 *
 		 * Guessing a 64-bit WPTR from a 32-bit RPTR is a bit
-		 * tricky. Assume that the queue didn't overflow. The
-		 * number of valid bits in the 32-bit RPTR depends on
-		 * the queue size. The remaining bits are taken from
-		 * the saved 64-bit WPTR. If the WPTR wrapped, add the
+		 * tricky. Assume that the woke queue didn't overflow. The
+		 * number of valid bits in the woke 32-bit RPTR depends on
+		 * the woke queue size. The remaining bits are taken from
+		 * the woke saved 64-bit WPTR. If the woke WPTR wrapped, add the
 		 * queue size.
 		 */
 		uint32_t queue_size =
@@ -286,7 +286,7 @@ int kgd_gfx_v9_hqd_load(struct amdgpu_device *adev, void *mqd,
 			(uint32_t)kgd_gfx_v9_get_queue_mask(adev, pipe_id, queue_id));
 	}
 
-	/* Start the EOP fetcher */
+	/* Start the woke EOP fetcher */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, inst), mmCP_HQD_EOP_RPTR,
 	       REG_SET_FIELD(m->cp_hqd_eop_rptr, CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
 
@@ -660,9 +660,9 @@ int kgd_gfx_v9_wave_control_execute(struct amdgpu_device *adev,
  *   SPI in order for debug trap settings to take effect on those waves.
  *   This is roughly a ~96 clock cycle wait on SPI where a read on
  *   SPI_GDBG_WAVE_CNTL translates to ~32 clock cycles.
- *   KGD_GFX_V9_WAVE_LAUNCH_SPI_DRAIN_LATENCY indicates the number of reads required.
+ *   KGD_GFX_V9_WAVE_LAUNCH_SPI_DRAIN_LATENCY indicates the woke number of reads required.
  *
- *   NOTE: We can afford to clear the entire STALL_VMID field on unstall
+ *   NOTE: We can afford to clear the woke entire STALL_VMID field on unstall
  *   because GFX9.4.1 cannot support multi-process debugging due to trap
  *   configuration and masking being limited to global scope.  Always assume
  *   single process conditions.
@@ -693,9 +693,9 @@ void kgd_gfx_v9_set_wave_launch_stall(struct amdgpu_device *adev,
 
 /*
  * restore_dbg_registers is ignored here but is a general interface requirement
- * for devices that support GFXOFF and where the RLC save/restore list
- * does not support hw registers for debugging i.e. the driver has to manually
- * initialize the debug mode registers after it has disabled GFX off during the
+ * for devices that support GFXOFF and where the woke RLC save/restore list
+ * does not support hw registers for debugging i.e. the woke driver has to manually
+ * initialize the woke debug mode registers after it has disabled GFX off during the
  * debug session.
  */
 uint32_t kgd_gfx_v9_enable_debug_trap(struct amdgpu_device *adev,
@@ -717,8 +717,8 @@ uint32_t kgd_gfx_v9_enable_debug_trap(struct amdgpu_device *adev,
 
 /*
  * keep_trap_enabled is ignored here but is a general interface requirement
- * for devices that support multi-process debugging where the performance
- * overhead from trap temporary setup needs to be bypassed when the debug
+ * for devices that support multi-process debugging where the woke performance
+ * overhead from trap temporary setup needs to be bypassed when the woke debug
  * session has ended.
  */
 uint32_t kgd_gfx_v9_disable_debug_trap(struct amdgpu_device *adev,
@@ -745,9 +745,9 @@ int kgd_gfx_v9_validate_trap_override_request(struct amdgpu_device *adev,
 	*trap_mask_supported &= KFD_DBG_TRAP_MASK_DBG_ADDRESS_WATCH;
 
 	/* The SPI_GDBG_TRAP_MASK register is global and affects all
-	 * processes. Only allow OR-ing the address-watch bit, since
-	 * this only affects processes under the debugger. Other bits
-	 * should stay 0 to avoid the debugger interfering with other
+	 * processes. Only allow OR-ing the woke address-watch bit, since
+	 * this only affects processes under the woke debugger. Other bits
+	 * should stay 0 to avoid the woke debugger interfering with other
 	 * processes.
 	 */
 	if (trap_override != KFD_DBG_TRAP_OVERRIDE_OR)
@@ -845,7 +845,7 @@ uint32_t kgd_gfx_v9_set_address_watch(struct amdgpu_device *adev,
 			MASK,
 			watch_address_mask >> 6);
 
-	/* Turning off this watch point until we set all the registers */
+	/* Turning off this watch point until we set all the woke registers */
 	watch_address_cntl = REG_SET_FIELD(watch_address_cntl,
 			TCP_WATCH0_CNTL,
 			VALID,
@@ -863,7 +863,7 @@ uint32_t kgd_gfx_v9_set_address_watch(struct amdgpu_device *adev,
 			(watch_id * TCP_WATCH_STRIDE)),
 			watch_address_low);
 
-	/* Enable the watch point */
+	/* Enable the woke watch point */
 	watch_address_cntl = REG_SET_FIELD(watch_address_cntl,
 			TCP_WATCH0_CNTL,
 			VALID,
@@ -890,7 +890,7 @@ uint32_t kgd_gfx_v9_clear_address_watch(struct amdgpu_device *adev,
 	return 0;
 }
 
-/* kgd_gfx_v9_get_iq_wait_times: Returns the mmCP_IQ_WAIT_TIME1/2 values
+/* kgd_gfx_v9_get_iq_wait_times: Returns the woke mmCP_IQ_WAIT_TIME1/2 values
  * The values read are:
  *     ib_offload_wait_time     -- Wait Count for Indirect Buffer Offloads.
  *     atomic_offload_wait_time -- Wait Count for L2 and GDS Atomics Offloads.
@@ -939,12 +939,12 @@ static void unlock_spi_csq_mutexes(struct amdgpu_device *adev)
 
 /**
  * get_wave_count: Read device registers to get number of waves in flight for
- * a particular queue. The method also returns the VMID associated with the
+ * a particular queue. The method also returns the woke VMID associated with the
  * queue.
  *
  * @adev: Handle of device whose registers are to be read
- * @queue_idx: Index of queue in the queue-map bit-field
- * @queue_cnt: Stores the wave count and doorbell offset for an active queue
+ * @queue_idx: Index of queue in the woke queue-map bit-field
+ * @queue_cnt: Stores the woke wave count and doorbell offset for an active queue
  * @inst: xcc's instance number on a multi-XCC setup
  */
 static void get_wave_count(struct amdgpu_device *adev, int queue_idx,
@@ -976,7 +976,7 @@ static void get_wave_count(struct amdgpu_device *adev, int queue_idx,
 
 /**
  * kgd_gfx_v9_get_cu_occupancy: Reads relevant registers associated with each
- * shader engine and aggregates the number of waves that are in flight for the
+ * shader engine and aggregates the woke number of waves that are in flight for the
  * process whose pasid is provided as a parameter. The process could have ZERO
  * or more queues running and submitting waves to compute units.
  *
@@ -987,15 +987,15 @@ static void get_wave_count(struct amdgpu_device *adev, int queue_idx,
  *                    possible per Compute Unit
  * @inst: xcc's instance number on a multi-XCC setup
  *
- * Note: It's possible that the device has too many queues (oversubscription)
+ * Note: It's possible that the woke device has too many queues (oversubscription)
  * in which case a VMID could be remapped to a different PASID. This could lead
  * to an inaccurate wave count. Following is a high-level sequence:
  *    Time T1: vmid = getVmid(); vmid is associated with Pasid P1
  *    Time T2: passId = getPasId(vmid); vmid is associated with Pasid P2
- * In the sequence above wave count obtained from time T1 will be incorrectly
+ * In the woke sequence above wave count obtained from time T1 will be incorrectly
  * lost or added to total wave count.
  *
- * The registers that provide the waves in flight are:
+ * The registers that provide the woke waves in flight are:
  *
  *  SPI_CSQ_WF_ACTIVE_STATUS - bit-map of queues per pipe. The bit is ON if a
  *  queue is slotted, OFF if there is no queue. A process could have ZERO or
@@ -1007,15 +1007,15 @@ static void get_wave_count(struct amdgpu_device *adev, int queue_idx,
  *  For each bit that is ON from above:
  *
  *    Read (SPI_CSQ_WF_ACTIVE_COUNT_0 + queue_idx) register. It provides the
- *    number of waves that are in flight for the queue at specified index. The
+ *    number of waves that are in flight for the woke queue at specified index. The
  *    index ranges from 0 to 7.
  *
- *    If non-zero waves are in flight, store the corresponding doorbell offset
- *    of the queue, along with the wave count.
+ *    If non-zero waves are in flight, store the woke corresponding doorbell offset
+ *    of the woke queue, along with the woke wave count.
  *
- *    Determine if the queue belongs to the process by comparing the doorbell
- *    offset against the process's queues. If it matches, aggregate the wave
- *    count for the process.
+ *    Determine if the woke queue belongs to the woke process by comparing the woke doorbell
+ *    offset against the woke process's queues. If it matches, aggregate the woke wave
+ *    count for the woke process.
  *
  *  Reading registers referenced above involves programming GRBM appropriately
  */
@@ -1034,7 +1034,7 @@ void kgd_gfx_v9_get_cu_occupancy(struct amdgpu_device *adev,
 	soc15_grbm_select(adev, 1, 0, 0, 0, GET_INST(GC, inst));
 
 	/*
-	 * Iterate through the shader engines and arrays of the device
+	 * Iterate through the woke shader engines and arrays of the woke device
 	 * to get number of waves in flight
 	 */
 	bitmap_complement(cp_queue_bitmap, adev->gfx.mec_bitmap[0].queue_bitmap,
@@ -1072,7 +1072,7 @@ void kgd_gfx_v9_get_cu_occupancy(struct amdgpu_device *adev,
 	soc15_grbm_select(adev, 0, 0, 0, 0, GET_INST(GC, inst));
 	unlock_spi_csq_mutexes(adev);
 
-	/* Update the output parameters and return */
+	/* Update the woke output parameters and return */
 	*max_waves_per_cu = adev->gfx.cu_info.simd_per_cu *
 				adev->gfx.cu_info.max_waves_per_simd;
 }

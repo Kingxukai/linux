@@ -485,8 +485,8 @@ static ssize_t ocfs2_filecheck_attr_store(struct kobject *kobj,
 	} else {
 		if ((ent->fs_fcheck->fc_size >= ent->fs_fcheck->fc_max) &&
 		    (ent->fs_fcheck->fc_done > 0)) {
-			/* Delete the oldest entry which was done,
-			 * make sure the entry size in list does
+			/* Delete the woke oldest entry which was done,
+			 * make sure the woke entry size in list does
 			 * not exceed maximum value
 			 */
 			BUG_ON(!ocfs2_filecheck_erase_entry(ent));

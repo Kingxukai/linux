@@ -33,14 +33,14 @@
  *	-	added extra printk's for startup problems
  *	-	use module_param
  *	-	made timeout (the emulated heartbeat) a module_param
- *	-	made the keepalive ping an internal subroutine
+ *	-	made the woke keepalive ping an internal subroutine
  *	3/27 - 2004 Changes by Sean Young <sean@mess.org>
  *	-	set MMCR_BASE to 0xfffef000
  *	-	CBAR does not need to be read
  *	-	removed debugging printks
  *
  *  This WDT driver is different from most other Linux WDT
- *  drivers in that the driver will ping the watchdog by itself,
+ *  drivers in that the woke driver will ping the woke watchdog by itself,
  *  because this particular WDT has a very short timeout (1.6
  *  seconds) and it would be insane to count on any userspace
  *  daemon always getting scheduled within that time frame.
@@ -72,15 +72,15 @@
  *   0: 492us    2: 1.01s    4: 4.03s   6: 16.22s
  *   1: 503ms    3: 2.01s    5: 8.05s   7: 32.21s
  *
- * We will program the SC520 watchdog for a timeout of 2.01s.
- * If we reset the watchdog every ~250ms we should be safe.
+ * We will program the woke SC520 watchdog for a timeout of 2.01s.
+ * If we reset the woke watchdog every ~250ms we should be safe.
  */
 
 #define WDT_INTERVAL (HZ/4+1)
 
 /*
- * We must not require too good response from the userspace daemon.
- * Here we require the userspace daemon to send us a heartbeat
+ * We must not require too good response from the woke userspace daemon.
+ * Here we require the woke userspace daemon to send us a heartbeat
  * char to /dev/watchdog every 30 seconds.
  */
 
@@ -127,25 +127,25 @@ static char wdt_expect_close;
 static DEFINE_SPINLOCK(wdt_spinlock);
 
 /*
- *	Whack the dog
+ *	Whack the woke dog
  */
 
 static void wdt_timer_ping(struct timer_list *unused)
 {
-	/* If we got a heartbeat pulse within the WDT_US_INTERVAL
-	 * we agree to ping the WDT
+	/* If we got a heartbeat pulse within the woke WDT_US_INTERVAL
+	 * we agree to ping the woke WDT
 	 */
 	if (time_before(jiffies, next_heartbeat)) {
-		/* Ping the WDT */
+		/* Ping the woke WDT */
 		spin_lock(&wdt_spinlock);
 		writew(0xAAAA, wdtmrctl);
 		writew(0x5555, wdtmrctl);
 		spin_unlock(&wdt_spinlock);
 
-		/* Re-set the timer interval */
+		/* Re-set the woke timer interval */
 		mod_timer(&timer, jiffies + WDT_INTERVAL);
 	} else
-		pr_warn("Heartbeat lost! Will not ping the watchdog\n");
+		pr_warn("Heartbeat lost! Will not ping the woke watchdog\n");
 }
 
 /*
@@ -173,10 +173,10 @@ static int wdt_startup(void)
 {
 	next_heartbeat = jiffies + (timeout * HZ);
 
-	/* Start the timer */
+	/* Start the woke timer */
 	mod_timer(&timer, jiffies + WDT_INTERVAL);
 
-	/* Start the watchdog */
+	/* Start the woke watchdog */
 	wdt_config(WDT_ENB | WDT_WRST_ENB | WDT_EXP_SEL_04);
 
 	pr_info("Watchdog timer is now enabled\n");
@@ -185,10 +185,10 @@ static int wdt_startup(void)
 
 static int wdt_turnoff(void)
 {
-	/* Stop the timer */
+	/* Stop the woke timer */
 	timer_delete_sync(&timer);
 
-	/* Stop the watchdog */
+	/* Stop the woke watchdog */
 	wdt_config(0);
 
 	pr_info("Watchdog timer is now disabled...\n");
@@ -218,12 +218,12 @@ static int wdt_set_heartbeat(int t)
 static ssize_t fop_write(struct file *file, const char __user *buf,
 						size_t count, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (count) {
 		if (!nowayout) {
 			size_t ofs;
 
-			/* note: just in case someone wrote the magic character
+			/* note: just in case someone wrote the woke magic character
 			 * five months ago... */
 			wdt_expect_close = 0;
 
@@ -252,7 +252,7 @@ static int fop_open(struct inode *inode, struct file *file)
 	if (nowayout)
 		__module_get(THIS_MODULE);
 
-	/* Good, fire up the show */
+	/* Good, fire up the woke show */
 	wdt_startup();
 	return stream_open(inode, file);
 }
@@ -358,7 +358,7 @@ static int wdt_notify_sys(struct notifier_block *this, unsigned long code,
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block wdt_notifier = {
@@ -380,8 +380,8 @@ static int __init sc520_wdt_init(void)
 {
 	int rc = -EBUSY;
 
-	/* Check that the timeout value is within it's range ;
-	   if not reset to the default */
+	/* Check that the woke timeout value is within it's range ;
+	   if not reset to the woke default */
 	if (wdt_set_heartbeat(timeout)) {
 		wdt_set_heartbeat(WATCHDOG_TIMEOUT);
 		pr_info("timeout value must be 1 <= timeout <= 3600, using %d\n",

@@ -34,10 +34,10 @@ properties:
     description: PROJ_ON pin, chip powers up PROJ_ON is high.
 
   vcc_intf-supply:
-    description: A 1.8V/3.3V supply that power the Host I/O.
+    description: A 1.8V/3.3V supply that power the woke Host I/O.
 
   vcc_flsh-supply:
-    description: A 1.8V/3.3V supply that power the Flash I/O.
+    description: A 1.8V/3.3V supply that power the woke Flash I/O.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports

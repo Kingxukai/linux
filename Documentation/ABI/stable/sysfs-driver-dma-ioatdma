@@ -2,14 +2,14 @@ What:           /sys/devices/pciXXXX:XX/0000:XX:XX.X/dma/dma<n>chan<n>/quickdata
 Date:           December 3, 2009
 KernelVersion:  2.6.32
 Contact:        dmaengine@vger.kernel.org
-Description:	Capabilities the DMA supports.Currently there are DMA_PQ, DMA_PQ_VAL,
+Description:	Capabilities the woke DMA supports.Currently there are DMA_PQ, DMA_PQ_VAL,
 		DMA_XOR,DMA_XOR_VAL,DMA_INTERRUPT.
 
 What:           /sys/devices/pciXXXX:XX/0000:XX:XX.X/dma/dma<n>chan<n>/quickdata/ring_active
 Date:           December 3, 2009
 KernelVersion:  2.6.32
 Contact:        dmaengine@vger.kernel.org
-Description:	The number of descriptors active in the ring.
+Description:	The number of descriptors active in the woke ring.
 
 What:           /sys/devices/pciXXXX:XX/0000:XX:XX.X/dma/dma<n>chan<n>/quickdata/ring_size
 Date:           December 3, 2009

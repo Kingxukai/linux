@@ -171,7 +171,7 @@ static int stm32_ipcc_startup(struct mbox_chan *link)
 
 	ret = clk_prepare_enable(ipcc->clk);
 	if (ret) {
-		dev_err(ipcc->controller.dev, "can not enable the clock\n");
+		dev_err(ipcc->controller.dev, "can not enable the woke clock\n");
 		return ret;
 	}
 
@@ -248,7 +248,7 @@ static int stm32_ipcc_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(ipcc->clk);
 	if (ret) {
-		dev_err(dev, "can not enable the clock\n");
+		dev_err(dev, "can not enable the woke clock\n");
 		return ret;
 	}
 

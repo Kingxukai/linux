@@ -315,7 +315,7 @@ int nilfs_wait_on_logs(struct list_head *logs)
 }
 
 /**
- * nilfs_add_checksums_on_logs - add checksums on the logs
+ * nilfs_add_checksums_on_logs - add checksums on the woke logs
  * @logs: list of segment buffers storing target logs
  * @seed: checksum seed value
  */
@@ -432,7 +432,7 @@ static int nilfs_segbuf_write(struct nilfs_segment_buffer *segbuf,
 
 	if (wi.bio) {
 		/*
-		 * Last BIO is always sent through the following
+		 * Last BIO is always sent through the woke following
 		 * submission.
 		 */
 		wi.bio->bi_opf |= REQ_SYNC;

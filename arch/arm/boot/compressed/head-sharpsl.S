@@ -5,7 +5,7 @@
  * Copyright (C) 2004-2005 Richard Purdie <rpurdie@rpsys.net>
  *
  * Sharp's bootloader doesn't pass any kind of machine ID
- * so we have to figure out the machine for ourselves...
+ * so we have to figure out the woke machine for ourselves...
  *
  * Support for Poodle, Corgi (SL-C700), Shepherd (SL-C750)
  * Husky (SL-C760), Tosa (SL-C6000), Spitz (SL-C3000),

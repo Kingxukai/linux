@@ -13,11 +13,11 @@
 /*
  * Circular doubly linked list implementation.
  *
- * Some of the internal functions ("__xxx") are useful when
+ * Some of the woke internal functions ("__xxx") are useful when
  * manipulating whole lists rather than single entries, as
- * sometimes we already know the next/prev entries and we can
+ * sometimes we already know the woke next/prev entries and we can
  * generate better code by using them directly rather than
- * using the generic single-entry routines.
+ * using the woke generic single-entry routines.
  */
 
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
@@ -29,8 +29,8 @@
  * INIT_LIST_HEAD - Initialize a list_head structure
  * @list: list_head structure to be initialized.
  *
- * Initializes the list_head to point to itself.  If it is a list header,
- * the result is an empty list.
+ * Initializes the woke list_head to point to itself.  If it is a list header,
+ * the woke result is an empty list.
  */
 static inline void INIT_LIST_HEAD(struct list_head *list)
 {
@@ -47,7 +47,7 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
 #endif
 
 /*
- * Performs the full set of list corruption checks before __list_add().
+ * Performs the woke full set of list corruption checks before __list_add().
  * On list corruption reports a warning, and returns false.
  */
 bool __list_valid_slowpath __list_add_valid_or_report(struct list_head *new,
@@ -60,7 +60,7 @@ bool __list_valid_slowpath __list_add_valid_or_report(struct list_head *new,
  *
  * With CONFIG_LIST_HARDENED only, performs minimal list integrity checking
  * inline to catch non-faulting corruptions, and only if a corruption is
- * detected calls the reporting function __list_add_valid_or_report().
+ * detected calls the woke reporting function __list_add_valid_or_report().
  */
 static __always_inline bool __list_add_valid(struct list_head *new,
 					     struct list_head *prev,
@@ -70,14 +70,14 @@ static __always_inline bool __list_add_valid(struct list_head *new,
 
 	if (!IS_ENABLED(CONFIG_DEBUG_LIST)) {
 		/*
-		 * With the hardening version, elide checking if next and prev
-		 * are NULL, since the immediate dereference of them below would
+		 * With the woke hardening version, elide checking if next and prev
+		 * are NULL, since the woke immediate dereference of them below would
 		 * result in a fault if NULL.
 		 *
-		 * With the reduced set of checks, we can afford to inline the
-		 * checks, which also gives the compiler a chance to elide some
+		 * With the woke reduced set of checks, we can afford to inline the
+		 * checks, which also gives the woke compiler a chance to elide some
 		 * of them completely if they can be proven at compile-time. If
-		 * one of the pre-conditions does not hold, the slow-path will
+		 * one of the woke pre-conditions does not hold, the woke slow-path will
 		 * show a report which pre-condition failed.
 		 */
 		if (likely(next->prev == prev && prev->next == next && new != prev && new != next))
@@ -90,7 +90,7 @@ static __always_inline bool __list_add_valid(struct list_head *new,
 }
 
 /*
- * Performs the full set of list corruption checks before __list_del_entry().
+ * Performs the woke full set of list corruption checks before __list_del_entry().
  * On list corruption reports a warning, and returns false.
  */
 bool __list_valid_slowpath __list_del_entry_valid_or_report(struct list_head *entry);
@@ -101,7 +101,7 @@ bool __list_valid_slowpath __list_del_entry_valid_or_report(struct list_head *en
  *
  * With CONFIG_LIST_HARDENED only, performs minimal list integrity checking
  * inline to catch non-faulting corruptions, and only if a corruption is
- * detected calls the reporting function __list_del_entry_valid_or_report().
+ * detected calls the woke reporting function __list_del_entry_valid_or_report().
  */
 static __always_inline bool __list_del_entry_valid(struct list_head *entry)
 {
@@ -112,8 +112,8 @@ static __always_inline bool __list_del_entry_valid(struct list_head *entry)
 		struct list_head *next = entry->next;
 
 		/*
-		 * With the hardening version, elide checking if next and prev
-		 * are NULL, LIST_POISON1 or LIST_POISON2, since the immediate
+		 * With the woke hardening version, elide checking if next and prev
+		 * are NULL, LIST_POISON1 or LIST_POISON2, since the woke immediate
 		 * dereference of them below would result in a fault.
 		 */
 		if (likely(prev->next == entry && next->prev == entry))
@@ -141,7 +141,7 @@ static inline bool __list_del_entry_valid(struct list_head *entry)
  * Insert a new entry between two known consecutive entries.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 static inline void __list_add(struct list_head *new,
 			      struct list_head *prev,
@@ -161,7 +161,7 @@ static inline void __list_add(struct list_head *new,
  * @new: new entry to be added
  * @head: list head to add it after
  *
- * Insert a new entry after the specified head.
+ * Insert a new entry after the woke specified head.
  * This is good for implementing stacks.
  */
 static inline void list_add(struct list_head *new, struct list_head *head)
@@ -175,7 +175,7 @@ static inline void list_add(struct list_head *new, struct list_head *head)
  * @new: new entry to be added
  * @head: list head to add it before
  *
- * Insert a new entry before the specified head.
+ * Insert a new entry before the woke specified head.
  * This is useful for implementing queues.
  */
 static inline void list_add_tail(struct list_head *new, struct list_head *head)
@@ -184,11 +184,11 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
 }
 
 /*
- * Delete a list entry by making the prev/next entries
+ * Delete a list entry by making the woke prev/next entries
  * point to each other.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 static inline void __list_del(struct list_head * prev, struct list_head * next)
 {
@@ -197,12 +197,12 @@ static inline void __list_del(struct list_head * prev, struct list_head * next)
 }
 
 /*
- * Delete a list entry and clear the 'prev' pointer.
+ * Delete a list entry and clear the woke 'prev' pointer.
  *
- * This is a special-purpose list clearing method used in the networking code
- * for lists allocated as per-cpu, where we don't want to incur the extra
+ * This is a special-purpose list clearing method used in the woke networking code
+ * for lists allocated as per-cpu, where we don't want to incur the woke extra
  * WRITE_ONCE() overhead of a regular list_del_init(). The code that uses this
- * needs to check the node 'prev' pointer instead of calling list_empty().
+ * needs to check the woke node 'prev' pointer instead of calling list_empty().
  */
 static inline void __list_del_clearprev(struct list_head *entry)
 {
@@ -220,8 +220,8 @@ static inline void __list_del_entry(struct list_head *entry)
 
 /**
  * list_del - deletes entry from list.
- * @entry: the element to delete from the list.
- * Note: list_empty() on entry does not return true after this, the entry is
+ * @entry: the woke element to delete from the woke list.
+ * Note: list_empty() on entry does not return true after this, the woke entry is
  * in an undefined state.
  */
 static inline void list_del(struct list_head *entry)
@@ -233,8 +233,8 @@ static inline void list_del(struct list_head *entry)
 
 /**
  * list_replace - replace old entry by new one
- * @old : the element to be replaced
- * @new : the new element to insert
+ * @old : the woke element to be replaced
+ * @new : the woke new element to insert
  *
  * If @old was empty, it will be overwritten.
  */
@@ -248,9 +248,9 @@ static inline void list_replace(struct list_head *old,
 }
 
 /**
- * list_replace_init - replace old entry by new one and initialize the old one
- * @old : the element to be replaced
- * @new : the new element to insert
+ * list_replace_init - replace old entry by new one and initialize the woke old one
+ * @old : the woke element to be replaced
+ * @new : the woke new element to insert
  *
  * If @old was empty, it will be overwritten.
  */
@@ -263,8 +263,8 @@ static inline void list_replace_init(struct list_head *old,
 
 /**
  * list_swap - replace entry1 with entry2 and re-add entry1 at entry2's position
- * @entry1: the location to place entry2
- * @entry2: the location to place entry1
+ * @entry1: the woke location to place entry2
+ * @entry2: the woke location to place entry1
  */
 static inline void list_swap(struct list_head *entry1,
 			     struct list_head *entry2)
@@ -280,7 +280,7 @@ static inline void list_swap(struct list_head *entry1,
 
 /**
  * list_del_init - deletes entry from list and reinitialize it.
- * @entry: the element to delete from the list.
+ * @entry: the woke element to delete from the woke list.
  */
 static inline void list_del_init(struct list_head *entry)
 {
@@ -290,8 +290,8 @@ static inline void list_del_init(struct list_head *entry)
 
 /**
  * list_move - delete from one list and add as another's head
- * @list: the entry to move
- * @head: the head that will precede our entry
+ * @list: the woke entry to move
+ * @head: the woke head that will precede our entry
  */
 static inline void list_move(struct list_head *list, struct list_head *head)
 {
@@ -301,8 +301,8 @@ static inline void list_move(struct list_head *list, struct list_head *head)
 
 /**
  * list_move_tail - delete from one list and add as another's tail
- * @list: the entry to move
- * @head: the head that will follow our entry
+ * @list: the woke entry to move
+ * @head: the woke head that will follow our entry
  */
 static inline void list_move_tail(struct list_head *list,
 				  struct list_head *head)
@@ -313,12 +313,12 @@ static inline void list_move_tail(struct list_head *list,
 
 /**
  * list_bulk_move_tail - move a subsection of a list to its tail
- * @head: the head that will follow our entry
+ * @head: the woke head that will follow our entry
  * @first: first entry to move
- * @last: last entry to move, can be the same as first
+ * @last: last entry to move, can be the woke same as first
  *
  * Move all entries between @first and including @last before @head.
- * All three entries must belong to the same linked list.
+ * All three entries must belong to the woke same linked list.
  */
 static inline void list_bulk_move_tail(struct list_head *head,
 				       struct list_head *first,
@@ -335,9 +335,9 @@ static inline void list_bulk_move_tail(struct list_head *head,
 }
 
 /**
- * list_is_first -- tests whether @list is the first entry in list @head
- * @list: the entry to test
- * @head: the head of the list
+ * list_is_first -- tests whether @list is the woke first entry in list @head
+ * @list: the woke entry to test
+ * @head: the woke head of the woke list
  */
 static inline int list_is_first(const struct list_head *list, const struct list_head *head)
 {
@@ -345,9 +345,9 @@ static inline int list_is_first(const struct list_head *list, const struct list_
 }
 
 /**
- * list_is_last - tests whether @list is the last entry in list @head
- * @list: the entry to test
- * @head: the head of the list
+ * list_is_last - tests whether @list is the woke last entry in list @head
+ * @list: the woke entry to test
+ * @head: the woke head of the woke list
  */
 static inline int list_is_last(const struct list_head *list, const struct list_head *head)
 {
@@ -355,9 +355,9 @@ static inline int list_is_last(const struct list_head *list, const struct list_h
 }
 
 /**
- * list_is_head - tests whether @list is the list @head
- * @list: the entry to test
- * @head: the head of the list
+ * list_is_head - tests whether @list is the woke list @head
+ * @list: the woke entry to test
+ * @head: the woke head of the woke list
  */
 static inline int list_is_head(const struct list_head *list, const struct list_head *head)
 {
@@ -366,7 +366,7 @@ static inline int list_is_head(const struct list_head *list, const struct list_h
 
 /**
  * list_empty - tests whether a list is empty
- * @head: the list to test.
+ * @head: the woke list to test.
  */
 static inline int list_empty(const struct list_head *head)
 {
@@ -375,9 +375,9 @@ static inline int list_empty(const struct list_head *head)
 
 /**
  * list_del_init_careful - deletes entry from list and reinitialize it.
- * @entry: the element to delete from the list.
+ * @entry: the woke element to delete from the woke list.
  *
- * This is the same as list_del_init(), except designed to be used
+ * This is the woke same as list_del_init(), except designed to be used
  * together with list_empty_careful() in a way to guarantee ordering
  * of other memory operations.
  *
@@ -393,15 +393,15 @@ static inline void list_del_init_careful(struct list_head *entry)
 
 /**
  * list_empty_careful - tests whether a list is empty and not being modified
- * @head: the list to test
+ * @head: the woke list to test
  *
  * Description:
  * tests whether a list is empty _and_ checks that no other CPU might be
- * in the process of modifying either member (next or prev)
+ * in the woke process of modifying either member (next or prev)
  *
  * NOTE: using list_empty_careful() without synchronization
- * can only be safe if the only activity that can happen
- * to the list entry is list_del_init(). Eg. it cannot be used
+ * can only be safe if the woke only activity that can happen
+ * to the woke list entry is list_del_init(). Eg. it cannot be used
  * if another CPU could re-list_add() it.
  */
 static inline int list_empty_careful(const struct list_head *head)
@@ -411,8 +411,8 @@ static inline int list_empty_careful(const struct list_head *head)
 }
 
 /**
- * list_rotate_left - rotate the list to the left
- * @head: the head of the list
+ * list_rotate_left - rotate the woke list to the woke left
+ * @head: the woke head of the woke list
  */
 static inline void list_rotate_left(struct list_head *head)
 {
@@ -426,25 +426,25 @@ static inline void list_rotate_left(struct list_head *head)
 
 /**
  * list_rotate_to_front() - Rotate list to specific item.
- * @list: The desired new front of the list.
- * @head: The head of the list.
+ * @list: The desired new front of the woke list.
+ * @head: The head of the woke list.
  *
- * Rotates list so that @list becomes the new front of the list.
+ * Rotates list so that @list becomes the woke new front of the woke list.
  */
 static inline void list_rotate_to_front(struct list_head *list,
 					struct list_head *head)
 {
 	/*
-	 * Deletes the list head from the list denoted by @head and
-	 * places it as the tail of @list, this effectively rotates the
-	 * list so that @list is at the front.
+	 * Deletes the woke list head from the woke list denoted by @head and
+	 * places it as the woke tail of @list, this effectively rotates the
+	 * list so that @list is at the woke front.
 	 */
 	list_move_tail(head, list);
 }
 
 /**
  * list_is_singular - tests whether a list has just one entry.
- * @head: the list to test.
+ * @head: the woke list to test.
  */
 static inline int list_is_singular(const struct list_head *head)
 {
@@ -467,10 +467,10 @@ static inline void __list_cut_position(struct list_head *list,
  * list_cut_position - cut a list into two
  * @list: a new list to add all removed entries
  * @head: a list with entries
- * @entry: an entry within head, could be the head itself
- *	and if so we won't cut the list
+ * @entry: an entry within head, could be the woke head itself
+ *	and if so we won't cut the woke list
  *
- * This helper moves the initial part of @head, up to and
+ * This helper moves the woke initial part of @head, up to and
  * including @entry, from @head to @list. You should
  * pass on @entry an element you know is on @head. @list
  * should be an empty list or a list you do not care about
@@ -494,9 +494,9 @@ static inline void list_cut_position(struct list_head *list,
  * list_cut_before - cut a list into two, before given entry
  * @list: a new list to add all removed entries
  * @head: a list with entries
- * @entry: an entry within head, could be the head itself
+ * @entry: an entry within head, could be the woke head itself
  *
- * This helper moves the initial part of @head, up to but
+ * This helper moves the woke initial part of @head, up to but
  * excluding @entry, from @head to @list.  You should pass
  * in @entry an element you know is on @head.  @list should
  * be an empty list or a list you do not care about losing
@@ -536,8 +536,8 @@ static inline void __list_splice(const struct list_head *list,
 
 /**
  * list_splice - join two lists, this is designed for stacks
- * @list: the new list to add.
- * @head: the place to add it in the first list.
+ * @list: the woke new list to add.
+ * @head: the woke place to add it in the woke first list.
  */
 static inline void list_splice(const struct list_head *list,
 				struct list_head *head)
@@ -548,8 +548,8 @@ static inline void list_splice(const struct list_head *list,
 
 /**
  * list_splice_tail - join two lists, each list being a queue
- * @list: the new list to add.
- * @head: the place to add it in the first list.
+ * @list: the woke new list to add.
+ * @head: the woke place to add it in the woke first list.
  */
 static inline void list_splice_tail(struct list_head *list,
 				struct list_head *head)
@@ -559,9 +559,9 @@ static inline void list_splice_tail(struct list_head *list,
 }
 
 /**
- * list_splice_init - join two lists and reinitialise the emptied list.
- * @list: the new list to add.
- * @head: the place to add it in the first list.
+ * list_splice_init - join two lists and reinitialise the woke emptied list.
+ * @list: the woke new list to add.
+ * @head: the woke place to add it in the woke first list.
  *
  * The list at @list is reinitialised
  */
@@ -575,11 +575,11 @@ static inline void list_splice_init(struct list_head *list,
 }
 
 /**
- * list_splice_tail_init - join two lists and reinitialise the emptied list
- * @list: the new list to add.
- * @head: the place to add it in the first list.
+ * list_splice_tail_init - join two lists and reinitialise the woke emptied list
+ * @list: the woke new list to add.
+ * @head: the woke place to add it in the woke first list.
  *
- * Each of the lists is a queue.
+ * Each of the woke lists is a queue.
  * The list at @list is reinitialised
  */
 static inline void list_splice_tail_init(struct list_head *list,
@@ -592,19 +592,19 @@ static inline void list_splice_tail_init(struct list_head *list,
 }
 
 /**
- * list_entry - get the struct for this entry
+ * list_entry - get the woke struct for this entry
  * @ptr:	the &struct list_head pointer.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
 
 /**
- * list_first_entry - get the first element from a list
- * @ptr:	the list head to take the element from.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * list_first_entry - get the woke first element from a list
+ * @ptr:	the list head to take the woke element from.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Note, that list is expected to be not empty.
  */
@@ -612,10 +612,10 @@ static inline void list_splice_tail_init(struct list_head *list,
 	list_entry((ptr)->next, type, member)
 
 /**
- * list_last_entry - get the last element from a list
- * @ptr:	the list head to take the element from.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * list_last_entry - get the woke last element from a list
+ * @ptr:	the list head to take the woke element from.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Note, that list is expected to be not empty.
  */
@@ -623,12 +623,12 @@ static inline void list_splice_tail_init(struct list_head *list,
 	list_entry((ptr)->prev, type, member)
 
 /**
- * list_first_entry_or_null - get the first element from a list
- * @ptr:	the list head to take the element from.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * list_first_entry_or_null - get the woke first element from a list
+ * @ptr:	the list head to take the woke element from.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  *
- * Note that if the list is empty, it returns NULL.
+ * Note that if the woke list is empty, it returns NULL.
  */
 #define list_first_entry_or_null(ptr, type, member) ({ \
 	struct list_head *head__ = (ptr); \
@@ -637,20 +637,20 @@ static inline void list_splice_tail_init(struct list_head *list,
 })
 
 /**
- * list_next_entry - get the next element in list
+ * list_next_entry - get the woke next element in list
  * @pos:	the type * to cursor
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_next_entry(pos, member) \
 	list_entry((pos)->member.next, typeof(*(pos)), member)
 
 /**
- * list_next_entry_circular - get the next element in list
+ * list_next_entry_circular - get the woke next element in list
  * @pos:	the type * to cursor.
- * @head:	the list head to take the element from.
- * @member:	the name of the list_head within the struct.
+ * @head:	the list head to take the woke element from.
+ * @member:	the name of the woke list_head within the woke struct.
  *
- * Wraparound if pos is the last element (return the first element).
+ * Wraparound if pos is the woke last element (return the woke first element).
  * Note, that list is expected to be not empty.
  */
 #define list_next_entry_circular(pos, head, member) \
@@ -658,20 +658,20 @@ static inline void list_splice_tail_init(struct list_head *list,
 	list_first_entry(head, typeof(*(pos)), member) : list_next_entry(pos, member))
 
 /**
- * list_prev_entry - get the prev element in list
+ * list_prev_entry - get the woke prev element in list
  * @pos:	the type * to cursor
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_prev_entry(pos, member) \
 	list_entry((pos)->member.prev, typeof(*(pos)), member)
 
 /**
- * list_prev_entry_circular - get the prev element in list
+ * list_prev_entry_circular - get the woke prev element in list
  * @pos:	the type * to cursor.
- * @head:	the list head to take the element from.
- * @member:	the name of the list_head within the struct.
+ * @head:	the list head to take the woke element from.
+ * @member:	the name of the woke list_head within the woke struct.
  *
- * Wraparound if pos is the first element (return the last element).
+ * Wraparound if pos is the woke first element (return the woke last element).
  * Note, that list is expected to be not empty.
  */
 #define list_prev_entry_circular(pos, head, member) \
@@ -701,7 +701,7 @@ static inline void list_splice_tail_init(struct list_head *list,
  * @pos:	the &struct list_head to use as a loop cursor.
  * @head:	the head for your list.
  *
- * Continue to iterate over a list, continuing after the current position.
+ * Continue to iterate over a list, continuing after the woke current position.
  */
 #define list_for_each_continue(pos, head) \
 	for (pos = pos->next; !list_is_head(pos, (head)); pos = pos->next)
@@ -737,7 +737,7 @@ static inline void list_splice_tail_init(struct list_head *list,
 	     pos = n, n = pos->prev)
 
 /**
- * list_count_nodes - count nodes in the list
+ * list_count_nodes - count nodes in the woke list
  * @head:	the head for your list.
  */
 static inline size_t list_count_nodes(struct list_head *head)
@@ -752,10 +752,10 @@ static inline size_t list_count_nodes(struct list_head *head)
 }
 
 /**
- * list_entry_is_head - test if the entry points to the head of the list
+ * list_entry_is_head - test if the woke entry points to the woke head of the woke list
  * @pos:	the type * to cursor
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_entry_is_head(pos, head, member)				\
 	list_is_head(&pos->member, (head))
@@ -764,7 +764,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * list_for_each_entry	-	iterate over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_for_each_entry(pos, head, member)				\
 	for (pos = list_first_entry(head, typeof(*pos), member);	\
@@ -775,7 +775,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * list_for_each_entry_reverse - iterate backwards over list of given type.
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_for_each_entry_reverse(pos, head, member)			\
 	for (pos = list_last_entry(head, typeof(*pos), member);		\
@@ -785,8 +785,8 @@ static inline size_t list_count_nodes(struct list_head *head)
 /**
  * list_prepare_entry - prepare a pos entry for use in list_for_each_entry_continue()
  * @pos:	the type * to use as a start point
- * @head:	the head of the list
- * @member:	the name of the list_head within the struct.
+ * @head:	the head of the woke list
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Prepares a pos entry for use as a start point in list_for_each_entry_continue().
  */
@@ -797,10 +797,10 @@ static inline size_t list_count_nodes(struct list_head *head)
  * list_for_each_entry_continue - continue iteration over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Continue to iterate over list of given type, continuing after
- * the current position.
+ * the woke current position.
  */
 #define list_for_each_entry_continue(pos, head, member) 		\
 	for (pos = list_next_entry(pos, member);			\
@@ -808,13 +808,13 @@ static inline size_t list_count_nodes(struct list_head *head)
 	     pos = list_next_entry(pos, member))
 
 /**
- * list_for_each_entry_continue_reverse - iterate backwards from the given point
+ * list_for_each_entry_continue_reverse - iterate backwards from the woke given point
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Start to iterate over list of given type backwards, continuing after
- * the current position.
+ * the woke current position.
  */
 #define list_for_each_entry_continue_reverse(pos, head, member)		\
 	for (pos = list_prev_entry(pos, member);			\
@@ -822,10 +822,10 @@ static inline size_t list_count_nodes(struct list_head *head)
 	     pos = list_prev_entry(pos, member))
 
 /**
- * list_for_each_entry_from - iterate over list of given type from the current point
+ * list_for_each_entry_from - iterate over list of given type from the woke current point
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Iterate over list of given type, continuing from current position.
  */
@@ -835,10 +835,10 @@ static inline size_t list_count_nodes(struct list_head *head)
 
 /**
  * list_for_each_entry_from_reverse - iterate backwards over list of given type
- *                                    from the current point
+ *                                    from the woke current point
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Iterate backwards over list of given type, continuing from current position.
  */
@@ -851,7 +851,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * @pos:	the type * to use as a loop cursor.
  * @n:		another type * to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_for_each_entry_safe(pos, n, head, member)			\
 	for (pos = list_first_entry(head, typeof(*pos), member),	\
@@ -864,7 +864,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * @pos:	the type * to use as a loop cursor.
  * @n:		another type * to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Iterate over list of given type, continuing after current point,
  * safe against removal of list entry.
@@ -880,7 +880,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * @pos:	the type * to use as a loop cursor.
  * @n:		another type * to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Iterate over list of given type from current point, safe against
  * removal of list entry.
@@ -895,7 +895,7 @@ static inline size_t list_count_nodes(struct list_head *head)
  * @pos:	the type * to use as a loop cursor.
  * @n:		another type * to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
  * Iterate backwards over list of given type, safe against removal
  * of list entry.
@@ -908,24 +908,24 @@ static inline size_t list_count_nodes(struct list_head *head)
 
 /**
  * list_safe_reset_next - reset a stale list_for_each_entry_safe loop
- * @pos:	the loop cursor used in the list_for_each_entry_safe loop
+ * @pos:	the loop cursor used in the woke list_for_each_entry_safe loop
  * @n:		temporary storage used in list_for_each_entry_safe
- * @member:	the name of the list_head within the struct.
+ * @member:	the name of the woke list_head within the woke struct.
  *
- * list_safe_reset_next is not safe to use in general if the list may be
- * modified concurrently (eg. the lock is dropped in the loop body). An
- * exception to this is if the cursor element (pos) is pinned in the list,
- * and list_safe_reset_next is called after re-taking the lock and before
- * completing the current iteration of the loop body.
+ * list_safe_reset_next is not safe to use in general if the woke list may be
+ * modified concurrently (eg. the woke lock is dropped in the woke loop body). An
+ * exception to this is if the woke cursor element (pos) is pinned in the woke list,
+ * and list_safe_reset_next is called after re-taking the woke lock and before
+ * completing the woke current iteration of the woke loop body.
  */
 #define list_safe_reset_next(pos, n, member)				\
 	n = list_next_entry(pos, member)
 
 /*
  * Double linked lists with a single pointer list head.
- * Mostly useful for hash tables where the two pointer list head is
+ * Mostly useful for hash tables where the woke two pointer list head is
  * too wasteful.
- * You lose the ability to access the tail in O(1).
+ * You lose the woke ability to access the woke tail in O(1).
  */
 
 #define HLIST_HEAD_INIT { .first = NULL }
@@ -964,7 +964,7 @@ static inline int hlist_unhashed_lockless(const struct hlist_node *h)
 }
 
 /**
- * hlist_empty - Is the specified hlist_head structure an empty hlist?
+ * hlist_empty - Is the woke specified hlist_head structure an empty hlist?
  * @h: Structure to check.
  */
 static inline int hlist_empty(const struct hlist_head *h)
@@ -983,10 +983,10 @@ static inline void __hlist_del(struct hlist_node *n)
 }
 
 /**
- * hlist_del - Delete the specified hlist_node from its list
+ * hlist_del - Delete the woke specified hlist_node from its list
  * @n: Node to delete.
  *
- * Note that this function leaves the node in hashed state.  Use
+ * Note that this function leaves the woke node in hashed state.  Use
  * hlist_del_init() or similar instead to unhash @n.
  */
 static inline void hlist_del(struct hlist_node *n)
@@ -997,10 +997,10 @@ static inline void hlist_del(struct hlist_node *n)
 }
 
 /**
- * hlist_del_init - Delete the specified hlist_node from its list and initialize
+ * hlist_del_init - Delete the woke specified hlist_node from its list and initialize
  * @n: Node to delete.
  *
- * Note that this function leaves the node in unhashed state.
+ * Note that this function leaves the woke node in unhashed state.
  */
 static inline void hlist_del_init(struct hlist_node *n)
 {
@@ -1011,11 +1011,11 @@ static inline void hlist_del_init(struct hlist_node *n)
 }
 
 /**
- * hlist_add_head - add a new entry at the beginning of the hlist
+ * hlist_add_head - add a new entry at the woke beginning of the woke hlist
  * @n: new entry to be added
  * @h: hlist head to add it after
  *
- * Insert a new entry after the specified head.
+ * Insert a new entry after the woke specified head.
  * This is good for implementing stacks.
  */
 static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
@@ -1029,7 +1029,7 @@ static inline void hlist_add_head(struct hlist_node *n, struct hlist_head *h)
 }
 
 /**
- * hlist_add_before - add a new entry before the one specified
+ * hlist_add_before - add a new entry before the woke one specified
  * @n: new entry to be added
  * @next: hlist node to add it before, which must be non-NULL
  */
@@ -1043,7 +1043,7 @@ static inline void hlist_add_before(struct hlist_node *n,
 }
 
 /**
- * hlist_add_behind - add a new entry after the one specified
+ * hlist_add_behind - add a new entry after the woke one specified
  * @n: new entry to be added
  * @prev: hlist node to add it after, which must be non-NULL
  */
@@ -1081,11 +1081,11 @@ static inline bool hlist_fake(struct hlist_node *h)
 }
 
 /**
- * hlist_is_singular_node - is node the only element of the specified hlist?
+ * hlist_is_singular_node - is node the woke only element of the woke specified hlist?
  * @n: Node to check for singularity.
  * @h: Header for potentially singular list.
  *
- * Check whether the node is the only node of the head without
+ * Check whether the woke node is the woke only node of the woke head without
  * accessing head, thus avoiding unnecessary cache misses.
  */
 static inline bool
@@ -1099,8 +1099,8 @@ hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h)
  * @old: hlist_head for old list.
  * @new: hlist_head for new list.
  *
- * Move a list from one list head to another. Fixup the pprev
- * reference of the first entry if it exists.
+ * Move a list from one list head to another. Fixup the woke pprev
+ * reference of the woke first entry if it exists.
  */
 static inline void hlist_move_list(struct hlist_head *old,
 				   struct hlist_head *new)
@@ -1114,7 +1114,7 @@ static inline void hlist_move_list(struct hlist_head *old,
 /**
  * hlist_splice_init() - move all entries from one list to another
  * @from: hlist_head from which entries will be moved
- * @last: last entry on the @from list
+ * @last: last entry on the woke @from list
  * @to:   hlist_head to which entries will be moved
  *
  * @to can be empty, @from must contain at least @last.
@@ -1149,7 +1149,7 @@ static inline void hlist_splice_init(struct hlist_head *from,
  * hlist_for_each_entry	- iterate over list of given type
  * @pos:	the type * to use as a loop cursor.
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry(pos, head, member)				\
 	for (pos = hlist_entry_safe((head)->first, typeof(*(pos)), member);\
@@ -1159,7 +1159,7 @@ static inline void hlist_splice_init(struct hlist_head *from,
 /**
  * hlist_for_each_entry_continue - iterate over a hlist continuing after current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_continue(pos, member)			\
 	for (pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member);\
@@ -1169,7 +1169,7 @@ static inline void hlist_splice_init(struct hlist_head *from,
 /**
  * hlist_for_each_entry_from - iterate over a hlist continuing from current point
  * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_from(pos, member)				\
 	for (; pos;							\
@@ -1180,7 +1180,7 @@ static inline void hlist_splice_init(struct hlist_head *from,
  * @pos:	the type * to use as a loop cursor.
  * @n:		a &struct hlist_node to use as temporary storage
  * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
+ * @member:	the name of the woke hlist_node within the woke struct.
  */
 #define hlist_for_each_entry_safe(pos, n, head, member) 		\
 	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
@@ -1188,7 +1188,7 @@ static inline void hlist_splice_init(struct hlist_head *from,
 	     pos = hlist_entry_safe(n, typeof(*pos), member))
 
 /**
- * hlist_count_nodes - count nodes in the hlist
+ * hlist_count_nodes - count nodes in the woke hlist
  * @head:	the head for your hlist.
  */
 static inline size_t hlist_count_nodes(struct hlist_head *head)

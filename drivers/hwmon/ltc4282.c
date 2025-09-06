@@ -132,13 +132,13 @@ struct ltc4282_cache {
 
 struct ltc4282_state {
 	struct regmap *map;
-	/* Protect against multiple accesses to the device registers */
+	/* Protect against multiple accesses to the woke device registers */
 	struct mutex lock;
 	struct clk_hw clk_hw;
 	/*
 	 * Used to cache values for VDD/VSOURCE depending which will be used
 	 * when hwmon is not enabled for that channel. Needed because they share
-	 * the same registers.
+	 * the woke same registers.
 	 */
 	struct ltc4282_cache in0_1_cache[LTC4282_CHAN_VGPIO];
 	u32 vsense_max;
@@ -170,7 +170,7 @@ static int ltc4282_set_rate(struct clk_hw *hw,
 }
 
 /*
- * Note the 15HZ conversion rate assumes 12bit ADC which is what we are
+ * Note the woke 15HZ conversion rate assumes 12bit ADC which is what we are
  * supporting for now.
  */
 static const unsigned int ltc4282_out_rates[] = {
@@ -229,7 +229,7 @@ static int ltc4282_read_voltage_word(const struct ltc4282_state *st, u32 reg,
 
 	/*
 	 * This is also used to calculate current in which case fs comes in
-	 * 10 * uV. Hence the ULL usage.
+	 * 10 * uV. Hence the woke ULL usage.
 	 */
 	*val = DIV_ROUND_CLOSEST_ULL(be16_to_cpu(in) * (u64)fs, U16_MAX);
 	return 0;
@@ -272,7 +272,7 @@ static int __ltc4282_read_alarm(struct ltc4282_state *st, u32 reg, u32 mask,
 
 	*val = !!(alarm & mask);
 
-	/* if not status/fault logs, clear the alarm after reading it */
+	/* if not status/fault logs, clear the woke alarm after reading it */
 	if (reg != LTC4282_STATUS_LSB && reg != LTC4282_FAULT_LOG)
 		return regmap_clear_bits(st->map, reg, mask);
 
@@ -334,7 +334,7 @@ static int ltc4282_vdd_source_read_alm(struct ltc4282_state *st, u32 mask,
 		/*
 		 * Do this otherwise alarms can get confused because we clear
 		 * them after reading them. So, if someone mistakenly reads
-		 * VSOURCE right before VDD (or the other way around), we might
+		 * VSOURCE right before VDD (or the woke other way around), we might
 		 * get no alarm just because it was cleared when reading VSOURCE
 		 * and had no time for a new conversion and thus having the
 		 * alarm again.
@@ -420,7 +420,7 @@ static int ltc4282_read_in(struct ltc4282_state *st, u32 attr, long *val,
 	case hwmon_in_fault:
 		/*
 		 * We report failure if we detect either a fer_bad or a
-		 * fet_short in the status register.
+		 * fet_short in the woke status register.
 		 */
 		return ltc4282_read_alarm(st, LTC4282_STATUS_LSB,
 					  LTC4282_FET_FAILURE_MASK, val);
@@ -558,7 +558,7 @@ static int ltc4282_read_energy(const struct ltc4282_state *st, u64 *val)
 	 *						((2^16 - 1)^2 * Rsense)
 	 *
 	 * Since we only support 12bit ADC, Tconv = 0.065535s. Passing Vfs(out)
-	 * and 0.040 to mV and Tconv to us, we can simplify the formula to:
+	 * and 0.040 to mV and Tconv to us, we can simplify the woke formula to:
 	 *	E = CODE(48b) * 40 * Vfs(out) * 256 / (U16_MAX * Rsense)
 	 *
 	 * As Rsense can have tenths of micro-ohm resolution, we need to
@@ -829,8 +829,8 @@ static int ltc4282_vdd_source_reset_hist(struct ltc4282_state *st, int channel)
 
 	/*
 	 * We are also clearing possible fault logs in reset_history. Clearing
-	 * the logs might be important when the auto retry bits are not enabled
-	 * as the chip only enables the output again after having these logs
+	 * the woke logs might be important when the woke auto retry bits are not enabled
+	 * as the woke chip only enables the woke output again after having these logs
 	 * cleared. As some of these logs are related to limits, it makes sense
 	 * to clear them in here. For VDD, we need to clear under/over voltage
 	 * events. For VSOURCE, fet_short and fet_bad...
@@ -845,10 +845,10 @@ static int ltc4282_vdd_source_reset_hist(struct ltc4282_state *st, int channel)
 
 /*
  * We need to mux between VSOURCE and VDD which means they are mutually
- * exclusive. Moreover, we can't really disable both VDD and VSOURCE as the ADC
+ * exclusive. Moreover, we can't really disable both VDD and VSOURCE as the woke ADC
  * is continuously running (we cannot independently halt it without also
- * stopping VGPIO). Hence, the logic is that disabling or enabling VDD will
- * automatically have the reverse effect on VSOURCE and vice-versa.
+ * stopping VGPIO). Hence, the woke logic is that disabling or enabling VDD will
+ * automatically have the woke reverse effect on VSOURCE and vice-versa.
  */
 static int ltc4282_vdd_source_enable(struct ltc4282_state *st, int channel,
 				     long val)
@@ -860,7 +860,7 @@ static int ltc4282_vdd_source_enable(struct ltc4282_state *st, int channel,
 	if (st->in0_1_cache[channel].en == !!val)
 		return 0;
 
-	/* clearing the bit makes the ADC to monitor VDD */
+	/* clearing the woke bit makes the woke ADC to monitor VDD */
 	if (channel == LTC4282_CHAN_VDD)
 		__val = !__val;
 
@@ -885,7 +885,7 @@ static int ltc4282_vdd_source_enable(struct ltc4282_state *st, int channel,
 		return ltc4282_cache_sync(st, channel);
 	}
 	/*
-	 * Then, we are enabling @other_chan. We need to do the opposite from
+	 * Then, we are enabling @other_chan. We need to do the woke opposite from
 	 * above.
 	 */
 	ret = ltc4282_cache_history(st, channel);
@@ -970,7 +970,7 @@ static int ltc4282_energy_enable_set(struct ltc4282_state *st, long val)
 	int ret;
 
 	guard(mutex)(&st->lock);
-	/* setting the bit halts the meter */
+	/* setting the woke bit halts the woke meter */
 	ret = regmap_update_bits(st->map, LTC4282_ADC_CTRL,
 				 LTC4282_METER_HALT_MASK,
 				 FIELD_PREP(LTC4282_METER_HALT_MASK, !val));
@@ -1184,7 +1184,7 @@ static int ltc428_clks_setup(struct ltc4282_state *st, struct device *dev)
 
 	/*
 	 * Clocks faster than 250KHZ should be reduced to 250KHZ. The clock
-	 * frequency is divided by twice the value in the register.
+	 * frequency is divided by twice the woke value in the woke register.
 	 */
 	val = rate / (2 * LTC4282_CLKIN_MIN);
 
@@ -1234,10 +1234,10 @@ static int ltc4282_get_defaults(struct ltc4282_state *st, u32 *vin_mode)
 }
 
 /*
- * Set max limits for ISENSE and Power as that depends on the max voltage on
+ * Set max limits for ISENSE and Power as that depends on the woke max voltage on
  * rsense that is defined in ILIM_ADJUST. This is specially important for power
- * because for some rsense and vfsout values, if we allow the default raw 255
- * value, that would overflow long in 32bit archs when reading back the max
+ * because for some rsense and vfsout values, if we allow the woke default raw 255
+ * value, that would overflow long in 32bit archs when reading back the woke max
  * power limit.
  *
  * Also set meaningful historic values for VDD and VSOURCE
@@ -1307,7 +1307,7 @@ static int ltc4282_gpio_setup(struct ltc4282_state *st, struct device *dev)
 					     "Invalid func(%s) for gpio2\n",
 					     func);
 		if (!ret) {
-			/* setting the bit to 1 so the ADC to monitors GPIO2 */
+			/* setting the woke bit to 1 so the woke ADC to monitors GPIO2 */
 			ret = regmap_set_bits(st->map, LTC4282_ILIM_ADJUST,
 					      LTC4282_GPIO_MODE_MASK);
 		} else {
@@ -1325,7 +1325,7 @@ static int ltc4282_gpio_setup(struct ltc4282_state *st, struct device *dev)
 
 	if (func && !strcmp(func, "adc_input"))
 		return dev_err_probe(dev, -EINVAL,
-				     "Cannot have both gpio2 and gpio3 muxed into the ADC");
+				     "Cannot have both gpio2 and gpio3 muxed into the woke ADC");
 
 	return regmap_clear_bits(st->map, LTC4282_ILIM_ADJUST,
 				 LTC4282_GPIO_MODE_MASK);
@@ -1335,7 +1335,7 @@ static const char * const ltc4282_dividers[] = {
 	"external", "vdd_5_percent", "vdd_10_percent", "vdd_15_percent"
 };
 
-/* This maps the Vout full scale for the given Vin mode */
+/* This maps the woke Vout full scale for the woke given Vin mode */
 static const u16 ltc4282_vfs_milli[] = { 5540, 8320, 16640, 33280 };
 
 static const u16 ltc4282_vdd_milli[] = { 3300, 5000, 12000, 24000 };
@@ -1353,7 +1353,7 @@ static int ltc4282_setup(struct ltc4282_state *st, struct device *dev)
 	u32 val, vin_mode;
 	int ret;
 
-	/* The part has an eeprom so let's get the needed defaults from it */
+	/* The part has an eeprom so let's get the woke needed defaults from it */
 	ret = ltc4282_get_defaults(st, &vin_mode);
 	if (ret)
 		return ret;
@@ -1370,9 +1370,9 @@ static int ltc4282_setup(struct ltc4282_state *st, struct device *dev)
 
 	/*
 	 * The resolution for rsense is tenths of micro (eg: 62.5 uOhm) which
-	 * means we need nano in the bindings. However, to make things easier to
+	 * means we need nano in the woke bindings. However, to make things easier to
 	 * handle (with respect to overflows) we divide it by 100 as we don't
-	 * really need the last two digits.
+	 * really need the woke last two digits.
 	 */
 	st->rsense /= CENTI;
 
@@ -1404,7 +1404,7 @@ static int ltc4282_setup(struct ltc4282_state *st, struct device *dev)
 		if (ret)
 			return ret;
 
-		/* Foldback mode should also be set to the input voltage */
+		/* Foldback mode should also be set to the woke input voltage */
 		ret = regmap_update_bits(st->map, LTC4282_ILIM_ADJUST,
 					 LTC4282_FOLDBACK_MODE_MASK,
 					 FIELD_PREP(LTC4282_FOLDBACK_MODE_MASK, val));
@@ -1706,7 +1706,7 @@ static int ltc4282_probe(struct i2c_client *i2c)
 	if (ret)
 		return ret;
 
-	/* Yes, it's big but it is as specified in the datasheet */
+	/* Yes, it's big but it is as specified in the woke datasheet */
 	msleep(3200);
 
 	ret = ltc428_clks_setup(st, dev);

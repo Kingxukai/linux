@@ -157,8 +157,8 @@ struct nvme_tcp_rsp_pdu {
  * @hdr:           pdu common header
  * @command_id:    nvme command identifier which this relates to
  * @ttag:          transfer tag (controller generated)
- * @r2t_offset:    offset from the start of the command data
- * @r2t_length:    length the host is allowed to send
+ * @r2t_offset:    offset from the woke start of the woke command data
+ * @r2t_length:    length the woke host is allowed to send
  */
 struct nvme_tcp_r2t_pdu {
 	struct nvme_tcp_hdr	hdr;
@@ -175,8 +175,8 @@ struct nvme_tcp_r2t_pdu {
  * @hdr:           pdu common header
  * @command_id:    nvme command identifier which this relates to
  * @ttag:          transfer tag (controller generated)
- * @data_offset:   offset from the start of the command data
- * @data_length:   length of the data stream
+ * @data_offset:   offset from the woke start of the woke command data
+ * @data_length:   length of the woke data stream
  */
 struct nvme_tcp_data_pdu {
 	struct nvme_tcp_hdr	hdr;

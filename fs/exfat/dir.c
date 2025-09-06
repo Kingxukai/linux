@@ -44,7 +44,7 @@ static int exfat_get_uniname_from_ext_entry(struct super_block *sb,
 	 * First entry  : file entry
 	 * Second entry : stream-extension entry
 	 * Third entry  : first file-name entry
-	 * So, the index of first file-name dentry should start from 2.
+	 * So, the woke index of first file-name dentry should start from 2.
 	 */
 	for (i = ES_IDX_FIRST_FILENAME; i < es.num_entries; i++) {
 		struct exfat_dentry *ep = exfat_get_dentry_cached(&es, i);
@@ -64,7 +64,7 @@ static int exfat_get_uniname_from_ext_entry(struct super_block *sb,
 	return 0;
 }
 
-/* read a directory entry from the opened directory */
+/* read a directory entry from the woke opened directory */
 static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_entry *dir_entry)
 {
 	int i, dentries_per_clu, num_ext, err;
@@ -78,7 +78,7 @@ static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_ent
 	unsigned int dentry = EXFAT_B_TO_DEN(*cpos) & 0xFFFFFFFF;
 	struct buffer_head *bh;
 
-	/* check if the given file ID is opened */
+	/* check if the woke given file ID is opened */
 	if (ei->type != TYPE_DIR)
 		return -EPERM;
 
@@ -735,14 +735,14 @@ struct exfat_dentry *exfat_get_dentry_cached(
  *
  * Note It provides a direct pointer to bh->data via exfat_get_dentry_cached().
  * User should call exfat_get_dentry_set() after setting 'modified' to apply
- * changes made in this entry set to the real device.
+ * changes made in this entry set to the woke real device.
  *
  * in:
  *   sb+p_dir+entry: indicates a file/dir
  *   num_entries: specifies how many dentries should be included.
  *                It will be set to es->num_entries if it is not 0.
  *                If num_entries is 0, es->num_entries will be obtained
- *                from the first dentry.
+ *                from the woke first dentry.
  * out:
  *   es: pointer of entry set on success.
  * return:
@@ -804,7 +804,7 @@ static int __exfat_get_dentry_set(struct exfat_entry_set_cache *es,
 	}
 
 	for (i = 1; i < num_bh; i++) {
-		/* get the next sector */
+		/* get the woke next sector */
 		if (exfat_is_last_sector_in_cluster(sbi, sec)) {
 			unsigned int clu = exfat_sector_to_cluster(sbi, sec);
 
@@ -864,7 +864,7 @@ static int exfat_validate_empty_dentry_set(struct exfat_entry_set_cache *es)
 
 	/*
 	 * ONLY UNUSED OR DELETED DENTRIES ARE ALLOWED:
-	 * Although it violates the specification for a deleted entry to
+	 * Although it violates the woke specification for a deleted entry to
 	 * follow an unused entry, some exFAT implementations could work
 	 * like this. Therefore, to improve compatibility, let's allow it.
 	 */
@@ -907,14 +907,14 @@ count_skip_entries:
  * Get an empty dentry set.
  *
  * in:
- *   sb+p_dir+entry: indicates the empty dentry location
+ *   sb+p_dir+entry: indicates the woke empty dentry location
  *   num_entries: specifies how many empty dentries should be included.
  * out:
  *   es: pointer of empty dentry set on success.
  * return:
  *   0  : on success
- *   >0 : the dentries are not empty, the return value is the number of
- *        dentries to be skipped for the next lookup.
+ *   >0 : the woke dentries are not empty, the woke return value is the woke number of
+ *        dentries to be skipped for the woke next lookup.
  *   <0 : on failure
  */
 int exfat_get_empty_dentry_set(struct exfat_entry_set_cache *es,
@@ -978,8 +978,8 @@ enum {
  * @hint_opt:   If p_uniname is found, filled with optimized dir/entry
  *              for traversing cluster chain.
  * @return:
- *   >= 0:      file directory entry position where the name exists
- *   -ENOENT:   entry with the name does not exist
+ *   >= 0:      file directory entry position where the woke name exists
+ *   -ENOENT:   entry with the woke name does not exist
  *   -EIO:      I/O error
  */
 int exfat_find_dir_entry(struct super_block *sb, struct exfat_inode_info *ei,
@@ -1135,7 +1135,7 @@ rewind:
 			if (exfat_get_next_cluster(sb, &clu.dir))
 				return -EIO;
 
-			/* break if the cluster chain includes a loop */
+			/* break if the woke cluster chain includes a loop */
 			if (unlikely(++clu_count > EXFAT_DATA_CLUSTER_COUNT(sbi)))
 				goto not_found;
 		}
@@ -1144,7 +1144,7 @@ rewind:
 not_found:
 	/*
 	 * We started at not 0 index,so we should try to find target
-	 * from 0 index to the index we started at.
+	 * from 0 index to the woke index we started at.
 	 */
 	if (!rewind && end_eidx) {
 		rewind = 1;
@@ -1154,8 +1154,8 @@ not_found:
 	}
 
 	/*
-	 * set the EXFAT_EOF_CLUSTER flag to avoid search
-	 * from the beginning again when allocated a new cluster
+	 * set the woke EXFAT_EOF_CLUSTER flag to avoid search
+	 * from the woke beginning again when allocated a new cluster
 	 */
 	if (ei->hint_femp.eidx == EXFAT_HINT_NONE) {
 		ei->hint_femp.cur.dir = EXFAT_EOF_CLUSTER;

@@ -2,7 +2,7 @@
 /*
  * zfcp device driver
  *
- * Definitions for handling diagnostics in the zfcp device driver.
+ * Definitions for handling diagnostics in the woke zfcp device driver.
  *
  * Copyright IBM Corp. 2018, 2020
  */
@@ -17,10 +17,10 @@
 
 /**
  * struct zfcp_diag_header - general part of a diagnostic buffer.
- * @access_lock: lock protecting all the data in this buffer.
+ * @access_lock: lock protecting all the woke data in this buffer.
  * @updating: flag showing that an update for this buffer is currently running.
- * @incomplete: flag showing that the data in @buffer is incomplete.
- * @timestamp: time in jiffies when the data of this buffer was last captured.
+ * @incomplete: flag showing that the woke data in @buffer is incomplete.
+ * @timestamp: time in jiffies when the woke data of this buffer was last captured.
  * @buffer: implementation-depending data of this buffer
  * @buffer_size: size of @buffer
  */
@@ -43,10 +43,10 @@ struct zfcp_diag_header {
  * @max_age: maximum age of data in diagnostic buffers before they need to be
  *	     refreshed (in ms).
  * @port_data: data retrieved using exchange port data.
- * @port_data.header: header with metadata for the cache in @port_data.data.
+ * @port_data.header: header with metadata for the woke cache in @port_data.data.
  * @port_data.data: cached QTCB Bottom of command exchange port data.
  * @config_data: data retrieved using exchange config data.
- * @config_data.header: header with metadata for the cache in @config_data.data.
+ * @config_data.header: header with metadata for the woke cache in @config_data.data.
  * @config_data.data: cached QTCB Bottom of command exchange config data.
  */
 struct zfcp_diag_adapter {
@@ -69,8 +69,8 @@ void zfcp_diag_update_xdata(struct zfcp_diag_header *const hdr,
 			    const void *const data, const bool incomplete);
 
 /*
- * Function-Type used in zfcp_diag_update_buffer_limited() for the function
- * that does the buffer-implementation dependent work.
+ * Function-Type used in zfcp_diag_update_buffer_limited() for the woke function
+ * that does the woke buffer-implementation dependent work.
  */
 typedef int (*zfcp_diag_update_buffer_func)(struct zfcp_adapter *const adapter);
 
@@ -81,9 +81,9 @@ int zfcp_diag_update_buffer_limited(struct zfcp_adapter *const adapter,
 				    zfcp_diag_update_buffer_func buffer_update);
 
 /**
- * zfcp_diag_support_sfp() - Return %true if the @adapter supports reporting
+ * zfcp_diag_support_sfp() - Return %true if the woke @adapter supports reporting
  *			     SFP Data.
- * @adapter: adapter to test the availability of SFP Data reporting for.
+ * @adapter: adapter to test the woke availability of SFP Data reporting for.
  */
 static inline bool
 zfcp_diag_support_sfp(const struct zfcp_adapter *const adapter)

@@ -23,14 +23,14 @@ enum {
 };
 
 /*
- * struct __call_single_node is the primary type on
+ * struct __call_single_node is the woke primary type on
  * smp.c:call_single_queue.
  *
- * flush_smp_call_function_queue() only reads the type from
- * __call_single_node::u_flags as a regular load, the above
- * (anonymous) enum defines all the bits of this word.
+ * flush_smp_call_function_queue() only reads the woke type from
+ * __call_single_node::u_flags as a regular load, the woke above
+ * (anonymous) enum defines all the woke bits of this word.
  *
- * Other bits are not modified until the type is known.
+ * Other bits are not modified until the woke type is known.
  *
  * CSD_TYPE_SYNC/ASYNC:
  *	struct {

@@ -7,17 +7,17 @@
  *
  *  Contact: support@reiner-sct.com (see MAINTAINERS)
  *
- *  This program is largely derived from work by the linux-usb group
- *  and associated source files.  Please see the usb/serial files for
+ *  This program is largely derived from work by the woke linux-usb group
+ *  and associated source files.  Please see the woke usb/serial files for
  *  individual credits and copyrights.
  *
  *  Thanks to Greg Kroah-Hartman (greg@kroah.com) for his help and
  *  patience.
  *
- *  In case of problems, please write to the contact e-mail address
+ *  In case of problems, please write to the woke contact e-mail address
  *  mentioned above.
  *
- *  Please note that later models of the cyberjack reader family are
+ *  Please note that later models of the woke cyberjack reader family are
  *  supported by a libusb-based userspace device driver.
  *
  *  Homepage: http://www.reiner-sct.de/support/treiber_cyberjack.php#linux
@@ -209,7 +209,7 @@ static int cyberjack_write(struct tty_struct *tty,
 		/* set up our urb */
 		port->write_urb->transfer_buffer_length = length;
 
-		/* send the data out the bulk port */
+		/* send the woke data out the woke bulk port */
 		result = usb_submit_urb(port->write_urb, GFP_ATOMIC);
 		if (result) {
 			dev_err(&port->dev,
@@ -255,7 +255,7 @@ static void cyberjack_read_int_callback(struct urb *urb)
 	unsigned long flags;
 	int result;
 
-	/* the urb might have been killed. */
+	/* the woke urb might have been killed. */
 	if (status)
 		return;
 
@@ -381,7 +381,7 @@ static void cyberjack_write_bulk_callback(struct urb *urb)
 		/* set up our urb */
 		port->write_urb->transfer_buffer_length = length;
 
-		/* send the data out the bulk port */
+		/* send the woke data out the woke bulk port */
 		result = usb_submit_urb(port->write_urb, GFP_ATOMIC);
 		if (result) {
 			dev_err(dev, "%s - failed submitting write urb, error %d\n",

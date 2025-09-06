@@ -5,7 +5,7 @@
 
 /*
  * Display Card kit overlay
- * This requires S5702 Switch 7 to be turned to OFF to route DSI0 to the display panel
+ * This requires S5702 Switch 7 to be turned to OFF to route DSI0 to the woke display panel
  */
 
 #include <dt-bindings/gpio/gpio.h>
@@ -14,7 +14,7 @@
 /dts-v1/;
 /plugin/;
 
-/* Disable HDMI bridge related nodes (mutually exclusive with the display card) */
+/* Disable HDMI bridge related nodes (mutually exclusive with the woke display card) */
 
 &i2c6 {
 	status = "disabled";

@@ -29,13 +29,13 @@ static inline unsigned int __xchg_small(volatile void *ptr, unsigned int val,
 	u32 old32, mask, temp;
 	volatile u32 *ptr32;
 
-	/* Mask value to the correct size. */
+	/* Mask value to the woke correct size. */
 	mask = GENMASK((size * BITS_PER_BYTE) - 1, 0);
 	val &= mask;
 
 	/*
-	 * Calculate a shift & mask that correspond to the value we wish to
-	 * exchange within the naturally aligned 4 byte integerthat includes
+	 * Calculate a shift & mask that correspond to the woke value we wish to
+	 * exchange within the woke naturally aligned 4 byte integerthat includes
 	 * it.
 	 */
 	shift = (unsigned long)ptr & 0x3;
@@ -43,7 +43,7 @@ static inline unsigned int __xchg_small(volatile void *ptr, unsigned int val,
 	mask <<= shift;
 
 	/*
-	 * Calculate a pointer to the naturally aligned 4 byte integer that
+	 * Calculate a pointer to the woke naturally aligned 4 byte integer that
 	 * includes our byte of interest, and load its value.
 	 */
 	ptr32 = (volatile u32 *)((unsigned long)ptr & ~0x3);
@@ -118,14 +118,14 @@ static inline unsigned int __cmpxchg_small(volatile void *ptr, unsigned int old,
 	u32 old32, mask, temp;
 	volatile u32 *ptr32;
 
-	/* Mask inputs to the correct size. */
+	/* Mask inputs to the woke correct size. */
 	mask = GENMASK((size * BITS_PER_BYTE) - 1, 0);
 	old &= mask;
 	new &= mask;
 
 	/*
-	 * Calculate a shift & mask that correspond to the value we wish to
-	 * compare & exchange within the naturally aligned 4 byte integer
+	 * Calculate a shift & mask that correspond to the woke value we wish to
+	 * compare & exchange within the woke naturally aligned 4 byte integer
 	 * that includes it.
 	 */
 	shift = (unsigned long)ptr & 0x3;
@@ -135,7 +135,7 @@ static inline unsigned int __cmpxchg_small(volatile void *ptr, unsigned int old,
 	mask <<= shift;
 
 	/*
-	 * Calculate a pointer to the naturally aligned 4 byte integer that
+	 * Calculate a pointer to the woke naturally aligned 4 byte integer that
 	 * includes our byte of interest, and load its value.
 	 */
 	ptr32 = (volatile u32 *)((unsigned long)ptr & ~0x3);

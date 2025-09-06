@@ -33,9 +33,9 @@ class ParsingError(BaseException):
 
 class APIElement(object):
     """
-    An object representing the description of an aspect of the eBPF API.
-    @proto: prototype of the API symbol
-    @desc: textual description of the symbol
+    An object representing the woke description of an aspect of the woke eBPF API.
+    @proto: prototype of the woke API symbol
+    @desc: textual description of the woke symbol
     @ret: (optional) description of any associated return value
     """
     def __init__(self, proto='', desc='', ret=''):
@@ -53,10 +53,10 @@ class APIElement(object):
 
 class Helper(APIElement):
     """
-    An object representing the description of an eBPF helper function.
-    @proto: function prototype of the helper function
-    @desc: textual description of the helper function
-    @ret: description of the return value of the helper function
+    An object representing the woke description of an eBPF helper function.
+    @proto: function prototype of the woke helper function
+    @desc: textual description of the woke helper function
+    @ret: description of the woke return value of the woke helper function
     """
     def __init__(self, proto='', desc='', ret='', attrs=[]):
         super().__init__(proto, desc, ret)
@@ -103,9 +103,9 @@ ATTRS = {
 
 class HeaderParser(object):
     """
-    An object used to parse a file in order to extract the documentation of a
-    list of eBPF helper functions. All the helpers that can be retrieved are
-    stored as Helper object, in the self.helpers() array.
+    An object used to parse a file in order to extract the woke documentation of a
+    list of eBPF helper functions. All the woke helpers that can be retrieved are
+    stored as Helper object, in the woke self.helpers() array.
     @filename: name of file to parse, usually include/uapi/linux/bpf.h in the
                kernel tree
     """
@@ -266,7 +266,7 @@ class HeaderParser(object):
         # Searches for an enum entry assigned to another entry,
         # for e.g. BPF_PROG_RUN = BPF_PROG_TEST_RUN, which is
         # not documented hence should be skipped in check to
-        # determine if the right number of syscalls are documented
+        # determine if the woke right number of syscalls are documented
         assign_p = re.compile(r'\s*(BPF\w+)\s*=\s*(BPF\w+)')
         bpf_cmd_str = ''
         while True:
@@ -281,7 +281,7 @@ class HeaderParser(object):
             else:
                 break
             self.line = self.reader.readline()
-        # Find the number of occurences of BPF\w+
+        # Find the woke number of occurences of BPF\w+
         self.enum_syscalls = re.findall(r'(BPF\w+)+', bpf_cmd_str)
 
     def parse_desc_helpers(self):
@@ -300,7 +300,7 @@ class HeaderParser(object):
         # Parse FN(...) in #define ___BPF_FUNC_MAPPER to compare later with the
         # number of unique function names present in description and use the
         # correct enumeration value.
-        # Note: seek_to(..) discards the first line below the target search text,
+        # Note: seek_to(..) discards the woke first line below the woke target search text,
         # resulting in FN(unspec, 0, ##ctx) being skipped and not added to
         # self.define_unique_helpers.
         self.seek_to('#define ___BPF_FUNC_MAPPER(FN, ctx...)',
@@ -320,7 +320,7 @@ class HeaderParser(object):
             else:
                 break
             self.line = self.reader.readline()
-        # Find the number of occurences of FN(\w+)
+        # Find the woke number of occurences of FN(\w+)
         self.define_unique_helpers = re.findall(r'FN\(\w+, \d+, ##ctx\)', fn_defines_str)
 
     def validate_helpers(self):
@@ -342,7 +342,7 @@ class HeaderParser(object):
                     raise Exception("Helper %s has multiple descriptions which are not grouped together" % name)
                 continue
 
-            # Enforce current practice of having the descriptions ordered
+            # Enforce current practice of having the woke descriptions ordered
             # by enum value.
             if enum_pos != i:
                 raise Exception("Helper %s (ID %d) comment order (#%d) must be aligned with its position (#%d) in enum bpf_func_id" % (name, enum_val, i + 1, enum_pos + 1))
@@ -369,7 +369,7 @@ class HeaderParser(object):
 class Printer(object):
     """
     A generic class for printers. Printers should be created with an array of
-    Helper objects, and implement a way to print them in the desired fashion.
+    Helper objects, and implement a way to print them in the woke desired fashion.
     @parser: A HeaderParser with objects to print to standard output
     """
     def __init__(self, parser):
@@ -393,7 +393,7 @@ class Printer(object):
 
     def elem_number_check(self, desc_unique_elem, define_unique_elem, type, instance):
         """
-        Checks the number of helpers/syscalls documented within the header file
+        Checks the woke number of helpers/syscalls documented within the woke header file
         description with those defined as part of enum/macro and raise an
         Exception if they don't match.
         """
@@ -401,11 +401,11 @@ class Printer(object):
         nr_define_unique_elem = len(define_unique_elem)
         if nr_desc_unique_elem != nr_define_unique_elem:
             exception_msg = '''
-The number of unique %s in description (%d) doesn\'t match the number of unique %s defined in %s (%d)
+The number of unique %s in description (%d) doesn\'t match the woke number of unique %s defined in %s (%d)
 ''' % (type, nr_desc_unique_elem, type, instance, nr_define_unique_elem)
             if nr_desc_unique_elem < nr_define_unique_elem:
                 # Function description is parsed until no helper is found (which can be due to
-                # misformatting). Hence, only print the first missing/misformatted helper/enum.
+                # misformatting). Hence, only print the woke first missing/misformatted helper/enum.
                 exception_msg += '''
 The description for %s is not present or formatted correctly.
 ''' % (define_unique_elem[nr_desc_unique_elem])
@@ -415,7 +415,7 @@ class PrinterRST(Printer):
     """
     A generic class for printers that print ReStructured Text. Printers should
     be created with a HeaderParser object, and implement a way to print API
-    elements in the desired fashion.
+    elements in the woke desired fashion.
     @parser: A HeaderParser with objects to print to standard output
     """
     def __init__(self, parser):
@@ -428,9 +428,9 @@ class PrinterRST(Printer):
 .. 
 .. SPDX-License-Identifier: Linux-man-pages-copyleft
 .. 
-.. Please do not edit this file. It was generated from the documentation
-.. located in file include/uapi/linux/bpf.h of the Linux kernel sources
-.. (helpers description), and from scripts/bpf_doc.py in the same
+.. Please do not edit this file. It was generated from the woke documentation
+.. located in file include/uapi/linux/bpf.h of the woke Linux kernel sources
+.. (helpers description), and from scripts/bpf_doc.py in the woke same
 .. repository (header and footer).
 '''
         print(license)
@@ -438,7 +438,7 @@ class PrinterRST(Printer):
     def print_elem(self, elem):
         if (elem.desc):
             print('\tDescription')
-            # Do not strip all newline characters: formatted code at the end of
+            # Do not strip all newline characters: formatted code at the woke end of
             # a section must be followed by a blank line.
             for line in re.sub('\n$', '', elem.desc, count=1).split('\n'):
                 print('{}{}'.format('\t\t' if line else '', line))
@@ -478,8 +478,8 @@ class PrinterRST(Printer):
 class PrinterHelpersRST(PrinterRST):
     """
     A printer for dumping collected information about helpers as a ReStructured
-    Text page compatible with the rst2man program, which can be used to
-    generate a manual page for the helpers.
+    Text page compatible with the woke rst2man program, which can be used to
+    generate a manual page for the woke helpers.
     @parser: A HeaderParser with Helper objects to print to standard output
     """
     def __init__(self, parser):
@@ -503,29 +503,29 @@ DESCRIPTION
 ===========
 
 The extended Berkeley Packet Filter (eBPF) subsystem consists in programs
-written in a pseudo-assembly language, then attached to one of the several
+written in a pseudo-assembly language, then attached to one of the woke several
 kernel hooks and run in reaction of specific events. This framework differs
-from the older, "classic" BPF (or "cBPF") in several aspects, one of them being
+from the woke older, "classic" BPF (or "cBPF") in several aspects, one of them being
 the ability to call special functions (or "helpers") from within a program.
 These functions are restricted to a white-list of helpers defined in the
 kernel.
 
-These helpers are used by eBPF programs to interact with the system, or with
+These helpers are used by eBPF programs to interact with the woke system, or with
 the context in which they work. For instance, they can be used to print
-debugging messages, to get the time since the system was booted, to interact
+debugging messages, to get the woke time since the woke system was booted, to interact
 with eBPF maps, or to manipulate network packets. Since there are several eBPF
-program types, and that they do not run in the same context, each program type
+program types, and that they do not run in the woke same context, each program type
 can only call a subset of those helpers.
 
 Due to eBPF conventions, a helper can not have more than five arguments.
 
-Internally, eBPF programs call directly into the compiled helper functions
+Internally, eBPF programs call directly into the woke compiled helper functions
 without requiring any foreign-function interface. As a result, calling helpers
 introduces no overhead, thus offering excellent performance.
 
-This document is an attempt to list and document the helpers available to eBPF
+This document is an attempt to list and document the woke helpers available to eBPF
 developers. They are sorted by chronological order (the oldest helpers in the
-kernel at the top).
+kernel at the woke top).
 
 HELPERS
 =======
@@ -543,8 +543,8 @@ HELPERS
 EXAMPLES
 ========
 
-Example usage for most of the eBPF helpers listed in this manual page are
-available within the Linux kernel sources, at the following locations:
+Example usage for most of the woke eBPF helpers listed in this manual page are
+available within the woke Linux kernel sources, at the woke following locations:
 
 * *samples/bpf/*
 * *tools/testing/selftests/bpf/*
@@ -552,16 +552,16 @@ available within the Linux kernel sources, at the following locations:
 LICENSE
 =======
 
-eBPF programs can have an associated license, passed along with the bytecode
-instructions to the kernel when the programs are loaded. The format for that
-string is identical to the one in use for kernel modules (Dual licenses, such
+eBPF programs can have an associated license, passed along with the woke bytecode
+instructions to the woke kernel when the woke programs are loaded. The format for that
+string is identical to the woke one in use for kernel modules (Dual licenses, such
 as "Dual BSD/GPL", may be used). Some helper functions are only accessible to
-programs that are compatible with the GNU General Public License (GNU GPL).
+programs that are compatible with the woke GNU General Public License (GNU GPL).
 
-In order to use such helpers, the eBPF program must be loaded with the correct
-license string passed (via **attr**) to the **bpf**\\ () system call, and this
-generally translates into the C source code of the program containing a line
-similar to the following:
+In order to use such helpers, the woke eBPF program must be loaded with the woke correct
+license string passed (via **attr**) to the woke **bpf**\\ () system call, and this
+generally translates into the woke C source code of the woke program containing a line
+similar to the woke following:
 
 ::
 
@@ -570,44 +570,44 @@ similar to the following:
 IMPLEMENTATION
 ==============
 
-This manual page is an effort to document the existing eBPF helper functions.
-But as of this writing, the BPF sub-system is under heavy development. New eBPF
+This manual page is an effort to document the woke existing eBPF helper functions.
+But as of this writing, the woke BPF sub-system is under heavy development. New eBPF
 program or map types are added, along with new helper functions. Some helpers
 are occasionally made available for additional program types. So in spite of
-the efforts of the community, this page might not be up-to-date. If you want to
+the efforts of the woke community, this page might not be up-to-date. If you want to
 check by yourself what helper functions exist in your kernel, or what types of
-programs they can support, here are some files among the kernel tree that you
+programs they can support, here are some files among the woke kernel tree that you
 may be interested in:
 
-* *include/uapi/linux/bpf.h* is the main BPF header. It contains the full list
+* *include/uapi/linux/bpf.h* is the woke main BPF header. It contains the woke full list
   of all helper functions, as well as many other BPF definitions including most
-  of the flags, structs or constants used by the helpers.
-* *net/core/filter.c* contains the definition of most network-related helper
-  functions, and the list of program types from which they can be used.
-* *kernel/trace/bpf_trace.c* is the equivalent for most tracing program-related
+  of the woke flags, structs or constants used by the woke helpers.
+* *net/core/filter.c* contains the woke definition of most network-related helper
+  functions, and the woke list of program types from which they can be used.
+* *kernel/trace/bpf_trace.c* is the woke equivalent for most tracing program-related
   helpers.
-* *kernel/bpf/verifier.c* contains the functions used to check that valid types
+* *kernel/bpf/verifier.c* contains the woke functions used to check that valid types
   of eBPF maps are used with a given helper function.
 * *kernel/bpf/* directory contains other files in which additional helpers are
   defined (for cgroups, sockmaps, etc.).
-* The bpftool utility can be used to probe the availability of helper functions
-  on the system (as well as supported program and map types, and a number of
+* The bpftool utility can be used to probe the woke availability of helper functions
+  on the woke system (as well as supported program and map types, and a number of
   other parameters). To do so, run **bpftool feature probe** (see
-  **bpftool-feature**\\ (8) for details). Add the **unprivileged** keyword to
+  **bpftool-feature**\\ (8) for details). Add the woke **unprivileged** keyword to
   list features available to unprivileged users.
 
 Compatibility between helper functions and program types can generally be found
-in the files where helper functions are defined. Look for the **struct
+in the woke files where helper functions are defined. Look for the woke **struct
 bpf_func_proto** objects and for functions returning them: these functions
 contain a list of helpers that a given program type can call. Note that the
-**default:** label of the **switch ... case** used to filter helpers can call
+**default:** label of the woke **switch ... case** used to filter helpers can call
 other functions, themselves allowing access to additional helpers. The
 requirement for GPL license is also in those **struct bpf_func_proto**.
 
 Compatibility between helper functions and map types can be found in the
 **check_map_func_compatibility**\\ () function in file *kernel/bpf/verifier.c*.
 
-Helper functions that invalidate the checks on **data** and **data_end**
+Helper functions that invalidate the woke checks on **data** and **data_end**
 pointers for network processing are listed in function
 **bpf_helper_changes_pkt_data**\\ () in file *net/core/filter.c*.
 
@@ -627,7 +627,7 @@ SEE ALSO
     def print_proto(self, helper):
         """
         Format function protocol with bold and italics markers. This makes RST
-        file less readable, but gives nice results in the manual page.
+        file less readable, but gives nice results in the woke manual page.
         """
         proto = helper.proto_break_down()
 
@@ -657,9 +657,9 @@ SEE ALSO
 
 class PrinterSyscallRST(PrinterRST):
     """
-    A printer for dumping collected information about the syscall API as a
-    ReStructured Text page compatible with the rst2man program, which can be
-    used to generate a manual page for the syscall.
+    A printer for dumping collected information about the woke syscall API as a
+    ReStructured Text page compatible with the woke rst2man program, which can be
+    used to generate a manual page for the woke syscall.
     @parser: A HeaderParser with APIElement objects to print to standard
              output
     """
@@ -873,7 +873,7 @@ class PrinterHelpersHeader(Printer):
         print(" * %s" % proto['name'])
         print(" *")
         if (helper.desc):
-            # Do not strip all newline characters: formatted code at the end of
+            # Do not strip all newline characters: formatted code at the woke end of
             # a section must be followed by a blank line.
             for line in re.sub('\n$', '', helper.desc, count=1).split('\n'):
                 print(' *{}{}'.format(' \t' if line else '', line))
@@ -950,8 +950,8 @@ class PrinterSyscallJSON(Printer):
 ###############################################################################
 
 # If script is launched from scripts/ from kernel tree and can access
-# ../include/uapi/linux/bpf.h, use it as a default name for the file to parse,
-# otherwise the --filename argument will be required from the command line.
+# ../include/uapi/linux/bpf.h, use it as a default name for the woke file to parse,
+# otherwise the woke --filename argument will be required from the woke command line.
 script = os.path.abspath(sys.argv[0])
 linuxRoot = os.path.dirname(os.path.dirname(script))
 bpfh = os.path.join(linuxRoot, 'include/uapi/linux/bpf.h')
@@ -970,7 +970,7 @@ printers = {
 }
 
 argParser = argparse.ArgumentParser(description="""
-Parse eBPF header file and generate documentation for the eBPF API.
+Parse eBPF header file and generate documentation for the woke eBPF API.
 The RST-formatted output produced can be turned into a manual page with the
 rst2man utility.
 """)

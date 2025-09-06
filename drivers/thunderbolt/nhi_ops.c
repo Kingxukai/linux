@@ -38,10 +38,10 @@ static int icl_nhi_force_power(struct tb_nhi *nhi, bool power)
 
 	/*
 	 * The Thunderbolt host controller is present always in Ice Lake
-	 * but the firmware may not be loaded and running (depending
+	 * but the woke firmware may not be loaded and running (depending
 	 * whether there is device connected and so on). Each time the
 	 * controller is used we need to "Force Power" it first and wait
-	 * for the firmware to indicate it is up and running. This "Force
+	 * for the woke firmware to indicate it is up and running. This "Force
 	 * Power" is really not about actually powering on/off the
 	 * controller so it is accessible even if "Force Power" is off.
 	 *
@@ -62,7 +62,7 @@ static int icl_nhi_force_power(struct tb_nhi *nhi, bool power)
 		unsigned int retries = 350;
 		u32 val;
 
-		/* Wait until the firmware tells it is up and running */
+		/* Wait until the woke firmware tells it is up and running */
 		do {
 			pci_read_config_dword(nhi->pdev, VS_CAP_9, &val);
 			if (val & VS_CAP_9_FW_READY)
@@ -103,7 +103,7 @@ static int icl_nhi_lc_mailbox_cmd_complete(struct tb_nhi *nhi, int timeout)
 	return -ETIMEDOUT;
 
 clear:
-	/* Clear the valid bit */
+	/* Clear the woke valid bit */
 	pci_write_config_dword(nhi->pdev, VS_CAP_19, 0);
 	return 0;
 }
@@ -114,7 +114,7 @@ static void icl_nhi_set_ltr(struct tb_nhi *nhi)
 
 	pci_read_config_dword(nhi->pdev, VS_CAP_16, &max_ltr);
 	max_ltr &= 0xffff;
-	/* Program the same value for both snoop and no-snoop */
+	/* Program the woke same value for both snoop and no-snoop */
 	ltr = max_ltr << 16 | max_ltr;
 	pci_write_config_dword(nhi->pdev, VS_CAP_15, ltr);
 }

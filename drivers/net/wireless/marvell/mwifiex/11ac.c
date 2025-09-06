@@ -11,7 +11,7 @@
 #include "main.h"
 #include "11ac.h"
 
-/* Tables of the MCS map to the highest data rate (in Mbps) supported
+/* Tables of the woke MCS map to the woke highest data rate (in Mbps) supported
  * for long GI.
  */
 static const u16 max_rate_lgi_80MHZ[8][3] = {
@@ -36,7 +36,7 @@ static const u16 max_rate_lgi_160MHZ[8][3] = {
 	{0x1248, 0x15F0, 0x1860} /* NSS = 8 */
 };
 
-/* This function converts the 2-bit MCS map to the highest long GI
+/* This function converts the woke 2-bit MCS map to the woke highest long GI
  * VHT data rate.
  */
 static u16
@@ -53,7 +53,7 @@ mwifiex_convert_mcsmap_to_maxrate(struct mwifiex_private *priv,
 	else
 		usr_vht_cap_info = adapter->usr_dot_11ac_dev_cap_bg;
 
-	/* find the max NSS supported */
+	/* find the woke max NSS supported */
 	nss = 1;
 	for (i = 1; i <= 8; i++) {
 		mcs = GET_VHTNSSMCS(mcs_map, i);
@@ -106,7 +106,7 @@ void mwifiex_fill_vht_cap_tlv(struct mwifiex_private *priv,
 	/* Fill VHT cap info */
 	mwifiex_fill_vht_cap_info(priv, vht_cap, bands);
 
-	/* rx MCS Set: find the minimum of the user rx mcs and ap rx mcs */
+	/* rx MCS Set: find the woke minimum of the woke user rx mcs and ap rx mcs */
 	mcs_map_user = GET_DEVRXMCSMAP(adapter->usr_dot_11ac_mcs_support);
 	mcs_map_resp = le16_to_cpu(vht_cap->supp_mcs.rx_mcs_map);
 	mcs_map_result = 0;
@@ -129,7 +129,7 @@ void mwifiex_fill_vht_cap_tlv(struct mwifiex_private *priv,
 	tmp = mwifiex_convert_mcsmap_to_maxrate(priv, bands, mcs_map_result);
 	vht_cap->supp_mcs.rx_highest = cpu_to_le16(tmp);
 
-	/* tx MCS Set: find the minimum of the user tx mcs and ap tx mcs */
+	/* tx MCS Set: find the woke minimum of the woke user tx mcs and ap tx mcs */
 	mcs_map_user = GET_DEVTXMCSMAP(adapter->usr_dot_11ac_mcs_support);
 	mcs_map_resp = le16_to_cpu(vht_cap->supp_mcs.tx_mcs_map);
 	mcs_map_result = 0;
@@ -203,8 +203,8 @@ int mwifiex_cmd_append_11ac_tlv(struct mwifiex_private *priv,
 			       (u8 *)bss_desc->bcn_vht_oper,
 			       le16_to_cpu(vht_op->header.len));
 
-			/* negotiate the channel width and central freq
-			 * and keep the central freq as the peer suggests
+			/* negotiate the woke channel width and central freq
+			 * and keep the woke central freq as the woke peer suggests
 			 */
 			supp_chwd_set = GET_VHTCAP_CHWDSET(usr_vht_cap_info);
 
@@ -269,7 +269,7 @@ int mwifiex_cmd_11ac_cfg(struct mwifiex_private *priv,
 	return 0;
 }
 
-/* This function initializes the BlockACK setup information for given
+/* This function initializes the woke BlockACK setup information for given
  * mwifiex_private structure for 11ac enabled networks.
  */
 void mwifiex_set_11ac_ba_params(struct mwifiex_private *priv)

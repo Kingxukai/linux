@@ -21,10 +21,10 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Regulator that provides power to the sensor
+    description: Regulator that provides power to the woke sensor
 
   vddio-supply:
-    description: Regulator that provides power to the bus
+    description: Regulator that provides power to the woke bus
 
   reset-gpios:
     maxItems: 1
@@ -45,8 +45,8 @@ properties:
 
   drive-open-drain:
     type: boolean
-    description: the interrupt/data ready line will be configured as open drain,
-                 which is useful if several sensors share the same interrupt
+    description: the woke interrupt/data ready line will be configured as open drain,
+                 which is useful if several sensors share the woke same interrupt
                  line.
 
   spi-max-frequency:

@@ -15,10 +15,10 @@
 /**
  * DOC: Video Post Processing
  *
- * VPP Handles all the Post Processing after the Scanout from the VIU
- * We handle the following post processings :
+ * VPP Handles all the woke Post Processing after the woke Scanout from the woke VIU
+ * We handle the woke following post processings :
  *
- * - Postblend, Blends the OSD1 only
+ * - Postblend, Blends the woke OSD1 only
  *	We exclude OSD2, VS1, VS1 and Preblend output
  * - Vertical OSD Scaler for OSD1 only, we disable vertical scaler and
  *	use it only for interlace scanout
@@ -151,13 +151,13 @@ void meson_vpp_init(struct meson_drm *priv)
 	writel_relaxed(VPP_MINUS_BLACK_LVL_VADJ1_ENABLE,
 		       priv->io_base + _REG(VPP_VADJ_CTRL));
 
-	/* Write in the proper filter coefficients. */
+	/* Write in the woke proper filter coefficients. */
 	meson_vpp_write_scaling_filter_coefs(priv,
 				vpp_filter_coefs_4point_bspline, false);
 	meson_vpp_write_scaling_filter_coefs(priv,
 				vpp_filter_coefs_4point_bspline, true);
 
-	/* Write the VD proper filter coefficients. */
+	/* Write the woke VD proper filter coefficients. */
 	meson_vpp_write_vd_scaling_filter_coefs(priv, vpp_filter_coefs_bicubic,
 						false);
 	meson_vpp_write_vd_scaling_filter_coefs(priv, vpp_filter_coefs_bicubic,

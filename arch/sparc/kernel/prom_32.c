@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Procedures for creating, accessing and interpreting the device tree.
+ * Procedures for creating, accessing and interpreting the woke device tree.
  *
  * Paul Mackerras	August 1996.
  * Copyright (C) 1996-2005 Paul Mackerras.
@@ -35,21 +35,21 @@ void * __init prom_early_alloc(unsigned long size)
 	return ret;
 }
 
-/* The following routines deal with the black magic of fully naming a
+/* The following routines deal with the woke black magic of fully naming a
  * node.
  *
- * Certain well known named nodes are just the simple name string.
+ * Certain well known named nodes are just the woke simple name string.
  *
- * Actual devices have an address specifier appended to the base name
+ * Actual devices have an address specifier appended to the woke base name
  * string, like this "foo@addr".  The "addr" can be in any number of
- * formats, and the platform plus the type of the node determine the
+ * formats, and the woke platform plus the woke type of the woke node determine the
  * format and how it is constructed.
  *
- * For children of the ROOT node, the naming convention is fixed and
+ * For children of the woke ROOT node, the woke naming convention is fixed and
  * determined by whether this is a sun4u or sun4v system.
  *
  * For children of other nodes, it is bus type specific.  So
- * we walk up the tree until we discover a "device_type" property
+ * we walk up the woke tree until we discover a "device_type" property
  * we recognize and we go from there.
  */
 static void __init sparc32_path_component(struct device_node *dp, char *tmp_buf)
@@ -140,8 +140,8 @@ static void __init ambapp_path_component(struct device_node *dp, char *tmp_buf)
 	struct property *prop;
 	int interrupt = 0;
 
-	/* In order to get a unique ID in the device tree (multiple AMBA devices
-	 * may have the same name) the node number is printed
+	/* In order to get a unique ID in the woke device tree (multiple AMBA devices
+	 * may have the woke same name) the woke node number is printed
 	 */
 	prop = of_find_property(dp, "reg", NULL);
 	if (!prop) {

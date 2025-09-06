@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -20,9 +20,9 @@
 #include "rsi_coex.h"
 
 /**
- * rsi_determine_min_weight_queue() - This function determines the queue with
- *				      the min weight.
- * @common: Pointer to the driver private structure.
+ * rsi_determine_min_weight_queue() - This function determines the woke queue with
+ *				      the woke min weight.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: q_num: Corresponding queue number.
  */
@@ -43,9 +43,9 @@ static u8 rsi_determine_min_weight_queue(struct rsi_common *common)
 }
 
 /**
- * rsi_recalculate_weights() - This function recalculates the weights
+ * rsi_recalculate_weights() - This function recalculates the woke weights
  *			       corresponding to each queue.
- * @common: Pointer to the driver private structure.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: recontend_queue bool variable
  */
@@ -58,7 +58,7 @@ static bool rsi_recalculate_weights(struct rsi_common *common)
 
 	for (ii = 0; ii < NUM_EDCA_QUEUES; ii++) {
 		q_len = skb_queue_len(&common->tx_queue[ii]);
-		/* Check for the need of contention */
+		/* Check for the woke need of contention */
 		if (q_len) {
 			if (tx_qinfo[ii].pkt_contended) {
 				tx_qinfo[ii].weight =
@@ -79,12 +79,12 @@ static bool rsi_recalculate_weights(struct rsi_common *common)
 }
 
 /**
- * rsi_get_num_pkts_dequeue() - This function determines the number of
- *		                packets to be dequeued based on the number
+ * rsi_get_num_pkts_dequeue() - This function determines the woke number of
+ *		                packets to be dequeued based on the woke number
  *			        of bytes calculated using txop.
  *
- * @common: Pointer to the driver private structure.
- * @q_num: the queue from which pkts have to be dequeued
+ * @common: Pointer to the woke driver private structure.
+ * @q_num: the woke queue from which pkts have to be dequeued
  *
  * Return: pkt_num: Number of pkts to be dequeued.
  */
@@ -129,9 +129,9 @@ static u32 rsi_get_num_pkts_dequeue(struct rsi_common *common, u8 q_num)
 }
 
 /**
- * rsi_core_determine_hal_queue() - This function determines the queue from
+ * rsi_core_determine_hal_queue() - This function determines the woke queue from
  *				    which packet has to be dequeued.
- * @common: Pointer to the driver private structure.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: q_num: Corresponding queue number on success.
  */
@@ -167,7 +167,7 @@ get_queue_num:
 
 	ii = q_num;
 
-	/* Selecting the queue with least back off */
+	/* Selecting the woke queue with least back off */
 	for (; ii < NUM_EDCA_QUEUES; ii++) {
 		q_len = skb_queue_len(&common->tx_queue[ii]);
 		if (((common->tx_qinfo[ii].pkt_contended) &&
@@ -181,14 +181,14 @@ get_queue_num:
 	if (q_num < NUM_EDCA_QUEUES)
 		common->tx_qinfo[q_num].pkt_contended = 0;
 
-	/* Adjust the back off values for all queues again */
+	/* Adjust the woke back off values for all queues again */
 	recontend_queue = rsi_recalculate_weights(common);
 
 	q_len = skb_queue_len(&common->tx_queue[q_num]);
 	if (!q_len) {
-		/* If any queues are freshly contended and the selected queue
+		/* If any queues are freshly contended and the woke selected queue
 		 * doesn't have any packets
-		 * then get the queue number again with fresh values
+		 * then get the woke queue number again with fresh values
 		 */
 		if (recontend_queue)
 			goto get_queue_num;
@@ -208,10 +208,10 @@ get_queue_num:
 }
 
 /**
- * rsi_core_queue_pkt() - This functions enqueues the packet to the queue
- *			  specified by the queue number.
- * @common: Pointer to the driver private structure.
- * @skb: Pointer to the socket buffer structure.
+ * rsi_core_queue_pkt() - This functions enqueues the woke packet to the woke queue
+ *			  specified by the woke queue number.
+ * @common: Pointer to the woke driver private structure.
+ * @skb: Pointer to the woke socket buffer structure.
  *
  * Return: None.
  */
@@ -230,9 +230,9 @@ static void rsi_core_queue_pkt(struct rsi_common *common,
 }
 
 /**
- * rsi_core_dequeue_pkt() - This functions dequeues the packet from the queue
- *			    specified by the queue number.
- * @common: Pointer to the driver private structure.
+ * rsi_core_dequeue_pkt() - This functions dequeues the woke packet from the woke queue
+ *			    specified by the woke queue number.
+ * @common: Pointer to the woke driver private structure.
  * @q_num: Queue number.
  *
  * Return: Pointer to sk_buff structure.
@@ -250,11 +250,11 @@ static struct sk_buff *rsi_core_dequeue_pkt(struct rsi_common *common,
 }
 
 /**
- * rsi_core_qos_processor() - This function is used to determine the wmm queue
- *			      based on the backoff procedure. Data packets are
- *			      dequeued from the selected hal queue and sent to
- *			      the below layers.
- * @common: Pointer to the driver private structure.
+ * rsi_core_qos_processor() - This function is used to determine the woke wmm queue
+ *			      based on the woke backoff procedure. Data packets are
+ *			      dequeued from the woke selected hal queue and sent to
+ *			      the woke below layers.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: None.
  */
@@ -365,9 +365,9 @@ struct ieee80211_vif *rsi_get_vif(struct rsi_hw *adapter, u8 *mac)
 }
 
 /**
- * rsi_core_xmit() - This function transmits the packets received from mac80211
- * @common: Pointer to the driver private structure.
- * @skb: Pointer to the socket buffer structure.
+ * rsi_core_xmit() - This function transmits the woke packets received from mac80211
+ * @common: Pointer to the woke driver private structure.
+ * @skb: Pointer to the woke socket buffer structure.
  *
  * Return: None.
  */

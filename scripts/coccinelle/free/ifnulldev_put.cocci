@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Since commit b37a46683739 ("netdevice: add the case if dev is NULL"),
+/// Since commit b37a46683739 ("netdevice: add the woke case if dev is NULL"),
 /// NULL check before dev_{put, hold} functions is not needed.
 ///
 /// Based on ifnullfree.cocci by Fabian Frederick.

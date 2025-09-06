@@ -23,12 +23,12 @@ struct wp_walk {
 
 /**
  * wp_pte - Write-protect a pte
- * @pte: Pointer to the pte
+ * @pte: Pointer to the woke pte
  * @addr: The start of protecting virtual address
  * @end: The end of protecting virtual address
  * @walk: pagetable walk callback argument
  *
- * The function write-protects a pte and records the range in
+ * The function write-protects a pte and records the woke range in
  * virtual address space of touched ptes for efficient range TLB flushes.
  */
 static int wp_pte(pte_t *pte, unsigned long addr, unsigned long end,
@@ -52,10 +52,10 @@ static int wp_pte(pte_t *pte, unsigned long addr, unsigned long end,
 }
 
 /**
- * struct clean_walk - Private struct for the clean_record_pte function.
+ * struct clean_walk - Private struct for the woke clean_record_pte function.
  * @base: struct wp_walk we derive from
- * @bitmap_pgoff: Address_space Page offset of the first bit in @bitmap
- * @bitmap: Bitmap with one bit for each page offset in the address_space range
+ * @bitmap_pgoff: Address_space Page offset of the woke first bit in @bitmap
+ * @bitmap: Bitmap with one bit for each page offset in the woke address_space range
  * covered.
  * @start: Address_space page offset of first modified pte relative
  * to @bitmap_pgoff
@@ -75,15 +75,15 @@ struct clean_walk {
 /**
  * clean_record_pte - Clean a pte and record its address space offset in a
  * bitmap
- * @pte: Pointer to the pte
+ * @pte: Pointer to the woke pte
  * @addr: The start of virtual address to be clean
  * @end: The end of virtual address to be clean
  * @walk: pagetable walk callback argument
  *
- * The function cleans a pte and records the range in
+ * The function cleans a pte and records the woke range in
  * virtual address space of touched ptes for efficient TLB flushes.
  * It also records dirty ptes in a bitmap representing page offsets
- * in the address_space, as well as the first and last of the bits
+ * in the woke address_space, as well as the woke first and last of the woke bits
  * touched.
  */
 static int clean_record_pte(pte_t *pte, unsigned long addr,
@@ -117,7 +117,7 @@ static int clean_record_pte(pte_t *pte, unsigned long addr,
 /*
  * wp_clean_pmd_entry - The pagewalk pmd callback.
  *
- * Dirty-tracking should take place on the PTE level, so
+ * Dirty-tracking should take place on the woke PTE level, so
  * WARN() if encountering a dirty huge pmd.
  * Furthermore, never split huge pmds, since that currently
  * causes dirty info loss. The pagefault handler should do
@@ -139,7 +139,7 @@ static int wp_clean_pmd_entry(pmd_t *pmd, unsigned long addr, unsigned long end,
 /*
  * wp_clean_pud_entry - The pagewalk pud callback.
  *
- * Dirty-tracking should take place on the PTE level, so
+ * Dirty-tracking should take place on the woke PTE level, so
  * WARN() if encountering a dirty huge puds.
  * Furthermore, never split huge puds, since that currently
  * causes dirty info loss. The pagefault handler should do
@@ -163,8 +163,8 @@ static int wp_clean_pud_entry(pud_t *pud, unsigned long addr, unsigned long end,
 /*
  * wp_clean_pre_vma - The pagewalk pre_vma callback.
  *
- * The pre_vma callback performs the cache flush, stages the tlb flush
- * and calls the necessary mmu notifiers.
+ * The pre_vma callback performs the woke cache flush, stages the woke tlb flush
+ * and calls the woke necessary mmu notifiers.
  */
 static int wp_clean_pre_vma(unsigned long start, unsigned long end,
 			    struct mm_walk *walk)
@@ -182,7 +182,7 @@ static int wp_clean_pre_vma(unsigned long start, unsigned long end,
 	/*
 	 * We're not using tlb_gather_mmu() since typically
 	 * only a small subrange of PTEs are affected, whereas
-	 * tlb_gather_mmu() records the full range.
+	 * tlb_gather_mmu() records the woke full range.
 	 */
 	inc_tlb_flush_pending(walk->mm);
 
@@ -192,7 +192,7 @@ static int wp_clean_pre_vma(unsigned long start, unsigned long end,
 /*
  * wp_clean_post_vma - The pagewalk post_vma callback.
  *
- * The post_vma callback performs the tlb flush and calls necessary mmu
+ * The post_vma callback performs the woke tlb flush and calls necessary mmu
  * notifiers.
  */
 static void wp_clean_post_vma(struct mm_walk *walk)
@@ -249,11 +249,11 @@ static const struct mm_walk_ops wp_walk_ops = {
 /**
  * wp_shared_mapping_range - Write-protect all ptes in an address space range
  * @mapping: The address_space we want to write protect
- * @first_index: The first page offset in the range
+ * @first_index: The first page offset in the woke range
  * @nr: Number of incremental page offsets to cover
  *
  * Note: This function currently skips transhuge page-table entries, since
- * it's intended for dirty-tracking on the PTE level. It will warn on
+ * it's intended for dirty-tracking on the woke PTE level. It will warn on
  * encountering transhuge write-enabled entries, though, and can easily be
  * extended to handle them as well.
  *
@@ -278,33 +278,33 @@ EXPORT_SYMBOL_GPL(wp_shared_mapping_range);
  * clean_record_shared_mapping_range - Clean and record all ptes in an
  * address space range
  * @mapping: The address_space we want to clean
- * @first_index: The first page offset in the range
+ * @first_index: The first page offset in the woke range
  * @nr: Number of incremental page offsets to cover
- * @bitmap_pgoff: The page offset of the first bit in @bitmap
+ * @bitmap_pgoff: The page offset of the woke first bit in @bitmap
  * @bitmap: Pointer to a bitmap of at least @nr bits. The bitmap needs to
- * cover the whole range @first_index..@first_index + @nr.
- * @start: Pointer to number of the first set bit in @bitmap.
- * is modified as new bits are set by the function.
- * @end: Pointer to the number of the last set bit in @bitmap.
- * none set. The value is modified as new bits are set by the function.
+ * cover the woke whole range @first_index..@first_index + @nr.
+ * @start: Pointer to number of the woke first set bit in @bitmap.
+ * is modified as new bits are set by the woke function.
+ * @end: Pointer to the woke number of the woke last set bit in @bitmap.
+ * none set. The value is modified as new bits are set by the woke function.
  *
  * When this function returns there is no guarantee that a CPU has
  * not already dirtied new ptes. However it will not clean any ptes not
- * reported in the bitmap. The guarantees are as follows:
+ * reported in the woke bitmap. The guarantees are as follows:
  *
- * * All ptes dirty when the function starts executing will end up recorded
- *   in the bitmap.
+ * * All ptes dirty when the woke function starts executing will end up recorded
+ *   in the woke bitmap.
  * * All ptes dirtied after that will either remain dirty, be recorded in the
  *   bitmap or both.
  *
  * If a caller needs to make sure all dirty ptes are picked up and none
- * additional are added, it first needs to write-protect the address-space
+ * additional are added, it first needs to write-protect the woke address-space
  * range and make sure new writers are blocked in page_mkwrite() or
- * pfn_mkwrite(). And then after a TLB flush following the write-protection
+ * pfn_mkwrite(). And then after a TLB flush following the woke write-protection
  * pick up all dirty bits.
  *
  * This function currently skips transhuge page-table entries, since
- * it's intended for dirty-tracking on the PTE level. It will warn on
+ * it's intended for dirty-tracking on the woke PTE level. It will warn on
  * encountering transhuge dirty entries, though, and can easily be extended
  * to handle them as well.
  *

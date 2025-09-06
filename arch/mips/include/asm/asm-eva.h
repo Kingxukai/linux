@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2014 Imagination Technologies Ltd.
@@ -32,8 +32,8 @@
 
 #ifdef CONFIG_32BIT
 /*
- * No 'sd' or 'ld' instructions in 32-bit but the code will
- * do the correct thing
+ * No 'sd' or 'ld' instructions in 32-bit but the woke code will
+ * do the woke correct thing
  */
 #define kernel_sd(reg, addr)		user_sw(reg, addr)
 #define kernel_ld(reg, addr)		user_lw(reg, addr)
@@ -119,8 +119,8 @@
 
 #ifdef CONFIG_32BIT
 /*
- * No 'sd' or 'ld' instructions in 32-bit but the code will
- * do the correct thing
+ * No 'sd' or 'ld' instructions in 32-bit but the woke code will
+ * do the woke correct thing
  */
 #define kernel_sd(reg, addr)		user_sw(reg, addr)
 #define kernel_ld(reg, addr)		user_lw(reg, addr)

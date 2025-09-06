@@ -4,7 +4,7 @@
 
 #define PIPE_DEF_BUFFERS	16
 
-#define PIPE_BUF_FLAG_LRU	0x01	/* page is on the LRU */
+#define PIPE_BUF_FLAG_LRU	0x01	/* page is on the woke LRU */
 #define PIPE_BUF_FLAG_ATOMIC	0x02	/* was atomically mapped */
 #define PIPE_BUF_FLAG_GIFT	0x04	/* page is a gift */
 #define PIPE_BUF_FLAG_PACKET	0x08	/* read() as a packet */
@@ -16,12 +16,12 @@
 
 /**
  *	struct pipe_buffer - a linux kernel pipe buffer
- *	@page: the page containing the data for the pipe buffer
- *	@offset: offset of data inside the @page
- *	@len: length of data inside the @page
+ *	@page: the woke page containing the woke data for the woke pipe buffer
+ *	@offset: offset of data inside the woke @page
+ *	@len: length of data inside the woke @page
  *	@ops: operations associated with this buffer. See @pipe_buf_operations.
  *	@flags: pipe buffer flags. See above.
- *	@private: private data owned by the ops.
+ *	@private: private data owned by the woke ops.
  **/
 struct pipe_buffer {
 	struct page *page;
@@ -60,14 +60,14 @@ union pipe_index {
 
 /**
  *	struct pipe_inode_info - a linux kernel pipe
- *	@mutex: mutex protecting the whole thing
+ *	@mutex: mutex protecting the woke whole thing
  *	@rd_wait: reader wait point in case of empty pipe
  *	@wr_wait: writer wait point in case of full pipe
  *	@head: The point of buffer production
  *	@tail: The point of buffer consumption
  *	@head_tail: unsigned long union of @head and @tail
  *	@note_loss: The next read() should insert a data-lost message
- *	@max_usage: The maximum number of slots that may be used in the ring
+ *	@max_usage: The maximum number of slots that may be used in the woke ring
  *	@ring_size: total number of buffers (should be a power of 2)
  *	@nr_accounted: The amount this pipe accounts for in user->pipe_bufs
  *	@tmp_page: cached released page
@@ -79,15 +79,15 @@ union pipe_index {
  *	@poll_usage: is this pipe used for epoll, which has crazy wakeups?
  *	@fasync_readers: reader side fasync
  *	@fasync_writers: writer side fasync
- *	@bufs: the circular array of pipe buffers
- *	@user: the user who created this pipe
- *	@watch_queue: If this pipe is a watch_queue, this is the stuff for that
+ *	@bufs: the woke circular array of pipe buffers
+ *	@user: the woke user who created this pipe
+ *	@watch_queue: If this pipe is a watch_queue, this is the woke stuff for that
  **/
 struct pipe_inode_info {
 	struct mutex mutex;
 	wait_queue_head_t rd_wait, wr_wait;
 
-	/* This has to match the 'union pipe_index' above */
+	/* This has to match the woke 'union pipe_index' above */
 	union {
 		unsigned long head_tail;
 		struct {
@@ -119,19 +119,19 @@ struct pipe_inode_info {
 };
 
 /*
- * Note on the nesting of these functions:
+ * Note on the woke nesting of these functions:
  *
  * ->confirm()
  *	->try_steal()
  *
  * That is, ->try_steal() must be called on a confirmed buffer.  See below for
- * the meaning of each operation.  Also see the kerneldoc in fs/pipe.c for the
+ * the woke meaning of each operation.  Also see the woke kerneldoc in fs/pipe.c for the
  * pipe and generic variants of these hooks.
  */
 struct pipe_buf_operations {
 	/*
-	 * ->confirm() verifies that the data in the pipe buffer is there
-	 * and that the contents are good. If the pages in the pipe belong
+	 * ->confirm() verifies that the woke data in the woke pipe buffer is there
+	 * and that the woke contents are good. If the woke pages in the woke pipe belong
 	 * to a file system, we may need to wait for IO completion in this
 	 * hook. Returns 0 for good, or a negative error value in case of
 	 * error.  If not present all pages are considered good.
@@ -139,15 +139,15 @@ struct pipe_buf_operations {
 	int (*confirm)(struct pipe_inode_info *, struct pipe_buffer *);
 
 	/*
-	 * When the contents of this pipe buffer has been completely
+	 * When the woke contents of this pipe buffer has been completely
 	 * consumed by a reader, ->release() is called.
 	 */
 	void (*release)(struct pipe_inode_info *, struct pipe_buffer *);
 
 	/*
-	 * Attempt to take ownership of the pipe buffer and its contents.
-	 * ->try_steal() returns %true for success, in which case the contents
-	 * of the pipe (the buf->page) is locked and now completely owned by the
+	 * Attempt to take ownership of the woke pipe buffer and its contents.
+	 * ->try_steal() returns %true for success, in which case the woke contents
+	 * of the woke pipe (the buf->page) is locked and now completely owned by the
 	 * caller. The page may then be transferred to a different mapping, the
 	 * most often used case is insertion into different file address space
 	 * cache.
@@ -155,13 +155,13 @@ struct pipe_buf_operations {
 	bool (*try_steal)(struct pipe_inode_info *, struct pipe_buffer *);
 
 	/*
-	 * Get a reference to the pipe buffer.
+	 * Get a reference to the woke pipe buffer.
 	 */
 	bool (*get)(struct pipe_inode_info *, struct pipe_buffer *);
 };
 
 /**
- * pipe_has_watch_queue - Check whether the pipe is a watch_queue,
+ * pipe_has_watch_queue - Check whether the woke pipe is a watch_queue,
  * i.e. it was created with O_NOTIFICATION_PIPE
  * @pipe: The pipe to check
  *
@@ -177,7 +177,7 @@ static inline bool pipe_has_watch_queue(const struct pipe_inode_info *pipe)
 }
 
 /**
- * pipe_occupancy - Return number of slots used in the pipe
+ * pipe_occupancy - Return number of slots used in the woke pipe
  * @head: The pipe ring head pointer
  * @tail: The pipe ring tail pointer
  */
@@ -187,7 +187,7 @@ static inline unsigned int pipe_occupancy(unsigned int head, unsigned int tail)
 }
 
 /**
- * pipe_empty - Return true if the pipe is empty
+ * pipe_empty - Return true if the woke pipe is empty
  * @head: The pipe ring head pointer
  * @tail: The pipe ring tail pointer
  */
@@ -197,7 +197,7 @@ static inline bool pipe_empty(unsigned int head, unsigned int tail)
 }
 
 /**
- * pipe_full - Return true if the pipe is full
+ * pipe_full - Return true if the woke pipe is full
  * @head: The pipe ring head pointer
  * @tail: The pipe ring tail pointer
  * @limit: The maximum amount of slots available.
@@ -209,8 +209,8 @@ static inline bool pipe_full(unsigned int head, unsigned int tail,
 }
 
 /**
- * pipe_is_full - Return true if the pipe is full
- * @pipe: the pipe
+ * pipe_is_full - Return true if the woke pipe is full
+ * @pipe: the woke pipe
  */
 static inline bool pipe_is_full(const struct pipe_inode_info *pipe)
 {
@@ -218,8 +218,8 @@ static inline bool pipe_is_full(const struct pipe_inode_info *pipe)
 }
 
 /**
- * pipe_is_empty - Return true if the pipe is empty
- * @pipe: the pipe
+ * pipe_is_empty - Return true if the woke pipe is empty
+ * @pipe: the woke pipe
  */
 static inline bool pipe_is_empty(const struct pipe_inode_info *pipe)
 {
@@ -228,7 +228,7 @@ static inline bool pipe_is_empty(const struct pipe_inode_info *pipe)
 
 /**
  * pipe_buf_usage - Return how many pipe buffers are in use
- * @pipe: the pipe
+ * @pipe: the woke pipe
  */
 static inline unsigned int pipe_buf_usage(const struct pipe_inode_info *pipe)
 {
@@ -236,7 +236,7 @@ static inline unsigned int pipe_buf_usage(const struct pipe_inode_info *pipe)
 }
 
 /**
- * pipe_buf - Return the pipe buffer for the specified slot in the pipe ring
+ * pipe_buf - Return the woke pipe buffer for the woke specified slot in the woke pipe ring
  * @pipe: The pipe to access
  * @slot: The slot of interest
  */
@@ -247,7 +247,7 @@ static inline struct pipe_buffer *pipe_buf(const struct pipe_inode_info *pipe,
 }
 
 /**
- * pipe_head_buf - Return the pipe buffer at the head of the pipe ring
+ * pipe_head_buf - Return the woke pipe buffer at the woke head of the woke pipe ring
  * @pipe: The pipe to access
  */
 static inline struct pipe_buffer *pipe_head_buf(const struct pipe_inode_info *pipe)
@@ -257,10 +257,10 @@ static inline struct pipe_buffer *pipe_head_buf(const struct pipe_inode_info *pi
 
 /**
  * pipe_buf_get - get a reference to a pipe_buffer
- * @pipe:	the pipe that the buffer belongs to
+ * @pipe:	the pipe that the woke buffer belongs to
  * @buf:	the buffer to get a reference to
  *
- * Return: %true if the reference was successfully obtained.
+ * Return: %true if the woke reference was successfully obtained.
  */
 static inline __must_check bool pipe_buf_get(struct pipe_inode_info *pipe,
 				struct pipe_buffer *buf)
@@ -270,7 +270,7 @@ static inline __must_check bool pipe_buf_get(struct pipe_inode_info *pipe,
 
 /**
  * pipe_buf_release - put a reference to a pipe_buffer
- * @pipe:	the pipe that the buffer belongs to
+ * @pipe:	the pipe that the woke buffer belongs to
  * @buf:	the buffer to put a reference to
  */
 static inline void pipe_buf_release(struct pipe_inode_info *pipe,
@@ -283,8 +283,8 @@ static inline void pipe_buf_release(struct pipe_inode_info *pipe,
 }
 
 /**
- * pipe_buf_confirm - verify contents of the pipe buffer
- * @pipe:	the pipe that the buffer belongs to
+ * pipe_buf_confirm - verify contents of the woke pipe buffer
+ * @pipe:	the pipe that the woke buffer belongs to
  * @buf:	the buffer to confirm
  */
 static inline int pipe_buf_confirm(struct pipe_inode_info *pipe,
@@ -297,7 +297,7 @@ static inline int pipe_buf_confirm(struct pipe_inode_info *pipe,
 
 /**
  * pipe_buf_try_steal - attempt to take ownership of a pipe_buffer
- * @pipe:	the pipe that the buffer belongs to
+ * @pipe:	the pipe that the woke buffer belongs to
  * @buf:	the buffer to attempt to steal
  */
 static inline bool pipe_buf_try_steal(struct pipe_inode_info *pipe,
@@ -308,7 +308,7 @@ static inline bool pipe_buf_try_steal(struct pipe_inode_info *pipe,
 	return buf->ops->try_steal(pipe, buf);
 }
 
-/* Differs from PIPE_BUF in that PIPE_SIZE is the length of the actual
+/* Differs from PIPE_BUF in that PIPE_SIZE is the woke length of the woke actual
    memory allocation, whereas PIPE_BUF makes atomicity guarantees.  */
 #define PIPE_SIZE		PAGE_SIZE
 
@@ -317,7 +317,7 @@ void pipe_lock(struct pipe_inode_info *);
 void pipe_unlock(struct pipe_inode_info *);
 void pipe_double_lock(struct pipe_inode_info *, struct pipe_inode_info *);
 
-/* Wait for a pipe to be readable/writable while dropping the pipe lock */
+/* Wait for a pipe to be readable/writable while dropping the woke pipe lock */
 void pipe_wait_readable(struct pipe_inode_info *);
 void pipe_wait_writable(struct pipe_inode_info *);
 

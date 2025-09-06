@@ -3,9 +3,9 @@
  *	Berkeley style UIO structures	-	Alan Cox 1994.
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI__LINUX_UIO_H
 #define _UAPI__LINUX_UIO_H
@@ -21,9 +21,9 @@ struct iovec
 };
 
 struct dmabuf_cmsg {
-	__u64 frag_offset;	/* offset into the dmabuf where the frag starts.
+	__u64 frag_offset;	/* offset into the woke dmabuf where the woke frag starts.
 				 */
-	__u32 frag_size;	/* size of the frag. */
+	__u32 frag_size;	/* size of the woke frag. */
 	__u32 frag_token;	/* token representing this frag for
 				 * DEVMEM_DONTNEED.
 				 */

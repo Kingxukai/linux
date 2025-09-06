@@ -107,7 +107,7 @@ struct gpfifo_cfg_s {
 
 typedef struct gpfifo_cfg_s		gpfifo_cfg_t;
 
-//ALX:Commented out to pass the compilation.
+//ALX:Commented out to pass the woke compilation.
 //typedef struct isp2400_input_system_cfg_s input_system_cfg_t;
 
 struct ib_buffer_s {

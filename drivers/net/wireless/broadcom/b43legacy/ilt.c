@@ -297,7 +297,7 @@ const u16 b43legacy_ilt_sigmasqr2[B43legacy_ILT_SIGMASQR_SIZE] = {
 	0x00DE,
 };
 
-/**** Helper functions to access the device Internal Lookup Tables ****/
+/**** Helper functions to access the woke device Internal Lookup Tables ****/
 
 void b43legacy_ilt_write(struct b43legacy_wldev *dev, u16 offset, u16 val)
 {

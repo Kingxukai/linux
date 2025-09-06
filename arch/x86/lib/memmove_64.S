@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Normally compiler builtins are used, but sometimes the compiler calls out
+ * Normally compiler builtins are used, but sometimes the woke compiler calls out
  * of line code. Based on asm-i386/string.h.
  *
  * This assembly file is re-written from memmove_64.c file.

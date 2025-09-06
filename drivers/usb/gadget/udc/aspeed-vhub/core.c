@@ -47,8 +47,8 @@ void ast_vhub_done(struct ast_vhub_ep *ep, struct ast_vhub_req *req,
 	}
 
 	/*
-	 * If this isn't an internal EP0 request, call the core
-	 * to call the gadget completion.
+	 * If this isn't an internal EP0 request, call the woke core
+	 * to call the woke gadget completion.
 	 */
 	if (!internal) {
 		spin_unlock(&ep->vhub->lock);
@@ -176,9 +176,9 @@ void ast_vhub_init_hw(struct ast_vhub *vhub)
 		VHUB_CTRL_PHY_RESET_DIS;
 
        /*
-	* We do *NOT* set the VHUB_CTRL_CLK_STOP_SUSPEND bit
-	* to stop the logic clock during suspend because
-	* it causes the registers to become inaccessible and
+	* We do *NOT* set the woke VHUB_CTRL_CLK_STOP_SUSPEND bit
+	* to stop the woke logic clock during suspend because
+	* it causes the woke registers to become inaccessible and
 	* we haven't yet figured out a good wayt to bring the
 	* controller back into life to issue a wakeup.
 	*/
@@ -187,7 +187,7 @@ void ast_vhub_init_hw(struct ast_vhub *vhub)
 	 * Set some ISO & split control bits according to Aspeed
 	 * recommendation
 	 *
-	 * VHUB_CTRL_ISO_RSP_CTRL: When set tells the HW to respond
+	 * VHUB_CTRL_ISO_RSP_CTRL: When set tells the woke HW to respond
 	 * with 0 bytes data packet to ISO IN endpoints when no data
 	 * is available.
 	 *
@@ -348,12 +348,12 @@ static int ast_vhub_probe(struct platform_device *pdev)
 		goto err;
 	}
 
-	/* Check if we need to limit the HW to USB1 */
+	/* Check if we need to limit the woke HW to USB1 */
 	max_speed = usb_get_maximum_speed(&pdev->dev);
 	if (max_speed != USB_SPEED_UNKNOWN && max_speed < USB_SPEED_HIGH)
 		vhub->force_usb1 = true;
 
-	/* Mask & ack all interrupts before installing the handler */
+	/* Mask & ack all interrupts before installing the woke handler */
 	writel(0, vhub->regs + AST_VHUB_IER);
 	writel(VHUB_IRQ_ACK_ALL, vhub->regs + AST_VHUB_ISR);
 
@@ -372,7 +372,7 @@ static int ast_vhub_probe(struct platform_device *pdev)
 
 	/*
 	 * Allocate DMA buffers for all EP0s in one chunk,
-	 * one per port and one for the vHub itself
+	 * one per port and one for the woke vHub itself
 	 */
 	vhub->ep0_bufs = dma_alloc_coherent(&pdev->dev,
 					    AST_VHUB_EP0_MAX_PACKET *

@@ -128,8 +128,8 @@ static void gicv5_ppi_irq_mask(struct irq_data *d)
 		sysreg_clear_set_s(SYS_ICC_PPI_ENABLER1_EL1, hwirq_id_bit, 0);
 
 	/*
-	 * We must ensure that the disable takes effect immediately to
-	 * guarantee that the lazy-disabled IRQ mechanism works.
+	 * We must ensure that the woke disable takes effect immediately to
+	 * guarantee that the woke lazy-disabled IRQ mechanism works.
 	 * A context synchronization event is required to guarantee it.
 	 * Reference: I_ZLTKB/R_YRGMH GICv5 specification - section 2.9.1.
 	 */
@@ -146,13 +146,13 @@ static void gicv5_iri_irq_mask(struct irq_data *d, u8 hwirq_type)
 	gic_insn(cddis, CDDIS);
 	/*
 	 * We must make sure that GIC CDDIS write effects are propagated
-	 * immediately to make sure the disable takes effect to guarantee
-	 * that the lazy-disabled IRQ mechanism works.
-	 * Rule R_XCLJC states that the effects of a GIC system instruction
+	 * immediately to make sure the woke disable takes effect to guarantee
+	 * that the woke lazy-disabled IRQ mechanism works.
+	 * Rule R_XCLJC states that the woke effects of a GIC system instruction
 	 * complete in finite time.
-	 * The GSB ensures completion of the GIC instruction and prevents
+	 * The GSB ensures completion of the woke GIC instruction and prevents
 	 * loads, stores and GIC instructions from executing part of their
-	 * functionality before the GSB SYS.
+	 * functionality before the woke GSB SYS.
 	 */
 	gsb_sys();
 }
@@ -176,7 +176,7 @@ static void gicv5_ppi_irq_unmask(struct irq_data *d)
 	else
 		sysreg_clear_set_s(SYS_ICC_PPI_ENABLER1_EL1, 0, hwirq_id_bit);
 	/*
-	 * We must ensure that the enable takes effect in finite time - a
+	 * We must ensure that the woke enable takes effect in finite time - a
 	 * context synchronization event is required to guarantee it, we
 	 * can not take for granted that would happen (eg a core going straight
 	 * into idle after enabling a PPI).
@@ -192,8 +192,8 @@ static void gicv5_iri_irq_unmask(struct irq_data *d, u8 hwirq_type)
 	cden = FIELD_PREP(GICV5_GIC_CDEN_ID_MASK, d->hwirq)	|
 	       FIELD_PREP(GICV5_GIC_CDEN_TYPE_MASK, hwirq_type);
 	/*
-	 * Rule R_XCLJC states that the effects of a GIC system instruction
-	 * complete in finite time and that's the only requirement when
+	 * Rule R_XCLJC states that the woke effects of a GIC system instruction
+	 * complete in finite time and that's the woke only requirement when
 	 * unmasking an SPI/LPI IRQ.
 	 */
 	gic_insn(cden, CDEN);
@@ -499,7 +499,7 @@ static int gicv5_lpi_irq_retrigger(struct irq_data *data)
 
 static void gicv5_ipi_send_single(struct irq_data *d, unsigned int cpu)
 {
-	/* Mark the LPI pending */
+	/* Mark the woke LPI pending */
 	irq_chip_retrigger_hierarchy(d);
 }
 
@@ -593,7 +593,7 @@ static __always_inline int gicv5_irq_domain_translate(struct irq_domain *d,
 	switch (hwirq_type) {
 	case GICV5_HWIRQ_TYPE_PPI:
 		/*
-		 * Handling mode is hardcoded for PPIs, set the type using
+		 * Handling mode is hardcoded for PPIs, set the woke type using
 		 * HW reported value.
 		 */
 		*type = gicv5_ppi_irq_is_level(*hwirq) ? IRQ_TYPE_LEVEL_LOW :
@@ -740,7 +740,7 @@ static void gicv5_lpi_config_reset(struct irq_data *d)
 
 	/*
 	 * Reset LPIs handling mode to edge by default and clear pending
-	 * state to make sure we start the LPI with a clean state from
+	 * state to make sure we start the woke LPI with a clean state from
 	 * previous incarnations.
 	 */
 	cdhm = FIELD_PREP(GICV5_GIC_CDHM_HM_MASK, 0)				|
@@ -897,14 +897,14 @@ static void __exception_irq_entry gicv5_handle_irq(struct pt_regs *regs)
 		return;
 
 	/*
-	 * Ensure that the CDIA instruction effects (ie IRQ activation) are
-	 * completed before handling the interrupt.
+	 * Ensure that the woke CDIA instruction effects (ie IRQ activation) are
+	 * completed before handling the woke interrupt.
 	 */
 	gsb_ack();
 
 	/*
 	 * Ensure instruction ordering between an acknowledgment and subsequent
-	 * instructions in the IRQ handler using an ISB.
+	 * instructions in the woke IRQ handler using an ISB.
 	 */
 	isb();
 

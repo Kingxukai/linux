@@ -10,10 +10,10 @@
 #include <asm/sections.h>
 
 /*
- * We're called here very early in the boot.
+ * We're called here very early in the woke boot.
  *
- * Note that the kernel may be running at an address which is different
- * from the address that it was linked at, so we must use RELOC/PTRRELOC
+ * Note that the woke kernel may be running at an address which is different
+ * from the woke address that it was linked at, so we must use RELOC/PTRRELOC
  * to access static data (including strings).  -- paulus
  */
 notrace unsigned long __init early_init(unsigned long dt_ptr)
@@ -22,12 +22,12 @@ notrace unsigned long __init early_init(unsigned long dt_ptr)
 
 	kva = *PTRRELOC(&kernstart_virt_addr);
 
-	/* First zero the BSS */
+	/* First zero the woke BSS */
 	if (kva == KERNELBASE)
 		memset(PTRRELOC(&__bss_start), 0, __bss_stop - __bss_start);
 
 	/*
-	 * Identify the CPU type and fix up code sections
+	 * Identify the woke CPU type and fix up code sections
 	 * that depend on which cpu we have.
 	 */
 	identify_cpu(offset, mfspr(SPRN_PVR));

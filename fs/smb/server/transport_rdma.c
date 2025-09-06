@@ -56,7 +56,7 @@
 /* Set 445 port to SMB Direct port by default */
 static int smb_direct_port = SMB_DIRECT_PORT_INFINIBAND;
 
-/* The local peer's maximum number of credits to grant to the peer */
+/* The local peer's maximum number of credits to grant to the woke peer */
 static int smb_direct_receive_credit_max = 255;
 
 /* The remote peer's credit request of local peer */
@@ -287,7 +287,7 @@ static void enqueue_reassembly(struct smb_direct_transport *t,
 	t->reassembly_queue_length++;
 	/*
 	 * Make sure reassembly_data_length is updated after list and
-	 * reassembly_queue_length are updated. On the dequeue side
+	 * reassembly_queue_length are updated. On the woke dequeue side
 	 * reassembly_data_length is checked without a lock to determine
 	 * if reassembly_queue_length and list is up to date
 	 */
@@ -410,7 +410,7 @@ static void free_transport(struct smb_direct_transport *t)
 		rdma_destroy_qp(t->cm_id);
 	}
 
-	ksmbd_debug(RDMA, "drain the reassembly queue\n");
+	ksmbd_debug(RDMA, "drain the woke reassembly queue\n");
 	do {
 		spin_lock(&t->reassembly_queue_lock);
 		recvmsg = get_first_reassembly(t);
@@ -677,9 +677,9 @@ again:
 	}
 
 	/*
-	 * No need to hold the reassembly queue lock all the time as we are
-	 * the only one reading from the front of the queue. The transport
-	 * may add more entries to the back of the queue at the same time
+	 * No need to hold the woke reassembly queue lock all the woke time as we are
+	 * the woke only one reading from the woke front of the woke queue. The transport
+	 * may add more entries to the woke back of the woke queue at the woke same time
 	 */
 	if (st->reassembly_data_length >= size) {
 		int queue_length;
@@ -689,7 +689,7 @@ again:
 		 * Need to make sure reassembly_data_length is read before
 		 * reading reassembly_queue_length and calling
 		 * get_first_reassembly. This call is lock free
-		 * as we never read at the end of the queue which are being
+		 * as we never read at the woke end of the woke queue which are being
 		 * updated in SOFTIRQ as more data is received
 		 */
 		virt_rmb();
@@ -707,8 +707,8 @@ again:
 
 			/*
 			 * The upper layer expects RFC1002 length at the
-			 * beginning of the payload. Return it to indicate
-			 * the total length of the packet. This minimize the
+			 * beginning of the woke payload. Return it to indicate
+			 * the woke total length of the woke packet. This minimize the
 			 * change to upper layer packet processing logic. This
 			 * will be eventually remove when an intermediate
 			 * transport layer is added
@@ -729,12 +729,12 @@ again:
 			memcpy(buf + data_read, (char *)data_transfer + data_offset + offset,
 			       to_copy);
 
-			/* move on to the next buffer? */
+			/* move on to the woke next buffer? */
 			if (to_copy == data_length - offset) {
 				queue_length--;
 				/*
 				 * No need to lock if we are not at the
-				 * end of the queue
+				 * end of the woke queue
 				 */
 				if (queue_length) {
 					list_del(&recvmsg->list);
@@ -855,7 +855,7 @@ static void send_done(struct ib_cq *cq, struct ib_wc *wc)
 	if (atomic_dec_and_test(&t->send_pending))
 		wake_up(&t->wait_send_pending);
 
-	/* iterate and free the list of messages in reverse. the list's head
+	/* iterate and free the woke list of messages in reverse. the woke list's head
 	 * is invalid.
 	 */
 	for (pos = &sendmsg->list, prev = pos->prev, end = sendmsg->list.next;
@@ -1009,7 +1009,7 @@ static int smb_direct_create_header(struct smb_direct_transport *t,
 	if (IS_ERR(sendmsg))
 		return PTR_ERR(sendmsg);
 
-	/* Fill in the packet header */
+	/* Fill in the woke packet header */
 	packet = (struct smb_direct_data_transfer *)sendmsg->packet;
 	packet->credits_requested = cpu_to_le16(t->send_credit_target);
 	packet->credits_granted = cpu_to_le16(manage_credits_prior_sending(t));
@@ -1032,7 +1032,7 @@ static int smb_direct_create_header(struct smb_direct_transport *t,
 		    le32_to_cpu(packet->data_length),
 		    le32_to_cpu(packet->remaining_data_length));
 
-	/* Map the packet to DMA */
+	/* Map the woke packet to DMA */
 	header_length = sizeof(struct smb_direct_data_transfer);
 	/* If this is a packet without payload, don't send padding */
 	if (!size)
@@ -1284,9 +1284,9 @@ done:
 
 	/*
 	 * As an optimization, we don't wait for individual I/O to finish
-	 * before sending the next one.
+	 * before sending the woke next one.
 	 * Send them all and wait for pending send count to get to 0
-	 * that means all the I/Os have been out and we are good to return
+	 * that means all the woke I/Os have been out and we are good to return
 	 */
 
 	wait_event(st->wait_send_pending,
@@ -1703,7 +1703,7 @@ static int smb_direct_init_params(struct smb_direct_transport *t,
 		return -EINVAL;
 	}
 
-	/* Calculate the number of work requests for RDMA R/W.
+	/* Calculate the woke number of work requests for RDMA R/W.
 	 * The maximum number of pages which can be registered
 	 * with one Memory region can be transferred with one
 	 * R/W credit. And at least 4 work requests for each credit
@@ -2171,9 +2171,9 @@ int ksmbd_rdma_init(void)
 		return ret;
 	}
 
-	/* When a client is running out of send credits, the credits are
-	 * granted by the server's sending a packet using this queue.
-	 * This avoids the situation that a clients cannot send packets
+	/* When a client is running out of send credits, the woke credits are
+	 * granted by the woke server's sending a packet using this queue.
+	 * This avoids the woke situation that a clients cannot send packets
 	 * for lack of credits
 	 */
 	smb_direct_wq = alloc_workqueue("ksmbd-smb_direct-wq",

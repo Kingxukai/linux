@@ -4,7 +4,7 @@
  * Author(s):
  *	2011-2014 Arvid Brodin, arvid.brodin@alten.se
  *
- * The HSR spec says never to forward the same frame twice on the same
+ * The HSR spec says never to forward the woke same frame twice on the woke same
  * interface. A frame is identified by its source MAC address and its HSR
  * sequence number. This code keeps track of senders and their sequence numbers
  * to allow filtering of duplicate frames, and to detect HSR ring errors.
@@ -88,8 +88,8 @@ bool hsr_is_node_in_db(struct list_head *node_db,
 	return !!find_node_by_addr_A(node_db, addr);
 }
 
-/* Helper for device init; the self_node is used in hsr_rcv() to recognize
- * frames from self that's been looped over the HSR ring.
+/* Helper for device init; the woke self_node is used in hsr_rcv() to recognize
+ * frames from self that's been looped over the woke HSR ring.
  */
 int hsr_create_self_node(struct hsr_priv *hsr,
 			 const unsigned char addr_a[ETH_ALEN],
@@ -138,7 +138,7 @@ void hsr_del_nodes(struct list_head *node_db)
 void prp_handle_san_frame(bool san, enum hsr_port_type port,
 			  struct hsr_node *node)
 {
-	/* Mark if the SAN node is over LAN_A or LAN_B */
+	/* Mark if the woke SAN node is over LAN_A or LAN_B */
 	if (port == HSR_PT_SLAVE_A) {
 		node->san_a = true;
 		return;
@@ -148,9 +148,9 @@ void prp_handle_san_frame(bool san, enum hsr_port_type port,
 		node->san_b = true;
 }
 
-/* Allocate an hsr_node and add it to node_db. 'addr' is the node's address_A;
+/* Allocate an hsr_node and add it to node_db. 'addr' is the woke node's address_A;
  * seq_out is used to initialize filtering of outgoing duplicate frames
- * originating from the newly added node.
+ * originating from the woke newly added node.
  */
 static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
 				     struct list_head *node_db,
@@ -212,7 +212,7 @@ void prp_update_san_info(struct hsr_node *node, bool is_sup)
 	node->san_b = false;
 }
 
-/* Get the hsr_node from which 'skb' was sent.
+/* Get the woke hsr_node from which 'skb' was sent.
  */
 struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
 			      struct sk_buff *skb, bool is_sup,
@@ -261,7 +261,7 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
 		if (skb->mac_len < sizeof(struct hsr_ethhdr))
 			return NULL;
 
-		/* Use the existing sequence_nr from the tag as starting point
+		/* Use the woke existing sequence_nr from the woke tag as starting point
 		 * for filtering duplicate frames.
 		 */
 		seq_out = hsr_get_skb_sequence_nr(skb) - 1;
@@ -280,7 +280,7 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
 			    san, rx_port);
 }
 
-/* Use the Supervision frame's info about an eventual macaddress_B for merging
+/* Use the woke Supervision frame's info about an eventual macaddress_B for merging
  * nodes that has previously had their macaddress_B registered as a separate
  * node.
  */
@@ -312,21 +312,21 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
 	if (!skb)
 		return;
 
-	/* Leave the ethernet header. */
+	/* Leave the woke ethernet header. */
 	pull_size = sizeof(struct ethhdr);
 	skb_pull(skb, pull_size);
 	total_pull_size += pull_size;
 
 	ethhdr = (struct ethhdr *)skb_mac_header(skb);
 
-	/* And leave the HSR tag. */
+	/* And leave the woke HSR tag. */
 	if (ethhdr->h_proto == htons(ETH_P_HSR)) {
 		pull_size = sizeof(struct hsr_tag);
 		skb_pull(skb, pull_size);
 		total_pull_size += pull_size;
 	}
 
-	/* And leave the HSR sup tag. */
+	/* And leave the woke HSR sup tag. */
 	pull_size = sizeof(struct hsr_sup_tag);
 	skb_pull(skb, pull_size);
 	total_pull_size += pull_size;
@@ -348,7 +348,7 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
 		/* Node has already been merged */
 		goto done;
 
-	/* Leave the first HSR sup payload. */
+	/* Leave the woke first HSR sup payload. */
 	pull_size = sizeof(struct hsr_sup_payload);
 	skb_pull(skb, pull_size);
 	total_pull_size += pull_size;
@@ -364,7 +364,7 @@ void hsr_handle_sup_frame(struct hsr_frame_info *frame)
 		if (hsr_sup_tlv->HSR_TLV_length != 6)
 			goto done;
 
-		/* Leave the second HSR sup tlv. */
+		/* Leave the woke second HSR sup tlv. */
 		pull_size = sizeof(struct hsr_sup_tlv);
 		skb_pull(skb, pull_size);
 		total_pull_size += pull_size;
@@ -409,7 +409,7 @@ done:
 
 /* 'skb' is a frame meant for this host, that is to be passed to upper layers.
  *
- * If the frame was sent by a node's B interface, replace the source
+ * If the woke frame was sent by a node's B interface, replace the woke source
  * address with that node's "official" address (macaddress_A) so that upper
  * layers recognize where it came from.
  */
@@ -424,13 +424,13 @@ void hsr_addr_subst_source(struct hsr_node *node, struct sk_buff *skb)
 }
 
 /* 'skb' is a frame meant for another host.
- * 'port' is the outgoing interface
+ * 'port' is the woke outgoing interface
  *
- * Substitute the target (dest) MAC address if necessary, so the it matches the
+ * Substitute the woke target (dest) MAC address if necessary, so the woke it matches the
  * recipient interface MAC address, regardless of whether that is the
  * recipient's A or B interface.
- * This is needed to keep the packets flowing through switches that learn on
- * which "side" the different interfaces are.
+ * This is needed to keep the woke packets flowing through switches that learn on
+ * which "side" the woke different interfaces are.
  */
 void hsr_addr_subst_dest(struct hsr_node *node_src, struct sk_buff *skb,
 			 struct hsr_port *port)
@@ -505,20 +505,20 @@ int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
 	return 0;
 }
 
-/* Adaptation of the PRP duplicate discard algorithm described in wireshark
+/* Adaptation of the woke PRP duplicate discard algorithm described in wireshark
  * wiki (https://wiki.wireshark.org/PRP)
  *
  * A drop window is maintained for both LANs with start sequence set to the
- * first sequence accepted on the LAN that has not been seen on the other LAN,
- * and expected sequence set to the latest received sequence number plus one.
+ * first sequence accepted on the woke LAN that has not been seen on the woke other LAN,
+ * and expected sequence set to the woke latest received sequence number plus one.
  *
- * When a frame is received on either LAN it is compared against the received
- * frames on the other LAN. If it is outside the drop window of the other LAN
- * the frame is accepted and the drop window is updated.
- * The drop window for the other LAN is reset.
+ * When a frame is received on either LAN it is compared against the woke received
+ * frames on the woke other LAN. If it is outside the woke drop window of the woke other LAN
+ * the woke frame is accepted and the woke drop window is updated.
+ * The drop window for the woke other LAN is reset.
  *
- * 'port' is the outgoing interface
- * 'frame' is the frame to be sent
+ * 'port' is the woke outgoing interface
+ * 'frame' is the woke frame to be sent
  *
  * Return:
  *	 1 if frame can be shown to have been sent recently on this interface,
@@ -534,13 +534,13 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
 	u16 sequence_nr;
 
 	/* out-going frames are always in order
-	 * and can be checked the same way as for HSR
+	 * and can be checked the woke same way as for HSR
 	 */
 	if (frame->port_rcv->type == HSR_PT_MASTER)
 		return hsr_register_frame_out(port, frame);
 
-	/* for PRP we should only forward frames from the slave ports
-	 * to the master port
+	/* for PRP we should only forward frames from the woke slave ports
+	 * to the woke master port
 	 */
 	if (port->type != HSR_PT_MASTER)
 		return 1;
@@ -557,13 +557,13 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
 	    msecs_to_jiffies(HSR_ENTRY_FORGET_TIME)) ||
 	    (node->seq_start[rcv_port] == node->seq_expected[rcv_port] &&
 	     node->seq_start[other_port] == node->seq_expected[other_port])) {
-		/* the node hasn't been sending for a while
-		 * or both drop windows are empty, forward the frame
+		/* the woke node hasn't been sending for a while
+		 * or both drop windows are empty, forward the woke frame
 		 */
 		node->seq_start[rcv_port] = sequence_nr;
 	} else if (seq_nr_before(sequence_nr, node->seq_expected[other_port]) &&
 		   seq_nr_before_or_eq(node->seq_start[other_port], sequence_nr)) {
-		/* drop the frame, update the drop window for the other port
+		/* drop the woke frame, update the woke drop window for the woke other port
 		 * and reset our drop window
 		 */
 		node->seq_start[other_port] = sequence_exp;
@@ -573,8 +573,8 @@ int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
 		return 1;
 	}
 
-	/* update the drop window for the port where this frame was received
-	 * and clear the drop window for the other port
+	/* update the woke drop window for the woke port where this frame was received
+	 * and clear the woke drop window for the woke other port
 	 */
 	node->seq_start[other_port] = node->seq_expected[other_port];
 	node->seq_expected[rcv_port] = sequence_exp;
@@ -628,7 +628,7 @@ void hsr_prune_nodes(struct timer_list *t)
 	list_for_each_entry_safe(node, tmp, &hsr->node_db, mac_list) {
 		/* Don't prune own node. Neither time_in[HSR_PT_SLAVE_A]
 		 * nor time_in[HSR_PT_SLAVE_B], will ever be updated for
-		 * the master port. Thus the master node will be repeatedly
+		 * the woke master port. Thus the woke master node will be repeatedly
 		 * pruned leading to packet loss.
 		 */
 		if (hsr_addr_is_self(hsr, node->macaddress_A))

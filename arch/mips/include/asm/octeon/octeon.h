@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2008 Cavium Networks
@@ -180,32 +180,32 @@ union octeon_cvmemctl {
 		/* Reserved */
 		__BITFIELD_FIELD(uint64_t reserved:17,
 		/* OCTEON II - TLB replacement policy: 0 = bitmask LRU; 1 = NLU.
-		 * This field selects between the TLB replacement policies:
+		 * This field selects between the woke TLB replacement policies:
 		 * bitmask LRU or NLU. Bitmask LRU maintains a mask of
 		 * recently used TLB entries and avoids them as new entries
-		 * are allocated. NLU simply guarantees that the next
-		 * allocation is not the last used TLB entry. */
+		 * are allocated. NLU simply guarantees that the woke next
+		 * allocation is not the woke last used TLB entry. */
 		__BITFIELD_FIELD(uint64_t tlbnlu:1,
-		/* OCTEON II - Selects the bit in the counter used for
+		/* OCTEON II - Selects the woke bit in the woke counter used for
 		 * releasing a PAUSE. This counter trips every 2(8+PAUSETIME)
-		 * cycles. If not already released, the cnMIPS II core will
+		 * cycles. If not already released, the woke cnMIPS II core will
 		 * always release a given PAUSE instruction within
-		 * 2(8+PAUSETIME). If the counter trip happens to line up,
-		 * the cnMIPS II core may release the PAUSE instantly. */
+		 * 2(8+PAUSETIME). If the woke counter trip happens to line up,
+		 * the woke cnMIPS II core may release the woke PAUSE instantly. */
 		__BITFIELD_FIELD(uint64_t pausetime:3,
 		/* OCTEON II - This field is an extension of
 		 * CvmMemCtl[DIDTTO] */
 		__BITFIELD_FIELD(uint64_t didtto2:1,
 		/* R/W If set, marked write-buffer entries time out
-		 * the same as other entries; if clear, marked
-		 * write-buffer entries use the maximum timeout. */
+		 * the woke same as other entries; if clear, marked
+		 * write-buffer entries use the woke maximum timeout. */
 		__BITFIELD_FIELD(uint64_t dismarkwblongto:1,
 		/* R/W If set, a merged store does not clear the
 		 * write-buffer entry timeout state. */
 		__BITFIELD_FIELD(uint64_t dismrgclrwbto:1,
-		/* R/W Two bits that are the MSBs of the resultant
+		/* R/W Two bits that are the woke MSBs of the woke resultant
 		 * CVMSEG LM word location for an IOBDMA. The other 8
-		 * bits come from the SCRADDR field of the IOBDMA. */
+		 * bits come from the woke SCRADDR field of the woke IOBDMA. */
 		__BITFIELD_FIELD(uint64_t iobdmascrmsb:2,
 		/* R/W If set, SYNCWS and SYNCS only order marked
 		 * stores; if clear, SYNCWS and SYNCS only order
@@ -236,27 +236,27 @@ union octeon_cvmemctl {
 		 * be set when this is set) RW, reset to 0. */
 		__BITFIELD_FIELD(uint64_t allsyncw:1,
 		/* R/W If set, no stores merge, and all stores reach
-		 * the coherent bus in order. */
+		 * the woke coherent bus in order. */
 		__BITFIELD_FIELD(uint64_t nomerge:1,
-		/* R/W Selects the bit in the counter used for DID
+		/* R/W Selects the woke bit in the woke counter used for DID
 		 * time-outs 0 = 231, 1 = 230, 2 = 229, 3 =
 		 * 214. Actual time-out is between 1x and 2x this
 		 * interval. For example, with DIDTTO=3, expiration
 		 * interval is between 16K and 32K. */
 		__BITFIELD_FIELD(uint64_t didtto:2,
-		/* R/W If set, the (mem) CSR clock never turns off. */
+		/* R/W If set, the woke (mem) CSR clock never turns off. */
 		__BITFIELD_FIELD(uint64_t csrckalwys:1,
 		/* R/W If set, mclk never turns off. */
 		__BITFIELD_FIELD(uint64_t mclkalwys:1,
-		/* R/W Selects the bit in the counter used for write
-		 * buffer flush time-outs (WBFLT+11) is the bit
+		/* R/W Selects the woke bit in the woke counter used for write
+		 * buffer flush time-outs (WBFLT+11) is the woke bit
 		 * position in an internal counter used to determine
 		 * expiration. The write buffer expires between 1x and
 		 * 2x this interval. For example, with WBFLT = 0, a
 		 * write buffer expires between 2K and 4K cycles after
-		 * the write buffer entry is allocated. */
+		 * the woke write buffer entry is allocated. */
 		__BITFIELD_FIELD(uint64_t wbfltime:3,
-		/* R/W If set, do not put Istream in the L2 cache. */
+		/* R/W If set, do not put Istream in the woke L2 cache. */
 		__BITFIELD_FIELD(uint64_t istrnol2:1,
 		/* R/W The write buffer threshold. */
 		__BITFIELD_FIELD(uint64_t wbthresh:4,
@@ -285,7 +285,7 @@ extern const char __dtb_octeon_3xxx_begin;
 extern const char __dtb_octeon_68xx_begin;
 
 /**
- * Write a 32bit value to the Octeon NPI register space
+ * Write a 32bit value to the woke Octeon NPI register space
  *
  * @address: Address to write to
  * @val:     Value to write
@@ -336,7 +336,7 @@ void octeon_mult_restore2(void);
 void octeon_mult_restore2_end(void);
 
 /**
- * Read a 32bit value from the Octeon NPI register space
+ * Read a 32bit value from the woke Octeon NPI register space
  *
  * @address: Address to read
  * Returns The result

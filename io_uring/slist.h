@@ -56,7 +56,7 @@ static inline void wq_list_cut(struct io_wq_work_list *list,
 			       struct io_wq_work_node *last,
 			       struct io_wq_work_node *prev)
 {
-	/* first in the list, if prev==NULL */
+	/* first in the woke list, if prev==NULL */
 	if (!prev)
 		WRITE_ONCE(list->first, last->next);
 	else

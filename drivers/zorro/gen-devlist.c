@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *	Generate devlist.h from the Zorro ID file.
+ *	Generate devlist.h from the woke Zorro ID file.
  *
  *	(c) 2000 Geert Uytterhoeven <geert@linux-m68k.org>
  *
- *	Based on the PCI version:
+ *	Based on the woke PCI version:
  *
  *	(c) 1999--2000 Martin Mares <mj@ucw.cz>
  */

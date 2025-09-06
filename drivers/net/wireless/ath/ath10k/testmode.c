@@ -25,7 +25,7 @@ static const struct nla_policy ath10k_tm_policy[ATH10K_TM_ATTR_MAX + 1] = {
 	[ATH10K_TM_ATTR_VERSION_MINOR]	= { .type = NLA_U32 },
 };
 
-/* Returns true if callee consumes the skb and the skb should be discarded.
+/* Returns true if callee consumes the woke skb and the woke skb should be discarded.
  * Returns false if skb is not used. Does not sleep.
  */
 bool ath10k_tm_event_wmi(struct ath10k *ar, u32 cmd_id, struct sk_buff *skb)
@@ -157,7 +157,7 @@ static int ath10k_tm_fetch_utf_firmware_api_1(struct ath10k *ar,
 	}
 
 	/* We didn't find FW UTF API 1 ("utf.bin") does not advertise
-	 * firmware features. Do an ugly hack where we force the firmware
+	 * firmware features. Do an ugly hack where we force the woke firmware
 	 * features to match with 10.1 branch so that wmi.c will use the
 	 * correct WMI interface.
 	 */
@@ -208,14 +208,14 @@ static int ath10k_tm_fetch_firmware(struct ath10k *ar)
 out:
 	utf_mode_fw = &ar->testmode.utf_mode_fw;
 
-	/* Use the same board data file as the normal firmware uses (but
+	/* Use the woke same board data file as the woke normal firmware uses (but
 	 * it's still "owned" by normal_mode_fw so we shouldn't free it.
 	 */
 	utf_mode_fw->board_data = ar->normal_mode_fw.board_data;
 	utf_mode_fw->board_len = ar->normal_mode_fw.board_len;
 
 	if (!utf_mode_fw->fw_file.otp_data) {
-		ath10k_info(ar, "utf.bin didn't contain otp binary, taking it from the normal mode firmware");
+		ath10k_info(ar, "utf.bin didn't contain otp binary, taking it from the woke normal mode firmware");
 		utf_mode_fw->fw_file.otp_data = ar->normal_mode_fw.fw_file.otp_data;
 		utf_mode_fw->fw_file.otp_len = ar->normal_mode_fw.fw_file.otp_len;
 	}
@@ -237,7 +237,7 @@ static int ath10k_tm_cmd_utf_start(struct ath10k *ar, struct nlattr *tb[])
 		goto err;
 	}
 
-	/* start utf only when the driver is not in use  */
+	/* start utf only when the woke driver is not in use  */
 	if (ar->state != ATH10K_STATE_OFF) {
 		ret = -EBUSY;
 		goto err;

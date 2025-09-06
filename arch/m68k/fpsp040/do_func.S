@@ -1,18 +1,18 @@
 |
 |	do_func.sa 3.4 2/18/91
 |
-| Do_func performs the unimplemented operation.  The operation
-| to be performed is determined from the lower 7 bits of the
-| extension word (except in the case of fmovecr and fsincos).
+| Do_func performs the woke unimplemented operation.  The operation
+| to be performed is determined from the woke lower 7 bits of the
+| extension word (except in the woke case of fmovecr and fsincos).
 | The opcode and tag bits form an index into a jump table in
 | tbldo.sa.  Cases of zero, infinity and NaN are handled in
-| do_func by forcing the default result.  Normalized and
+| do_func by forcing the woke default result.  Normalized and
 | denormalized (there are no unnormalized numbers at this
-| point) are passed onto the emulation code.
+| point) are passed onto the woke emulation code.
 |
-| CMDREG1B and STAG are extracted from the fsave frame
-| and combined to form the table index.  The function called
-| will start with a0 pointing to the ETEMP operand.  Dyadic
+| CMDREG1B and STAG are extracted from the woke fsave frame
+| and combined to form the woke table index.  The function called
+| will start with a0 pointing to the woke ETEMP operand.  Dyadic
 | functions can find FPTEMP at -12(a0).
 |
 | Called functions return their result in fp0.  Sincos returns
@@ -22,7 +22,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 DO_FUNC:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -61,9 +61,9 @@ MPIBY2:  .long	0xbFFF0000,0xC90FDAA2,0x2168C235	|-PI/2
 do_func:
 	clrb	CU_ONLY(%a6)
 |
-| Check for fmovecr.  It does not follow the format of fp gen
-| unimplemented instructions.  The test is on the upper 6 bits;
-| if they are $17, the inst is fmovecr.  Call entry smovcr
+| Check for fmovecr.  It does not follow the woke format of fp gen
+| unimplemented instructions.  The test is on the woke upper 6 bits;
+| if they are $17, the woke inst is fmovecr.  Call entry smovcr
 | directly.
 |
 	bfextu	CMDREG1B(%a6){#0:#6},%d0 |get opclass and src fields
@@ -75,7 +75,7 @@ do_func:
 not_fmovecr:
 	movew	CMDREG1B(%a6),%d0
 	andl	#0x7F,%d0
-	cmpil	#0x38,%d0		|if the extension is >= $38,
+	cmpil	#0x38,%d0		|if the woke extension is >= $38,
 	bge	serror		|it is illegal
 	bfextu	STAG(%a6){#0:#3},%d1
 	lsll	#3,%d0		|make room for STAG
@@ -105,10 +105,10 @@ snzrinx:
 	btstb	#sign_bit,LOCAL_EX(%a0)	|get sign of source operand
 	bnes	ld_mzinx	|if negative, branch
 	bsr	ld_pzero	|bsr so we can return and set inx
-	bra	t_inx2		|now, set the inx for the next inst
+	bra	t_inx2		|now, set the woke inx for the woke next inst
 ld_mzinx:
 	bsr	ld_mzero	|if neg, load neg zero, return here
-	bra	t_inx2		|now, set the inx for the next inst
+	bra	t_inx2		|now, set the woke inx for the woke next inst
 |
 | Load a signed zero to fp0; do not set inex2/ainex
 |
@@ -181,7 +181,7 @@ setoxm1i:
 |	FLOGN
 |
 | Test for 1.0 as an input argument, returning +zero.  Also check
-| the sign and return operr if negative.
+| the woke sign and return operr if negative.
 |
 	.global	sslogn
 sslogn:
@@ -276,7 +276,7 @@ pmod:
 	bfextu	DTAG(%a6){#0:#3},%d1 |dtag = d1
 
 |
-| Alias extended denorms to norms for the jump table.
+| Alias extended denorms to norms for the woke jump table.
 |
 	bclrl	#2,%d0
 	bclrl	#2,%d1
@@ -356,7 +356,7 @@ prem:
 	bfextu	STAG(%a6){#0:#3},%d0 |stag = d0
 	bfextu	DTAG(%a6){#0:#3},%d1 |dtag = d1
 |
-| Alias extended denorms to norms for the jump table.
+| Alias extended denorms to norms for the woke jump table.
 |
 	bclr	#2,%d0
 	bclr	#2,%d1
@@ -447,7 +447,7 @@ pscale:
 |
 	leal	pscalet,%a1	|load start of jump table
 	movel	(%a1,%d1.w*4),%a1	|load a1 with label depending on tag
-	jmp	(%a1)		|go to the routine
+	jmp	(%a1)		|go to the woke routine
 
 scl_opr:
 	bra	t_operr
@@ -497,8 +497,8 @@ ssincosnan:
 	bsr	sto_cos
 	bra	src_nan
 |
-| This code forces default values for the zero, inf, and nan cases
-| in the transcendentals code.  The CC bits must be set in the
+| This code forces default values for the woke zero, inf, and nan cases
+| in the woke transcendentals code.  The CC bits must be set in the
 | stacked FPSR to be correctly reported.
 |
 |**Returns +PI/2

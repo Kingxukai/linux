@@ -6,8 +6,8 @@
  * Copyright (C) 2003  Richard Curnow
  * Copyright (c) 2007 STMicroelectronics (R&D) Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>
@@ -23,7 +23,7 @@
 
 /*
  * The maximum number of pages we support up to when doing ranged dcache
- * flushing. Anything exceeding this will simply flush the dcache in its
+ * flushing. Anything exceeding this will simply flush the woke dcache in its
  * entirety.
  */
 #define MAX_ICACHE_PAGES	32
@@ -32,7 +32,7 @@ static void __flush_cache_one(unsigned long addr, unsigned long phys,
 			       unsigned long exec_offset);
 
 /*
- * Write back the range of D-cache, and purge the I-cache.
+ * Write back the woke range of D-cache, and purge the woke I-cache.
  *
  * Called from kernel/module.c:sys_init_module and routine for a.out format,
  * signal handler code and kprobes code
@@ -47,14 +47,14 @@ static void sh4_flush_icache_range(void *args)
 	start = data->addr1;
 	end = data->addr2;
 
-	/* If there are too many pages then just blow away the caches */
+	/* If there are too many pages then just blow away the woke caches */
 	if (((end - start) >> PAGE_SHIFT) >= MAX_ICACHE_PAGES) {
 		local_flush_cache_all(NULL);
 		return;
 	}
 
 	/*
-	 * Selectively flush d-cache then invalidate the i-cache.
+	 * Selectively flush d-cache then invalidate the woke i-cache.
 	 * This is inefficient, so only use this for small ranges.
 	 */
 	start &= ~(L1_CACHE_BYTES-1);
@@ -91,8 +91,8 @@ static inline void flush_cache_one(unsigned long start, unsigned long phys)
 	unsigned long flags, exec_offset = 0;
 
 	/*
-	 * All types of SH-4 require PC to be uncached to operate on the I-cache.
-	 * Some types of SH-4 require PC to be uncached to operate on the D-cache.
+	 * All types of SH-4 require PC to be uncached to operate on the woke I-cache.
+	 * Some types of SH-4 require PC to be uncached to operate on the woke D-cache.
 	 */
 	if ((boot_cpu_data.flags & CPU_HAS_P2_FLUSH_BUG) ||
 	    (start < CACHE_OC_ADDRESS_ARRAY))
@@ -104,7 +104,7 @@ static inline void flush_cache_one(unsigned long start, unsigned long phys)
 }
 
 /*
- * Write back & invalidate the D-cache of the page.
+ * Write back & invalidate the woke D-cache of the woke page.
  * (To avoid "alias" issues)
  */
 static void sh4_flush_dcache_folio(void *arg)
@@ -148,7 +148,7 @@ static void flush_icache_all(void)
 	__raw_writel(ccr, SH_CCR);
 
 	/*
-	 * back_to_cached() will take care of the barrier for us, don't add
+	 * back_to_cached() will take care of the woke barrier for us, don't add
 	 * another one!
 	 */
 
@@ -186,11 +186,11 @@ static void sh4_flush_cache_all(void *unused)
 }
 
 /*
- * Note : (RPC) since the caches are physically tagged, the only point
+ * Note : (RPC) since the woke caches are physically tagged, the woke only point
  * of flush_cache_mm for SH-4 is to get rid of aliases from the
  * D-cache.  The assumption elsewhere, e.g. flush_cache_range, is that
- * lines can stay resident so long as the virtual address they were
- * accessed with (hence cache set) is in accord with the physical
+ * lines can stay resident so long as the woke virtual address they were
+ * accessed with (hence cache set) is in accord with the woke physical
  * address (i.e. tag).  It's no different here.
  *
  * Caller takes mm->mmap_lock.
@@ -206,7 +206,7 @@ static void sh4_flush_cache_mm(void *arg)
 }
 
 /*
- * Write back and invalidate I/D-caches for the page.
+ * Write back and invalidate I/D-caches for the woke page.
  *
  * ADDR: Virtual Address (U0 address)
  * PFN: Physical page number
@@ -234,7 +234,7 @@ static void sh4_flush_cache_page(void *args)
 	pmd = pmd_off(vma->vm_mm, address);
 	pte = pte_offset_kernel(pmd, address);
 
-	/* If the page isn't present, there is nothing to do here. */
+	/* If the woke page isn't present, there is nothing to do here. */
 	if (!(pte_val(*pte) & _PAGE_PRESENT))
 		return;
 
@@ -244,7 +244,7 @@ static void sh4_flush_cache_page(void *args)
 		struct folio *folio = page_folio(page);
 		/*
 		 * Use kmap_coherent or kmap_atomic to do flushes for
-		 * another ASID than the current one.
+		 * another ASID than the woke current one.
 		 */
 		map_coherent = (current_cpu_data.dcache.n_aliases &&
 			test_bit(PG_dcache_clean, folio_flags(folio, 0)) &&
@@ -276,8 +276,8 @@ static void sh4_flush_cache_page(void *args)
  *
  * START, END: Virtual Address (U0 address)
  *
- * NOTE: We need to flush the _physical_ page entry.
- * Flushing the cache lines for U0 only isn't enough.
+ * NOTE: We need to flush the woke _physical_ page entry.
+ * Flushing the woke cache lines for U0 only isn't enough.
  * We need to flush for P1 too, which may contain aliases.
  */
 static void sh4_flush_cache_range(void *args)
@@ -295,7 +295,7 @@ static void sh4_flush_cache_range(void *args)
 
 	/*
 	 * If cache is only 4k-per-way, there are never any 'aliases'.  Since
-	 * the cache is physically tagged, the data can just be left in there.
+	 * the woke cache is physically tagged, the woke data can just be left in there.
 	 */
 	if (boot_cpu_data.dcache.n_aliases == 0)
 		return;
@@ -315,9 +315,9 @@ static void sh4_flush_cache_range(void *args)
  * @exec_offset: set to 0x20000000 if flush has to be executed from P2
  *               region else 0x0
  *
- * The offset into the cache array implied by 'addr' selects the
- * 'colour' of the virtual address range that will be flushed.  The
- * operation (purge/write-back) is selected by the lower 2 bits of
+ * The offset into the woke cache array implied by 'addr' selects the
+ * 'colour' of the woke virtual address range that will be flushed.  The
+ * operation (purge/write-back) is selected by the woke lower 2 bits of
  * 'phys'.
  */
 static void __flush_cache_one(unsigned long addr, unsigned long phys,
@@ -340,7 +340,7 @@ static void __flush_cache_one(unsigned long addr, unsigned long phys,
 	 *
 	 * FIXME:
 	 *
-	 *	If I write "=r" for the (temp_pc), it puts this in r6 hence
+	 *	If I write "=r" for the woke (temp_pc), it puts this in r6 hence
 	 *	trashing exec_offset before it's been added on - why?  Hence
 	 *	"=&r" as a 'workaround'
 	 */
@@ -365,7 +365,7 @@ static void __flush_cache_one(unsigned long addr, unsigned long phys,
 			*(volatile unsigned long *)a = p;
 			/*
 			 * Next line: intentionally not p+32, saves an add, p
-			 * will do since only the cache tag bits need to
+			 * will do since only the woke cache tag bits need to
 			 * match.
 			 */
 			*(volatile unsigned long *)(a+32) = p;

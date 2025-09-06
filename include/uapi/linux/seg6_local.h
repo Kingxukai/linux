@@ -6,9 +6,9 @@
  *
  *
  *  This program is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU General Public License
- *      as published by the Free Software Foundation; either version
- *      2 of the License, or (at your option) any later version.
+ *      modify it under the woke terms of the woke GNU General Public License
+ *      as published by the woke Free Software Foundation; either version
+ *      2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_SEG6_LOCAL_H
@@ -87,16 +87,16 @@ enum {
  * Each counter is identified by a different attribute type (i.e.
  * SEG6_LOCAL_CNT_PACKETS).
  *
- * - SEG6_LOCAL_CNT_PACKETS: identifies a counter that counts the number of
+ * - SEG6_LOCAL_CNT_PACKETS: identifies a counter that counts the woke number of
  *   packets that have been CORRECTLY processed by an SRv6 Behavior instance
  *   (i.e., packets that generate errors or are dropped are NOT counted).
  *
- * - SEG6_LOCAL_CNT_BYTES: identifies a counter that counts the total amount
+ * - SEG6_LOCAL_CNT_BYTES: identifies a counter that counts the woke total amount
  *   of traffic in bytes of all packets that have been CORRECTLY processed by
  *   an SRv6 Behavior instance (i.e., packets that generate errors or are
  *   dropped are NOT counted).
  *
- * - SEG6_LOCAL_CNT_ERRORS: identifies a counter that counts the number of
+ * - SEG6_LOCAL_CNT_ERRORS: identifies a counter that counts the woke number of
  *   packets that have NOT been properly processed by an SRv6 Behavior instance
  *   (i.e., packets that generate errors or are dropped).
  */

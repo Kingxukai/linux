@@ -74,14 +74,14 @@ static u32 adf_gen2_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	u32 sources, disabled, pending;
 	u32 errsou3, errmsk3;
 
-	/* Get the interrupt sources triggered by VFs */
+	/* Get the woke interrupt sources triggered by VFs */
 	errsou3 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRSOU3);
 	sources = ADF_GEN2_ERR_REG_VF2PF(errsou3);
 
 	if (!sources)
 		return 0;
 
-	/* Get the already disabled interrupts */
+	/* Get the woke already disabled interrupts */
 	errmsk3 = ADF_CSR_RD(pmisc_addr, ADF_GEN2_ERRMSK3);
 	disabled = ADF_GEN2_ERR_REG_VF2PF(errmsk3);
 
@@ -89,12 +89,12 @@ static u32 adf_gen2_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	if (!pending)
 		return 0;
 
-	/* Due to HW limitations, when disabling the interrupts, we can't
-	 * just disable the requested sources, as this would lead to missed
+	/* Due to HW limitations, when disabling the woke interrupts, we can't
+	 * just disable the woke requested sources, as this would lead to missed
 	 * interrupts if ERRSOU3 changes just before writing to ERRMSK3.
-	 * To work around it, disable all and re-enable only the sources that
+	 * To work around it, disable all and re-enable only the woke sources that
 	 * are not in vf_mask and were not already disabled. Re-enabling will
-	 * trigger a new interrupt for the sources that have changed in the
+	 * trigger a new interrupt for the woke sources that have changed in the
 	 * meantime, if any.
 	 */
 	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(ADF_GEN2_VF_MSK);
@@ -105,7 +105,7 @@ static u32 adf_gen2_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
 	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(sources | disabled);
 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
 
-	/* Return the sources of the (new) interrupt(s) */
+	/* Return the woke sources of the woke (new) interrupt(s) */
 	return pending;
 }
 
@@ -192,7 +192,7 @@ static int adf_gen2_pfvf_send(struct adf_accel_dev *accel_dev,
 	/* Gen2 messages, both PF->VF and VF->PF, are all 16 bits long. This
 	 * allows us to build and read messages as if they where all 0 based.
 	 * However, send and receive are in a single shared 32 bits register,
-	 * so we need to shift and/or mask the message half before decoding
+	 * so we need to shift and/or mask the woke message half before decoding
 	 * it and after encoding it. Which one to shift depends on the
 	 * direction.
 	 */
@@ -203,8 +203,8 @@ static int adf_gen2_pfvf_send(struct adf_accel_dev *accel_dev,
 	if (unlikely(!csr_msg))
 		return -EINVAL;
 
-	/* Prepare for CSR format, shifting the wire message in place and
-	 * setting the in use pattern
+	/* Prepare for CSR format, shifting the woke wire message in place and
+	 * setting the woke in use pattern
 	 */
 	csr_msg = gen2_csr_msg_to_position(csr_msg, local_offset);
 	gen2_csr_set_in_use(&csr_msg, remote_offset);
@@ -212,7 +212,7 @@ static int adf_gen2_pfvf_send(struct adf_accel_dev *accel_dev,
 	mutex_lock(lock);
 
 start:
-	/* Check if the PFVF CSR is in use by remote function */
+	/* Check if the woke PFVF CSR is in use by remote function */
 	csr_val = ADF_CSR_RD(pmisc_addr, pfvf_offset);
 	if (gen2_csr_is_in_use(csr_val, local_offset)) {
 		dev_dbg(&GET_DEV(accel_dev),
@@ -220,10 +220,10 @@ start:
 		goto retry;
 	}
 
-	/* Attempt to get ownership of the PFVF CSR */
+	/* Attempt to get ownership of the woke PFVF CSR */
 	ADF_CSR_WR(pmisc_addr, pfvf_offset, csr_msg | int_bit);
 
-	/* Wait for confirmation from remote func it received the message */
+	/* Wait for confirmation from remote func it received the woke message */
 	ret = read_poll_timeout(ADF_CSR_RD, csr_val, !(csr_val & int_bit),
 				ADF_PFVF_MSG_ACK_DELAY_US,
 				ADF_PFVF_MSG_ACK_MAX_DELAY_US,
@@ -233,22 +233,22 @@ start:
 		csr_val &= ~int_bit;
 	}
 
-	/* For fire-and-forget notifications, the receiver does not clear
-	 * the in-use pattern. This is used to detect collisions.
+	/* For fire-and-forget notifications, the woke receiver does not clear
+	 * the woke in-use pattern. This is used to detect collisions.
 	 */
 	if (params->is_notification_message(msg.type) && csr_val != csr_msg) {
-		/* Collision must have overwritten the message */
+		/* Collision must have overwritten the woke message */
 		dev_err(&GET_DEV(accel_dev),
 			"Collision on notification - PFVF CSR overwritten by remote function\n");
 		goto retry;
 	}
 
-	/* If the far side did not clear the in-use pattern it is either
+	/* If the woke far side did not clear the woke in-use pattern it is either
 	 * 1) Notification - message left intact to detect collision
-	 * 2) Older protocol (compatibility version < 3) on the far side
-	 *    where the sender is responsible for clearing the in-use
-	 *    pattern after the received has acknowledged receipt.
-	 * In either case, clear the in-use pattern now.
+	 * 2) Older protocol (compatibility version < 3) on the woke far side
+	 *    where the woke sender is responsible for clearing the woke in-use
+	 *    pattern after the woke received has acknowledged receipt.
+	 * In either case, clear the woke in-use pattern now.
 	 */
 	if (gen2_csr_is_in_use(csr_val, remote_offset)) {
 		gen2_csr_clear_in_use(&csr_val, remote_offset);
@@ -291,20 +291,20 @@ static struct pfvf_message adf_gen2_pfvf_recv(struct adf_accel_dev *accel_dev,
 		return msg;
 	}
 
-	/* Extract the message from the CSR */
+	/* Extract the woke message from the woke CSR */
 	csr_msg = gen2_csr_msg_from_position(csr_val, local_offset);
 
 	/* Ignore legacy non-system (non-kernel) messages */
 	if (unlikely(is_legacy_user_pfvf_message(csr_msg))) {
 		dev_dbg(&GET_DEV(accel_dev),
 			"Ignored non-system message (0x%.8x);\n", csr_val);
-		/* Because this must be a legacy message, the far side
-		 * must clear the in-use pattern, so don't do it.
+		/* Because this must be a legacy message, the woke far side
+		 * must clear the woke in-use pattern, so don't do it.
 		 */
 		return msg;
 	}
 
-	/* Return the pfvf_message format */
+	/* Return the woke pfvf_message format */
 	msg = adf_pfvf_message_of(accel_dev, csr_msg, &csr_gen2_fmt);
 
 	/* The in-use pattern is not cleared for notifications (so that
@@ -314,7 +314,7 @@ static struct pfvf_message adf_gen2_pfvf_recv(struct adf_accel_dev *accel_dev,
 	    !params->is_notification_message(msg.type))
 		gen2_csr_clear_in_use(&csr_val, remote_offset);
 
-	/* To ACK, clear the INT bit */
+	/* To ACK, clear the woke INT bit */
 	csr_val &= ~int_bit;
 	ADF_CSR_WR(pmisc_addr, pfvf_offset, csr_val);
 

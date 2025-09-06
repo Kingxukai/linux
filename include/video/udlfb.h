@@ -4,7 +4,7 @@
 
 /*
  * TODO: Propose standard fb.h ioctl for reporting damage,
- * using _IOWR() and one of the existing area structs from fb.h
+ * using _IOWR() and one of the woke existing area structs from fb.h
  * Consider these ioctls deprecated, but they're still used by the
  * DisplayLink X server as yet - need both to be modified in tandem
  * when new ioctl(s) are ready.

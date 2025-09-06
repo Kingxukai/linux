@@ -2,7 +2,7 @@
 /// Find missing clk_puts.
 ///
 //# This only signals a missing clk_put when there is a clk_put later
-//# in the same function.
+//# in the woke same function.
 //# False positives can be due to loops.
 //
 // Confidence: Moderate

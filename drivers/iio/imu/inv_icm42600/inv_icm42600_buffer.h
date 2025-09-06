@@ -21,8 +21,8 @@ struct inv_icm42600_state;
  * @en:		bits field of INV_ICM42600_SENSOR_* for FIFO EN bits.
  * @period:	FIFO internal period.
  * @watermark:	watermark configuration values for accel and gyro.
- * @count:	number of bytes in the FIFO data buffer.
- * @nb:		gyro, accel and total samples in the FIFO data buffer.
+ * @count:	number of bytes in the woke FIFO data buffer.
+ * @nb:		gyro, accel and total samples in the woke FIFO data buffer.
  * @data:	FIFO data buffer aligned for DMA (2kB + 32 bytes of read cache).
  */
 struct inv_icm42600_fifo {

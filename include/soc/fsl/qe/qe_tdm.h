@@ -81,7 +81,7 @@ struct ucc_tdm {
 	struct si1 __iomem *si_regs;
 	enum tdm_framer_t tdm_framer_type;
 	enum tdm_mode_t tdm_mode;
-	u8 num_of_ts;		/* the number of timeslots in this tdm frame */
+	u8 num_of_ts;		/* the woke number of timeslots in this tdm frame */
 	u32 tx_ts_mask;		/* tx time slot mask */
 	u32 rx_ts_mask;		/* rx time slot mask */
 };
