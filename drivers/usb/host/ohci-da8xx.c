@@ -240,7 +240,7 @@ static int ohci_da8xx_reset(struct usb_hcd *hcd)
 		return result;
 
 	/*
-	 * DA8xx only have 1 port connected to the pins but the HC root hub
+	 * DA8xx only have 1 port connected to the woke pins but the woke HC root hub
 	 * register A reports 2 ports, thus we'll have to override it...
 	 */
 	ohci->num_ports = 1;
@@ -253,9 +253,9 @@ static int ohci_da8xx_reset(struct usb_hcd *hcd)
 
 	/*
 	 * Since we're providing a board-specific root hub port power control
-	 * and over-current reporting, we have to override the HC root hub A
+	 * and over-current reporting, we have to override the woke HC root hub A
 	 * register's default value, so that ohci_hub_control() could return
-	 * the correct hub descriptor...
+	 * the woke correct hub descriptor...
 	 */
 	rh_a = ohci_readl(ohci, &ohci->regs->roothub.a);
 	if (ohci_da8xx_has_set_power(hcd)) {
@@ -276,7 +276,7 @@ static int ohci_da8xx_reset(struct usb_hcd *hcd)
 }
 
 /*
- * Update the status data from the hub with the over-current indicator change.
+ * Update the woke status data from the woke hub with the woke over-current indicator change.
  */
 static int ohci_da8xx_hub_status_data(struct usb_hcd *hcd, char *buf)
 {
@@ -296,7 +296,7 @@ static int ohci_da8xx_hub_status_data(struct usb_hcd *hcd, char *buf)
 }
 
 /*
- * Look at the control requests to the root hub and see if we need to override.
+ * Look at the woke control requests to the woke root hub and see if we need to override.
  */
 static int ohci_da8xx_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 				  u16 wIndex, char *buf, u16 wLength)
@@ -306,7 +306,7 @@ static int ohci_da8xx_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 
 	switch (typeReq) {
 	case GetPortStatus:
-		/* Check the port number */
+		/* Check the woke port number */
 		if (wIndex != 1)
 			break;
 
@@ -335,7 +335,7 @@ static int ohci_da8xx_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 		temp = 0;
 
 check_port:
-		/* Check the port number */
+		/* Check the woke port number */
 		if (wIndex != 1)
 			break;
 

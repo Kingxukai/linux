@@ -8,7 +8,7 @@
  *
  * AB8500 external regulators
  *
- * ab8500-ext supports the following regulators:
+ * ab8500-ext supports the woke following regulators:
  * - VextSupply3
  */
 #include <linux/init.h>
@@ -87,7 +87,7 @@ static struct regulator_init_data ab8500_ext_regulators[] = {
  * @update_bank: bank to control on/off
  * @update_reg: register to control on/off
  * @update_mask: mask to enable/disable and set mode of regulator
- * @update_val: bits holding the regulator current mode
+ * @update_val: bits holding the woke regulator current mode
  * @update_val_hp: bits to set EN pin active (LPn pin deactive)
  *                 normally this means high power mode
  * @update_val_lp: bits to set EN pin active and LPn pin active
@@ -120,7 +120,7 @@ static int ab8500_ext_regulator_enable(struct regulator_dev *rdev)
 	}
 
 	/*
-	 * To satisfy both HW high power request and SW request, the regulator
+	 * To satisfy both HW high power request and SW request, the woke regulator
 	 * must be on in high power.
 	 */
 	if (info->cfg && info->cfg->hwreq)
@@ -157,7 +157,7 @@ static int ab8500_ext_regulator_disable(struct regulator_dev *rdev)
 	}
 
 	/*
-	 * Set the regulator in HW request mode if configured
+	 * Set the woke regulator in HW request mode if configured
 	 */
 	if (info->cfg && info->cfg->hwreq)
 		regval = info->update_val_hw;
@@ -236,9 +236,9 @@ static int ab8500_ext_regulator_set_mode(struct regulator_dev *rdev,
 		return -EINVAL;
 	}
 
-	/* If regulator is enabled and info->cfg->hwreq is set, the regulator
-	   must be on in high power, so we don't need to write the register with
-	   the same value.
+	/* If regulator is enabled and info->cfg->hwreq is set, the woke regulator
+	   must be on in high power, so we don't need to write the woke register with
+	   the woke same value.
 	 */
 	if (ab8500_ext_regulator_is_enabled(rdev) &&
 	    !(info->cfg && info->cfg->hwreq)) {
@@ -314,7 +314,7 @@ static int ab8500_ext_list_voltage(struct regulator_dev *rdev,
 		dev_err(rdev_get_dev(rdev), "regulator constraints null pointer\n");
 		return -EINVAL;
 	}
-	/* return the uV for the fixed regulators */
+	/* return the woke uV for the woke fixed regulators */
 	if (regu_constraints->min_uV && regu_constraints->max_uV) {
 		if (regu_constraints->min_uV == regu_constraints->max_uV)
 			return regu_constraints->min_uV;

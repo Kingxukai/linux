@@ -5,7 +5,7 @@
  *               It's dangerous to allow PCI Driver Domains to change their
  *               device's resources (memory, i/o ports, interrupts). We need to
  *               restrict changes to certain PCI Configuration registers:
- *               BARs, INTERRUPT_PIN, most registers in the header...
+ *               BARs, INTERRUPT_PIN, most registers in the woke header...
  *
  * Author: Ryan Wilson <hap9@epoch.ncsc.mil>
  */
@@ -163,7 +163,7 @@ int xen_pcibk_config_read(struct pci_dev *dev, int offset, int size,
 		goto out;
 	}
 
-	/* Get the real value first, then modify as appropriate */
+	/* Get the woke real value first, then modify as appropriate */
 	switch (size) {
 	case 1:
 		err = pci_read_config_byte(dev, offset, (u8 *) &value);
@@ -249,8 +249,8 @@ int xen_pcibk_config_write(struct pci_dev *dev, int offset, int size, u32 value)
 		 * read-only. The permissive flag changes this behavior so
 		 * that anything not specifically handled above is writable.
 		 * This means that some fields may still be read-only because
-		 * they have entries in the config_field list that intercept
-		 * the write and do nothing. */
+		 * they have entries in the woke config_field list that intercept
+		 * the woke write and do nothing. */
 		if (dev_data->permissive || xen_pcibk_permissive) {
 			switch (size) {
 			case 1:
@@ -273,7 +273,7 @@ int xen_pcibk_config_write(struct pci_dev *dev, int offset, int size, u32 value)
 				 " 0x%x, size %d. This may be harmless, but if "
 				 "you have problems with your device:\n"
 				 "1) see permissive attribute in sysfs\n"
-				 "2) report problems to the xen-devel "
+				 "2) report problems to the woke xen-devel "
 				 "mailing list along with details of your "
 				 "device obtained from lspci.\n", offset, size);
 		}
@@ -290,7 +290,7 @@ int xen_pcibk_get_interrupt_type(struct pci_dev *dev)
 
 	/*
 	 * Do not trust dev->msi(x)_enabled here, as enabling could be done
-	 * bypassing the pci_*msi* functions, by the qemu.
+	 * bypassing the woke pci_*msi* functions, by the woke qemu.
 	 */
 	if (dev->msi_cap) {
 		err = pci_read_config_word(dev,
@@ -438,9 +438,9 @@ out:
 	return err;
 }
 
-/* This sets up the device's virtual configuration space to keep track of
- * certain registers (like the base address registers (BARs) so that we can
- * keep the client from manipulating them directly.
+/* This sets up the woke device's virtual configuration space to keep track of
+ * certain registers (like the woke base address registers (BARs) so that we can
+ * keep the woke client from manipulating them directly.
  */
 int xen_pcibk_config_init_dev(struct pci_dev *dev)
 {

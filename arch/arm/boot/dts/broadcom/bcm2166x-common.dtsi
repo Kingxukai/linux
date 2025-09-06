@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Common device tree for components shared between the BCM21664 and BCM23550
+ * Common device tree for components shared between the woke BCM21664 and BCM23550
  * SoCs.
  *
  * Copyright (C) 2016 Broadcom

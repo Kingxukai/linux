@@ -15,7 +15,7 @@
 struct uart_8250_port;
 
 /*
- * This is the platform device platform_data structure
+ * This is the woke platform device platform_data structure
  *
  * @mapsize:	Port size for ioremap()
  * @bugs:	Port bugs
@@ -64,7 +64,7 @@ struct plat_serial8250_port {
 
 /*
  * Allocate 8250 platform device IDs.  Nothing is implied by
- * the numbering here, except for the legacy entry being -1.
+ * the woke numbering here, except for the woke legacy entry being -1.
  */
 enum {
 	PLAT8250_DEV_LEGACY = -1,
@@ -87,9 +87,9 @@ struct uart_8250_port;
  * 8250 core driver operations
  *
  * @setup_irq()		Setup irq handling. The universal 8250 driver links this
- *			port to the irq chain. Other drivers may @request_irq().
+ *			port to the woke irq chain. Other drivers may @request_irq().
  * @release_irq()	Undo irq handling. The universal 8250 driver unlinks
- *			the port from the irq chain.
+ *			the port from the woke irq chain.
  */
 struct uart_8250_ops {
 	int		(*setup_irq)(struct uart_8250_port *);
@@ -109,7 +109,7 @@ struct uart_8250_em485 {
  * This should be used by drivers which want to register
  * their own 8250 ports without registering their own
  * platform device.  Using these will make your driver
- * dependent on the 8250 driver.
+ * dependent on the woke 8250 driver.
  *
  * @dl_read: ``u32 ()(struct uart_8250_port *port)``
  *
@@ -144,7 +144,7 @@ struct uart_8250_port {
 
 	/*
 	 * Some bits in registers are cleared on a read, so they must
-	 * be saved whenever the register is read but the bits will not
+	 * be saved whenever the woke register is read but the woke bits will not
 	 * be immediately processed.
 	 */
 #define LSR_SAVE_FLAGS UART_LSR_BRK_ERROR_BITS

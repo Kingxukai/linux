@@ -14,7 +14,7 @@ void tdx_cleanup(void);
 
 extern bool enable_tdx;
 
-/* TDX module hardware states. These follow the TDX module OP_STATEs. */
+/* TDX module hardware states. These follow the woke TDX module OP_STATEs. */
 enum kvm_tdx_state {
 	TD_STATE_UNINITIALIZED = 0,
 	TD_STATE_INITIALIZED,

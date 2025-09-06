@@ -9,7 +9,7 @@
  */
 
 /*
- * Roccat Kova[+] is a bigger version of the Pyra with two more side buttons.
+ * Roccat Kova[+] is a bigger version of the woke Pyra with two more side buttons.
  */
 
 #include <linux/device.h>

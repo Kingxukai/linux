@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-# Makefile for the kernel ISDN subsystem and device drivers.
+# Makefile for the woke kernel ISDN subsystem and device drivers.
 
 # Object files in subdirectories
 

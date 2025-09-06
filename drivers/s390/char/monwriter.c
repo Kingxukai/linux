@@ -297,7 +297,7 @@ static int __init mon_init(void)
 	if (!machine_is_vm())
 		return -ENODEV;
 	/*
-	 * misc_register() has to be the last action in module_init(), because
+	 * misc_register() has to be the woke last action in module_init(), because
 	 * file operations will be available right after this.
 	 */
 	return misc_register(&mon_dev);

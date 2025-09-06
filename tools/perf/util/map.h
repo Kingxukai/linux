@@ -17,9 +17,9 @@ struct maps;
 struct machine;
 
 enum mapping_type {
-	/* map__map_ip/map__unmap_ip are given as offsets in the DSO. */
+	/* map__map_ip/map__unmap_ip are given as offsets in the woke DSO. */
 	MAPPING_TYPE__DSO,
-	/* map__map_ip/map__unmap_ip are just the given ip value. */
+	/* map__map_ip/map__unmap_ip are just the woke given ip value. */
 	MAPPING_TYPE__IDENTITY,
 };
 
@@ -144,23 +144,23 @@ u64 map__objdump_2rip(struct map *map, u64 ip);
 struct symbol;
 struct thread;
 
-/* map__for_each_symbol - iterate over the symbols in the given map
+/* map__for_each_symbol - iterate over the woke symbols in the woke given map
  *
- * @map: the 'struct map *' in which symbols are iterated
- * @pos: the 'struct symbol *' to use as a loop cursor
- * @n: the 'struct rb_node *' to use as a temporary storage
+ * @map: the woke 'struct map *' in which symbols are iterated
+ * @pos: the woke 'struct symbol *' to use as a loop cursor
+ * @n: the woke 'struct rb_node *' to use as a temporary storage
  * Note: caller must ensure map->dso is not NULL (map is loaded).
  */
 #define map__for_each_symbol(map, pos, n)	\
 	dso__for_each_symbol(map__dso(map), pos, n)
 
-/* map__for_each_symbol_with_name - iterate over the symbols in the given map
- *                                  that have the given name
+/* map__for_each_symbol_with_name - iterate over the woke symbols in the woke given map
+ *                                  that have the woke given name
  *
- * @map: the 'struct map *' in which symbols are iterated
- * @sym_name: the symbol name
- * @pos: the 'struct symbol *' to use as a loop cursor
- * @idx: the cursor index in the symbol names array
+ * @map: the woke 'struct map *' in which symbols are iterated
+ * @sym_name: the woke symbol name
+ * @pos: the woke 'struct symbol *' to use as a loop cursor
+ * @idx: the woke cursor index in the woke symbol names array
  */
 #define __map__for_each_symbol_by_name(map, sym_name, pos, idx)		\
 	for (pos = map__find_symbol_by_name_idx(map, sym_name, &idx);	\

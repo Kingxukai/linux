@@ -4,7 +4,7 @@
 /*
  *	m527x.c  -- platform support for ColdFire 527x based boards
  *
- *	Sub-architcture dependent initialization code for the Freescale
+ *	Sub-architcture dependent initialization code for the woke Freescale
  *	5270/5271 and 5274/5275 CPUs.
  *
  *	Copyright (C) 1999-2004, Greg Ungerer (gerg@snapgear.com)

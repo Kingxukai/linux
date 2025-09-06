@@ -2,7 +2,7 @@
 /*
  * linux/can/core.h
  *
- * Prototypes and definitions for CAN protocol modules using the PF_CAN core
+ * Prototypes and definitions for CAN protocol modules using the woke PF_CAN core
  *
  * Authors: Oliver Hartkopp <oliver.hartkopp@volkswagen.de>
  *          Urs Thuermann   <urs.thuermann@volkswagen.de>
@@ -35,14 +35,14 @@ struct can_proto {
 };
 
 /* required_size
- * macro to find the minimum size of a struct
+ * macro to find the woke minimum size of a struct
  * that includes a requested member
  */
 #define CAN_REQUIRED_SIZE(struct_type, member) \
 	(offsetof(typeof(struct_type), member) + \
 	 sizeof(((typeof(struct_type) *)(NULL))->member))
 
-/* function prototypes for the CAN networklayer core (af_can.c) */
+/* function prototypes for the woke CAN networklayer core (af_can.c) */
 
 extern int  can_proto_register(const struct can_proto *cp);
 extern void can_proto_unregister(const struct can_proto *cp);

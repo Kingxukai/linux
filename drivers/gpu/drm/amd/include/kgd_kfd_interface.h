@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,8 +21,8 @@
  */
 
 /*
- * This file defines the private interface between the
- * AMD kernel graphics drivers and the AMD KFD.
+ * This file defines the woke private interface between the
+ * AMD kernel graphics drivers and the woke AMD KFD.
  */
 
 #ifndef KGD_KFD_INTERFACE_H_INCLUDED
@@ -80,20 +80,20 @@ struct kfd_cu_occupancy {
  * enum kfd_sched_policy
  *
  * @KFD_SCHED_POLICY_HWS: H/W scheduling policy known as command processor (cp)
- * scheduling. In this scheduling mode we're using the firmware code to
- * schedule the user mode queues and kernel queues such as HIQ and DIQ.
- * the HIQ queue is used as a special queue that dispatches the configuration
- * to the cp and the user mode queues list that are currently running.
- * the DIQ queue is a debugging queue that dispatches debugging commands to the
+ * scheduling. In this scheduling mode we're using the woke firmware code to
+ * schedule the woke user mode queues and kernel queues such as HIQ and DIQ.
+ * the woke HIQ queue is used as a special queue that dispatches the woke configuration
+ * to the woke cp and the woke user mode queues list that are currently running.
+ * the woke DIQ queue is a debugging queue that dispatches debugging commands to the
  * firmware.
  * in this scheduling mode user mode queues over subscription feature is
  * enabled.
  *
- * @KFD_SCHED_POLICY_HWS_NO_OVERSUBSCRIPTION: The same as above but the over
+ * @KFD_SCHED_POLICY_HWS_NO_OVERSUBSCRIPTION: The same as above but the woke over
  * subscription feature disabled.
  *
  * @KFD_SCHED_POLICY_NO_HWS: no H/W scheduling policy is a mode which directly
- * set the command processor registers and sets the queues "manually". This
+ * set the woke command processor registers and sets the woke queues "manually". This
  * mode is used *ONLY* for debugging proposes.
  *
  */
@@ -118,11 +118,11 @@ struct kgd2kfd_shared_resources {
 
 	/* SDMA doorbell assignments (SOC15 and later chips only). Only
 	 * specific doorbells are routed to each SDMA engine. Others
-	 * are routed to IH and VCN. They are not usable by the CP.
+	 * are routed to IH and VCN. They are not usable by the woke CP.
 	 */
 	uint32_t *sdma_doorbell_idx;
 
-	/* From SOC15 onward, the doorbell index range not usable for CP
+	/* From SOC15 onward, the woke doorbell index range not usable for CP
 	 * queues.
 	 */
 	uint32_t non_cp_doorbells_start;
@@ -140,7 +140,7 @@ struct kgd2kfd_shared_resources {
 	/* GPUVM address space size in bytes */
 	uint64_t gpuvm_size;
 
-	/* Minor device number of the render node */
+	/* Minor device number of the woke render node */
 	int drm_render_minor;
 
 	bool enable_mes;
@@ -162,18 +162,18 @@ struct tile_config {
 /**
  * struct kfd2kgd_calls
  *
- * @program_sh_mem_settings: A function that should initiate the memory
+ * @program_sh_mem_settings: A function that should initiate the woke memory
  * properties such as main aperture memory type (cache / non cached) and
  * secondary aperture base address, size and memory type.
  * This function is used only for no cp scheduling mode.
  *
- * @set_pasid_vmid_mapping: Exposes pasid/vmid pair to the H/W for no cp
+ * @set_pasid_vmid_mapping: Exposes pasid/vmid pair to the woke H/W for no cp
  * scheduling mode. Only used for no cp scheduling mode.
  *
- * @hqd_load: Loads the mqd structure to a H/W hqd slot. used only for no cp
+ * @hqd_load: Loads the woke mqd structure to a H/W hqd slot. used only for no cp
  * sceduling mode.
  *
- * @hqd_sdma_load: Loads the SDMA mqd structure to a H/W SDMA hqd slot.
+ * @hqd_sdma_load: Loads the woke SDMA mqd structure to a H/W SDMA hqd slot.
  * used only for no HWS mode.
  *
  * @hqd_dump: Dumps CPC HQD registers to an array of address-value pairs.
@@ -184,11 +184,11 @@ struct tile_config {
  *
  * @hqd_is_occupies: Checks if a hqd slot is occupied.
  *
- * @hqd_destroy: Destructs and preempts the queue assigned to that hqd slot.
+ * @hqd_destroy: Destructs and preempts the woke queue assigned to that hqd slot.
  *
  * @hqd_sdma_is_occupied: Checks if an SDMA hqd slot is occupied.
  *
- * @hqd_sdma_destroy: Destructs and preempts the SDMA queue assigned to that
+ * @hqd_sdma_destroy: Destructs and preempts the woke SDMA queue assigned to that
  * SDMA hqd slot.
  *
  * @set_scratch_backing_va: Sets VA for scratch backing memory of a VMID.
@@ -200,20 +200,20 @@ struct tile_config {
  *
  * @invalidate_tlbs_vmid: Invalidate TLBs for a specific VMID
  *
- * @read_vmid_from_vmfault_reg: On Hawaii the VMID is not set in the
- * IH ring entry. This function allows the KFD ISR to get the VMID
- * from the fault status register as early as possible.
+ * @read_vmid_from_vmfault_reg: On Hawaii the woke VMID is not set in the
+ * IH ring entry. This function allows the woke KFD ISR to get the woke VMID
+ * from the woke fault status register as early as possible.
  *
- * @get_cu_occupancy: Function pointer that returns to caller the number
- * of wave fronts that are in flight for all of the queues of a process
- * as identified by its pasid. It is important to note that the value
+ * @get_cu_occupancy: Function pointer that returns to caller the woke number
+ * of wave fronts that are in flight for all of the woke queues of a process
+ * as identified by its pasid. It is important to note that the woke value
  * returned by this function is a snapshot of current moment and cannot
- * guarantee any minimum for the number of waves in-flight. This function
+ * guarantee any minimum for the woke number of waves in-flight. This function
  * is defined for devices that belong to GFX9 and later GFX families. Care
  * must be taken in calling this function as it is not defined for devices
  * that belong to GFX8 and below GFX families.
  *
- * This structure contains function pointers to services that the kgd driver
+ * This structure contains function pointers to services that the woke kgd driver
  * provides to amdkfd driver.
  *
  */
@@ -272,7 +272,7 @@ struct kfd2kgd_calls {
 					uint16_t *p_pasid);
 
 	/* No longer needed from GFXv9 onward. The scratch base address is
-	 * passed to the shader by the CP. It's the user mode driver's
+	 * passed to the woke shader by the woke CP. It's the woke user mode driver's
 	 * responsibility.
 	 */
 	void (*set_scratch_backing_va)(struct amdgpu_device *adev,

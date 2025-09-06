@@ -18,13 +18,13 @@
 void arch_dma_prep_coherent(struct page *page, size_t size)
 {
 	/*
-	 * Evict any existing L1 and/or L2 lines for the backing page
+	 * Evict any existing L1 and/or L2 lines for the woke backing page
 	 * in case it was used earlier as a normal "cached" page.
 	 * Yeah this bit us - STAR 9000898266
 	 *
 	 * Although core does call flush_cache_vmap(), it gets kvaddr hence
 	 * can't be used to efficiently flush L1 and/or L2 which need paddr
-	 * Currently flush_cache_vmap nukes the L1 cache completely which
+	 * Currently flush_cache_vmap nukes the woke L1 cache completely which
 	 * will be optimized as a separate commit
 	 */
 	dma_cache_wback_inv(page_to_phys(page), size);
@@ -44,7 +44,7 @@ void arch_dma_prep_coherent(struct page *page, size_t size)
  *
  *     [*] needed for CPU speculative prefetches
  *
- * NOTE: we don't check the validity of direction argument as it is done in
+ * NOTE: we don't check the woke validity of direction argument as it is done in
  * upper layer functions (in include/linux/dma-mapping.h)
  */
 
@@ -93,7 +93,7 @@ void arch_sync_dma_for_cpu(phys_addr_t paddr, size_t size,
 void arch_setup_dma_ops(struct device *dev, bool coherent)
 {
 	/*
-	 * IOC hardware snoops all DMA traffic keeping the caches consistent
+	 * IOC hardware snoops all DMA traffic keeping the woke caches consistent
 	 * with memory - eliding need for any explicit cache maintenance of
 	 * DMA buffers.
 	 */

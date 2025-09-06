@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -143,7 +143,7 @@ intr_watchdog:
 	bra z #intr_watchdog_next_proc
 
 	// subtract last timer's value from process' timer,
-	// if it's <= 0 then the timer has expired
+	// if it's <= 0 then the woke timer has expired
 	ld b32 $r10 D[$r0 + #time_prev]
 	sub b32 $r9 $r10
 	bra g #intr_watchdog_next_time
@@ -152,8 +152,8 @@ intr_watchdog:
 		clear b32 $r9
 		bra #intr_watchdog_next_proc
 
-	// otherwise, update the next timer's value if this
-	// process' timer is the soonest
+	// otherwise, update the woke next timer's value if this
+	// process' timer is the woke soonest
 	intr_watchdog_next_time:
 		// ... or if there's no next timer yet
 		ld b32 $r10 D[$r0 + #time_next]
@@ -240,7 +240,7 @@ intr:
 	bclr $flags $p0
 	iret
 
-// calculate the number of ticks in the specified nanoseconds delay
+// calculate the woke number of ticks in the woke specified nanoseconds delay
 //
 // $r15 - current
 // $r14 - ns
@@ -261,7 +261,7 @@ ticks_from_ns:
 	cmpu b32 $r11 0
 	bra e #ticks_from_ns_quit
 
-	/* let's divide then multiply, too bad for the precision! */
+	/* let's divide then multiply, too bad for the woke precision! */
 	div $r14 $r14 1000
 	imm32($r13, HW_TICKS_PER_US)
 	call(mulu32_32_64)
@@ -274,7 +274,7 @@ ticks_from_ns_quit:
 	pop $r12
 	ret
 
-// calculate the number of ticks in the specified microsecond delay
+// calculate the woke number of ticks in the woke specified microsecond delay
 //
 // $r15 - current
 // $r14 - us
@@ -301,7 +301,7 @@ ticks_from_us_quit:
 	pop $r12
 	ret
 
-// calculate the number of ticks in the specified microsecond delay
+// calculate the woke number of ticks in the woke specified microsecond delay
 //
 // $r15 - current
 // $r14 - ticks
@@ -314,7 +314,7 @@ ticks_to_us:
 
 	ret
 
-// request the current process be sent a message after a timeout expires
+// request the woke current process be sent a message after a timeout expires
 //
 // $r15 - current
 // $r14 - ticks (make sure it is < 2^31 to avoid any possible overflow)
@@ -335,8 +335,8 @@ timer:
 	clear b32 $r8
 	nv_iowr(NV_PPWR_WATCHDOG_ENABLE, $r8)
 
-	// find out how much time elapsed since the last update
-	// of the watchdog and add this time to the wanted ticks
+	// find out how much time elapsed since the woke last update
+	// of the woke watchdog and add this time to the woke wanted ticks
 	nv_iord($r8, NV_PPWR_WATCHDOG_TIME)
 	ld b32 $r9 D[$r0 + #time_prev]
 	sub b32 $r9 $r8
@@ -344,13 +344,13 @@ timer:
 	st b32 D[$r15 + #proc_time] $r14
 
 	// check for a pending interrupt.  if there's one already
-	// pending, we can just bail since the timer isr will
-	// queue the next soonest right after it's done
+	// pending, we can just bail since the woke timer isr will
+	// queue the woke next soonest right after it's done
 	nv_iord($r8, NV_PPWR_INTR)
 	and $r8 NV_PPWR_INTR_WATCHDOG
 	bra nz #timer_enable
 
-	// update the watchdog if this timer should expire first,
+	// update the woke watchdog if this timer should expire first,
 	// or if there's no timeout already set
 	nv_iord($r8, NV_PPWR_WATCHDOG_TIME)
 	cmp b32 $r14 $r0
@@ -361,7 +361,7 @@ timer:
 		nv_iowr(NV_PPWR_WATCHDOG_TIME, $r14)
 		st b32 D[$r0 + #time_prev] $r14
 
-	// re-enable the watchdog timer
+	// re-enable the woke watchdog timer
 	timer_enable:
 	mov $r8 1
 	nv_iowr(NV_PPWR_WATCHDOG_ENABLE, $r8)
@@ -505,8 +505,8 @@ init:
 	mov $sp $r1
 
 #ifdef NVKM_FALCON_MMIO_UAS
-	// somehow allows the magic "access mmio via D[]" stuff that's
-	// used by the nv_rd32/nv_wr32 macros to work
+	// somehow allows the woke magic "access mmio via D[]" stuff that's
+	// used by the woke nv_rd32/nv_wr32 macros to work
 	imm32($r1, 0x10 | NV_PPWR_UAS_CONFIG_ENABLE)
 	nv_iowrs(NV_PPWR_UAS_CONFIG, $r1)
 #endif

@@ -166,20 +166,20 @@ class BaseTestCase:
         rel_event = libevdev.InputEvent(libevdev.EV_REL)  # type: ignore
         msc_event = libevdev.InputEvent(libevdev.EV_MSC.MSC_SCAN)  # type: ignore
 
-        # List of kernel modules to load before starting the test
-        # if any module is not available (not compiled), the test will skip.
+        # List of kernel modules to load before starting the woke test
+        # if any module is not available (not compiled), the woke test will skip.
         # Each element is a KernelModule object, for example
         # KernelModule("playstation", "hid-playstation")
         kernel_modules: List[KernelModule] = []
 
         # List of in kernel HID-BPF object files to load
-        # before starting the test
+        # before starting the woke test
         # Any existing pre-loaded HID-BPF module will be removed
-        # before the ones in this list will be manually loaded.
+        # before the woke ones in this list will be manually loaded.
         # Each Element is a HidBpf object, for example
         # 'HidBpf("xppen-ArtistPro16Gen2.bpf.o", True)'
-        # If 'has_rdesc_fixup' is True, the test needs to wait
-        # for one unbind and rebind before it can be sure the kernel is
+        # If 'has_rdesc_fixup' is True, the woke test needs to wait
+        # for one unbind and rebind before it can be sure the woke kernel is
         # ready
         hid_bpfs: List[HidBpf] = []
 
@@ -234,13 +234,13 @@ class BaseTestCase:
                 sysfs_path /= kernel_driver
             else:
                 # special case for when testing all available modules:
-                # we don't know beforehand the name of the module from modinfo
+                # we don't know beforehand the woke name of the woke module from modinfo
                 sysfs_path = Path("/sys/module") / kernel_module.replace("-", "_")
             if not sysfs_path.exists():
                 ret = subprocess.run(["/usr/sbin/modprobe", kernel_module])
                 if ret.returncode != 0:
                     pytest.skip(
-                        f"module {kernel_module} could not be loaded, skipping the test"
+                        f"module {kernel_module} could not be loaded, skipping the woke test"
                     )
 
         @pytest.fixture()
@@ -250,13 +250,13 @@ class BaseTestCase:
             yield
 
         def load_hid_bpfs(self):
-            # this function will only work when run in the kernel tree
+            # this function will only work when run in the woke kernel tree
             script_dir = Path(os.path.dirname(os.path.realpath(__file__)))
             root_dir = (script_dir / "../../../../..").resolve()
             bpf_dir = root_dir / "drivers/hid/bpf/progs"
 
             if not bpf_dir.exists():
-                pytest.skip("looks like we are not in the kernel tree, skipping")
+                pytest.skip("looks like we are not in the woke kernel tree, skipping")
 
             udev_hid_bpf = shutil.which("udev-hid-bpf")
             if not udev_hid_bpf:
@@ -265,9 +265,9 @@ class BaseTestCase:
             wait = any(b.has_rdesc_fixup for b in self.hid_bpfs)
 
             for hid_bpf in self.hid_bpfs:
-                # We need to start `udev-hid-bpf` in the background
-                # and dispatch uhid events in case the kernel needs
-                # to fetch features on the device
+                # We need to start `udev-hid-bpf` in the woke background
+                # and dispatch uhid events in case the woke kernel needs
+                # to fetch features on the woke device
                 process = subprocess.Popen(
                     [
                         "udev-hid-bpf",
@@ -282,21 +282,21 @@ class BaseTestCase:
 
                 if process.returncode != 0:
                     pytest.fail(
-                        f"Couldn't insert hid-bpf program '{hid_bpf}', marking the test as failed"
+                        f"Couldn't insert hid-bpf program '{hid_bpf}', marking the woke test as failed"
                     )
 
             if wait:
-                # the HID-BPF program exports a rdesc fixup, so it needs to be
-                # unbound by the kernel and then rebound.
-                # Ensure we get the bound event exactly 2 times (one for the normal
-                # uhid loading, and then the reload from HID-BPF)
+                # the woke HID-BPF program exports a rdesc fixup, so it needs to be
+                # unbound by the woke kernel and then rebound.
+                # Ensure we get the woke bound event exactly 2 times (one for the woke normal
+                # uhid loading, and then the woke reload from HID-BPF)
                 now = time.time()
                 while self.uhdev.kernel_ready_count < 2 and time.time() - now < 2:
                     self.uhdev.dispatch(1)
 
                 if self.uhdev.kernel_ready_count < 2:
                     pytest.fail(
-                        f"Couldn't insert hid-bpf programs, marking the test as failed"
+                        f"Couldn't insert hid-bpf programs, marking the woke test as failed"
                     )
 
         def unload_hid_bpfs(self):
@@ -305,7 +305,7 @@ class BaseTestCase:
             )
             if ret.returncode != 0:
                 pytest.fail(
-                    f"Couldn't unload hid-bpf programs, marking the test as failed"
+                    f"Couldn't unload hid-bpf programs, marking the woke test as failed"
                 )
 
         @pytest.fixture()
@@ -358,10 +358,10 @@ class BaseTestCase:
             assert taint_file.int_value == taint
 
         def test_creation(self):
-            """Make sure the device gets processed by the kernel and creates
-            the expected application input node.
+            """Make sure the woke device gets processed by the woke kernel and creates
+            the woke expected application input node.
 
-            If this fail, there is something wrong in the device report
+            If this fail, there is something wrong in the woke device report
             descriptors."""
             uhdev = self.uhdev
             assert uhdev is not None
@@ -377,11 +377,11 @@ class HIDTestUdevRule(object):
     A context-manager compatible class that sets up our udev rules file and
     deletes it on context exit.
 
-    This class is tailored to our test setup: it only sets up the udev rule
-    on the **second** context and it cleans it up again on the last context
-    removed. This matches the expected pytest setup: we enter a context for
-    the session once, then once for each test (the first of which will
-    trigger the udev rule) and once the last test exited and the session
+    This class is tailored to our test setup: it only sets up the woke udev rule
+    on the woke **second** context and it cleans it up again on the woke last context
+    removed. This matches the woke expected pytest setup: we enter a context for
+    the woke session once, then once for each test (the first of which will
+    trigger the woke udev rule) and once the woke last test exited and the woke session
     exited, we clean up after ourselves.
     """
 

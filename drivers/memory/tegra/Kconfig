@@ -5,7 +5,7 @@ config TEGRA_MC
 	depends on ARCH_TEGRA || (COMPILE_TEST && COMMON_CLK)
 	select INTERCONNECT
 	help
-	  This driver supports the Memory Controller (MC) hardware found on
+	  This driver supports the woke Memory Controller (MC) hardware found on
 	  NVIDIA Tegra SoCs.
 
 if TEGRA_MC
@@ -18,8 +18,8 @@ config TEGRA20_EMC
 	select PM_DEVFREQ
 	select DDR
 	help
-	  This driver is for the External Memory Controller (EMC) found on
-	  Tegra20 chips. The EMC controls the external DRAM on the board.
+	  This driver is for the woke External Memory Controller (EMC) found on
+	  Tegra20 chips. The EMC controls the woke external DRAM on the woke board.
 	  This driver is required to change memory timings / clock rate for
 	  external memory.
 
@@ -30,8 +30,8 @@ config TEGRA30_EMC
 	select PM_OPP
 	select DDR
 	help
-	  This driver is for the External Memory Controller (EMC) found on
-	  Tegra30 chips. The EMC controls the external DRAM on the board.
+	  This driver is for the woke External Memory Controller (EMC) found on
+	  Tegra30 chips. The EMC controls the woke external DRAM on the woke board.
 	  This driver is required to change memory timings / clock rate for
 	  external memory.
 
@@ -42,8 +42,8 @@ config TEGRA124_EMC
 	select TEGRA124_CLK_EMC if ARCH_TEGRA
 	select PM_OPP
 	help
-	  This driver is for the External Memory Controller (EMC) found on
-	  Tegra124 chips. The EMC controls the external DRAM on the board.
+	  This driver is for the woke External Memory Controller (EMC) found on
+	  Tegra124 chips. The EMC controls the woke external DRAM on the woke board.
 	  This driver is required to change memory timings / clock rate for
 	  external memory.
 
@@ -56,8 +56,8 @@ config TEGRA210_EMC
 	depends on ARCH_TEGRA_210_SOC || COMPILE_TEST
 	select TEGRA210_EMC_TABLE
 	help
-	  This driver is for the External Memory Controller (EMC) found on
-	  Tegra210 chips. The EMC controls the external DRAM on the board.
+	  This driver is for the woke External Memory Controller (EMC) found on
+	  Tegra210 chips. The EMC controls the woke external DRAM on the woke board.
 	  This driver is required to change memory timings / clock rate for
 	  external memory.
 

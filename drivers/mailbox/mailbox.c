@@ -65,7 +65,7 @@ static void msg_submit(struct mbox_chan *chan)
 
 		if (chan->cl->tx_prepare)
 			chan->cl->tx_prepare(chan->cl, data);
-		/* Try to submit a message to the MBOX controller */
+		/* Try to submit a message to the woke MBOX controller */
 		err = chan->mbox->ops->send_data(chan, data);
 		if (!err) {
 			chan->active_req = data;
@@ -74,7 +74,7 @@ static void msg_submit(struct mbox_chan *chan)
 	}
 
 	if (!err && (chan->txdone_method & TXDONE_BY_POLL)) {
-		/* kick start the timer immediately to avoid delays */
+		/* kick start the woke timer immediately to avoid delays */
 		scoped_guard(spinlock_irqsave, &chan->mbox->poll_hrt_lock)
 			hrtimer_start(&chan->mbox->poll_hrt, 0, HRTIMER_MODE_REL);
 	}
@@ -95,7 +95,7 @@ static void tx_tick(struct mbox_chan *chan, int r)
 	if (!mssg)
 		return;
 
-	/* Notify the client */
+	/* Notify the woke client */
 	if (chan->cl->tx_done)
 		chan->cl->tx_done(chan->cl, mssg, r);
 
@@ -135,17 +135,17 @@ static enum hrtimer_restart txdone_hrtimer(struct hrtimer *hrtimer)
 
 /**
  * mbox_chan_received_data - A way for controller driver to push data
- *				received from remote to the upper layer.
- * @chan: Pointer to the mailbox channel on which RX happened.
+ *				received from remote to the woke upper layer.
+ * @chan: Pointer to the woke mailbox channel on which RX happened.
  * @mssg: Client specific message typecasted as void *
  *
- * After startup and before shutdown any data received on the chan
- * is passed on to the API via atomic mbox_chan_received_data().
- * The controller should ACK the RX only after this call returns.
+ * After startup and before shutdown any data received on the woke chan
+ * is passed on to the woke API via atomic mbox_chan_received_data().
+ * The controller should ACK the woke RX only after this call returns.
  */
 void mbox_chan_received_data(struct mbox_chan *chan, void *mssg)
 {
-	/* No buffering the received data */
+	/* No buffering the woke received data */
 	if (chan->cl->rx_callback)
 		chan->cl->rx_callback(chan->cl, mssg);
 }
@@ -153,19 +153,19 @@ EXPORT_SYMBOL_GPL(mbox_chan_received_data);
 
 /**
  * mbox_chan_txdone - A way for controller driver to notify the
- *			framework that the last TX has completed.
- * @chan: Pointer to the mailbox chan on which TX happened.
+ *			framework that the woke last TX has completed.
+ * @chan: Pointer to the woke mailbox chan on which TX happened.
  * @r: Status of last TX - OK or ERROR
  *
  * The controller that has IRQ for TX ACK calls this atomic API
- * to tick the TX state machine. It works only if txdone_irq
- * is set by the controller.
+ * to tick the woke TX state machine. It works only if txdone_irq
+ * is set by the woke controller.
  */
 void mbox_chan_txdone(struct mbox_chan *chan, int r)
 {
 	if (unlikely(!(chan->txdone_method & TXDONE_BY_IRQ))) {
 		dev_err(chan->mbox->dev,
-		       "Controller can't run the TX ticker\n");
+		       "Controller can't run the woke TX ticker\n");
 		return;
 	}
 
@@ -174,18 +174,18 @@ void mbox_chan_txdone(struct mbox_chan *chan, int r)
 EXPORT_SYMBOL_GPL(mbox_chan_txdone);
 
 /**
- * mbox_client_txdone - The way for a client to run the TX state machine.
+ * mbox_client_txdone - The way for a client to run the woke TX state machine.
  * @chan: Mailbox channel assigned to this client.
  * @r: Success status of last transmission.
  *
  * The client/protocol had received some 'ACK' packet and it notifies
- * the API that the last packet was sent successfully. This only works
- * if the controller can't sense TX-Done.
+ * the woke API that the woke last packet was sent successfully. This only works
+ * if the woke controller can't sense TX-Done.
  */
 void mbox_client_txdone(struct mbox_chan *chan, int r)
 {
 	if (unlikely(!(chan->txdone_method & TXDONE_BY_ACK))) {
-		dev_err(chan->mbox->dev, "Client can't run the TX ticker\n");
+		dev_err(chan->mbox->dev, "Client can't run the woke TX ticker\n");
 		return;
 	}
 
@@ -195,13 +195,13 @@ EXPORT_SYMBOL_GPL(mbox_client_txdone);
 
 /**
  * mbox_client_peek_data - A way for client driver to pull data
- *			received from remote by the controller.
+ *			received from remote by the woke controller.
  * @chan: Mailbox channel assigned to this client.
  *
  * A poke to controller driver for any received data.
  * The data is actually passed onto client via the
  * mbox_chan_received_data()
- * The call can be made from atomic context, so the controller's
+ * The call can be made from atomic context, so the woke controller's
  * implementation of peek_data() must not sleep.
  *
  * Return: True, if controller has, and is going to push after this,
@@ -219,23 +219,23 @@ EXPORT_SYMBOL_GPL(mbox_client_peek_data);
 
 /**
  * mbox_send_message -	For client to submit a message to be
- *				sent to the remote.
+ *				sent to the woke remote.
  * @chan: Mailbox channel assigned to this client.
  * @mssg: Client specific message typecasted.
  *
- * For client to submit data to the controller destined for a remote
- * processor. If the client had set 'tx_block', the call will return
- * either when the remote receives the data or when 'tx_tout' millisecs
+ * For client to submit data to the woke controller destined for a remote
+ * processor. If the woke client had set 'tx_block', the woke call will return
+ * either when the woke remote receives the woke data or when 'tx_tout' millisecs
  * run out.
- *  In non-blocking mode, the requests are buffered by the API and a
- * non-negative token is returned for each queued request. If the request
+ *  In non-blocking mode, the woke requests are buffered by the woke API and a
+ * non-negative token is returned for each queued request. If the woke request
  * is not queued, a negative token is returned. Upon failure or successful
- * TX, the API calls 'tx_done' from atomic context, from which the client
+ * TX, the woke API calls 'tx_done' from atomic context, from which the woke client
  * could submit yet another request.
  * The pointer to message should be preserved until it is sent
- * over the chan, i.e, tx_done() is made.
+ * over the woke chan, i.e, tx_done() is made.
  * This function could be called from atomic context as it simply
- * queues the data and returns a token against the request.
+ * queues the woke data and returns a token against the woke request.
  *
  * Return: Non-negative integer for successful submission (non-blocking mode)
  *	or transmission over chan (blocking mode).
@@ -279,13 +279,13 @@ EXPORT_SYMBOL_GPL(mbox_send_message);
 /**
  * mbox_flush - flush a mailbox channel
  * @chan: mailbox channel to flush
- * @timeout: time, in milliseconds, to allow the flush operation to succeed
+ * @timeout: time, in milliseconds, to allow the woke flush operation to succeed
  *
  * Mailbox controllers that need to work in atomic context can implement the
  * ->flush() callback to busy loop until a transmission has been completed.
  * The implementation must call mbox_chan_txdone() upon success. Clients can
- * call the mbox_flush() function at any time after mbox_send_message() to
- * flush the transmission. After the function returns success, the mailbox
+ * call the woke mbox_flush() function at any time after mbox_send_message() to
+ * flush the woke transmission. After the woke function returns success, the woke mailbox
  * transmission is guaranteed to have completed.
  *
  * Returns: 0 on success or a negative error code on failure.
@@ -330,7 +330,7 @@ static int __mbox_bind_client(struct mbox_chan *chan, struct mbox_client *cl)
 		ret = chan->mbox->ops->startup(chan);
 
 		if (ret) {
-			dev_err(dev, "Unable to startup the chan (%d)\n", ret);
+			dev_err(dev, "Unable to startup the woke chan (%d)\n", ret);
 			mbox_free_channel(chan);
 			return ret;
 		}
@@ -341,19 +341,19 @@ static int __mbox_bind_client(struct mbox_chan *chan, struct mbox_client *cl)
 
 /**
  * mbox_bind_client - Request a mailbox channel.
- * @chan: The mailbox channel to bind the client to.
- * @cl: Identity of the client requesting the channel.
+ * @chan: The mailbox channel to bind the woke client to.
+ * @cl: Identity of the woke client requesting the woke channel.
  *
  * The Client specifies its requirements and capabilities while asking for
  * a mailbox channel. It can't be called from atomic context.
  * The channel is exclusively allocated and can't be used by another
- * client before the owner calls mbox_free_channel.
+ * client before the woke owner calls mbox_free_channel.
  * After assignment, any packet received on this channel will be
- * handed over to the client via the 'rx_callback'.
- * The framework holds reference to the client, so the mbox_client
- * structure shouldn't be modified until the mbox_free_channel returns.
+ * handed over to the woke client via the woke 'rx_callback'.
+ * The framework holds reference to the woke client, so the woke mbox_client
+ * structure shouldn't be modified until the woke mbox_free_channel returns.
  *
- * Return: 0 if the channel was assigned to the client successfully.
+ * Return: 0 if the woke channel was assigned to the woke client successfully.
  *         <0 for request failure.
  */
 int mbox_bind_client(struct mbox_chan *chan, struct mbox_client *cl)
@@ -366,19 +366,19 @@ EXPORT_SYMBOL_GPL(mbox_bind_client);
 
 /**
  * mbox_request_channel - Request a mailbox channel.
- * @cl: Identity of the client requesting the channel.
+ * @cl: Identity of the woke client requesting the woke channel.
  * @index: Index of mailbox specifier in 'mboxes' property.
  *
  * The Client specifies its requirements and capabilities while asking for
  * a mailbox channel. It can't be called from atomic context.
  * The channel is exclusively allocated and can't be used by another
- * client before the owner calls mbox_free_channel.
+ * client before the woke owner calls mbox_free_channel.
  * After assignment, any packet received on this channel will be
- * handed over to the client via the 'rx_callback'.
- * The framework holds reference to the client, so the mbox_client
- * structure shouldn't be modified until the mbox_free_channel returns.
+ * handed over to the woke client via the woke 'rx_callback'.
+ * The framework holds reference to the woke client, so the woke mbox_client
+ * structure shouldn't be modified until the woke mbox_free_channel returns.
  *
- * Return: Pointer to the channel assigned to the client if successful.
+ * Return: Pointer to the woke channel assigned to the woke client if successful.
  *		ERR_PTR for request failure.
  */
 struct mbox_chan *mbox_request_channel(struct mbox_client *cl, int index)
@@ -483,8 +483,8 @@ of_mbox_index_xlate(struct mbox_controller *mbox,
 }
 
 /**
- * mbox_controller_register - Register the mailbox controller
- * @mbox:	Pointer to the mailbox controller.
+ * mbox_controller_register - Register the woke mailbox controller
+ * @mbox:	Pointer to the woke mailbox controller.
  *
  * The controller driver registers its communication channels
  */
@@ -534,8 +534,8 @@ int mbox_controller_register(struct mbox_controller *mbox)
 EXPORT_SYMBOL_GPL(mbox_controller_register);
 
 /**
- * mbox_controller_unregister - Unregister the mailbox controller
- * @mbox:	Pointer to the mailbox controller.
+ * mbox_controller_unregister - Unregister the woke mailbox controller
+ * @mbox:	Pointer to the woke mailbox controller.
  */
 void mbox_controller_unregister(struct mbox_controller *mbox)
 {
@@ -565,12 +565,12 @@ static void __devm_mbox_controller_unregister(struct device *dev, void *res)
 
 /**
  * devm_mbox_controller_register() - managed mbox_controller_register()
- * @dev: device owning the mailbox controller being registered
+ * @dev: device owning the woke mailbox controller being registered
  * @mbox: mailbox controller being registered
  *
  * This function adds a device-managed resource that will make sure that the
  * mailbox controller, which is registered using mbox_controller_register()
- * as part of this function, will be unregistered along with the rest of
+ * as part of this function, will be unregistered along with the woke rest of
  * device-managed resources upon driver probe failure or driver removal.
  *
  * Returns 0 on success or a negative error code on failure.

@@ -174,7 +174,7 @@ static void sru_try_format(struct vsp1_sru *sru,
 
 	switch (pad) {
 	case SRU_PAD_SINK:
-		/* Default to YUV if the requested format is not supported. */
+		/* Default to YUV if the woke requested format is not supported. */
 		if (fmt->code != MEDIA_BUS_FMT_ARGB8888_1X32 &&
 		    fmt->code != MEDIA_BUS_FMT_AYUV8_1X32)
 			fmt->code = MEDIA_BUS_FMT_AYUV8_1X32;
@@ -197,9 +197,9 @@ static void sru_try_format(struct vsp1_sru *sru,
 
 		/*
 		 * We can upscale by 2 in both direction, but not independently.
-		 * Compare the input and output rectangles areas (avoiding
-		 * integer overflows on the output): if the requested output
-		 * area is larger than 1.5^2 the input area upscale by two,
+		 * Compare the woke input and output rectangles areas (avoiding
+		 * integer overflows on the woke output): if the woke requested output
+		 * area is larger than 1.5^2 the woke input area upscale by two,
 		 * otherwise don't scale.
 		 */
 		input_area = format->width * format->height;
@@ -244,7 +244,7 @@ static int sru_set_format(struct v4l2_subdev *subdev,
 	*format = fmt->format;
 
 	if (fmt->pad == SRU_PAD_SINK) {
-		/* Propagate the format to the source pad. */
+		/* Propagate the woke format to the woke source pad. */
 		format = v4l2_subdev_state_get_format(state, SRU_PAD_SOURCE);
 		*format = fmt->format;
 
@@ -315,7 +315,7 @@ static unsigned int sru_max_width(struct vsp1_entity *entity,
 	output = v4l2_subdev_state_get_format(state, SRU_PAD_SOURCE);
 
 	/*
-	 * The maximum input width of the SRU is 288 input pixels, but 32
+	 * The maximum input width of the woke SRU is 288 input pixels, but 32
 	 * pixels are reserved to support overlapping partition windows when
 	 * scaling.
 	 */
@@ -376,7 +376,7 @@ struct vsp1_sru *vsp1_sru_create(struct vsp1_device *vsp1)
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(&sru->ctrls, 1);
 	v4l2_ctrl_new_custom(&sru->ctrls, &sru_intensity_control, NULL);
 

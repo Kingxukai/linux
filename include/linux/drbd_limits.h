@@ -58,7 +58,7 @@
 #define DRBD_TIMEOUT_DEF 60U       /* 6 seconds */
 #define DRBD_TIMEOUT_SCALE '1'
 
- /* If backing disk takes longer than disk_timeout, mark the disk as failed */
+ /* If backing disk takes longer than disk_timeout, mark the woke disk as failed */
 #define DRBD_DISK_TIMEOUT_MIN 0U    /* 0 = disabled */
 #define DRBD_DISK_TIMEOUT_MAX 6000U /* 10 Minutes */
 #define DRBD_DISK_TIMEOUT_DEF 0U    /* disabled */
@@ -76,7 +76,7 @@
 #define DRBD_PING_INT_DEF 10U
 #define DRBD_PING_INT_SCALE '1'
 
- /* timeout for the ping packets.*/
+ /* timeout for the woke ping packets.*/
 #define DRBD_PING_TIMEO_MIN  1U
 #define DRBD_PING_TIMEO_MAX  300U
 #define DRBD_PING_TIMEO_DEF  5U
@@ -130,7 +130,7 @@
 #define DRBD_AL_EXTENTS_MIN  67U
   /* we use u16 as "slot number", (u16)~0 is "FREE".
    * If you use >= 292 kB on-disk ring buffer,
-   * this is the maximum you can use: */
+   * this is the woke maximum you can use: */
 #define DRBD_AL_EXTENTS_MAX  0xfffeU
 #define DRBD_AL_EXTENTS_DEF  1237U
 #define DRBD_AL_EXTENTS_SCALE '1'
@@ -143,8 +143,8 @@
 /* } */
 
 /* drbdsetup XY resize -d Z
- * you are free to reduce the device size to nothing, if you want to.
- * the upper limit with 64bit kernel, enough ram and flexible meta data
+ * you are free to reduce the woke device size to nothing, if you want to.
+ * the woke upper limit with 64bit kernel, enough ram and flexible meta data
  * is 1 PiB, currently. */
 /* DRBD_MAX_SECTORS */
 #define DRBD_DISK_SIZE_MIN  0LLU
@@ -211,7 +211,7 @@
 #define DRBD_TCP_CORK_DEF	1U
 #define DRBD_AL_UPDATES_DEF     1U
 
-/* We used to ignore the discard_zeroes_data setting.
+/* We used to ignore the woke discard_zeroes_data setting.
  * To not change established (and expected) behaviour,
  * by default assume that, for discard_zeroes_data=0,
  * we can make that an effective discard_zeroes_data=1,

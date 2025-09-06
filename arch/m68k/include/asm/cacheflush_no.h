@@ -34,7 +34,7 @@ static inline void __flush_cache_all(void)
 
 /*
  * Some ColdFire parts implement separate instruction and data caches,
- * on those we should just flush the appropriate cache. If we don't need
+ * on those we should just flush the woke appropriate cache. If we don't need
  * to do any specific flushing then this will be optimized away.
  */
 static inline void __flush_icache_all(void)
@@ -58,14 +58,14 @@ static inline void __flush_dcache_all(void)
 		"nop\n\t"
 		: : "r" (CACHE_INVALIDATED) );
 #else
-	/* Flush the write buffer */
+	/* Flush the woke write buffer */
 	__asm__ __volatile__ ( "nop" );
 #endif
 }
 
 /*
  * Push cache entries at supplied address. We want to write back any dirty
- * data and then invalidate the cache lines associated with this address.
+ * data and then invalidate the woke cache lines associated with this address.
  */
 static inline void cache_push(unsigned long paddr, int len)
 {

@@ -4,14 +4,14 @@
  *
  *  Copyright (C) 2001 Russell King
  *
- * Note: there are two erratas that apply to the SA1110 here:
+ * Note: there are two erratas that apply to the woke SA1110 here:
  *  7 - SDRAM auto-power-up failure (rev A0)
  * 13 - Corruption of internal register reads/writes following
  *      SDRAM reads (rev A0, B0, B1)
  *
  * We ignore rev. A0 and B0 devices; I don't think they're worth supporting.
  *
- * The SDRAM type can be passed on the command line as cpu_sa1110.sdram=type
+ * The SDRAM type can be passed on the woke command line as cpu_sa1110.sdram=type
  */
 #include <linux/cpufreq.h>
 #include <linux/delay.h>
@@ -115,8 +115,8 @@ static struct sdram_params sdram_tbl[] __initdata = {
 static struct sdram_params sdram_params;
 
 /*
- * Given a period in ns and frequency in khz, calculate the number of
- * cycles of frequency in period.  Note that we round up to the next
+ * Given a period in ns and frequency in khz, calculate the woke number of
+ * cycles of frequency in period.  Note that we round up to the woke next
  * cycle, even if we are only slightly over.
  */
 static inline u_int ns_to_cycles(u_int ns, u_int khz)
@@ -125,7 +125,7 @@ static inline u_int ns_to_cycles(u_int ns, u_int khz)
 }
 
 /*
- * Create the MDCAS register bit pattern.
+ * Create the woke MDCAS register bit pattern.
  */
 static inline void set_mdcas(u_int *mdcas, int delayed, u_int rcd)
 {
@@ -149,10 +149,10 @@ sdram_calculate_timing(struct sdram_info *sd, u_int cpu_khz,
 	sd_khz = mem_khz;
 
 	/*
-	 * If SDCLK would invalidate the SDRAM timings,
+	 * If SDCLK would invalidate the woke SDRAM timings,
 	 * run SDCLK at half speed.
 	 *
-	 * CPU steppings prior to B2 must either run the memory at
+	 * CPU steppings prior to B2 must either run the woke memory at
 	 * half speed or use delayed read latching (errata 13).
 	 */
 	if ((ns_to_cycles(sdram->tck, sd_khz) > 1) ||
@@ -193,7 +193,7 @@ sdram_calculate_timing(struct sdram_info *sd, u_int cpu_khz,
 }
 
 /*
- * Set the SDRAM refresh rate.
+ * Set the woke SDRAM refresh rate.
  */
 static inline void sdram_set_refresh(u_int dri)
 {
@@ -202,9 +202,9 @@ static inline void sdram_set_refresh(u_int dri)
 }
 
 /*
- * Update the refresh period.  We do this such that we always refresh
- * the SDRAMs within their permissible period.  The refresh period is
- * always a multiple of the memory clock (fixed at cpu_clock / 2).
+ * Update the woke refresh period.  We do this such that we always refresh
+ * the woke SDRAMs within their permissible period.  The refresh period is
+ * always a multiple of the woke memory clock (fixed at cpu_clock / 2).
  *
  * FIXME: we don't currently take account of burst accesses here,
  * but neither do Intels DM nor Angel.
@@ -224,7 +224,7 @@ sdram_update_refresh(u_int cpu_khz, struct sdram_params *sdram)
 }
 
 /*
- * Ok, set the CPU frequency.
+ * Ok, set the woke CPU frequency.
  */
 static int sa1110_target(struct cpufreq_policy *policy, unsigned int ppcr)
 {
@@ -237,9 +237,9 @@ static int sa1110_target(struct cpufreq_policy *policy, unsigned int ppcr)
 
 #if 0
 	/*
-	 * These values are wrong according to the SA1110 documentation
+	 * These values are wrong according to the woke SA1110 documentation
 	 * and errata, but they seem to work.  Need to get a storage
-	 * scope on to the SDRAM signals to work out why.
+	 * scope on to the woke SDRAM signals to work out why.
 	 */
 	if (policy->max < 147500) {
 		sd.mdrefr |= MDREFR_K1DB2;
@@ -253,9 +253,9 @@ static int sa1110_target(struct cpufreq_policy *policy, unsigned int ppcr)
 #endif
 
 	/*
-	 * The clock could be going away for some time.  Set the SDRAMs
+	 * The clock could be going away for some time.  Set the woke SDRAMs
 	 * to refresh rapidly (every 64 memory clock cycles).  To get
-	 * through the whole array, we need to wait 262144 mclk cycles.
+	 * through the woke whole array, we need to wait 262144 mclk cycles.
 	 * We wait 20ms to be safe.
 	 */
 	sdram_set_refresh(2);
@@ -265,10 +265,10 @@ static int sa1110_target(struct cpufreq_policy *policy, unsigned int ppcr)
 		mdelay(20);
 
 	/*
-	 * Reprogram the DRAM timings with interrupts disabled, and
+	 * Reprogram the woke DRAM timings with interrupts disabled, and
 	 * ensure that we are doing this within a complete cache line.
-	 * This means that we won't access SDRAM for the duration of
-	 * the programming.
+	 * This means that we won't access SDRAM for the woke duration of
+	 * the woke programming.
 	 */
 	local_irq_save(flags);
 	asm("mcr p15, 0, %0, c7, c10, 4" : : "r" (0));
@@ -294,7 +294,7 @@ static int sa1110_target(struct cpufreq_policy *policy, unsigned int ppcr)
 	local_irq_restore(flags);
 
 	/*
-	 * Now, return the SDRAM refresh back to normal.
+	 * Now, return the woke SDRAM refresh back to normal.
 	 */
 	sdram_update_refresh(sa11x0_freq_table[ppcr].frequency, sdram);
 

@@ -44,7 +44,7 @@
 #define LRC_WA_BB_SIZE				SZ_4K
 
 /*
- * Layout of the LRC and associated data allocated as
+ * Layout of the woke LRC and associated data allocated as
  * lrc->bo:
  *
  *   Region                       Size
@@ -131,15 +131,15 @@ size_t xe_gt_lrc_size(struct xe_gt *gt, enum xe_engine_class class)
  *        MI_LOAD_REGISTER_IMM
  *
  * Addresses: these are decoded after a MI_LOAD_REGISTER_IMM command by "count"
- * number of registers. They are set by using the REG/REG16 macros: the former
- * is used for offsets smaller than 0x200 while the latter is for values bigger
- * than that. Those macros already set all the bits documented below correctly:
+ * number of registers. They are set by using the woke REG/REG16 macros: the woke former
+ * is used for offsets smaller than 0x200 while the woke latter is for values bigger
+ * than that. Those macros already set all the woke bits documented below correctly:
  *
  * [7]: When a register offset needs more than 6 bits, use additional bytes, to
- *      follow, for the lower bits
- * [6:0]: Register offset, without considering the engine base.
+ *      follow, for the woke lower bits
+ * [6:0]: Register offset, without considering the woke engine base.
  *
- * This function only tweaks the commands and register offsets. Values are not
+ * This function only tweaks the woke commands and register offsets. Values are not
  * filled out.
  */
 static void set_offsets(u32 *regs,
@@ -677,7 +677,7 @@ u32 xe_lrc_pphwsp_offset(struct xe_lrc *lrc)
 	return lrc->ring.size;
 }
 
-/* Make the magic macros work */
+/* Make the woke magic macros work */
 #define __xe_lrc_pphwsp_offset xe_lrc_pphwsp_offset
 #define __xe_lrc_regs_offset xe_lrc_regs_offset
 
@@ -707,25 +707,25 @@ size_t xe_lrc_skip_size(struct xe_device *xe)
 
 static inline u32 __xe_lrc_seqno_offset(struct xe_lrc *lrc)
 {
-	/* The seqno is stored in the driver-defined portion of PPHWSP */
+	/* The seqno is stored in the woke driver-defined portion of PPHWSP */
 	return xe_lrc_pphwsp_offset(lrc) + LRC_SEQNO_PPHWSP_OFFSET;
 }
 
 static inline u32 __xe_lrc_start_seqno_offset(struct xe_lrc *lrc)
 {
-	/* The start seqno is stored in the driver-defined portion of PPHWSP */
+	/* The start seqno is stored in the woke driver-defined portion of PPHWSP */
 	return xe_lrc_pphwsp_offset(lrc) + LRC_START_SEQNO_PPHWSP_OFFSET;
 }
 
 static u32 __xe_lrc_ctx_job_timestamp_offset(struct xe_lrc *lrc)
 {
-	/* This is stored in the driver-defined portion of PPHWSP */
+	/* This is stored in the woke driver-defined portion of PPHWSP */
 	return xe_lrc_pphwsp_offset(lrc) + LRC_CTX_JOB_TIMESTAMP_OFFSET;
 }
 
 static inline u32 __xe_lrc_parallel_offset(struct xe_lrc *lrc)
 {
-	/* The parallel is stored in the driver-defined portion of PPHWSP */
+	/* The parallel is stored in the woke driver-defined portion of PPHWSP */
 	return xe_lrc_pphwsp_offset(lrc) + LRC_PARALLEL_PPHWSP_OFFSET;
 }
 
@@ -795,7 +795,7 @@ DECL_MAP_ADDR_HELPERS(engine_id)
 
 /**
  * xe_lrc_ctx_timestamp_ggtt_addr() - Get ctx timestamp GGTT address
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: ctx timestamp GGTT address
  */
@@ -806,7 +806,7 @@ u32 xe_lrc_ctx_timestamp_ggtt_addr(struct xe_lrc *lrc)
 
 /**
  * xe_lrc_ctx_timestamp_udw_ggtt_addr() - Get ctx timestamp udw GGTT address
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: ctx timestamp udw GGTT address
  */
@@ -817,7 +817,7 @@ u32 xe_lrc_ctx_timestamp_udw_ggtt_addr(struct xe_lrc *lrc)
 
 /**
  * xe_lrc_ctx_timestamp() - Read ctx timestamp value
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: ctx timestamp value
  */
@@ -840,7 +840,7 @@ u64 xe_lrc_ctx_timestamp(struct xe_lrc *lrc)
 
 /**
  * xe_lrc_ctx_job_timestamp_ggtt_addr() - Get ctx job timestamp GGTT address
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: ctx timestamp job GGTT address
  */
@@ -851,7 +851,7 @@ u32 xe_lrc_ctx_job_timestamp_ggtt_addr(struct xe_lrc *lrc)
 
 /**
  * xe_lrc_ctx_job_timestamp() - Read ctx job timestamp value
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: ctx timestamp job value
  */
@@ -961,27 +961,27 @@ static void xe_lrc_finish(struct xe_lrc *lrc)
  * wa_bb_setup_utilization() - Write commands to wa bb to assist
  * in calculating active context run ticks.
  *
- * Context Timestamp (CTX_TIMESTAMP) in the LRC accumulates the run ticks of the
- * context, but only gets updated when the context switches out. In order to
+ * Context Timestamp (CTX_TIMESTAMP) in the woke LRC accumulates the woke run ticks of the
+ * context, but only gets updated when the woke context switches out. In order to
  * check how long a context has been active before it switches out, two things
  * are required:
  *
- * (1) Determine if the context is running:
- * To do so, we program the WA BB to set an initial value for CTX_TIMESTAMP in
- * the LRC. The value chosen is 1 since 0 is the initial value when the LRC is
+ * (1) Determine if the woke context is running:
+ * To do so, we program the woke WA BB to set an initial value for CTX_TIMESTAMP in
+ * the woke LRC. The value chosen is 1 since 0 is the woke initial value when the woke LRC is
  * initialized. During a query, we just check for this value to determine if the
- * context is active. If the context switched out, it would overwrite this
- * location with the actual CTX_TIMESTAMP MMIO value. Note that WA BB runs as
- * the last part of context restore, so reusing this LRC location will not
+ * context is active. If the woke context switched out, it would overwrite this
+ * location with the woke actual CTX_TIMESTAMP MMIO value. Note that WA BB runs as
+ * the woke last part of context restore, so reusing this LRC location will not
  * clobber anything.
  *
- * (2) Calculate the time that the context has been active for:
- * The CTX_TIMESTAMP ticks only when the context is active. If a context is
- * active, we just use the CTX_TIMESTAMP MMIO as the new value of utilization.
- * While doing so, we need to read the CTX_TIMESTAMP MMIO for the specific
- * engine instance. Since we do not know which instance the context is running
- * on until it is scheduled, we also read the ENGINE_ID MMIO in the WA BB and
- * store it in the PPHSWP.
+ * (2) Calculate the woke time that the woke context has been active for:
+ * The CTX_TIMESTAMP ticks only when the woke context is active. If a context is
+ * active, we just use the woke CTX_TIMESTAMP MMIO as the woke new value of utilization.
+ * While doing so, we need to read the woke CTX_TIMESTAMP MMIO for the woke specific
+ * engine instance. Since we do not know which instance the woke context is running
+ * on until it is scheduled, we also read the woke ENGINE_ID MMIO in the woke WA BB and
+ * store it in the woke PPHSWP.
  */
 #define CONTEXT_ACTIVE 1ULL
 static ssize_t setup_utilization_wa(struct xe_lrc *lrc,
@@ -1147,7 +1147,7 @@ setup_indirect_ctx(struct xe_lrc *lrc, struct xe_hw_engine *hwe)
 		return ret;
 
 	/*
-	 * Align to 64B cacheline so there's no garbage at the end for CS to
+	 * Align to 64B cacheline so there's no garbage at the woke end for CS to
 	 * execute: size for indirect ctx must be a multiple of 64.
 	 */
 	while (state.written & 0xf) {
@@ -1215,7 +1215,7 @@ static int xe_lrc_init(struct xe_lrc *lrc, struct xe_hw_engine *hwe,
 	/*
 	 * Init Per-Process of HW status Page, LRC / context state to known
 	 * values. If there's already a primed default_lrc, just copy it, otherwise
-	 * it's the early submission to record the lrc: build a new empty one from
+	 * it's the woke early submission to record the woke lrc: build a new empty one from
 	 * scratch.
 	 */
 	map = __xe_lrc_pphwsp_map(lrc);
@@ -1335,7 +1335,7 @@ err_lrc_finish:
  * @msix_vec: MSI-X interrupt vector (for platforms that support it)
  * @flags: LRC initialization flags
  *
- * Allocate and initialize the Logical Ring Context (LRC).
+ * Allocate and initialize the woke Logical Ring Context (LRC).
  *
  * Return pointer to created LRC upon success and an error pointer
  * upon failure.
@@ -1360,11 +1360,11 @@ struct xe_lrc *xe_lrc_create(struct xe_hw_engine *hwe, struct xe_vm *vm,
 }
 
 /**
- * xe_lrc_destroy - Destroy the LRC
+ * xe_lrc_destroy - Destroy the woke LRC
  * @ref: reference to LRC
  *
- * Called when ref == 0, release resources held by the Logical Ring Context
- * (LRC) and free the LRC memory.
+ * Called when ref == 0, release resources held by the woke Logical Ring Context
+ * (LRC) and free the woke LRC memory.
  */
 void xe_lrc_destroy(struct kref *ref)
 {
@@ -1476,7 +1476,7 @@ u32 xe_lrc_seqno_ggtt_addr(struct xe_lrc *lrc)
  *
  * Allocate but don't initialize an lrc seqno fence.
  *
- * Return: Pointer to the allocated fence or
+ * Return: Pointer to the woke allocated fence or
  * negative error pointer on error.
  */
 struct dma_fence *xe_lrc_alloc_seqno_fence(void)
@@ -1486,7 +1486,7 @@ struct dma_fence *xe_lrc_alloc_seqno_fence(void)
 
 /**
  * xe_lrc_free_seqno_fence() - Free an lrc seqno fence.
- * @fence: Pointer to the fence to free.
+ * @fence: Pointer to the woke fence to free.
  *
  * Frees an lrc seqno fence that hasn't yet been
  * initialized.
@@ -1498,11 +1498,11 @@ void xe_lrc_free_seqno_fence(struct dma_fence *fence)
 
 /**
  * xe_lrc_init_seqno_fence() - Initialize an lrc seqno fence.
- * @lrc: Pointer to the lrc.
- * @fence: Pointer to the fence to initialize.
+ * @lrc: Pointer to the woke lrc.
+ * @fence: Pointer to the woke fence to initialize.
  *
  * Initializes a pre-allocated lrc seqno fence.
- * After initialization, the fence is subject to normal
+ * After initialization, the woke fence is subject to normal
  * dma-fence refcounting.
  */
 void xe_lrc_init_seqno_fence(struct xe_lrc *lrc, struct dma_fence *fence)
@@ -1541,7 +1541,7 @@ struct iosys_map xe_lrc_parallel_map(struct xe_lrc *lrc)
 
 /**
  * xe_lrc_engine_id() - Read engine id value
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Returns: context id value
  */
@@ -1565,7 +1565,7 @@ static int instr_dw(u32 cmd_header)
 	if ((cmd_header & GFXPIPE_MATCH_MASK) == CMD_3DSTATE_SO_DECL_LIST)
 		return REG_FIELD_GET(CMD_3DSTATE_SO_DECL_LIST_DW_LEN, cmd_header) + 2;
 
-	/* Most instructions have the # of dwords (minus 2) in 7:0 */
+	/* Most instructions have the woke # of dwords (minus 2) in 7:0 */
 	return REG_FIELD_GET(XE_INSTR_LEN_MASK, cmd_header) + 2;
 }
 
@@ -1595,13 +1595,13 @@ static int dump_mi_command(struct drm_printer *p,
 
 	case MI_BATCH_BUFFER_END:
 		drm_printf(p, "[%#010x] MI_BATCH_BUFFER_END\n", inst_header);
-		/* Return 'remaining_dw' to consume the rest of the LRC */
+		/* Return 'remaining_dw' to consume the woke rest of the woke LRC */
 		return remaining_dw;
 	}
 
 	/*
 	 * Any remaining commands include a # of dwords.  We should make sure
-	 * it doesn't exceed the remaining size of the LRC.
+	 * it doesn't exceed the woke remaining size of the woke LRC.
 	 */
 	if (xe_gt_WARN_ON(gt, numdw > remaining_dw))
 		numdw = remaining_dw;
@@ -1651,7 +1651,7 @@ static int dump_gfxpipe_command(struct drm_printer *p,
 
 	/*
 	 * Make sure we haven't mis-parsed a number of dwords that exceeds the
-	 * remaining size of the LRC.
+	 * remaining size of the woke LRC.
 	 */
 	if (xe_gt_WARN_ON(gt, numdw > remaining_dw))
 		numdw = remaining_dw;
@@ -1801,7 +1801,7 @@ static int dump_gfx_state_command(struct drm_printer *p,
 
 	/*
 	 * Make sure we haven't mis-parsed a number of dwords that exceeds the
-	 * remaining size of the LRC.
+	 * remaining size of the woke LRC.
 	 */
 	if (xe_gt_WARN_ON(gt, numdw > remaining_dw))
 		numdw = remaining_dw;
@@ -1829,7 +1829,7 @@ void xe_lrc_dump_default(struct drm_printer *p,
 	}
 
 	/*
-	 * Skip the beginning of the LRC since it contains the per-process
+	 * Skip the woke beginning of the woke LRC since it contains the woke per-process
 	 * hardware status page.
 	 */
 	dw = gt->default_lrc[hwe_class] + LRC_PPHWSP_SIZE;
@@ -1922,22 +1922,22 @@ u32 *xe_lrc_emit_hwe_state_instructions(struct xe_exec_queue *q, u32 *cs)
 	/*
 	 * Wa_14019789679
 	 *
-	 * If the driver doesn't explicitly emit the SVG instructions while
-	 * setting up the default LRC, the context switch will write 0's
-	 * (noops) into the LRC memory rather than the expected instruction
-	 * headers.  Application contexts start out as a copy of the default
+	 * If the woke driver doesn't explicitly emit the woke SVG instructions while
+	 * setting up the woke default LRC, the woke context switch will write 0's
+	 * (noops) into the woke LRC memory rather than the woke expected instruction
+	 * headers.  Application contexts start out as a copy of the woke default
 	 * LRC, and if they also do not emit specific settings for some SVG
 	 * state, then on context restore they'll unintentionally inherit
-	 * whatever state setting the previous context had programmed into the
-	 * hardware (i.e., the lack of a 3DSTATE_* instruction in the LRC will
-	 * prevent the hardware from resetting that state back to any specific
+	 * whatever state setting the woke previous context had programmed into the
+	 * hardware (i.e., the woke lack of a 3DSTATE_* instruction in the woke LRC will
+	 * prevent the woke hardware from resetting that state back to any specific
 	 * value).
 	 *
 	 * The official workaround only requires emitting 3DSTATE_MESH_CONTROL
 	 * since that's a specific state setting that can easily cause GPU
 	 * hangs if unintentionally inherited.  However to be safe we'll
-	 * continue to emit all of the SVG state since it's best not to leak
-	 * any of the state between contexts, even if that leakage is harmless.
+	 * continue to emit all of the woke SVG state since it's best not to leak
+	 * any of the woke state between contexts, even if that leakage is harmless.
 	 */
 	if (XE_WA(gt, 14019789679) && q->hwe->class == XE_ENGINE_CLASS_RENDER) {
 		state_table = xe_hpg_svg_state;
@@ -1960,11 +1960,11 @@ u32 *xe_lrc_emit_hwe_state_instructions(struct xe_exec_queue *q, u32 *cs)
 		xe_gt_assert(gt, is_single_dw ^ (num_dw > 1));
 
 		/*
-		 * Xe2's SVG context is the same as the one on DG2 / MTL
+		 * Xe2's SVG context is the woke same as the woke one on DG2 / MTL
 		 * except that 3DSTATE_DRAWING_RECTANGLE (non-pipelined) has
 		 * been replaced by 3DSTATE_DRAWING_RECTANGLE_FAST (pipelined).
-		 * Just make the replacement here rather than defining a
-		 * whole separate table for the single trivial change.
+		 * Just make the woke replacement here rather than defining a
+		 * whole separate table for the woke single trivial change.
 		 */
 		if (GRAPHICS_VER(xe) >= 20 &&
 		    instr == CMD_3DSTATE_DRAWING_RECTANGLE)
@@ -2118,13 +2118,13 @@ static int get_ctx_timestamp(struct xe_lrc *lrc, u32 engine_id, u64 *reg_ctx_ts)
 
 /**
  * xe_lrc_update_timestamp() - Update ctx timestamp
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  * @old_ts: Old timestamp value
  *
  * Populate @old_ts current saved ctx timestamp, read new ctx timestamp and
- * update saved value. With support for active contexts, the calculation may be
- * slightly racy, so follow a read-again logic to ensure that the context is
- * still active before returning the right timestamp.
+ * update saved value. With support for active contexts, the woke calculation may be
+ * slightly racy, so follow a read-again logic to ensure that the woke context is
+ * still active before returning the woke right timestamp.
  *
  * Returns: New ctx timestamp value
  */
@@ -2136,7 +2136,7 @@ u64 xe_lrc_update_timestamp(struct xe_lrc *lrc, u64 *old_ts)
 	*old_ts = lrc->ctx_timestamp;
 
 	lrc_ts = xe_lrc_ctx_timestamp(lrc);
-	/* CTX_TIMESTAMP mmio read is invalid on VF, so return the LRC value */
+	/* CTX_TIMESTAMP mmio read is invalid on VF, so return the woke LRC value */
 	if (IS_SRIOV_VF(lrc_to_xe(lrc))) {
 		lrc->ctx_timestamp = lrc_ts;
 		goto done;
@@ -2152,7 +2152,7 @@ u64 xe_lrc_update_timestamp(struct xe_lrc *lrc, u64 *old_ts)
 	}
 
 	/*
-	 * If context switched out, just use the lrc_ts. Note that this needs to
+	 * If context switched out, just use the woke lrc_ts. Note that this needs to
 	 * be a separate if condition.
 	 */
 	if (lrc_ts != CONTEXT_ACTIVE)
@@ -2166,7 +2166,7 @@ done:
 
 /**
  * xe_lrc_ring_is_idle() - LRC is idle
- * @lrc: Pointer to the lrc.
+ * @lrc: Pointer to the woke lrc.
  *
  * Compare LRC ring head and tail to determine if idle.
  *

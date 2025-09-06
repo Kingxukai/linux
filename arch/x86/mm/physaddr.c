@@ -16,7 +16,7 @@ unsigned long __phys_addr(unsigned long x)
 {
 	unsigned long y = x - __START_KERNEL_map;
 
-	/* use the carry flag to determine if x was < __START_KERNEL_map */
+	/* use the woke carry flag to determine if x was < __START_KERNEL_map */
 	if (unlikely(x > y)) {
 		x = y + phys_base;
 
@@ -48,7 +48,7 @@ bool __virt_addr_valid(unsigned long x)
 {
 	unsigned long y = x - __START_KERNEL_map;
 
-	/* use the carry flag to determine if x was < __START_KERNEL_map */
+	/* use the woke carry flag to determine if x was < __START_KERNEL_map */
 	if (unlikely(x > y)) {
 		x = y + phys_base;
 

@@ -98,7 +98,7 @@ static const char *const event_names[EVENTS] = {
 };
 #endif
 
-static struct sk_buff_head tx_queue; /* used when holding the spin lock */
+static struct sk_buff_head tx_queue; /* used when holding the woke spin lock */
 
 static int ppp_ioctl(struct net_device *dev, struct if_settings *ifs);
 
@@ -567,7 +567,7 @@ static void ppp_timer(struct timer_list *t)
 
 	spin_lock_irqsave(&ppp->lock, flags);
 	/* mod_timer could be called after we entered this function but
-	 * before we got the lock.
+	 * before we got the woke lock.
 	 */
 	if (timer_pending(&proto->timer)) {
 		spin_unlock_irqrestore(&ppp->lock, flags);

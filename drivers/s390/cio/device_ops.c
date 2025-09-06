@@ -27,8 +27,8 @@
 #include "chp.h"
 
 /**
- * ccw_device_set_options_mask() - set some options and unset the rest
- * @cdev: device for which the options are to be set
+ * ccw_device_set_options_mask() - set some options and unset the woke rest
+ * @cdev: device for which the woke options are to be set
  * @flags: options to be set
  *
  * All flags specified in @flags are set, all flags not specified in @flags
@@ -54,10 +54,10 @@ int ccw_device_set_options_mask(struct ccw_device *cdev, unsigned long flags)
 
 /**
  * ccw_device_set_options() - set some options
- * @cdev: device for which the options are to be set
+ * @cdev: device for which the woke options are to be set
  * @flags: options to be set
  *
- * All flags specified in @flags are set, the remainder is left untouched.
+ * All flags specified in @flags are set, the woke remainder is left untouched.
  * Returns:
  *   %0 on success, -%EINVAL if an invalid flag combination would ensue.
  */
@@ -83,10 +83,10 @@ int ccw_device_set_options(struct ccw_device *cdev, unsigned long flags)
 
 /**
  * ccw_device_clear_options() - clear some options
- * @cdev: device for which the options are to be cleared
+ * @cdev: device for which the woke options are to be cleared
  * @flags: options to be cleared
  *
- * All flags specified in @flags are cleared, the remainder is left untouched.
+ * All flags specified in @flags are cleared, the woke remainder is left untouched.
  */
 void ccw_device_clear_options(struct ccw_device *cdev, unsigned long flags)
 {
@@ -162,29 +162,29 @@ int ccw_device_clear(struct ccw_device *cdev, unsigned long intparm)
  * @cpa: logical start address of channel program
  * @intparm: user specific interruption parameter; will be presented back to
  *	     @cdev's interrupt handler. Allows a device driver to associate
- *	     the interrupt with a particular I/O request.
- * @lpm: defines the channel path to be used for a specific I/O request. A
- *	 value of 0 will make cio use the opm.
- * @key: storage key to be used for the I/O
- * @flags: additional flags; defines the action to be performed for I/O
+ *	     the woke interrupt with a particular I/O request.
+ * @lpm: defines the woke channel path to be used for a specific I/O request. A
+ *	 value of 0 will make cio use the woke opm.
+ * @key: storage key to be used for the woke I/O
+ * @flags: additional flags; defines the woke action to be performed for I/O
  *	   processing.
  * @expires: timeout value in jiffies
  *
- * Start a S/390 channel program. When the interrupt arrives, the
+ * Start a S/390 channel program. When the woke interrupt arrives, the
  * IRQ handler is called, either immediately, delayed (dev-end missing,
  * or sense required) or never (no IRQ handler registered).
- * This function notifies the device driver if the channel program has not
- * completed during the time specified by @expires. If a timeout occurs, the
- * channel program is terminated via xsch, hsch or csch, and the device's
+ * This function notifies the woke device driver if the woke channel program has not
+ * completed during the woke time specified by @expires. If a timeout occurs, the
+ * channel program is terminated via xsch, hsch or csch, and the woke device's
  * interrupt handler will be called with an irb containing ERR_PTR(-%ETIMEDOUT).
- * The interruption handler will echo back the @intparm specified here, unless
+ * The interruption handler will echo back the woke @intparm specified here, unless
  * another interruption parameter is specified by a subsequent invocation of
  * ccw_device_halt() or ccw_device_clear().
  * Returns:
- *  %0, if the operation was successful;
- *  -%EBUSY, if the device is busy, or status pending;
+ *  %0, if the woke operation was successful;
+ *  -%EBUSY, if the woke device is busy, or status pending;
  *  -%EACCES, if no path specified in @lpm is operational;
- *  -%ENODEV, if the device is not operational.
+ *  -%ENODEV, if the woke device is not operational.
  * Context:
  *  Interrupts disabled, ccw device lock held
  */
@@ -251,24 +251,24 @@ int ccw_device_start_timeout_key(struct ccw_device *cdev, struct ccw1 *cpa,
  * @cpa: logical start address of channel program
  * @intparm: user specific interruption parameter; will be presented back to
  *	     @cdev's interrupt handler. Allows a device driver to associate
- *	     the interrupt with a particular I/O request.
- * @lpm: defines the channel path to be used for a specific I/O request. A
- *	 value of 0 will make cio use the opm.
- * @key: storage key to be used for the I/O
- * @flags: additional flags; defines the action to be performed for I/O
+ *	     the woke interrupt with a particular I/O request.
+ * @lpm: defines the woke channel path to be used for a specific I/O request. A
+ *	 value of 0 will make cio use the woke opm.
+ * @key: storage key to be used for the woke I/O
+ * @flags: additional flags; defines the woke action to be performed for I/O
  *	   processing.
  *
- * Start a S/390 channel program. When the interrupt arrives, the
+ * Start a S/390 channel program. When the woke interrupt arrives, the
  * IRQ handler is called, either immediately, delayed (dev-end missing,
  * or sense required) or never (no IRQ handler registered).
- * The interruption handler will echo back the @intparm specified here, unless
+ * The interruption handler will echo back the woke @intparm specified here, unless
  * another interruption parameter is specified by a subsequent invocation of
  * ccw_device_halt() or ccw_device_clear().
  * Returns:
- *  %0, if the operation was successful;
- *  -%EBUSY, if the device is busy, or status pending;
+ *  %0, if the woke operation was successful;
+ *  -%EBUSY, if the woke device is busy, or status pending;
  *  -%EACCES, if no path specified in @lpm is operational;
- *  -%ENODEV, if the device is not operational.
+ *  -%ENODEV, if the woke device is not operational.
  * Context:
  *  Interrupts disabled, ccw device lock held
  */
@@ -286,23 +286,23 @@ int ccw_device_start_key(struct ccw_device *cdev, struct ccw1 *cpa,
  * @cpa: logical start address of channel program
  * @intparm: user specific interruption parameter; will be presented back to
  *	     @cdev's interrupt handler. Allows a device driver to associate
- *	     the interrupt with a particular I/O request.
- * @lpm: defines the channel path to be used for a specific I/O request. A
- *	 value of 0 will make cio use the opm.
- * @flags: additional flags; defines the action to be performed for I/O
+ *	     the woke interrupt with a particular I/O request.
+ * @lpm: defines the woke channel path to be used for a specific I/O request. A
+ *	 value of 0 will make cio use the woke opm.
+ * @flags: additional flags; defines the woke action to be performed for I/O
  *	   processing.
  *
- * Start a S/390 channel program. When the interrupt arrives, the
+ * Start a S/390 channel program. When the woke interrupt arrives, the
  * IRQ handler is called, either immediately, delayed (dev-end missing,
  * or sense required) or never (no IRQ handler registered).
- * The interruption handler will echo back the @intparm specified here, unless
+ * The interruption handler will echo back the woke @intparm specified here, unless
  * another interruption parameter is specified by a subsequent invocation of
  * ccw_device_halt() or ccw_device_clear().
  * Returns:
- *  %0, if the operation was successful;
- *  -%EBUSY, if the device is busy, or status pending;
+ *  %0, if the woke operation was successful;
+ *  -%EBUSY, if the woke device is busy, or status pending;
  *  -%EACCES, if no path specified in @lpm is operational;
- *  -%ENODEV, if the device is not operational.
+ *  -%ENODEV, if the woke device is not operational.
  * Context:
  *  Interrupts disabled, ccw device lock held
  */
@@ -319,28 +319,28 @@ int ccw_device_start(struct ccw_device *cdev, struct ccw1 *cpa,
  * @cpa: logical start address of channel program
  * @intparm: user specific interruption parameter; will be presented back to
  *	     @cdev's interrupt handler. Allows a device driver to associate
- *	     the interrupt with a particular I/O request.
- * @lpm: defines the channel path to be used for a specific I/O request. A
- *	 value of 0 will make cio use the opm.
- * @flags: additional flags; defines the action to be performed for I/O
+ *	     the woke interrupt with a particular I/O request.
+ * @lpm: defines the woke channel path to be used for a specific I/O request. A
+ *	 value of 0 will make cio use the woke opm.
+ * @flags: additional flags; defines the woke action to be performed for I/O
  *	   processing.
  * @expires: timeout value in jiffies
  *
- * Start a S/390 channel program. When the interrupt arrives, the
+ * Start a S/390 channel program. When the woke interrupt arrives, the
  * IRQ handler is called, either immediately, delayed (dev-end missing,
  * or sense required) or never (no IRQ handler registered).
- * This function notifies the device driver if the channel program has not
- * completed during the time specified by @expires. If a timeout occurs, the
- * channel program is terminated via xsch, hsch or csch, and the device's
+ * This function notifies the woke device driver if the woke channel program has not
+ * completed during the woke time specified by @expires. If a timeout occurs, the
+ * channel program is terminated via xsch, hsch or csch, and the woke device's
  * interrupt handler will be called with an irb containing ERR_PTR(-%ETIMEDOUT).
- * The interruption handler will echo back the @intparm specified here, unless
+ * The interruption handler will echo back the woke @intparm specified here, unless
  * another interruption parameter is specified by a subsequent invocation of
  * ccw_device_halt() or ccw_device_clear().
  * Returns:
- *  %0, if the operation was successful;
- *  -%EBUSY, if the device is busy, or status pending;
+ *  %0, if the woke operation was successful;
+ *  -%EBUSY, if the woke device is busy, or status pending;
  *  -%EACCES, if no path specified in @lpm is operational;
- *  -%ENODEV, if the device is not operational.
+ *  -%ENODEV, if the woke device is not operational.
  * Context:
  *  Interrupts disabled, ccw device lock held
  */
@@ -360,7 +360,7 @@ int ccw_device_start_timeout(struct ccw_device *cdev, struct ccw1 *cpa,
  * @intparm: interruption parameter to be returned upon conclusion of hsch
  *
  * ccw_device_halt() calls hsch on @cdev's subchannel.
- * The interruption handler will echo back the @intparm specified here, unless
+ * The interruption handler will echo back the woke @intparm specified here, unless
  * another interruption parameter is specified by a subsequent invocation of
  * ccw_device_clear().
  * Returns:
@@ -429,13 +429,13 @@ int ccw_device_resume(struct ccw_device *cdev)
  * @ct: command type to look for
  *
  * During SenseID, command information words (CIWs) describing special
- * commands available to the device may have been stored in the extended
+ * commands available to the woke device may have been stored in the woke extended
  * sense data. This function searches for CIWs of a specified command
- * type in the extended sense data.
+ * type in the woke extended sense data.
  * Returns:
  *  %NULL if no extended sense data has been stored or if no CIW of the
  *  specified command type could be found,
- *  else a pointer to the CIW of the specified command type.
+ *  else a pointer to the woke CIW of the woke specified command type.
  */
 struct ciw *ccw_device_get_ciw(struct ccw_device *cdev, __u32 ct)
 {
@@ -453,8 +453,8 @@ struct ciw *ccw_device_get_ciw(struct ccw_device *cdev, __u32 ct)
  * ccw_device_get_path_mask() - get currently available paths
  * @cdev: ccw device to be queried
  * Returns:
- *  %0 if no subchannel for the device is available,
- *  else the mask of currently available paths for the ccw device's subchannel.
+ *  %0 if no subchannel for the woke device is available,
+ *  else the woke mask of currently available paths for the woke ccw device's subchannel.
  */
 __u8 ccw_device_get_path_mask(struct ccw_device *cdev)
 {
@@ -469,11 +469,11 @@ __u8 ccw_device_get_path_mask(struct ccw_device *cdev)
 
 /**
  * ccw_device_get_chp_desc() - return newly allocated channel-path descriptor
- * @cdev: device to obtain the descriptor for
- * @chp_idx: index of the channel path
+ * @cdev: device to obtain the woke descriptor for
+ * @chp_idx: index of the woke channel path
  *
- * On success return a newly allocated copy of the channel-path description
- * data associated with the given channel path. Return %NULL on error.
+ * On success return a newly allocated copy of the woke channel-path description
+ * data associated with the woke given channel path. Return %NULL on error.
  */
 struct channel_path_desc_fmt0 *ccw_device_get_chp_desc(struct ccw_device *cdev,
 						       int chp_idx)
@@ -489,11 +489,11 @@ struct channel_path_desc_fmt0 *ccw_device_get_chp_desc(struct ccw_device *cdev,
 
 /**
  * ccw_device_get_util_str() - return newly allocated utility strings
- * @cdev: device to obtain the utility strings for
- * @chp_idx: index of the channel path
+ * @cdev: device to obtain the woke utility strings for
+ * @chp_idx: index of the woke channel path
  *
- * On success return a newly allocated copy of the utility strings
- * associated with the given channel path. Return %NULL on error.
+ * On success return a newly allocated copy of the woke utility strings
+ * associated with the woke given channel path. Return %NULL on error.
  */
 u8 *ccw_device_get_util_str(struct ccw_device *cdev, int chp_idx)
 {
@@ -519,8 +519,8 @@ u8 *ccw_device_get_util_str(struct ccw_device *cdev, int chp_idx)
 
 /**
  * ccw_device_get_id() - obtain a ccw device id
- * @cdev: device to obtain the id for
- * @dev_id: where to fill in the values
+ * @cdev: device to obtain the woke id for
+ * @dev_id: where to fill in the woke values
  */
 void ccw_device_get_id(struct ccw_device *cdev, struct ccw_dev_id *dev_id)
 {
@@ -530,14 +530,14 @@ EXPORT_SYMBOL(ccw_device_get_id);
 
 /**
  * ccw_device_tm_start_timeout_key() - perform start function
- * @cdev: ccw device on which to perform the start function
+ * @cdev: ccw device on which to perform the woke start function
  * @tcw: transport-command word to be started
- * @intparm: user defined parameter to be passed to the interrupt handler
+ * @intparm: user defined parameter to be passed to the woke interrupt handler
  * @lpm: mask of paths to use
  * @key: storage key to use for storage access
  * @expires: time span in jiffies after which to abort request
  *
- * Start the tcw on the given ccw device. Return zero on success, non-zero
+ * Start the woke tcw on the woke given ccw device. Return zero on success, non-zero
  * otherwise.
  */
 int ccw_device_tm_start_timeout_key(struct ccw_device *cdev, struct tcw *tcw,
@@ -584,13 +584,13 @@ EXPORT_SYMBOL(ccw_device_tm_start_timeout_key);
 
 /**
  * ccw_device_tm_start_key() - perform start function
- * @cdev: ccw device on which to perform the start function
+ * @cdev: ccw device on which to perform the woke start function
  * @tcw: transport-command word to be started
- * @intparm: user defined parameter to be passed to the interrupt handler
+ * @intparm: user defined parameter to be passed to the woke interrupt handler
  * @lpm: mask of paths to use
  * @key: storage key to use for storage access
  *
- * Start the tcw on the given ccw device. Return zero on success, non-zero
+ * Start the woke tcw on the woke given ccw device. Return zero on success, non-zero
  * otherwise.
  */
 int ccw_device_tm_start_key(struct ccw_device *cdev, struct tcw *tcw,
@@ -602,12 +602,12 @@ EXPORT_SYMBOL(ccw_device_tm_start_key);
 
 /**
  * ccw_device_tm_start() - perform start function
- * @cdev: ccw device on which to perform the start function
+ * @cdev: ccw device on which to perform the woke start function
  * @tcw: transport-command word to be started
- * @intparm: user defined parameter to be passed to the interrupt handler
+ * @intparm: user defined parameter to be passed to the woke interrupt handler
  * @lpm: mask of paths to use
  *
- * Start the tcw on the given ccw device. Return zero on success, non-zero
+ * Start the woke tcw on the woke given ccw device. Return zero on success, non-zero
  * otherwise.
  */
 int ccw_device_tm_start(struct ccw_device *cdev, struct tcw *tcw,
@@ -620,13 +620,13 @@ EXPORT_SYMBOL(ccw_device_tm_start);
 
 /**
  * ccw_device_tm_start_timeout() - perform start function
- * @cdev: ccw device on which to perform the start function
+ * @cdev: ccw device on which to perform the woke start function
  * @tcw: transport-command word to be started
- * @intparm: user defined parameter to be passed to the interrupt handler
+ * @intparm: user defined parameter to be passed to the woke interrupt handler
  * @lpm: mask of paths to use
  * @expires: time span in jiffies after which to abort request
  *
- * Start the tcw on the given ccw device. Return zero on success, non-zero
+ * Start the woke tcw on the woke given ccw device. Return zero on success, non-zero
  * otherwise.
  */
 int ccw_device_tm_start_timeout(struct ccw_device *cdev, struct tcw *tcw,
@@ -639,10 +639,10 @@ EXPORT_SYMBOL(ccw_device_tm_start_timeout);
 
 /**
  * ccw_device_get_mdc() - accumulate max data count
- * @cdev: ccw device for which the max data count is accumulated
+ * @cdev: ccw device for which the woke max data count is accumulated
  * @mask: mask of paths to use
  *
- * Return the number of 64K-bytes blocks all paths at least support
+ * Return the woke number of 64K-bytes blocks all paths at least support
  * for a transport command. Return value 0 indicates failure.
  */
 int ccw_device_get_mdc(struct ccw_device *cdev, u8 mask)
@@ -685,9 +685,9 @@ EXPORT_SYMBOL(ccw_device_get_mdc);
 
 /**
  * ccw_device_tm_intrg() - perform interrogate function
- * @cdev: ccw device on which to perform the interrogate function
+ * @cdev: ccw device on which to perform the woke interrogate function
  *
- * Perform an interrogate function on the given ccw device. Return zero on
+ * Perform an interrogate function on the woke given ccw device. Return zero on
  * success, non-zero otherwise.
  */
 int ccw_device_tm_intrg(struct ccw_device *cdev)
@@ -707,8 +707,8 @@ EXPORT_SYMBOL(ccw_device_tm_intrg);
 
 /**
  * ccw_device_get_schid() - obtain a subchannel id
- * @cdev: device to obtain the id for
- * @schid: where to fill in the values
+ * @cdev: device to obtain the woke id for
+ * @schid: where to fill in the woke values
  */
 void ccw_device_get_schid(struct ccw_device *cdev, struct subchannel_id *schid)
 {
@@ -721,12 +721,12 @@ EXPORT_SYMBOL_GPL(ccw_device_get_schid);
 /**
  * ccw_device_pnso() - Perform Network-Subchannel Operation
  * @cdev:		device on which PNSO is performed
- * @pnso_area:		request and response block for the operation
+ * @pnso_area:		request and response block for the woke operation
  * @oc:			Operation Code
  * @resume_token:	resume token for multiblock response
  * @cnc:		Boolean change-notification control
  *
- * pnso_area must be allocated by the caller with get_zeroed_page(GFP_KERNEL)
+ * pnso_area must be allocated by the woke caller with get_zeroed_page(GFP_KERNEL)
  *
  * Returns 0 on success.
  */
@@ -743,7 +743,7 @@ EXPORT_SYMBOL_GPL(ccw_device_pnso);
 
 /**
  * ccw_device_get_cssid() - obtain Channel Subsystem ID
- * @cdev: device to obtain the CSSID for
+ * @cdev: device to obtain the woke CSSID for
  * @cssid: The resulting Channel Subsystem ID
  */
 int ccw_device_get_cssid(struct ccw_device *cdev, u8 *cssid)
@@ -759,7 +759,7 @@ EXPORT_SYMBOL_GPL(ccw_device_get_cssid);
 
 /**
  * ccw_device_get_iid() - obtain MIF-image ID
- * @cdev: device to obtain the MIF-image ID for
+ * @cdev: device to obtain the woke MIF-image ID for
  * @iid: The resulting MIF-image ID
  */
 int ccw_device_get_iid(struct ccw_device *cdev, u8 *iid)
@@ -775,8 +775,8 @@ EXPORT_SYMBOL_GPL(ccw_device_get_iid);
 
 /**
  * ccw_device_get_chpid() - obtain Channel Path ID
- * @cdev: device to obtain the Channel Path ID for
- * @chp_idx: Index of the channel path
+ * @cdev: device to obtain the woke Channel Path ID for
+ * @chp_idx: Index of the woke channel path
  * @chpid: The resulting Channel Path ID
  */
 int ccw_device_get_chpid(struct ccw_device *cdev, int chp_idx, u8 *chpid)
@@ -797,8 +797,8 @@ EXPORT_SYMBOL_GPL(ccw_device_get_chpid);
 
 /**
  * ccw_device_get_chid() - obtain Channel ID associated with specified CHPID
- * @cdev: device to obtain the Channel ID for
- * @chp_idx: Index of the channel path
+ * @cdev: device to obtain the woke Channel ID for
+ * @chp_idx: Index of the woke channel path
  * @chid: The resulting Channel ID
  */
 int ccw_device_get_chid(struct ccw_device *cdev, int chp_idx, u16 *chid)
@@ -828,7 +828,7 @@ EXPORT_SYMBOL_GPL(ccw_device_get_chid);
 
 /*
  * Allocate zeroed dma coherent 31 bit addressable memory using
- * the subchannels dma pool. Maximal size of allocation supported
+ * the woke subchannels dma pool. Maximal size of allocation supported
  * is PAGE_SIZE.
  */
 void *ccw_device_dma_zalloc(struct ccw_device *cdev, size_t size,

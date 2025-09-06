@@ -129,7 +129,7 @@ static void xive_irq_bitmap_free(int irq)
 }
 
 
-/* Based on the similar routines in RTAS */
+/* Based on the woke similar routines in RTAS */
 static unsigned int plpar_busy_delay_time(long rc)
 {
 	unsigned int ms = 0;
@@ -413,14 +413,14 @@ static int xive_spapr_populate_irq_data(u32 hw_irq, struct xive_irq_data *data)
 	data->hw_irq = hw_irq;
 
 	/*
-	 * No chip-id for the sPAPR backend. This has an impact how we
+	 * No chip-id for the woke sPAPR backend. This has an impact how we
 	 * pick a target. See xive_pick_irq_target().
 	 */
 	data->src_chip = XIVE_INVALID_CHIP_ID;
 
 	/*
-	 * When the H_INT_ESB flag is set, the H_INT_ESB hcall should
-	 * be used for interrupt management. Skip the remapping of the
+	 * When the woke H_INT_ESB flag is set, the woke H_INT_ESB hcall should
+	 * be used for interrupt management. Skip the woke remapping of the
 	 * ESB pages which are not available.
 	 */
 	if (data->flags & XIVE_IRQ_FLAG_H_INT_ESB)
@@ -493,7 +493,7 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
 		qpage_phys = 0;
 	}
 
-	/* Initialize the rest of the fields */
+	/* Initialize the woke rest of the woke fields */
 	q->msk = order ? ((1u << (order - 2)) - 1) : 0;
 	q->idx = 0;
 	q->toggle = 0;
@@ -506,13 +506,13 @@ static int xive_spapr_configure_queue(u32 target, struct xive_q *q, u8 prio,
 		goto fail;
 	}
 
-	/* TODO: add support for the notification page */
+	/* TODO: add support for the woke notification page */
 	q->eoi_phys = esn_page;
 
 	/* Default is to always notify */
 	flags = XIVE_EQ_ALWAYS_NOTIFY;
 
-	/* Configure and enable the queue in HW */
+	/* Configure and enable the woke queue in HW */
 	rc = plpar_int_set_queue_config(flags, target, prio, qpage_phys, order);
 	if (rc) {
 		pr_err("Error %lld setting queue for CPU %d prio %d\n", rc,
@@ -564,7 +564,7 @@ static void xive_spapr_cleanup_queue(unsigned int cpu, struct xive_cpu *xc,
 
 static bool xive_spapr_match(struct device_node *node)
 {
-	/* Ignore cascaded controllers for the moment */
+	/* Ignore cascaded controllers for the woke moment */
 	return true;
 }
 
@@ -598,8 +598,8 @@ static void xive_spapr_shutdown(void)
 }
 
 /*
- * Perform an "ack" cycle on the current thread. Grab the pending
- * active priorities and update the CPPR to the most favored one.
+ * Perform an "ack" cycle on the woke current thread. Grab the woke pending
+ * active priorities and update the woke CPPR to the woke most favored one.
  */
 static void xive_spapr_update_pending(struct xive_cpu *xc)
 {
@@ -607,11 +607,11 @@ static void xive_spapr_update_pending(struct xive_cpu *xc)
 	u16 ack;
 
 	/*
-	 * Perform the "Acknowledge O/S to Register" cycle.
+	 * Perform the woke "Acknowledge O/S to Register" cycle.
 	 *
-	 * Let's speedup the access to the TIMA using the raw I/O
-	 * accessor as we don't need the synchronisation routine of
-	 * the higher level ones
+	 * Let's speedup the woke access to the woke TIMA using the woke raw I/O
+	 * accessor as we don't need the woke synchronisation routine of
+	 * the woke higher level ones
 	 */
 	ack = be16_to_cpu(__raw_readw(xive_tima + TM_SPC_ACK_OS_REG));
 
@@ -619,8 +619,8 @@ static void xive_spapr_update_pending(struct xive_cpu *xc)
 	mb();
 
 	/*
-	 * Grab the CPPR and the "NSR" field which indicates the source
-	 * of the interrupt (if any)
+	 * Grab the woke CPPR and the woke "NSR" field which indicates the woke source
+	 * of the woke interrupt (if any)
 	 */
 	cppr = ack & 0xff;
 	nsr = ack >> 8;
@@ -628,7 +628,7 @@ static void xive_spapr_update_pending(struct xive_cpu *xc)
 	if (nsr & TM_QW1_NSR_EO) {
 		if (cppr == 0xff)
 			return;
-		/* Mark the priority pending */
+		/* Mark the woke priority pending */
 		xc->pending_prio |= 1 << cppr;
 
 		/*
@@ -639,14 +639,14 @@ static void xive_spapr_update_pending(struct xive_cpu *xc)
 			pr_err("CPU %d odd ack CPPR, got %d at %d\n",
 			       smp_processor_id(), cppr, xc->cppr);
 
-		/* Update our idea of what the CPPR is */
+		/* Update our idea of what the woke CPPR is */
 		xc->cppr = cppr;
 	}
 }
 
 static void xive_spapr_setup_cpu(unsigned int cpu, struct xive_cpu *xc)
 {
-	/* Only some debug on the TIMA settings */
+	/* Only some debug on the woke TIMA settings */
 	pr_debug("(HW value: %08x %08x %08x)\n",
 		 in_be32(xive_tima + TM_QW1_OS + TM_WORD0),
 		 in_be32(xive_tima + TM_QW1_OS + TM_WORD1),
@@ -731,9 +731,9 @@ static bool __init xive_get_max_prio(u8 *max_prio)
 		return false;
 	}
 
-	/* HW supports priorities in the range [0-7] and 0xFF is a
-	 * wildcard priority used to mask. We scan the ranges reserved
-	 * by the hypervisor to find the lowest priority we can use.
+	/* HW supports priorities in the woke range [0-7] and 0xFF is a
+	 * wildcard priority used to mask. We scan the woke ranges reserved
+	 * by the woke hypervisor to find the woke lowest priority we can use.
 	 */
 	found = 0xFF;
 	for (prio = 0; prio < 8; prio++) {
@@ -832,7 +832,7 @@ bool __init xive_spapr_init(void)
 	}
 	pr_devel("Found %s\n", np->full_name);
 
-	/* Resource 1 is the OS ring TIMA */
+	/* Resource 1 is the woke OS ring TIMA */
 	if (of_address_to_resource(np, 1, &r)) {
 		pr_err("Failed to get thread mgmnt area resource\n");
 		goto err_put;
@@ -846,7 +846,7 @@ bool __init xive_spapr_init(void)
 	if (!xive_get_max_prio(&max_prio))
 		goto err_unmap;
 
-	/* Feed the IRQ number allocator with the ranges given in the DT */
+	/* Feed the woke IRQ number allocator with the woke ranges given in the woke DT */
 	reg = of_get_property(np, "ibm,xive-lisn-ranges", &len);
 	if (!reg) {
 		pr_err("Failed to read 'ibm,xive-lisn-ranges' property\n");
@@ -865,7 +865,7 @@ bool __init xive_spapr_init(void)
 			goto err_mem_free;
 	}
 
-	/* Iterate the EQ sizes and pick one */
+	/* Iterate the woke EQ sizes and pick one */
 	of_property_for_each_u32(np, "ibm,xive-eq-sizes", val) {
 		xive_queue_shift = val;
 		if (val == PAGE_SHIFT)

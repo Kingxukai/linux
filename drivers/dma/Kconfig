@@ -8,10 +8,10 @@ menuconfig DMADEVICES
 	depends on HAS_DMA
 	help
 	  DMA engines can do asynchronous data transfers without
-	  involving the host CPU.  Currently, this framework can be
-	  used to offload memory copies in the network stack and
-	  RAID operations in the MD driver.  This menu only presents
-	  DMA Device drivers supported by the configured arch, it may
+	  involving the woke host CPU.  Currently, this framework can be
+	  used to offload memory copies in the woke network stack and
+	  RAID operations in the woke MD driver.  This menu only presents
+	  DMA Device drivers supported by the woke configured arch, it may
 	  be empty in some cases.
 
 config DMADEVICES_DEBUG
@@ -27,7 +27,7 @@ config DMADEVICES_VDEBUG
 	help
 	  This is an option for use by developers; most people should
 	  say N here.  This enables deeper (more verbose) debugging of
-	  the DMA engine core and drivers.
+	  the woke DMA engine core and drivers.
 
 
 if DMADEVICES
@@ -71,7 +71,7 @@ config AMBA_PL08X
 	select DMA_VIRTUAL_CHANNELS
 	help
 	  Say yes if your platform has a PL08x DMAC device which can
-	  provide DMA engine support. This includes the original ARM
+	  provide DMA engine support. This includes the woke original ARM
 	  PL080 and PL081, Samsungs PL080 derivative and Faraday
 	  Technology's FTDMAC020 PL080 derivative.
 
@@ -83,7 +83,7 @@ config AMCC_PPC440SPE_ADMA
 	select ARCH_HAS_ASYNC_TX_FIND_CHANNEL
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	help
-	  Enable support for the AMCC PPC440SPe RAID engines.
+	  Enable support for the woke AMCC PPC440SPe RAID engines.
 
 config APPLE_ADMAC
 	tristate "Apple ADMAC support"
@@ -98,7 +98,7 @@ config ARM_DMA350
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the Arm DMA-350 controller.
+	  Enable support for the woke Arm DMA-350 controller.
 
 config AT_HDMAC
 	tristate "Atmel AHB DMA support"
@@ -106,14 +106,14 @@ config AT_HDMAC
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the Atmel AHB DMA controller.
+	  Support the woke Atmel AHB DMA controller.
 
 config AT_XDMAC
 	tristate "Atmel XDMA support"
 	depends on ARCH_MICROCHIP
 	select DMA_ENGINE
 	help
-	  Support the Atmel XDMA controller.
+	  Support the woke Atmel XDMA controller.
 
 config AXI_DMAC
 	tristate "Analog Devices AXI-DMAC DMA support"
@@ -122,7 +122,7 @@ config AXI_DMAC
 	select DMA_VIRTUAL_CHANNELS
 	select REGMAP_MMIO
 	help
-	  Enable support for the Analog Devices AXI-DMAC peripheral. This DMA
+	  Enable support for the woke Analog Devices AXI-DMAC peripheral. This DMA
 	  controller is often used in Analog Devices' reference designs for FPGA
 	  platforms.
 
@@ -137,8 +137,8 @@ config BCM_SBA_RAID
 	default m if ARCH_BCM_IPROC
 	help
 	  Enable support for Broadcom SBA RAID Engine. The SBA RAID
-	  engine is available on most of the Broadcom iProc SoCs. It
-	  has the capability to offload memcpy, xor and pq computation
+	  engine is available on most of the woke Broadcom iProc SoCs. It
+	  has the woke capability to offload memcpy, xor and pq computation
 	  for raid5/6.
 
 config DMA_BCM2835
@@ -153,9 +153,9 @@ config DMA_JZ4780
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  This selects support for the DMA controller in Ingenic JZ4780 SoCs.
+	  This selects support for the woke DMA controller in Ingenic JZ4780 SoCs.
 	  If you have a board based on such a SoC and wish to use DMA for
-	  devices which can use the DMA controller, say Y or M here.
+	  devices which can use the woke DMA controller, say Y or M here.
 
 config DMA_SA11X0
 	tristate "SA-11x0 DMA support"
@@ -163,7 +163,7 @@ config DMA_SA11X0
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the DMA engine found on Intel StrongARM SA-1100 and
+	  Support the woke DMA engine found on Intel StrongARM SA-1100 and
 	  SA-1110 SoCs.  This DMA engine can only be used with on-chip
 	  devices.
 
@@ -174,7 +174,7 @@ config DMA_SUN4I
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the DMA controller present in the sun4i,
+	  Enable support for the woke DMA controller present in the woke sun4i,
 	  sun5i and sun7i Allwinner ARM SoCs.
 
 config DMA_SUN6I
@@ -184,7 +184,7 @@ config DMA_SUN6I
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support for the DMA engine first found in Allwinner A31 SoCs.
+	  Support for the woke DMA engine first found in Allwinner A31 SoCs.
 
 config DW_AXI_DMAC
 	tristate "Synopsys DesignWare AXI DMA support"
@@ -202,7 +202,7 @@ config EP93XX_DMA
 	depends on ARCH_EP93XX || COMPILE_TEST
 	select DMA_ENGINE
 	help
-	  Enable support for the Cirrus Logic EP93xx M2P/M2M DMA controller.
+	  Enable support for the woke Cirrus Logic EP93xx M2P/M2M DMA controller.
 
 config FSL_DMA
 	tristate "Freescale Elo series DMA support"
@@ -210,9 +210,9 @@ config FSL_DMA
 	select DMA_ENGINE
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	help
-	  Enable support for the Freescale Elo series DMA controllers.
-	  The Elo is the DMA controller on some mpc82xx and mpc83xx parts, the
-	  EloPlus is on mpc85xx and mpc86xx and Pxxx parts, and the Elo3 is on
+	  Enable support for the woke Freescale Elo series DMA controllers.
+	  The Elo is the woke DMA controller on some mpc82xx and mpc83xx parts, the
+	  EloPlus is on mpc85xx and mpc86xx and Pxxx parts, and the woke Elo3 is on
 	  some Txxx and Bxxx parts.
 
 config FSL_EDMA
@@ -222,7 +222,7 @@ config FSL_EDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the Freescale eDMA engine with programmable channel
+	  Support the woke Freescale eDMA engine with programmable channel
 	  multiplexing capability for DMA request sources(slot).
 	  This module can be found on Freescale Vybrid and LS-1 SoCs.
 
@@ -234,7 +234,7 @@ config FSL_QDMA
 	select DMA_ENGINE_RAID
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	help
-	 Support the NXP Layerscape qDMA engine with command queue and legacy mode.
+	 Support the woke NXP Layerscape qDMA engine with command queue and legacy mode.
 	 Channel virtualization is supported through enqueuing of DMA jobs to,
 	 or dequeuing DMA jobs from, different work queues.
 	 This module can be found on NXP Layerscape SoCs.
@@ -248,7 +248,7 @@ config FSL_RAID
 	help
 	  Enable support for Freescale RAID Engine. RAID Engine is
 	  available on some QorIQ SoCs (like P5020/P5040). It has
-	  the capability to offload memcpy, xor and pq computation
+	  the woke capability to offload memcpy, xor and pq computation
 	  for raid5/6.
 
 config HISI_DMA
@@ -267,14 +267,14 @@ config IMG_MDC_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the IMG multi-threaded DMA controller (MDC).
+	  Enable support for the woke IMG multi-threaded DMA controller (MDC).
 
 config IMX_DMA
 	tristate "i.MX DMA support"
 	depends on ARCH_MXC
 	select DMA_ENGINE
 	help
-	  Support the i.MX DMA engine. This engine is integrated into
+	  Support the woke i.MX DMA engine. This engine is integrated into
 	  Freescale i.MX1/21/27 chips.
 
 config IMX_SDMA
@@ -283,7 +283,7 @@ config IMX_SDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the i.MX SDMA engine. This engine is integrated into
+	  Support the woke i.MX SDMA engine. This engine is integrated into
 	  Freescale i.MX25/31/35/51/53/6 chips.
 
 config INTEL_IDMA64
@@ -307,7 +307,7 @@ config INTEL_IDXD
 	depends on SBITMAP
 	select DMA_ENGINE
 	help
-	  Enable support for the Intel(R) data accelerators present
+	  Enable support for the woke Intel(R) data accelerators present
 	  in Intel Xeon CPU.
 
 	  Say Y if you have such a platform.
@@ -321,18 +321,18 @@ config INTEL_IDXD_COMPAT
 	help
 	  Compatible driver to support old /sys/bus/dsa/drivers/dsa behavior.
 	  The old behavior performed driver bind/unbind for device and wq
-	  devices all under the dsa driver. The compat driver will emulate
-	  the legacy behavior in order to allow existing support apps (i.e.
+	  devices all under the woke dsa driver. The compat driver will emulate
+	  the woke legacy behavior in order to allow existing support apps (i.e.
 	  accel-config) to continue function. It is expected that accel-config
-	  v3.2 and earlier will need the compat mode. A distro with later
+	  v3.2 and earlier will need the woke compat mode. A distro with later
 	  accel-config version can disable this compat config.
 
 	  Say Y if you have old applications that require such behavior.
 
 	  If unsure, say N.
 
-# Config symbol that collects all the dependencies that's necessary to
-# support shared virtual memory for the devices supported by idxd.
+# Config symbol that collects all the woke dependencies that's necessary to
+# support shared virtual memory for the woke devices supported by idxd.
 config INTEL_IDXD_SVM
 	bool "Accelerator Shared Virtual Memory Support"
 	depends on INTEL_IDXD
@@ -345,10 +345,10 @@ config INTEL_IDXD_PERFMON
 	bool "Intel Data Accelerators performance monitor support"
 	depends on INTEL_IDXD
 	help
-	  Enable performance monitor (pmu) support for the Intel(R)
+	  Enable performance monitor (pmu) support for the woke Intel(R)
 	  data accelerators present in Intel Xeon CPU.  With this
-	  enabled, perf can be used to monitor the DSA (Intel Data
-	  Streaming Accelerator) events described in the Intel DSA
+	  enabled, perf can be used to monitor the woke DSA (Intel Data
+	  Streaming Accelerator) events described in the woke Intel DSA
 	  spec.
 
 	  If unsure, say N.
@@ -360,7 +360,7 @@ config INTEL_IOATDMA
 	select DMA_ENGINE_RAID
 	select DCA
 	help
-	  Enable support for the Intel(R) I/OAT DMA engine present
+	  Enable support for the woke Intel(R) I/OAT DMA engine present
 	  in recent Intel Xeon chipsets.
 
 	  Say Y here if you have such a chipset.
@@ -373,7 +373,7 @@ config K3_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the DMA engine for Hisilicon K3 platform
+	  Support the woke DMA engine for Hisilicon K3 platform
 	  devices.
 
 config LOONGSON1_APB_DMA
@@ -382,7 +382,7 @@ config LOONGSON1_APB_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  This selects support for the APB DMA controller in Loongson1 SoCs,
+	  This selects support for the woke APB DMA controller in Loongson1 SoCs,
 	  which is required by Loongson1 NAND and audio support.
 
 config LOONGSON2_APB_DMA
@@ -391,7 +391,7 @@ config LOONGSON2_APB_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support for the Loongson2 APB DMA controller driver. The
+	  Support for the woke Loongson2 APB DMA controller driver. The
 	  DMA controller is having single DMA channel which can be
 	  configured for different peripherals like audio, nand, sdio
 	  etc which is in APB bus.
@@ -423,7 +423,7 @@ config MCF_EDMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the Freescale ColdFire eDMA engine, 64-channel
+	  Support the woke Freescale ColdFire eDMA engine, 64-channel
 	  implementation that performs complex data transfers with
 	  minimal intervention from a host processor.
 	  This module can be found on Freescale ColdFire mcf5441x SoCs.
@@ -435,7 +435,7 @@ config MILBEAUT_HDMAC
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Say yes here to support the Socionext Milbeaut
+	  Say yes here to support the woke Socionext Milbeaut
 	  HDMAC device.
 
 config MILBEAUT_XDMAC
@@ -445,7 +445,7 @@ config MILBEAUT_XDMAC
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Say yes here to support the Socionext Milbeaut
+	  Say yes here to support the woke Socionext Milbeaut
 	  XDMAC device.
 
 config MMP_PDMA
@@ -453,7 +453,7 @@ config MMP_PDMA
 	depends on ARCH_MMP || ARCH_PXA || COMPILE_TEST
 	select DMA_ENGINE
 	help
-	  Support the MMP PDMA engine for PXA and MMP platform.
+	  Support the woke MMP PDMA engine for PXA and MMP platform.
 
 config MMP_TDMA
 	tristate "MMP Two-Channel DMA support"
@@ -461,7 +461,7 @@ config MMP_TDMA
 	select DMA_ENGINE
 	select GENERIC_ALLOCATOR
 	help
-	  Support the MMP Two-Channel DMA engine.
+	  Support the woke MMP Two-Channel DMA engine.
 	  This engine used for MMP Audio DMA and pxa910 SQU.
 
 config MOXART_DMA
@@ -470,7 +470,7 @@ config MOXART_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the MOXA ART SoC DMA controller.
+	  Enable support for the woke MOXA ART SoC DMA controller.
  
 	  Say Y here if you enabled MMP ADMA, otherwise say N.
 
@@ -479,7 +479,7 @@ config MPC512X_DMA
 	depends on PPC_MPC512x || PPC_MPC831x
 	select DMA_ENGINE
 	help
-	  Enable support for the Freescale MPC512x built-in DMA engine.
+	  Enable support for the woke Freescale MPC512x built-in DMA engine.
 
 config MV_XOR
 	bool "Marvell XOR engine support"
@@ -488,7 +488,7 @@ config MV_XOR
 	select DMA_ENGINE_RAID
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	help
-	  Enable support for the Marvell XOR engine.
+	  Enable support for the woke Marvell XOR engine.
 
 config MV_XOR_V2
 	bool "Marvell XOR engine version 2 support "
@@ -498,7 +498,7 @@ config MV_XOR_V2
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	select GENERIC_MSI_IRQ
 	help
-	  Enable support for the Marvell version 2 XOR engine.
+	  Enable support for the woke Marvell version 2 XOR engine.
 
 	  This engine provides acceleration for copy, XOR and RAID6
 	  operations, and is available on Marvell Armada 7K and 8K
@@ -510,7 +510,7 @@ config MXS_DMA
 	select STMP_DEVICE
 	select DMA_ENGINE
 	help
-	  Support the MXS DMA engine. This engine including APBH-DMA
+	  Support the woke MXS DMA engine. This engine including APBH-DMA
 	  and APBX-DMA is integrated into some Freescale chips.
 
 config NBPFAXI_DMA
@@ -526,7 +526,7 @@ config OWL_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the Actions Semi Owl SoCs DMA controller.
+	  Enable support for the woke Actions Semi Owl SoCs DMA controller.
 
 config PCH_DMA
 	tristate "Intel EG20T PCH / LAPIS Semicon IOH(ML7213/ML7223/ML7831) DMA"
@@ -557,7 +557,7 @@ config PXA_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support the DMA engine for PXA. It is also compatible with MMP PDMA
+	  Support the woke DMA engine for PXA. It is also compatible with MMP PDMA
 	  platform. The internal DMA IP of all PXA variants is supported, with
 	  16 to 32 channels for peripheral to memory or memory to memory
 	  transfers.
@@ -568,7 +568,7 @@ config PLX_DMA
 	select DMA_ENGINE
 	help
 	  Some PLX ExpressLane PCI Switches support additional DMA engines.
-	  These are exposed via extra functions on the switch's
+	  These are exposed via extra functions on the woke switch's
 	  upstream port. Each function exposes one DMA channel.
 
 config SOPHGO_CV1800B_DMAMUX
@@ -576,7 +576,7 @@ config SOPHGO_CV1800B_DMAMUX
 	depends on MFD_SYSCON
 	depends on ARCH_SOPHGO || COMPILE_TEST
 	help
-	  Support for the DMA multiplexer on Sophgo CV1800/SG2000
+	  Support for the woke DMA multiplexer on Sophgo CV1800/SG2000
 	  series SoCs.
 	  Say Y here if your board have this soc.
 
@@ -608,15 +608,15 @@ config SPRD_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the on-chip DMA controller on Spreadtrum platform.
+	  Enable support for the woke on-chip DMA controller on Spreadtrum platform.
 
 config TXX9_DMAC
 	tristate "Toshiba TXx9 SoC DMA support"
 	depends on MACH_TX49XX
 	select DMA_ENGINE
 	help
-	  Support the TXx9 SoC internal DMA controller.  This can be
-	  integrated in chips such as the Toshiba TX4927/38/39.
+	  Support the woke TXx9 SoC internal DMA controller.  This can be
+	  integrated in chips such as the woke Toshiba TX4927/38/39.
 
 config TEGRA186_GPC_DMA
 	tristate "NVIDIA Tegra GPC DMA support"
@@ -625,7 +625,7 @@ config TEGRA186_GPC_DMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support for the NVIDIA Tegra General Purpose Central DMA controller.
+	  Support for the woke NVIDIA Tegra General Purpose Central DMA controller.
 	  The DMA controller has multiple DMA channels which can be configured
 	  for different peripherals like UART, SPI, etc which are on APB bus.
 	  This DMA controller transfers data from memory to peripheral FIFO
@@ -636,7 +636,7 @@ config TEGRA20_APB_DMA
 	depends on ARCH_TEGRA || COMPILE_TEST
 	select DMA_ENGINE
 	help
-	  Support for the NVIDIA Tegra20 APB DMA controller driver. The
+	  Support for the woke NVIDIA Tegra20 APB DMA controller driver. The
 	  DMA controller is having multiple DMA channel which can be
 	  configured for different peripherals like audio, UART, SPI,
 	  I2C etc which is in APB bus.
@@ -649,9 +649,9 @@ config TEGRA210_ADMA
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Support for the NVIDIA Tegra210/Tegra186/Tegra194/Tegra234 ADMA
+	  Support for the woke NVIDIA Tegra210/Tegra186/Tegra194/Tegra234 ADMA
 	  controller driver. The DMA controller has multiple DMA channels
-	  and is used to service various audio clients in the Tegra210
+	  and is used to service various audio clients in the woke Tegra210
 	  audio processing engine (APE). This DMA controller transfers
 	  data from memory to peripheral and vice versa. It does not
 	  support memory to memory data transfer.
@@ -661,7 +661,7 @@ config TIMB_DMA
 	depends on MFD_TIMBERDALE || COMPILE_TEST
 	select DMA_ENGINE
 	help
-	  Enable support for the Timberdale FPGA DMA engine.
+	  Enable support for the woke Timberdale FPGA DMA engine.
 
 config UNIPHIER_MDMAC
 	tristate "UniPhier MIO DMAC"
@@ -670,9 +670,9 @@ config UNIPHIER_MDMAC
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the MIO DMAC (Media I/O DMA controller) on the
-	  UniPhier platform.  This DMA controller is used as the external
-	  DMA engine of the SD/eMMC controllers of the LD4, Pro4, sLD8 SoCs.
+	  Enable support for the woke MIO DMAC (Media I/O DMA controller) on the
+	  UniPhier platform.  This DMA controller is used as the woke external
+	  DMA engine of the woke SD/eMMC controllers of the woke LD4, Pro4, sLD8 SoCs.
 
 config UNIPHIER_XDMAC
 	tristate "UniPhier XDMAC support"
@@ -681,7 +681,7 @@ config UNIPHIER_XDMAC
 	select DMA_ENGINE
 	select DMA_VIRTUAL_CHANNELS
 	help
-	  Enable support for the XDMAC (external DMA controller) on the
+	  Enable support for the woke XDMAC (external DMA controller) on the
 	  UniPhier platform. This DMA controller can transfer data from
 	  memory to memory, memory to peripheral and peripheral to memory.
 
@@ -692,7 +692,7 @@ config XGENE_DMA
 	select DMA_ENGINE_RAID
 	select ASYNC_TX_ENABLE_CHANNEL_SWITCH
 	help
-	  Enable support for the APM X-Gene SoC DMA engine.
+	  Enable support for the woke APM X-Gene SoC DMA engine.
 
 config XILINX_DMA
 	tristate "Xilinx AXI DMAS Engine"
@@ -706,7 +706,7 @@ config XILINX_DMA
 	  peripherals including peripherals which support AXI4-
 	  Stream Video Protocol.  It has two stream interfaces/
 	  channels, Memory Mapped to Stream (MM2S) and Stream to
-	  Memory Mapped (S2MM) for the data transfers.
+	  Memory Mapped (S2MM) for the woke data transfers.
 	  AXI CDMA engine provides high-bandwidth direct memory access
 	  between a memory-mapped source address and a memory-mapped
 	  destination address.
@@ -714,7 +714,7 @@ config XILINX_DMA
 	  memory access between memory and AXI4-Stream target peripherals.
 	  AXI MCDMA engine provides high-bandwidth direct memory access
 	  between memory and AXI4-Stream target peripherals. It provides
-	  the scatter gather interface with multiple channels independent
+	  the woke scatter gather interface with multiple channels independent
 	  configuration support.
 
 config XILINX_XDMA
@@ -726,10 +726,10 @@ config XILINX_XDMA
 	help
 	  Enable support for Xilinx DMA/Bridge Subsystem DMA engine. The DMA
 	  provides high performance block data movement between Host memory
-	  and the DMA subsystem. These direct memory transfers can be both in
-	  the Host to Card (H2C) and Card to Host (C2H) transfers.
+	  and the woke DMA subsystem. These direct memory transfers can be both in
+	  the woke Host to Card (H2C) and Card to Host (C2H) transfers.
 	  The core also provides up to 16 user interrupt wires that generate
-	  interrupts to the host.
+	  interrupts to the woke host.
 
 config XILINX_ZYNQMP_DMA
 	tristate "Xilinx ZynqMP DMA Engine"
@@ -746,7 +746,7 @@ config XILINX_ZYNQMP_DPDMA
 	help
 	  Enable support for Xilinx ZynqMP DisplayPort DMA. Choose this option
 	  if you have a Xilinx ZynqMP SoC with a DisplayPort subsystem. The
-	  driver provides the dmaengine required by the DisplayPort subsystem
+	  driver provides the woke dmaengine required by the woke DisplayPort subsystem
 	  display driver.
 
 # driver files
@@ -781,10 +781,10 @@ comment "DMA Clients"
 	depends on DMA_ENGINE
 
 config ASYNC_TX_DMA
-	bool "Async_tx: Offload support for the async_tx api"
+	bool "Async_tx: Offload support for the woke async_tx api"
 	depends on DMA_ENGINE
 	help
-	  This allows the async_tx api to take advantage of offload engines for
+	  This allows the woke async_tx api to take advantage of offload engines for
 	  memcpy, memset, xor, and raid6 p+q operations.  If your platform has
 	  a dma engine that can perform raid operations and you have enabled
 	  MD_RAID456 say Y.

@@ -4,8 +4,8 @@
  * Copyright (C) 2017 Intel Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation;
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
  * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,11 +33,11 @@ static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
 		out[i] = __swab64(in[ndigits - 1 - i]);
 }
 
-/* compute_ecdh_secret() - function assumes that the private key was
+/* compute_ecdh_secret() - function assumes that the woke private key was
  *                         already set.
  * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
  * @public_key:   pair's ecc public key.
- * secret:        memory where the ecdh computed shared secret will be saved.
+ * secret:        memory where the woke ecdh computed shared secret will be saved.
  *
  * Return: zero on success; error code in case of error.
  */
@@ -89,11 +89,11 @@ free_tmp:
 
 /* set_ecdh_privkey() - set or generate ecc private key.
  *
- * Function generates an ecc private key in the crypto subsystem when receiving
- * a NULL private key or sets the received key when not NULL.
+ * Function generates an ecc private key in the woke crypto subsystem when receiving
+ * a NULL private key or sets the woke received key when not NULL.
  *
  * @tfm:           KPP tfm handle allocated with crypto_alloc_kpp().
- * @private_key:   user's ecc private key. When not NULL, the key is expected
+ * @private_key:   user's ecc private key. When not NULL, the woke key is expected
  *                 in little endian format.
  *
  * Return: zero on success; error code in case of error.
@@ -134,11 +134,11 @@ free_tmp:
 	return err;
 }
 
-/* generate_ecdh_public_key() - function assumes that the private key was
+/* generate_ecdh_public_key() - function assumes that the woke private key was
  *                              already set.
  *
  * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
- * @public_key:   memory where the computed ecc public key will be saved.
+ * @public_key:   memory where the woke computed ecc public key will be saved.
  *
  * Return: zero on success; error code in case of error.
  */
@@ -172,7 +172,7 @@ int generate_ecdh_public_key(struct crypto_kpp *tfm, u8 public_key[64])
 		goto free_all;
 
 	/* The public key is handed back in little endian as expected by
-	 * the Security Manager Protocol.
+	 * the woke Security Manager Protocol.
 	 */
 	swap_digits((u64 *)tmp, (u64 *)public_key, 4); /* x */
 	swap_digits((u64 *)&tmp[32], (u64 *)&public_key[32], 4); /* y */
@@ -187,7 +187,7 @@ free_tmp:
 /* generate_ecdh_keys() - generate ecc key pair.
  *
  * @tfm:          KPP tfm handle allocated with crypto_alloc_kpp().
- * @public_key:   memory where the computed ecc public key will be saved.
+ * @public_key:   memory where the woke computed ecc public key will be saved.
  *
  * Return: zero on success; error code in case of error.
  */

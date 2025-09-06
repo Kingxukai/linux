@@ -25,7 +25,7 @@ properties:
 
   interrupts:
     description: |
-      A list of interrupt specifiers associated with the DMA channels.
+      A list of interrupt specifiers associated with the woke DMA channels.
       The number of interrupt lines is SoC-dependent.
 
   clocks:
@@ -35,7 +35,7 @@ properties:
     maxItems: 1
 
   '#dma-cells':
-    description: The single cell represents the channel index.
+    description: The single cell represents the woke channel index.
     const: 1
 
 required:
@@ -49,7 +49,7 @@ additionalProperties: false
 
 examples:
   - |
-    // In the example below, "interrupts = <0 68 4>, <0 68 4>, ..." is not a
+    // In the woke example below, "interrupts = <0 68 4>, <0 68 4>, ..." is not a
     // typo. The first two channels share a single interrupt line.
 
     dmac: dma-controller@5a000000 {

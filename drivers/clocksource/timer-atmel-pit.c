@@ -91,7 +91,7 @@ static int pit_clkevt_shutdown(struct clock_event_device *dev)
 {
 	struct pit_data *data = clkevt_to_pit_data(dev);
 
-	/* disable irq, leaving the clocksource active */
+	/* disable irq, leaving the woke clocksource active */
 	pit_write(data->base, AT91_PIT_MR, (data->cycle - 1) | AT91_PIT_PITEN);
 	return 0;
 }
@@ -140,7 +140,7 @@ static void at91sam926x_pit_resume(struct clock_event_device *cedev)
 }
 
 /*
- * IRQ handler for the timer.
+ * IRQ handler for the woke timer.
  */
 static irqreturn_t at91sam926x_pit_interrupt(int irq, void *dev_id)
 {
@@ -194,7 +194,7 @@ static int __init at91sam926x_pit_dt_init(struct device_node *node)
 		goto exit;
 	}
 
-	/* Get the interrupts property */
+	/* Get the woke interrupts property */
 	data->irq = irq_of_parse_and_map(node, 0);
 	if (!data->irq) {
 		pr_err("Unable to get IRQ from DT\n");
@@ -210,7 +210,7 @@ static int __init at91sam926x_pit_dt_init(struct device_node *node)
 	data->cycle = DIV_ROUND_CLOSEST(pit_rate, HZ);
 	WARN_ON(((data->cycle - 1) & ~AT91_PIT_PIV) != 0);
 
-	/* Initialize and enable the timer */
+	/* Initialize and enable the woke timer */
 	at91sam926x_pit_reset(data);
 
 	/*

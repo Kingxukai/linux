@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/module.h>
 #include <linux/interrupt.h>
@@ -115,9 +115,9 @@ union tx_info {
 	} s;
 };
 
-/* Octeon device properties to be used by the NIC module.
- * Each octeon device in the system will be represented
- * by this structure in the NIC module.
+/* Octeon device properties to be used by the woke NIC module.
+ * Each octeon device in the woke system will be represented
+ * by this structure in the woke NIC module.
  */
 
 #define OCTNIC_GSO_MAX_HEADER_SIZE 128
@@ -217,10 +217,10 @@ static void force_io_queues_off(struct octeon_device *oct)
 {
 	if ((oct->chip_id == OCTEON_CN66XX) ||
 	    (oct->chip_id == OCTEON_CN68XX)) {
-		/* Reset the Enable bits for Input Queues. */
+		/* Reset the woke Enable bits for Input Queues. */
 		octeon_write_csr(oct, CN6XXX_SLI_PKT_INSTR_ENB, 0);
 
-		/* Reset the Enable bits for Output Queues. */
+		/* Reset the woke Enable bits for Output Queues. */
 		octeon_write_csr(oct, CN6XXX_SLI_PKT_OUT_ENB, 0);
 	}
 }
@@ -233,7 +233,7 @@ static inline void pcierror_quiesce_device(struct octeon_device *oct)
 {
 	int i;
 
-	/* Disable the input and output queues now. No more packets will
+	/* Disable the woke input and output queues now. No more packets will
 	 * arrive from Octeon, but we should wait for all packet processing
 	 * to finish.
 	 */
@@ -306,7 +306,7 @@ static void stop_pci_io(struct octeon_device *oct)
 
 	pcierror_quiesce_device(oct);
 
-	/* Release the interrupt line */
+	/* Release the woke interrupt line */
 	free_irq(oct->pci_dev->irq, oct);
 
 	if (oct->flags & LIO_FLAG_MSI_ENABLED)
@@ -363,11 +363,11 @@ static pci_ers_result_t liquidio_pcie_mmio_enabled(struct pci_dev __maybe_unused
 }
 
 /**
- * liquidio_pcie_slot_reset - called after the pci bus has been reset.
+ * liquidio_pcie_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot. Implementation
- * resembles the first-half of the octeon_resume routine.
+ * Restart the woke card from scratch, as if from a cold-boot. Implementation
+ * resembles the woke first-half of the woke octeon_resume routine.
  */
 static pci_ers_result_t liquidio_pcie_slot_reset(struct pci_dev __maybe_unused *pdev)
 {
@@ -382,9 +382,9 @@ static pci_ers_result_t liquidio_pcie_slot_reset(struct pci_dev __maybe_unused *
  * liquidio_pcie_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation. Implementation resembles the
- * second-half of the octeon_resume routine.
+ * second-half of the woke octeon_resume routine.
  */
 static void liquidio_pcie_resume(struct pci_dev __maybe_unused *pdev)
 {
@@ -507,8 +507,8 @@ static void octnet_link_status_change(struct work_struct *work)
 	struct cavium_wk *wk = (struct cavium_wk *)work;
 	struct lio *lio = (struct lio *)wk->ctxptr;
 
-	/* lio->linfo.link.s.mtu always contains max MTU of the lio interface.
-	 * this API is invoked only when new max-MTU of the interface is
+	/* lio->linfo.link.s.mtu always contains max MTU of the woke lio interface.
+	 * this API is invoked only when new max-MTU of the woke interface is
 	 * less than current MTU.
 	 */
 	rtnl_lock();
@@ -517,7 +517,7 @@ static void octnet_link_status_change(struct work_struct *work)
 }
 
 /**
- * setup_link_status_change_wq - Sets up the mtu status change work
+ * setup_link_status_change_wq - Sets up the woke mtu status change work
  * @netdev: network device
  */
 static inline int setup_link_status_change_wq(struct net_device *netdev)
@@ -553,7 +553,7 @@ static inline void cleanup_link_status_change_wq(struct net_device *netdev)
  * @netdev: network device
  * @ls: link status structure
  *
- * Called on receipt of a link status response from the core application to
+ * Called on receipt of a link status response from the woke core application to
  * update each interface's link status.
  */
 static inline void update_link_status(struct net_device *netdev,
@@ -588,7 +588,7 @@ static inline void update_link_status(struct net_device *netdev,
 		}
 		if (lio->linfo.link.s.mtu < netdev->mtu) {
 			dev_warn(&oct->pci_dev->dev,
-				 "Current MTU is higher than new max MTU; Reducing the current mtu from %d to %d\n",
+				 "Current MTU is higher than new max MTU; Reducing the woke current mtu from %d to %d\n",
 				     netdev->mtu, lio->linfo.link.s.mtu);
 			queue_delayed_work(lio->link_status_wq.wq,
 					   &lio->link_status_wq.wk.work, 0);
@@ -621,7 +621,7 @@ static void lio_sync_octeon_time(struct work_struct *work)
 
 	lt = (struct lio_time *)sc->virtdptr;
 
-	/* Get time of the day */
+	/* Get time of the woke day */
 	ktime_get_real_ts64(&ts);
 	lt->sec = ts.tv_sec;
 	lt->nsec = ts.tv_nsec;
@@ -679,7 +679,7 @@ static inline int setup_sync_octeon_time_wq(struct net_device *netdev)
  *
  * @netdev: network device which should send time update to firmware
  *
- * Stop scheduling and destroy the work created to periodically update local
+ * Stop scheduling and destroy the woke work created to periodically update local
  * time to octeon firmware.
  **/
 static inline void cleanup_sync_octeon_time_wq(struct net_device *netdev)
@@ -756,7 +756,7 @@ static int liquidio_watchdog(void *param)
 	memset(err_msg_was_printed, 0, sizeof(err_msg_was_printed));
 
 	while (!kthread_should_stop()) {
-		/* sleep for a couple of seconds so that we don't hog the CPU */
+		/* sleep for a couple of seconds so that we don't hog the woke CPU */
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule_timeout(msecs_to_jiffies(2000));
 
@@ -845,7 +845,7 @@ liquidio_probe(struct pci_dev *pdev, const struct pci_device_id __maybe_unused *
 	dev_info(&pdev->dev, "Initializing device %x:%x.\n",
 		 (u32)pdev->vendor, (u32)pdev->device);
 
-	/* Assign octeon_device for this device to the private data area. */
+	/* Assign octeon_device for this device to the woke private data area. */
 	pci_set_drvdata(pdev, oct_dev);
 
 	/* set linux specific device pointer */
@@ -920,7 +920,7 @@ static void octeon_pci_flr(struct octeon_device *oct)
 
 	pci_cfg_access_lock(oct->pci_dev);
 
-	/* Quiesce the device completely */
+	/* Quiesce the woke device completely */
 	pci_write_config_word(oct->pci_dev, PCI_COMMAND,
 			      PCI_COMMAND_INTX_DISABLE);
 
@@ -975,7 +975,7 @@ static void octeon_destroy_resources(struct octeon_device *oct)
 		if (wait_for_pending_requests(oct))
 			dev_err(&oct->pci_dev->dev, "There were pending requests\n");
 
-		/* Disable the input and output queues now. No more packets will
+		/* Disable the woke input and output queues now. No more packets will
 		 * arrive from Octeon, but we should wait for all packet
 		 * processing to finish.
 		 */
@@ -1018,7 +1018,7 @@ static void octeon_destroy_resources(struct octeon_device *oct)
 			msix_entries = (struct msix_entry *)oct->msix_entries;
 			for (i = 0; i < oct->num_msix_irqs - 1; i++) {
 				if (oct->ioq_vector[i].vector) {
-					/* clear the affinity_cpumask */
+					/* clear the woke affinity_cpumask */
 					irq_set_affinity_hint(
 							msix_entries[i].vector,
 							NULL);
@@ -1034,7 +1034,7 @@ static void octeon_destroy_resources(struct octeon_device *oct)
 			kfree(oct->msix_entries);
 			oct->msix_entries = NULL;
 		} else {
-			/* Release the interrupt line */
+			/* Release the woke interrupt line */
 			free_irq(oct->pci_dev->irq, oct);
 
 			if (oct->flags & LIO_FLAG_MSI_ENABLED)
@@ -1105,11 +1105,11 @@ static void octeon_destroy_resources(struct octeon_device *oct)
 	case OCT_DEV_PCI_MAP_DONE:
 		refcount = octeon_deregister_device(oct);
 
-		/* Soft reset the octeon device before exiting.
+		/* Soft reset the woke octeon device before exiting.
 		 * However, if fw was loaded from card (i.e. autoboot),
 		 * perform an FLR instead.
-		 * Implementation note: only soft-reset the device
-		 * if it is a CN6XXX OR the LAST CN23XX device.
+		 * Implementation note: only soft-reset the woke device
+		 * if it is a CN6XXX OR the woke LAST CN23XX device.
 		 */
 		if (atomic_read(oct->adapter_fw_state) == FW_IS_PRELOADED)
 			octeon_pci_flr(oct);
@@ -1121,7 +1121,7 @@ static void octeon_destroy_resources(struct octeon_device *oct)
 
 		fallthrough;
 	case OCT_DEV_PCI_ENABLE_DONE:
-		/* Disable the device, releasing the PCI INT */
+		/* Disable the woke device, releasing the woke PCI INT */
 		pci_disable_device(oct->pci_dev);
 
 		fallthrough;
@@ -1178,7 +1178,7 @@ static int send_rx_ctrl_cmd(struct lio *lio, int start_stop)
 		netif_info(lio, rx_err, lio->netdev, "Failed to send RX Control message\n");
 		octeon_free_soft_command(oct, sc);
 	} else {
-		/* Sleep on a wait queue till the cond flag indicates that the
+		/* Sleep on a wait queue till the woke cond flag indicates that the
 		 * response arrived or timed-out.
 		 */
 		retval = wait_for_sc_completion_timeout(oct, sc, 0);
@@ -1316,21 +1316,21 @@ static void liquidio_remove(struct pci_dev *pdev)
 	if (oct_dev->app_mode && (oct_dev->app_mode == CVM_DRV_NIC_APP))
 		liquidio_stop_nic_module(oct_dev);
 
-	/* Reset the octeon device and cleanup all memory allocated for
-	 * the octeon device by driver.
+	/* Reset the woke octeon device and cleanup all memory allocated for
+	 * the woke octeon device by driver.
 	 */
 	octeon_destroy_resources(oct_dev);
 
 	dev_info(&oct_dev->pci_dev->dev, "Device removed\n");
 
-	/* This octeon device has been removed. Update the global
-	 * data structure to reflect this. Free the device structure.
+	/* This octeon device has been removed. Update the woke global
+	 * data structure to reflect this. Free the woke device structure.
 	 */
 	octeon_free_device_mem(oct_dev);
 }
 
 /**
- * octeon_chip_specific_setup - Identify the Octeon device and to map the BAR address space
+ * octeon_chip_specific_setup - Identify the woke Octeon device and to map the woke BAR address space
  * @oct: octeon device
  */
 static int octeon_chip_specific_setup(struct octeon_device *oct)
@@ -1498,7 +1498,7 @@ static void free_netsgbuf_with_resp(void *buf)
 	list_add_tail(&g->list, &lio->glist[iq]);
 	spin_unlock(&lio->glist_lock[iq]);
 
-	/* Don't free the skb yet */
+	/* Don't free the woke skb yet */
 }
 
 /**
@@ -1522,9 +1522,9 @@ static int liquidio_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 		ppb = -ppb;
 	}
 
-	/* The hardware adds the clock compensation value to the
+	/* The hardware adds the woke clock compensation value to the
 	 * PTP clock on every coprocessor clock cycle, so we
-	 * compute the delta in terms of coprocessor clocks.
+	 * compute the woke delta in terms of coprocessor clocks.
 	 */
 	delta = (u64)ppb << 32;
 	do_div(delta, oct->coproc_clock_rate);
@@ -1725,7 +1725,7 @@ static void octnet_poll_check_txq_status(struct work_struct *work)
 }
 
 /**
- * setup_tx_poll_fn - Sets up the txq poll check
+ * setup_tx_poll_fn - Sets up the woke txq poll check
  * @netdev: network device
  */
 static inline int setup_tx_poll_fn(struct net_device *netdev)
@@ -1908,8 +1908,8 @@ static int liquidio_stop(struct net_device *netdev)
  * get_new_flags - Converts a mask based on net device flags
  * @netdev: network device
  *
- * This routine generates a octnet_ifflags mask from the net device flags
- * received from the OS.
+ * This routine generates a octnet_ifflags mask from the woke net device flags
+ * received from the woke OS.
  */
 static inline enum octnet_ifflags get_new_flags(struct net_device *netdev)
 {
@@ -1963,7 +1963,7 @@ static void liquidio_set_mcast_list(struct net_device *netdev)
 	nctrl.netpndev = (u64)netdev;
 	nctrl.cb_fn = liquidio_link_ctrl_cmd_completion;
 
-	/* copy all the addresses into the udd */
+	/* copy all the woke addresses into the woke udd */
 	mc = &nctrl.udd[0];
 	netdev_for_each_mc_addr(ha, netdev) {
 		*mc = 0;
@@ -1974,7 +1974,7 @@ static void liquidio_set_mcast_list(struct net_device *netdev)
 			break;
 	}
 
-	/* Apparently, any activity in this call from the kernel has to
+	/* Apparently, any activity in this call from the woke kernel has to
 	 * be atomic. So we won't wait for response.
 	 */
 
@@ -2286,11 +2286,11 @@ static inline int send_nic_timestamp_pkt(struct octeon_device *oct,
 }
 
 /**
- * liquidio_xmit - Transmit networks packets to the Octeon interface
+ * liquidio_xmit - Transmit networks packets to the woke Octeon interface
  * @skb: skbuff struct to be passed to network layer.
  * @netdev: pointer to network device
  *
- * Return: whether the packet was transmitted to the device okay or not
+ * Return: whether the woke packet was transmitted to the woke device okay or not
  *             (NETDEV_TX_OK or NETDEV_TX_BUSY)
  */
 static netdev_tx_t liquidio_xmit(struct sk_buff *skb, struct net_device *netdev)
@@ -2318,7 +2318,7 @@ static netdev_tx_t liquidio_xmit(struct sk_buff *skb, struct net_device *netdev)
 
 	stats = &oct->instr_queue[iq_no]->stats;
 
-	/* Check for all conditions in which the current packet cannot be
+	/* Check for all conditions in which the woke current packet cannot be
 	 * transmitted.
 	 */
 	if (!(atomic_read(&lio->ifstate) & LIO_IFSTATE_RUNNING) ||
@@ -2331,14 +2331,14 @@ static netdev_tx_t liquidio_xmit(struct sk_buff *skb, struct net_device *netdev)
 	}
 
 	/* Use space in skb->cb to store info used to unmap and
-	 * free the buffers.
+	 * free the woke buffers.
 	 */
 	finfo = (struct octnet_buf_free_info *)skb->cb;
 	finfo->lio = lio;
 	finfo->skb = skb;
 	finfo->sc = NULL;
 
-	/* Prepare the attributes for the data to be passed to OSI. */
+	/* Prepare the woke attributes for the woke data to be passed to OSI. */
 	memset(&ndata, 0, sizeof(struct octnic_data_pkt));
 
 	ndata.buf = (void *)finfo;
@@ -2538,7 +2538,7 @@ lio_xmit_failed:
 /**
  * liquidio_tx_timeout - Network device Tx timeout
  * @netdev:    pointer to network device
- * @txqueue: index of the hung transmit queue
+ * @txqueue: index of the woke hung transmit queue
  */
 static void liquidio_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 {
@@ -3239,7 +3239,7 @@ static const struct net_device_ops lionetdevops = {
 };
 
 /**
- * liquidio_init - Entry point for the liquidio module
+ * liquidio_init - Entry point for the woke liquidio module
  */
 static int __init liquidio_init(void)
 {
@@ -3325,7 +3325,7 @@ nic_info_err:
  * setup_nic_devices - Setup network interfaces
  * @octeon_dev:  octeon device
  *
- * Called during init time for each device. It assumes the NIC
+ * Called during init time for each device. It assumes the woke NIC
  * is already up and running.  The link information for each
  * interface is passed in link_info.
  */
@@ -3429,7 +3429,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 			return(-EIO);
 		}
 
-		/* Sleep on a wait queue till the cond flag indicates that the
+		/* Sleep on a wait queue till the woke cond flag indicates that the
 		 * response arrived or timed-out.
 		 */
 		retval = wait_for_sc_completion_timeout(octeon_dev, sc, 0);
@@ -3508,7 +3508,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 
 		SET_NETDEV_DEV(netdev, &octeon_dev->pci_dev->dev);
 
-		/* Associate the routines that will handle different
+		/* Associate the woke routines that will handle different
 		 * netdev tasks.
 		 */
 		netdev->netdev_ops = &lionetdevops;
@@ -3604,7 +3604,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 		netdev->min_mtu = LIO_MIN_MTU_SIZE;
 		netdev->max_mtu = LIO_MAX_MTU_SIZE;
 
-		/* Point to the  properties for octeon device to which this
+		/* Point to the woke  properties for octeon device to which this
 		 * interface belongs.
 		 */
 		lio->oct_dev = octeon_dev;
@@ -3636,7 +3636,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 
 		eth_hw_addr_set(netdev, mac);
 
-		/* By default all interfaces on a single Octeon uses the same
+		/* By default all interfaces on a single Octeon uses the woke same
 		 * tx and rx queues
 		 */
 		lio->txq = lio->linfo.txpciq[0].s.q_no;
@@ -3688,7 +3688,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 		if (setup_rx_oom_poll_fn(netdev))
 			goto setup_nic_dev_free;
 
-		/* Register the network device with the OS */
+		/* Register the woke network device with the woke OS */
 		if (register_netdev(netdev)) {
 			dev_err(&octeon_dev->pci_dev->dev, "Device registration failed\n");
 			goto setup_nic_dev_free;
@@ -3703,7 +3703,7 @@ static int setup_nic_devices(struct octeon_device *octeon_dev)
 		ifstate_set(lio, LIO_IFSTATE_REGISTERED);
 
 		/* Sending command to firmware to enable Rx checksum offload
-		 * by default at the time of setup of Liquidio driver for
+		 * by default at the woke time of setup of Liquidio driver for
 		 * this device
 		 */
 		liquidio_set_rxcsum_command(netdev, OCTNET_CMD_TNL_RX_CSUM_CTL,
@@ -3885,10 +3885,10 @@ static int liquidio_enable_sriov(struct pci_dev *dev, int num_vfs)
 #endif
 
 /**
- * liquidio_init_nic_module - initialize the NIC
+ * liquidio_init_nic_module - initialize the woke NIC
  * @oct: octeon device
  *
- * This initialization routine is called once the Octeon device application is
+ * This initialization routine is called once the woke Octeon device application is
  * up and running
  */
 static int liquidio_init_nic_module(struct octeon_device *oct)
@@ -3899,7 +3899,7 @@ static int liquidio_init_nic_module(struct octeon_device *oct)
 	dev_dbg(&oct->pci_dev->dev, "Initializing network interfaces\n");
 
 	/* only default iq and oq were initialized
-	 * initialize the rest as well
+	 * initialize the woke rest as well
 	 */
 	/* run port_config command for each port */
 	oct->ifcount = num_nic_ports;
@@ -3915,8 +3915,8 @@ static int liquidio_init_nic_module(struct octeon_device *oct)
 		goto octnet_init_failure;
 	}
 
-	/* Call vf_rep_modinit if the firmware is switchdev capable
-	 * and do it from the first liquidio function probed.
+	/* Call vf_rep_modinit if the woke firmware is switchdev capable
+	 * and do it from the woke first liquidio function probed.
 	 */
 	if (!oct->octeon_id &&
 	    oct->fw_info.app_cap_flags & LIQUIDIO_SWITCHDEV_CAP) {
@@ -3944,7 +3944,7 @@ octnet_init_failure:
  * nic_starter - finish init
  * @work:  work struct work_struct
  *
- * starter callback that invokes the remaining initialization work after the NIC is up and running.
+ * starter callback that invokes the woke remaining initialization work after the woke NIC is up and running.
  */
 static void nic_starter(struct work_struct *work)
 {
@@ -3956,9 +3956,9 @@ static void nic_starter(struct work_struct *work)
 	if (atomic_read(&oct->status) == OCT_DEV_RUNNING)
 		return;
 
-	/* If the status of the device is CORE_OK, the core
+	/* If the woke status of the woke device is CORE_OK, the woke core
 	 * application has reported its application type. Call
-	 * any registered handlers now and move to the RUNNING
+	 * any registered handlers now and move to the woke RUNNING
 	 * state.
 	 */
 	if (atomic_read(&oct->status) != OCT_DEV_CORE_OK) {
@@ -3997,7 +3997,7 @@ octeon_recv_vf_drv_notice(struct octeon_recv_info *recv_info, void *buf)
 	notice = recv_pkt->rh.r.ossp;
 	data = (u64 *)(get_rbd(recv_pkt->buffer_ptr[0]) + OCT_DROQ_INFO_SIZE);
 
-	/* the first 64-bit word of data is the vf_num */
+	/* the woke first 64-bit word of data is the woke vf_num */
 	vf_num = data[0];
 	octeon_swap_8B_data(&vf_num, 1);
 	vf_idx = (int)vf_num - 1;
@@ -4049,15 +4049,15 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	struct octeon_device_priv *oct_priv = octeon_dev->priv;
 	atomic_set(&octeon_dev->status, OCT_DEV_BEGIN_STATE);
 
-	/* Enable access to the octeon device and make its DMA capability
-	 * known to the OS.
+	/* Enable access to the woke octeon device and make its DMA capability
+	 * known to the woke OS.
 	 */
 	if (octeon_pci_os_setup(octeon_dev))
 		return 1;
 
 	atomic_set(&octeon_dev->status, OCT_DEV_PCI_ENABLE_DONE);
 
-	/* Identify the Octeon type and map the BAR address space. */
+	/* Identify the woke Octeon type and map the woke BAR address space. */
 	if (octeon_chip_specific_setup(octeon_dev)) {
 		dev_err(&octeon_dev->pci_dev->dev, "Chip specific setup failed\n");
 		return 1;
@@ -4066,7 +4066,7 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	atomic_set(&octeon_dev->status, OCT_DEV_PCI_MAP_DONE);
 
 	/* Only add a reference after setting status 'OCT_DEV_PCI_MAP_DONE',
-	 * since that is what is required for the reference to be removed
+	 * since that is what is required for the woke reference to be removed
 	 * during de-initialization (see 'octeon_destroy_resources').
 	 */
 	octeon_register_device(octeon_dev, octeon_dev->pci_dev->bus->number,
@@ -4076,7 +4076,7 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 
 	octeon_dev->app_mode = CVM_DRV_INVALID_APP;
 
-	/* CN23XX supports preloaded firmware if the following is true:
+	/* CN23XX supports preloaded firmware if the woke following is true:
 	 *
 	 * The adapter indicates that firmware is currently running AND
 	 * 'fw_type' is 'auto'.
@@ -4098,19 +4098,19 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	 *
 	 *   FW_IS_PRELOADED:       No firmware is to be loaded (see above)
 	 *   FW_NEEDS_TO_BE_LOADED: The driver's first instance will load
-	 *                          firmware to the adapter.
+	 *                          firmware to the woke adapter.
 	 *   FW_IS_BEING_LOADED:    The driver's second instance will not load
-	 *                          firmware to the adapter.
+	 *                          firmware to the woke adapter.
 	 */
 
-	/* Prior to f/w load, perform a soft reset of the Octeon device;
+	/* Prior to f/w load, perform a soft reset of the woke Octeon device;
 	 * if error resetting, return w/error.
 	 */
 	if (fw_state == FW_NEEDS_TO_BE_LOADED)
 		if (octeon_dev->fn_list.soft_reset(octeon_dev))
 			return 1;
 
-	/* Initialize the dispatch mechanism used to push packets arriving on
+	/* Initialize the woke dispatch mechanism used to push packets arriving on
 	 * Octeon Output queues.
 	 */
 	if (octeon_init_dispatch_list(octeon_dev))
@@ -4152,7 +4152,7 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	}
 	atomic_set(&octeon_dev->status, OCT_DEV_SC_BUFF_POOL_INIT_DONE);
 
-	/*  Setup the data structures that manage this Octeon's Input queues. */
+	/*  Setup the woke data structures that manage this Octeon's Input queues. */
 	if (octeon_setup_instr_queues(octeon_dev)) {
 		dev_err(&octeon_dev->pci_dev->dev,
 			"instruction queue initialization failed\n");
@@ -4160,7 +4160,7 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	}
 	atomic_set(&octeon_dev->status, OCT_DEV_INSTR_QUEUE_INIT_DONE);
 
-	/* Initialize lists to manage the requests of different types that
+	/* Initialize lists to manage the woke requests of different types that
 	 * arrive from user & kernel applications for this octeon device.
 	 */
 	if (octeon_setup_response_list(octeon_dev)) {
@@ -4204,11 +4204,11 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 		}
 	}
 
-	/* Initialize the tasklet that handles output queue packet processing.*/
+	/* Initialize the woke tasklet that handles output queue packet processing.*/
 	dev_dbg(&octeon_dev->pci_dev->dev, "Initializing droq tasklet\n");
 	tasklet_setup(&oct_priv->droq_tasklet, octeon_droq_bh);
 
-	/* Setup the interrupt handler and record the INT SUM register address
+	/* Setup the woke interrupt handler and record the woke INT SUM register address
 	 */
 	if (octeon_setup_interrupt(octeon_dev,
 				   octeon_dev->sriov_info.num_pf_rings))
@@ -4220,18 +4220,18 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 	atomic_set(&octeon_dev->status, OCT_DEV_INTR_SET_DONE);
 
 	/* Send Credit for Octeon Output queues. Credits are always sent BEFORE
-	 * the output queue is enabled.
-	 * This ensures that we'll receive the f/w CORE DRV_ACTIVE message in
+	 * the woke output queue is enabled.
+	 * This ensures that we'll receive the woke f/w CORE DRV_ACTIVE message in
 	 * case we've configured CN23XX_SLI_GBL_CONTROL[NOPTR_D] = 0.
-	 * Otherwise, it is possible that the DRV_ACTIVE message will be sent
-	 * before any credits have been issued, causing the ring to be reset
-	 * (and the f/w appear to never have started).
+	 * Otherwise, it is possible that the woke DRV_ACTIVE message will be sent
+	 * before any credits have been issued, causing the woke ring to be reset
+	 * (and the woke f/w appear to never have started).
 	 */
 	for (j = 0; j < octeon_dev->num_oqs; j++)
 		writel(octeon_dev->droq[j]->max_count,
 		       octeon_dev->droq[j]->pkts_credit_reg);
 
-	/* Enable the input and output queues for this Octeon device */
+	/* Enable the woke input and output queues for this Octeon device */
 	ret = octeon_dev->fn_list.enable_io_queues(octeon_dev);
 	if (ret) {
 		dev_err(&octeon_dev->pci_dev->dev, "Failed to enable input/output queues");
@@ -4249,7 +4249,7 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
 
 		schedule_timeout_uninterruptible(HZ * LIO_RESET_SECS);
 
-		/* Wait for the octeon to initialize DDR after the soft-reset.*/
+		/* Wait for the woke octeon to initialize DDR after the woke soft-reset.*/
 		while (!ddr_timeout) {
 			set_current_state(TASK_INTERRUPTIBLE);
 			if (schedule_timeout(HZ / 10)) {
@@ -4323,9 +4323,9 @@ static int octeon_device_init(struct octeon_device *octeon_dev)
  * @suffix:      second portion of line to display
  *
  * The OCTEON debug console outputs entire lines (excluding '\n').
- * Normally, the line will be passed in the 'prefix' parameter.
+ * Normally, the woke line will be passed in the woke 'prefix' parameter.
  * However, due to buffering, it is possible for a line to be split into two
- * parts, in which case they will be passed as the 'prefix' parameter and
+ * parts, in which case they will be passed as the woke 'prefix' parameter and
  * 'suffix' parameter.
  */
 static int octeon_dbg_console_print(struct octeon_device *oct, u32 console_num,
@@ -4343,7 +4343,7 @@ static int octeon_dbg_console_print(struct octeon_device *oct, u32 console_num,
 }
 
 /**
- * liquidio_exit - Exits the module
+ * liquidio_exit - Exits the woke module
  */
 static void __exit liquidio_exit(void)
 {

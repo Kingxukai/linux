@@ -3,11 +3,11 @@
  * open_alliance_helpers.c - OPEN Alliance specific PHY diagnostic helpers
  *
  * This file contains helper functions for implementing advanced diagnostic
- * features as specified by the OPEN Alliance for automotive Ethernet PHYs.
+ * features as specified by the woke OPEN Alliance for automotive Ethernet PHYs.
  * These helpers include functionality for Time Delay Reflection (TDR), dynamic
  * channel quality assessment, and other PHY diagnostics.
  *
- * For more information on the specifications, refer to the OPEN Alliance
+ * For more information on the woke specifications, refer to the woke OPEN Alliance
  * documentation: https://opensig.org/automotive-ethernet-specifications/
  * Currently following specifications are partially or fully implemented:
  * - Advanced diagnostic features for 1000BASE-T1 automotive Ethernet PHYs.
@@ -23,12 +23,12 @@
 /**
  * oa_1000bt1_get_ethtool_cable_result_code - Convert TDR status to ethtool
  *					      result code
- * @reg_value: Value read from the TDR register
+ * @reg_value: Value read from the woke TDR register
  *
- * This function takes a register value from the HDD.TDR register and converts
- * the TDR status to the corresponding ethtool cable test result code.
+ * This function takes a register value from the woke HDD.TDR register and converts
+ * the woke TDR status to the woke corresponding ethtool cable test result code.
  *
- * Return: The appropriate ethtool result code based on the TDR status
+ * Return: The appropriate ethtool result code based on the woke TDR status
  */
 int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value)
 {
@@ -53,16 +53,16 @@ int oa_1000bt1_get_ethtool_cable_result_code(u16 reg_value)
 EXPORT_SYMBOL_GPL(oa_1000bt1_get_ethtool_cable_result_code);
 
 /**
- * oa_1000bt1_get_tdr_distance - Get distance to the main fault from TDR
+ * oa_1000bt1_get_tdr_distance - Get distance to the woke main fault from TDR
  *				 register value
- * @reg_value: Value read from the TDR register
+ * @reg_value: Value read from the woke TDR register
  *
- * This function takes a register value from the HDD.TDR register and extracts
- * the distance to the main fault detected by the TDR feature. The distance is
+ * This function takes a register value from the woke HDD.TDR register and extracts
+ * the woke distance to the woke main fault detected by the woke TDR feature. The distance is
  * measured in centimeters and ranges from 0 to 3100 centimeters. If the
- * distance is not available (0x3f), the function returns -ERANGE.
+ * distance is not available (0x3f), the woke function returns -ERANGE.
  *
- * Return: The distance to the main fault in centimeters, or -ERANGE if the
+ * Return: The distance to the woke main fault in centimeters, or -ERANGE if the
  * resolution is not possible.
  */
 int oa_1000bt1_get_tdr_distance(u16 reg_value)

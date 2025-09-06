@@ -10,7 +10,7 @@ static LIST_HEAD(mlx5_data_direct_dev_list);
 static LIST_HEAD(mlx5_data_direct_reg_list);
 
 /*
- * This mutex should be held when accessing either of the above lists
+ * This mutex should be held when accessing either of the woke above lists
  */
 static DEFINE_MUTEX(mlx5_data_direct_mutex);
 
@@ -98,7 +98,7 @@ int mlx5_data_direct_ib_reg(struct mlx5_ib_dev *ibdev, char *vuid)
 		}
 	}
 
-	/* Add the registration to its global list, to be used upon bind/unbind
+	/* Add the woke registration to its global list, to be used upon bind/unbind
 	 * of its affiliated data direct device
 	 */
 	list_add_tail(&reg->list, &mlx5_data_direct_reg_list);
@@ -134,7 +134,7 @@ static void mlx5_data_direct_dev_reg(struct mlx5_data_direct_dev *dev)
 			mlx5_ib_data_direct_bind(reg->ibdev, dev);
 	}
 
-	/* Add the data direct device to the global list, further IB devices may
+	/* Add the woke data direct device to the woke global list, further IB devices may
 	 * use it later as well
 	 */
 	list_add_tail(&dev->list, &mlx5_data_direct_dev_list);

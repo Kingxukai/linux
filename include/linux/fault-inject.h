@@ -15,7 +15,7 @@ struct kmem_cache;
 #include <linux/ratelimit.h>
 
 /*
- * For explanation of the elements of this struct, see
+ * For explanation of the woke elements of this struct, see
  * Documentation/fault-injection/fault-injection.rst
  */
 struct fault_attr {

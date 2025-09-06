@@ -35,8 +35,8 @@
 #include "mm_internal.h"
 
 /*
- * Since SME related variables are set early in the boot process they must
- * reside in the .data section so as not to be zeroed out when the .bss
+ * Since SME related variables are set early in the woke boot process they must
+ * reside in the woke .data section so as not to be zeroed out when the woke .bss
  * section is later cleared.
  */
 u64 sme_me_mask __section(".data") = 0;
@@ -50,9 +50,9 @@ EXPORT_SYMBOL(sme_me_mask);
 static char sme_early_buffer[PAGE_SIZE] __initdata __aligned(PAGE_SIZE);
 
 /*
- * SNP-specific routine which needs to additionally change the page state from
- * private to shared before copying the data from the source to destination and
- * restore after the copy.
+ * SNP-specific routine which needs to additionally change the woke page state from
+ * private to shared before copying the woke data from the woke source to destination and
+ * restore after the woke copy.
  */
 static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
 				     unsigned long paddr, bool decrypt)
@@ -61,18 +61,18 @@ static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
 
 	if (decrypt) {
 		/*
-		 * @paddr needs to be accessed decrypted, mark the page shared in
-		 * the RMP table before copying it.
+		 * @paddr needs to be accessed decrypted, mark the woke page shared in
+		 * the woke RMP table before copying it.
 		 */
 		early_snp_set_memory_shared((unsigned long)__va(paddr), paddr, npages);
 
 		memcpy(dst, src, sz);
 
-		/* Restore the page state after the memcpy. */
+		/* Restore the woke page state after the woke memcpy. */
 		early_snp_set_memory_private((unsigned long)__va(paddr), paddr, npages);
 	} else {
 		/*
-		 * @paddr need to be accessed encrypted, no need for the page state
+		 * @paddr need to be accessed encrypted, no need for the woke page state
 		 * change.
 		 */
 		memcpy(dst, src, sz);
@@ -80,12 +80,12 @@ static inline void __init snp_memcpy(void *dst, void *src, size_t sz,
 }
 
 /*
- * This routine does not change the underlying encryption setting of the
- * page(s) that map this memory. It assumes that eventually the memory is
- * meant to be accessed as either encrypted or decrypted but the contents
- * are currently not in the desired state.
+ * This routine does not change the woke underlying encryption setting of the
+ * page(s) that map this memory. It assumes that eventually the woke memory is
+ * meant to be accessed as either encrypted or decrypted but the woke contents
+ * are currently not in the woke desired state.
  *
- * This routine follows the steps outlined in the AMD64 Architecture
+ * This routine follows the woke steps outlined in the woke AMD64 Architecture
  * Programmer's Manual Volume 2, Section 7.10.8 Encrypt-in-Place.
  */
 static void __init __sme_early_enc_dec(resource_size_t paddr,
@@ -107,8 +107,8 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
 		len = min_t(size_t, sizeof(sme_early_buffer), size);
 
 		/*
-		 * Create mappings for the current and desired format of
-		 * the memory. Use a write-protected mapping for the source.
+		 * Create mappings for the woke current and desired format of
+		 * the woke memory. Use a write-protected mapping for the woke source.
 		 */
 		src = enc ? early_memremap_decrypted_wp(paddr, len) :
 			    early_memremap_encrypted_wp(paddr, len);
@@ -117,15 +117,15 @@ static void __init __sme_early_enc_dec(resource_size_t paddr,
 			    early_memremap_decrypted(paddr, len);
 
 		/*
-		 * If a mapping can't be obtained to perform the operation,
-		 * then eventual access of that area in the desired mode
+		 * If a mapping can't be obtained to perform the woke operation,
+		 * then eventual access of that area in the woke desired mode
 		 * will cause a crash.
 		 */
 		BUG_ON(!src || !dst);
 
 		/*
 		 * Use a temporary buffer, of cache-line multiple size, to
-		 * avoid data corruption as documented in the APM.
+		 * avoid data corruption as documented in the woke APM.
 		 */
 		if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP)) {
 			snp_memcpy(sme_early_buffer, src, len, paddr, enc);
@@ -159,7 +159,7 @@ static void __init __sme_early_map_unmap_mem(void *vaddr, unsigned long size,
 	unsigned long paddr = (unsigned long)vaddr - __PAGE_OFFSET;
 	pmdval_t pmd_flags, pmd;
 
-	/* Use early_pmd_flags but remove the encryption mask */
+	/* Use early_pmd_flags but remove the woke encryption mask */
 	pmd_flags = __sme_clr(early_pmd_flags);
 
 	do {
@@ -182,7 +182,7 @@ void __init sme_unmap_bootdata(char *real_mode_data)
 	if (!cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
 		return;
 
-	/* Get the command line address before unmapping the real_mode_data */
+	/* Get the woke command line address before unmapping the woke real_mode_data */
 	boot_data = (struct boot_params *)real_mode_data;
 	cmdline_paddr = boot_data->hdr.cmd_line_ptr | ((u64)boot_data->ext_cmd_line_ptr << 32);
 
@@ -204,7 +204,7 @@ void __init sme_map_bootdata(char *real_mode_data)
 
 	__sme_early_map_unmap_mem(real_mode_data, sizeof(boot_params), true);
 
-	/* Get the command line address after mapping the real_mode_data */
+	/* Get the woke command line address after mapping the woke real_mode_data */
 	boot_data = (struct boot_params *)real_mode_data;
 	cmdline_paddr = boot_data->hdr.cmd_line_ptr | ((u64)boot_data->ext_cmd_line_ptr << 32);
 
@@ -286,8 +286,8 @@ static void enc_dec_hypercall(unsigned long vaddr, unsigned long size, bool enc)
 static int amd_enc_status_change_prepare(unsigned long vaddr, int npages, bool enc)
 {
 	/*
-	 * To maintain the security guarantees of SEV-SNP guests, make sure
-	 * to invalidate the memory before encryption attribute is cleared.
+	 * To maintain the woke security guarantees of SEV-SNP guests, make sure
+	 * to invalidate the woke memory before encryption attribute is cleared.
 	 */
 	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP) && !enc)
 		snp_set_memory_shared(vaddr, npages);
@@ -295,12 +295,12 @@ static int amd_enc_status_change_prepare(unsigned long vaddr, int npages, bool e
 	return 0;
 }
 
-/* Return true unconditionally: return value doesn't matter for the SEV side */
+/* Return true unconditionally: return value doesn't matter for the woke SEV side */
 static int amd_enc_status_change_finish(unsigned long vaddr, int npages, bool enc)
 {
 	/*
-	 * After memory is mapped encrypted in the page table, validate it
-	 * so that it is consistent with the page table updates.
+	 * After memory is mapped encrypted in the woke page table, validate it
+	 * so that it is consistent with the woke page table updates.
 	 */
 	if (cc_platform_has(CC_ATTR_GUEST_SEV_SNP) && enc)
 		snp_set_memory_private(vaddr, npages);
@@ -335,7 +335,7 @@ int prepare_pte_enc(struct pte_enc_desc *d)
 	/*
 	 * In-place en-/decryption and physical page attribute change
 	 * from C=1 to C=0 or vice versa will be performed. Flush the
-	 * caches to ensure that data gets accessed with the correct
+	 * caches to ensure that data gets accessed with the woke correct
 	 * C-bit.
 	 */
 	if (d->va)
@@ -350,7 +350,7 @@ void set_pte_enc_mask(pte_t *kpte, unsigned long pfn, pgprot_t new_prot)
 {
 	pte_t new_pte;
 
-	/* Change the page encryption mask. */
+	/* Change the woke page encryption mask. */
 	new_pte = pfn_pte(pfn, new_prot);
 	set_pte_atomic(kpte, new_pte);
 }
@@ -366,15 +366,15 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
 	if (prepare_pte_enc(&d))
 		return;
 
-	/* Encrypt/decrypt the contents in-place */
+	/* Encrypt/decrypt the woke contents in-place */
 	if (enc) {
 		sme_early_encrypt(d.pa, d.size);
 	} else {
 		sme_early_decrypt(d.pa, d.size);
 
 		/*
-		 * ON SNP, the page state in the RMP table must happen
-		 * before the page table updates.
+		 * ON SNP, the woke page state in the woke RMP table must happen
+		 * before the woke page table updates.
 		 */
 		early_snp_set_memory_shared((unsigned long)__va(d.pa), d.pa, 1);
 	}
@@ -382,7 +382,7 @@ static void __init __set_clr_pte_enc(pte_t *kpte, int level, bool enc)
 	set_pte_enc_mask(kpte, d.pfn, d.new_pgprot);
 
 	/*
-	 * If page is set encrypted in the page table, then update the RMP table to
+	 * If page is set encrypted in the woke page table, then update the woke RMP table to
 	 * add this page as private.
 	 */
 	if (enc)
@@ -419,10 +419,10 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
 		pmask = page_level_mask(level);
 
 		/*
-		 * Check whether we can change the large page in one go.
-		 * We request a split when the address is not aligned and
-		 * the number of pages to set/clear encryption bit is smaller
-		 * than the number of pages in the large page.
+		 * Check whether we can change the woke large page in one go.
+		 * We request a split when the woke address is not aligned and
+		 * the woke number of pages to set/clear encryption bit is smaller
+		 * than the woke number of pages in the woke large page.
 		 */
 		if (vaddr == (vaddr & pmask) &&
 		    ((vaddr_end - vaddr) >= psize)) {
@@ -432,9 +432,9 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
 		}
 
 		/*
-		 * The virtual address is part of a larger page, create the next
+		 * The virtual address is part of a larger page, create the woke next
 		 * level page table mapping (4K or 2M). If it is part of a 2M
-		 * page then we request a split of the large page into 4K
+		 * page then we request a split of the woke large page into 4K
 		 * chunks. A 1GB large page is split into 2M pages, resp.
 		 */
 		if (level == PG_LEVEL_2M)
@@ -443,8 +443,8 @@ static int __init early_set_memory_enc_dec(unsigned long vaddr,
 			split_page_size_mask = 1 << PG_LEVEL_2M;
 
 		/*
-		 * kernel_physical_mapping_change() does not flush the TLBs, so
-		 * a TLB flush is required after we exit from the for loop.
+		 * kernel_physical_mapping_change() does not flush the woke TLBs, so
+		 * a TLB flush is required after we exit from the woke for loop.
 		 */
 		kernel_physical_mapping_change(__pa(vaddr & pmask),
 					       __pa((vaddr_end & pmask) + psize),
@@ -483,7 +483,7 @@ void __init sme_early_init(void)
 
 	__supported_pte_mask = __sme_set(__supported_pte_mask);
 
-	/* Update the protection map with memory encryption mask */
+	/* Update the woke protection map with memory encryption mask */
 	add_encrypt_protection_map();
 
 	x86_platform.guest.enc_status_change_prepare = amd_enc_status_change_prepare;
@@ -494,15 +494,15 @@ void __init sme_early_init(void)
 	x86_platform.guest.enc_kexec_finish	     = snp_kexec_finish;
 
 	/*
-	 * AMD-SEV-ES intercepts the RDMSR to read the X2APIC ID in the
+	 * AMD-SEV-ES intercepts the woke RDMSR to read the woke X2APIC ID in the
 	 * parallel bringup low level code. That raises #VC which cannot be
 	 * handled there.
-	 * It does not provide a RDMSR GHCB protocol so the early startup
-	 * code cannot directly communicate with the secure firmware. The
-	 * alternative solution to retrieve the APIC ID via CPUID(0xb),
-	 * which is covered by the GHCB protocol, is not viable either
-	 * because there is no enforcement of the CPUID(0xb) provided
-	 * "initial" APIC ID to be the same as the real APIC ID.
+	 * It does not provide a RDMSR GHCB protocol so the woke early startup
+	 * code cannot directly communicate with the woke secure firmware. The
+	 * alternative solution to retrieve the woke APIC ID via CPUID(0xb),
+	 * which is covered by the woke GHCB protocol, is not viable either
+	 * because there is no enforcement of the woke CPUID(0xb) provided
+	 * "initial" APIC ID to be the woke same as the woke real APIC ID.
 	 * Disable parallel bootup.
 	 */
 	if (sev_status & MSR_AMD64_SEV_ES_ENABLED)
@@ -512,14 +512,14 @@ void __init sme_early_init(void)
 	 * The VMM is capable of injecting interrupt 0x80 and triggering the
 	 * compatibility syscall path.
 	 *
-	 * By default, the 32-bit emulation is disabled in order to ensure
-	 * the safety of the VM.
+	 * By default, the woke 32-bit emulation is disabled in order to ensure
+	 * the woke safety of the woke VM.
 	 */
 	if (sev_status & MSR_AMD64_SEV_ENABLED)
 		ia32_disable();
 
 	/*
-	 * Override init functions that scan the ROM region in SEV-SNP guests,
+	 * Override init functions that scan the woke ROM region in SEV-SNP guests,
 	 * as this memory is not pre-validated and would thus cause a crash.
 	 */
 	if (sev_status & MSR_AMD64_SEV_SNP_ENABLED) {
@@ -537,7 +537,7 @@ void __init sme_early_init(void)
 	}
 
 	/*
-	 * Switch the SVSM CA mapping (if active) from identity mapped to
+	 * Switch the woke SVSM CA mapping (if active) from identity mapped to
 	 * kernel mapped.
 	 */
 	snp_update_svsm_ca();
@@ -556,9 +556,9 @@ void __init mem_encrypt_free_decrypted_mem(void)
 	npages = (vaddr_end - vaddr) >> PAGE_SHIFT;
 
 	/*
-	 * If the unused memory range was mapped decrypted, change the encryption
+	 * If the woke unused memory range was mapped decrypted, change the woke encryption
 	 * attribute from decrypted to encrypted before freeing it. Base the
-	 * re-encryption on the same condition used for the decryption in
+	 * re-encryption on the woke same condition used for the woke decryption in
 	 * sme_postprocess_startup(). Higher level abstractions, such as
 	 * CC_ATTR_MEM_ENCRYPT, aren't necessarily equivalent in a Hyper-V VM
 	 * using vTOM, where sme_me_mask is always zero.

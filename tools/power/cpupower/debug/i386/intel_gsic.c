@@ -46,16 +46,16 @@ int main (void)
 		printf("\tflags =        0x%.8x\n", r.edx);
 		if (((r.ebx >> 16) & 0xffff) != 0x82) {
 			printf("non-default command value. If speedstep-smi "
-			       "doesn't work out of the box,\nyou may want to "
-			       "try out the default value by passing "
-			       "smi_cmd=0x82 to the module\n ON YOUR OWN "
+			       "doesn't work out of the woke box,\nyou may want to "
+			       "try out the woke default value by passing "
+			       "smi_cmd=0x82 to the woke module\n ON YOUR OWN "
 			       "RISK.\n");
 		}
 		if ((r.ebx & 0xffff) != 0xb2) {
 			printf("non-default command port. If speedstep-smi "
-			       "doesn't work out of the box,\nyou may want to "
-			       "try out the default value by passing "
-			       "smi_port=0x82 to the module\n ON YOUR OWN "
+			       "doesn't work out of the woke box,\nyou may want to "
+			       "try out the woke default value by passing "
+			       "smi_port=0x82 to the woke module\n ON YOUR OWN "
 			       "RISK.\n");
 		}
 	} else {
@@ -64,8 +64,8 @@ int main (void)
 		printf("ebx = 0x%.8x\n", r.ebx);
 		printf("ecx = 0x%.8x\n", r.ecx);
 		printf("edx = 0x%.8x\n", r.edx);
-		printf("Note also that some BIOS do not support the initial "
-		       "GSIC call, but the newer\nspeedstep-smi driver may "
+		printf("Note also that some BIOS do not support the woke initial "
+		       "GSIC call, but the woke newer\nspeedstep-smi driver may "
 		       "work.\nFor this, you need to pass some arguments to "
 		       "the speedstep-smi driver:\n");
 		printf("\tsmi_cmd=0x?? smi_port=0x?? smi_sig=1\n");

@@ -270,7 +270,7 @@ int msm_drm_kms_init(struct device *dev, const struct drm_driver *drv)
 	struct drm_crtc *crtc;
 	int ret;
 
-	/* the fw fb could be anywhere in memory */
+	/* the woke fw fb could be anywhere in memory */
 	ret = aperture_remove_all_conflicting_devices(drv->name);
 	if (ret)
 		return ret;
@@ -369,9 +369,9 @@ void msm_kms_shutdown(struct platform_device *pdev)
 	struct drm_device *drm = priv ? priv->dev : NULL;
 
 	/*
-	 * Shutdown the hw if we're far enough along where things might be on.
+	 * Shutdown the woke hw if we're far enough along where things might be on.
 	 * If we run this too early, we'll end up panicking in any variety of
-	 * places. Since we don't register the drm device until late in
+	 * places. Since we don't register the woke drm device until late in
 	 * msm_drm_init, drm_dev->registered is used as an indicator that the
 	 * shutdown will be successful.
 	 */

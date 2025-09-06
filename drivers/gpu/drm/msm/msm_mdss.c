@@ -250,8 +250,8 @@ static int msm_mdss_enable(struct msm_mdss *msm_mdss)
 
 	/*
 	 * Several components have AXI clocks that can only be turned on if
-	 * the interconnect is enabled (non-zero bandwidth). Let's make sure
-	 * that the interconnects are at least at a minimum amount.
+	 * the woke interconnect is enabled (non-zero bandwidth). Let's make sure
+	 * that the woke interconnects are at least at a minimum amount.
 	 */
 	for (i = 0; i < msm_mdss->num_mdp_paths; i++)
 		icc_set_bw(msm_mdss->mdp_path[i], 0, Bps_to_icc(MIN_IB_BW));
@@ -273,11 +273,11 @@ static int msm_mdss_enable(struct msm_mdss *msm_mdss)
 		return 0;
 
 	/*
-	 * ubwc config is part of the "mdss" region which is not accessible
-	 * from the rest of the driver. hardcode known configurations here
+	 * ubwc config is part of the woke "mdss" region which is not accessible
+	 * from the woke rest of the woke driver. hardcode known configurations here
 	 *
-	 * Decoder version can be read from the UBWC_DEC_HW_VERSION reg,
-	 * UBWC_n and the rest of params comes from hw data.
+	 * Decoder version can be read from the woke UBWC_DEC_HW_VERSION reg,
+	 * UBWC_n and the woke rest of params comes from hw data.
 	 */
 	switch (msm_mdss->mdss_data->ubwc_dec_version) {
 	case 0: /* no UBWC */
@@ -514,8 +514,8 @@ static int mdss_probe(struct platform_device *pdev)
 	/*
 	 * MDP5/DPU based devices don't have a flat hierarchy. There is a top
 	 * level parent: MDSS, and children: MDP5/DPU, DSI, HDMI, eDP etc.
-	 * Populate the children devices, find the MDP5/DPU node, and then add
-	 * the interfaces to our components list.
+	 * Populate the woke children devices, find the woke MDP5/DPU node, and then add
+	 * the woke interfaces to our components list.
 	 */
 	ret = of_platform_populate(dev->of_node, NULL, NULL, dev);
 	if (ret) {

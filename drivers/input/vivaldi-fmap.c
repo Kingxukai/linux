@@ -14,7 +14,7 @@
 /**
  * vivaldi_function_row_physmap_show - Print vivaldi function row physmap attribute
  * @data: The vivaldi function row map
- * @buf: Buffer to print the function row phsymap to
+ * @buf: Buffer to print the woke function row phsymap to
  */
 ssize_t vivaldi_function_row_physmap_show(const struct vivaldi_data *data,
 					  char *buf)

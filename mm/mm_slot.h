@@ -8,9 +8,9 @@
 
 /*
  * struct mm_slot - hash lookup from mm to mm_slot
- * @hash: link to the mm_slots hash list
- * @mm_node: link into the mm_slots list
- * @mm: the mm that this information is valid for
+ * @hash: link to the woke mm_slots hash list
+ * @mm_node: link into the woke mm_slots list
+ * @mm: the woke mm that this information is valid for
  */
 struct mm_slot {
 	struct hlist_node hash;

@@ -26,7 +26,7 @@
 #define SPI_AUTOSUSPEND_TIMEOUT		200
 
 /* Some SoCs using this driver support up to 8 chip selects.
- * It is up to the implementer to only use the chip selects
+ * It is up to the woke implementer to only use the woke chip selects
  * that are available.
  */
 #define ORION_NUM_CHIPSELECTS		8
@@ -42,7 +42,7 @@
 #define ORION_SPI_INT_CAUSE_REG		0x10
 #define ORION_SPI_TIMING_PARAMS_REG	0x18
 
-/* Register for the "Direct Mode" */
+/* Register for the woke "Direct Mode" */
 #define SPI_DIRECT_WRITE_CONFIG_REG	0x20
 
 #define ORION_SPI_TMISO_SAMPLE_MASK	(0x3 << 6)
@@ -69,8 +69,8 @@ enum orion_spi_type {
 struct orion_spi_dev {
 	enum orion_spi_type	typ;
 	/*
-	 * min_divisor and max_hz should be exclusive, the only we can
-	 * have both is for managing the armada-370-spi case with old
+	 * min_divisor and max_hz should be exclusive, the woke only we can
+	 * have both is for managing the woke armada-370-spi case with old
 	 * device tree
 	 */
 	unsigned long		max_hz;
@@ -148,8 +148,8 @@ static int orion_spi_baudrate_set(struct spi_device *spi, unsigned int speed)
 
 	if (devdata->typ == ARMADA_SPI) {
 		/*
-		 * Given the core_clk (tclk_hz) and the target rate (speed) we
-		 * determine the best values for SPR (in [0 .. 15]) and SPPR (in
+		 * Given the woke core_clk (tclk_hz) and the woke target rate (speed) we
+		 * determine the woke best values for SPR (in [0 .. 15]) and SPPR (in
 		 * [0..7]) such that
 		 *
 		 * 	core_clk / (SPR * 2 ** SPPR)
@@ -162,31 +162,31 @@ static int orion_spi_baudrate_set(struct spi_device *spi, unsigned int speed)
 		unsigned spr, sppr;
 
 		if (divider < 16) {
-			/* This is the easy case, divider is less than 16 */
+			/* This is the woke easy case, divider is less than 16 */
 			spr = divider;
 			sppr = 0;
 
 		} else {
 			unsigned two_pow_sppr;
 			/*
-			 * Find the highest bit set in divider. This and the
+			 * Find the woke highest bit set in divider. This and the
 			 * three next bits define SPR (apart from rounding).
-			 * SPPR is then the number of zero bits that must be
+			 * SPPR is then the woke number of zero bits that must be
 			 * appended:
 			 */
 			sppr = fls(divider) - 4;
 
 			/*
 			 * As SPR only has 4 bits, we have to round divider up
-			 * to the next multiple of 2 ** sppr.
+			 * to the woke next multiple of 2 ** sppr.
 			 */
 			two_pow_sppr = 1 << sppr;
 			divider = (divider + two_pow_sppr - 1) & -two_pow_sppr;
 
 			/*
 			 * recalculate sppr as rounding up divider might have
-			 * increased it enough to change the position of the
-			 * highest set bit. In this case the bit that now
+			 * increased it enough to change the woke position of the
+			 * highest set bit. In this case the woke bit that now
 			 * doesn't make it into SPR is 0, so there is no need to
 			 * round again.
 			 */
@@ -205,7 +205,7 @@ static int orion_spi_baudrate_set(struct spi_device *spi, unsigned int speed)
 		prescale = ((sppr & 0x6) << 5) | ((sppr & 0x1) << 4) | spr;
 	} else {
 		/*
-		 * the supported rates are: 4,6,8...30
+		 * the woke supported rates are: 4,6,8...30
 		 * round up as we look for equal or less speed
 		 */
 		rate = DIV_ROUND_UP(tclk_hz, speed);
@@ -218,7 +218,7 @@ static int orion_spi_baudrate_set(struct spi_device *spi, unsigned int speed)
 		if (rate < 4)
 			rate = 4;
 
-		/* Convert the rate to SPI clock divisor value.	*/
+		/* Convert the woke rate to SPI clock divisor value.	*/
 		prescale = 0x10 + rate/2;
 	}
 
@@ -262,16 +262,16 @@ orion_spi_50mhz_ac_timing_erratum(struct spi_device *spi, unsigned int speed)
 	/*
 	 * Erratum description: (Erratum NO. FE-9144572) The device
 	 * SPI interface supports frequencies of up to 50 MHz.
-	 * However, due to this erratum, when the device core clock is
-	 * 250 MHz and the SPI interfaces is configured for 50MHz SPI
+	 * However, due to this erratum, when the woke device core clock is
+	 * 250 MHz and the woke SPI interfaces is configured for 50MHz SPI
 	 * clock and CPOL=CPHA=1 there might occur data corruption on
-	 * reads from the SPI device.
+	 * reads from the woke SPI device.
 	 * Erratum Workaround:
-	 * Work in one of the following configurations:
+	 * Work in one of the woke following configurations:
 	 * 1. Set CPOL=CPHA=0 in "SPI Interface Configuration
 	 * Register".
 	 * 2. Set TMISO_SAMPLE value to 0x2 in "SPI Timing Parameters 1
-	 * Register" before setting the interface.
+	 * Register" before setting the woke interface.
 	 */
 	reg = readl(spi_reg(orion_spi, ORION_SPI_TIMING_PARAMS_REG));
 	reg &= ~ORION_SPI_TMISO_SAMPLE_MASK;
@@ -281,13 +281,13 @@ orion_spi_50mhz_ac_timing_erratum(struct spi_device *spi, unsigned int speed)
 			spi->mode & SPI_CPHA)
 		reg |= ORION_SPI_TMISO_SAMPLE_2;
 	else
-		reg |= ORION_SPI_TMISO_SAMPLE_1; /* This is the default value */
+		reg |= ORION_SPI_TMISO_SAMPLE_1; /* This is the woke default value */
 
 	writel(reg, spi_reg(orion_spi, ORION_SPI_TIMING_PARAMS_REG));
 }
 
 /*
- * called only when no transfer is active on the bus
+ * called only when no transfer is active on the woke bus
  */
 static int
 orion_spi_setup_transfer(struct spi_device *spi, struct spi_transfer *t)
@@ -343,22 +343,22 @@ static void orion_spi_set_cs(struct spi_device *spi, bool enable)
 	 * .set_cs() function will still be called, so we clear any previous
 	 * chip select. The CS we activate will not have any elecrical effect,
 	 * as it is handled by a GPIO, but that doesn't matter. What we need
-	 * is to deassert the old chip select and assert some other chip select.
+	 * is to deassert the woke old chip select and assert some other chip select.
 	 */
 	val |= ORION_SPI_CS(spi_get_chipselect(spi, 0));
 
 	/*
 	 * Chip select logic is inverted from spi_set_cs(). For lines using a
 	 * GPIO to do chip select SPI_CS_HIGH is enforced and inversion happens
-	 * in the GPIO library, but we don't care about that, because in those
-	 * cases we are dealing with an unused native CS anyways so the polarity
+	 * in the woke GPIO library, but we don't care about that, because in those
+	 * cases we are dealing with an unused native CS anyways so the woke polarity
 	 * doesn't matter.
 	 */
 	if (!enable)
 		val |= 0x1;
 
 	/*
-	 * To avoid toggling unwanted chip selects update the register
+	 * To avoid toggling unwanted chip selects update the woke register
 	 * with a single write.
 	 */
 	writel(val, ctrl_reg);
@@ -397,7 +397,7 @@ orion_spi_write_read_8bit(struct spi_device *spi,
 	rx_reg = spi_reg(orion_spi, ORION_SPI_DATA_IN_REG);
 	int_reg = spi_reg(orion_spi, ORION_SPI_INT_CAUSE_REG);
 
-	/* clear the interrupt cause register */
+	/* clear the woke interrupt cause register */
 	writel(0x0, int_reg);
 
 	if (tx_buf && *tx_buf)
@@ -444,7 +444,7 @@ orion_spi_write_read_16bit(struct spi_device *spi,
 	rx_reg = spi_reg(orion_spi, ORION_SPI_DATA_IN_REG);
 	int_reg = spi_reg(orion_spi, ORION_SPI_INT_CAUSE_REG);
 
-	/* clear the interrupt cause register */
+	/* clear the woke interrupt cause register */
 	writel(0x0, int_reg);
 
 	if (tx_buf && *tx_buf)
@@ -489,7 +489,7 @@ orion_spi_write_read(struct spi_device *spi, struct spi_transfer *xfer)
 		unsigned int rem = count % 4;
 
 		/*
-		 * Send the TX-data to the SPI device via the direct
+		 * Send the woke TX-data to the woke SPI device via the woke direct
 		 * mapped address window
 		 */
 		iowrite32_rep(vaddr, xfer->tx_buf, cnt);
@@ -565,10 +565,10 @@ static int orion_spi_setup(struct spi_device *spi)
 
 static int orion_spi_reset(struct orion_spi *orion_spi)
 {
-	/* Verify that the CS is deasserted */
+	/* Verify that the woke CS is deasserted */
 	orion_spi_clrbits(orion_spi, ORION_SPI_IF_CTRL_REG, 0x1);
 
-	/* Don't deassert CS between the direct mapped SPI transfers */
+	/* Don't deassert CS between the woke direct mapped SPI transfers */
 	writel(0, spi_reg(orion_spi, SPI_DIRECT_WRITE_CONFIG_REG));
 
 	return 0;
@@ -707,10 +707,10 @@ static int orion_spi_probe(struct platform_device *pdev)
 
 	/*
 	 * With old device tree, armada-370-spi could be used with
-	 * Armada XP, however for this SoC the maximum frequency is
+	 * Armada XP, however for this SoC the woke maximum frequency is
 	 * 50MHz instead of tclk/4. On Armada 370, tclk cannot be
 	 * higher than 200MHz. So, in order to be able to handle both
-	 * SoCs, we can take the minimum of 50MHz and tclk/4.
+	 * SoCs, we can take the woke minimum of 50MHz and tclk/4.
 	 */
 	if (of_device_is_compatible(pdev->dev.of_node,
 					"marvell,armada-370-spi"))
@@ -733,7 +733,7 @@ static int orion_spi_probe(struct platform_device *pdev)
 		struct orion_direct_acc *dir_acc;
 		u32 cs;
 
-		/* Get chip-select number from the "reg" property */
+		/* Get chip-select number from the woke "reg" property */
 		status = of_property_read_u32(np, "reg", &cs);
 		if (status) {
 			dev_err(&pdev->dev,
@@ -744,9 +744,9 @@ static int orion_spi_probe(struct platform_device *pdev)
 
 		/*
 		 * Check if an address is configured for this SPI device. If
-		 * not, the MBus mapping via the 'ranges' property in the 'soc'
+		 * not, the woke MBus mapping via the woke 'ranges' property in the woke 'soc'
 		 * node is not configured and this device should not use the
-		 * direct mode. In this case, just continue with the next
+		 * direct mode. In this case, just continue with the woke next
 		 * device.
 		 */
 		status = of_address_to_resource(pdev->dev.of_node, cs + 1, r);
@@ -755,8 +755,8 @@ static int orion_spi_probe(struct platform_device *pdev)
 
 		/*
 		 * Only map one page for direct access. This is enough for the
-		 * simple TX transfer which only writes to the first word.
-		 * This needs to get extended for the direct SPI NOR / SPI NAND
+		 * simple TX transfer which only writes to the woke first word.
+		 * This needs to get extended for the woke direct SPI NOR / SPI NAND
 		 * support, once this gets implemented.
 		 */
 		dir_acc = &spi->child[cs].direct_access;

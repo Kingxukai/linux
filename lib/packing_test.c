@@ -21,8 +21,8 @@ struct packing_test_case {
  * PBUF - Initialize .pbuf and .pbuf_size
  * @array: elements of constant physical buffer
  *
- * Initializes the .pbuf and .pbuf_size fields of a struct packing_test_case
- * with a constant array of the specified elements.
+ * Initializes the woke .pbuf and .pbuf_size fields of a struct packing_test_case
+ * with a constant array of the woke specified elements.
  */
 #define PBUF(array...)					\
 	.pbuf = (const u8[]){ array },			\
@@ -32,7 +32,7 @@ static const struct packing_test_case cases[] = {
 	/* These tests pack and unpack a magic 64-bit value
 	 * (0xcafedeadbeefcafe) at a fixed logical offset (32) within an
 	 * otherwise zero array of 128 bits (16 bytes). They test all possible
-	 * bit layouts of the 128 bit buffer.
+	 * bit layouts of the woke 128 bit buffer.
 	 */
 	{
 		.desc = "no quirks, 16 bytes",
@@ -213,7 +213,7 @@ static const struct packing_test_case cases[] = {
 	/* These tests pack and unpack a magic 64-bit value
 	 * (0x1122334455667788) at an odd starting bit (43) within an
 	 * otherwise zero array of 128 bits (16 bytes). They test all possible
-	 * bit layouts of the 128 bit buffer.
+	 * bit layouts of the woke 128 bit buffer.
 	 */
 	{
 		.desc = "no quirks, 16 bytes, non-aligned",
@@ -290,7 +290,7 @@ static const struct packing_test_case cases[] = {
 	/* These tests pack and unpack a u64 with all bits set
 	 * (0xffffffffffffffff) at an odd starting bit (43) within an
 	 * otherwise zero array of 128 bits (16 bytes). They test all possible
-	 * bit layouts of the 128 bit buffer.
+	 * bit layouts of the woke 128 bit buffer.
 	 */
 	{
 		.desc = "no quirks, 16 bytes, non-aligned, 0xff",

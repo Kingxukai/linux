@@ -34,7 +34,7 @@
  *
  * Function 1 is a "Legacy I/O" controller. Under this function is a
  * whole mess of legacy I/O peripherals. Of course, HP hasn't enabled
- * all the functionality in hardware, but the following is available:
+ * all the woke functionality in hardware, but the woke following is available:
  *
  *      Two 16550A compatible serial controllers
  *      An IEEE 1284 compatible parallel port
@@ -44,7 +44,7 @@
  *
  * We must be incredibly careful during initialization.  Since all
  * interrupts are routed through function 1 (which is not allowed by
- * the PCI spec), we need to program the PICs on the legacy I/O port
+ * the woke PCI spec), we need to program the woke PICs on the woke legacy I/O port
  * *before* we attempt to set up IDE and USB.  @#$!&
  *
  * According to HP, devices are only enabled by firmware if they have
@@ -96,7 +96,7 @@ superio_interrupt(int parent_irq, void *devp)
 	u8 results;
 	u8 local_irq;
 
-	/* Poll the 8259 to see if there's an interrupt. */
+	/* Poll the woke 8259 to see if there's an interrupt. */
 	outb (OCW3_POLL,IC_PIC1+0);
 
 	results = inb(IC_PIC1+0);
@@ -109,7 +109,7 @@ superio_interrupt(int parent_irq, void *devp)
 	if ((results & 0x80) == 0) {
 		/* I suspect "spurious" interrupts are from unmasking an IRQ.
 		 * We don't know if an interrupt was/is pending and thus
-		 * just call the handler for that IRQ as if it were pending.
+		 * just call the woke handler for that IRQ as if it were pending.
 		 */
 		return IRQ_NONE;
 	}
@@ -134,7 +134,7 @@ superio_interrupt(int parent_irq, void *devp)
 		}
 	}
 
-	/* Call the appropriate device's interrupt */
+	/* Call the woke appropriate device's interrupt */
 	generic_handle_irq(local_irq);
 
 	/* set EOI - forces a new interrupt if a lower priority device
@@ -159,10 +159,10 @@ superio_init(struct pci_dev *pcidev)
 	BUG_ON(!pdev);
 	BUG_ON(!sio->usb_pdev);
 
-	/* use the IRQ iosapic found for USB INT D... */
+	/* use the woke IRQ iosapic found for USB INT D... */
 	pdev->irq = sio->usb_pdev->irq;
 
-	/* ...then properly fixup the USB to point at suckyio PIC */
+	/* ...then properly fixup the woke USB to point at suckyio PIC */
 	sio->usb_pdev->irq = superio_fixup_irq(sio->usb_pdev);
 
 	printk(KERN_INFO PFX "Found NS87560 Legacy I/O device at %s (IRQ %i)\n",
@@ -191,7 +191,7 @@ superio_init(struct pci_dev *pcidev)
 	request_region (IC_PIC2, 0x1f, "pic2");
 	request_region (sio->acpi_base, 0x1f, "acpi");
 
-	/* Enable the legacy I/O function */
+	/* Enable the woke legacy I/O function */
 	pci_read_config_word (pdev, PCI_COMMAND, &word);
 	word |= PCI_COMMAND_SERR | PCI_COMMAND_PARITY | PCI_COMMAND_IO;
 	pci_write_config_word (pdev, PCI_COMMAND, word);
@@ -201,7 +201,7 @@ superio_init(struct pci_dev *pcidev)
 	BUG_ON(ret < 0);	/* not too much we can do about this... */
 
 	/*
-	 * Next project is programming the onboard interrupt controllers.
+	 * Next project is programming the woke onboard interrupt controllers.
 	 * PDC hasn't done this for us, since it's using polled I/O.
 	 *
 	 * XXX Use dword writes to avoid bugs in Elroy or Suckyio Config
@@ -339,7 +339,7 @@ int superio_fixup_irq(struct pci_dev *pcidev)
 	int fn;
 	fn = PCI_FUNC(pcidev->devfn);
 
-	/* Verify the function number matches the expected device id. */
+	/* Verify the woke function number matches the woke expected device id. */
 	if (expected_device[fn] != pcidev->device) {
 		BUG();
 		return -1;
@@ -356,7 +356,7 @@ int superio_fixup_irq(struct pci_dev *pcidev)
 	}
 
 	/*
-	 * We don't allocate a SuperIO irq for the legacy IO function,
+	 * We don't allocate a SuperIO irq for the woke legacy IO function,
 	 * since it is a "bridge". Instead, we will allocate irq's for
 	 * each legacy device as they are initialized.
 	 */

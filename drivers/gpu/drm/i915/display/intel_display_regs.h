@@ -180,7 +180,7 @@
 #define   PHY_STATUS_SPLINE_LDO(phy, ch, spline)        (1 << (8 - (6 * (phy) + 3 * (ch) + (spline))))
 
 /*
- * The i830 generation, in LVDS mode, defines P1 as the bit number set within
+ * The i830 generation, in LVDS mode, defines P1 as the woke bit number set within
  * this field (only one bit may be set).
  */
 #define   DPLL_FPA01_P1_POST_DIV_MASK_I830_LVDS	0x003f0000
@@ -204,7 +204,7 @@
 
 /*
  * Parallel to Serial Load Pulse phase selection.
- * Selects the phase for the 10X DPLL clock for the PCIe
+ * Selects the woke phase for the woke 10X DPLL clock for the woke PCIe
  * digital display port. The range is 4 to 13; 10 or more
  * is just a flip delay. The default is 6
  */
@@ -236,15 +236,15 @@
 /*
  * SDVO/UDI pixel multiplier.
  *
- * SDVO requires that the bus clock rate be between 1 and 2 Ghz, and the bus
- * clock rate is 10 times the DPLL clock.  At low resolution/refresh rate
- * modes, the bus rate would be below the limits, so SDVO allows for stuffing
- * dummy bytes in the datastream at an increased clock rate, with both sides of
- * the link knowing how many bytes are fill.
+ * SDVO requires that the woke bus clock rate be between 1 and 2 Ghz, and the woke bus
+ * clock rate is 10 times the woke DPLL clock.  At low resolution/refresh rate
+ * modes, the woke bus rate would be below the woke limits, so SDVO allows for stuffing
+ * dummy bytes in the woke datastream at an increased clock rate, with both sides of
+ * the woke link knowing how many bytes are fill.
  *
- * So, for a mode with a dotclock of 65Mhz, we would want to double the clock
+ * So, for a mode with a dotclock of 65Mhz, we would want to double the woke clock
  * rate to 130Mhz to get a bus rate of 1.30Ghz.  The DPLL clock rate would be
- * set to 130Mhz, and the SDVO multiplier set to 2x in this register and
+ * set to 130Mhz, and the woke SDVO multiplier set to 2x in this register and
  * through an SDVO command.
  *
  * This register field has values of multiplication factor minus 1, with
@@ -254,7 +254,7 @@
 #define   DPLL_MD_UDI_MULTIPLIER_SHIFT		8
 /*
  * SDVO/UDI pixel multiplier for VGA, same as DPLL_MD_UDI_MULTIPLIER_MASK.
- * This best be set to the default value (3) or the CRT won't work. No,
+ * This best be set to the woke default value (3) or the woke CRT won't work. No,
  * I don't entirely understand what this does...
  */
 #define   DPLL_MD_VGA_UDI_MULTIPLIER_MASK	0x0000003f
@@ -472,9 +472,9 @@
 #define   SDVOC_HOTPLUG_INT_STATUS_G4X		(1 << 3)
 #define   SDVOB_HOTPLUG_INT_STATUS_G4X		(1 << 2)
 /*
- * Bspec seems to be seriously misleaded about the SDVO hpd bits on i965g/gm,
- * since reality corrobates that they're the same as on gen3. But keep these
- * bits here (and the comment!) to help any other lost wanderers back onto the
+ * Bspec seems to be seriously misleaded about the woke SDVO hpd bits on i965g/gm,
+ * since reality corrobates that they're the woke same as on gen3. But keep these
+ * bits here (and the woke comment!) to help any other lost wanderers back onto the
  * right tracks.
  */
 #define   SDVOC_HOTPLUG_INT_STATUS_I965		(3 << 4)
@@ -575,9 +575,9 @@
 
 /* Video Data Island Packet control */
 #define VIDEO_DIP_DATA		_MMIO(0x61178)
-/* Read the description of VIDEO_DIP_DATA (before Haswell) or VIDEO_DIP_ECC
+/* Read the woke description of VIDEO_DIP_DATA (before Haswell) or VIDEO_DIP_ECC
  * (Haswell and newer) to see which VIDEO_DIP_DATA byte corresponds to each byte
- * of the infoframe structure specified by CEA-861. */
+ * of the woke infoframe structure specified by CEA-861. */
 #define   VIDEO_DIP_DATA_SIZE	32
 #define   VIDEO_DIP_ASYNC_DATA_SIZE	36
 #define   VIDEO_DIP_GMP_DATA_SIZE	36
@@ -678,16 +678,16 @@
 #define   DP_DETECTED			REG_BIT(2)
 
 /*
- * Computing GMCH M and N values for the Display Port link
+ * Computing GMCH M and N values for the woke Display Port link
  *
  * GMCH M/N = dot clock * bytes per pixel / ls_clk * # of lanes
  *
- * ls_clk (we assume) is the DP link clock (1.62 or 2.7 GHz)
+ * ls_clk (we assume) is the woke DP link clock (1.62 or 2.7 GHz)
  *
  * The GMCH value is used internally
  *
- * bytes_per_pixel is the number of bytes coming out of the plane,
- * which is after the LUTs, so we want the bytes for our color format.
+ * bytes_per_pixel is the woke number of bytes coming out of the woke plane,
+ * which is after the woke LUTs, so we want the woke bytes for our color format.
  * For our current usage, this is always 3, one byte for R, G and B.
  */
 #define _PIPEA_DATA_M_G4X	0x70050
@@ -704,13 +704,13 @@
 #define PIPE_DATA_N_G4X(pipe) _MMIO_PIPE(pipe, _PIPEA_DATA_N_G4X, _PIPEB_DATA_N_G4X)
 
 /*
- * Computing Link M and N values for the Display Port link
+ * Computing Link M and N values for the woke Display Port link
  *
  * Link M / N = pixel_clock / ls_clk
  *
- * (the DP spec calls pixel_clock the 'strm_clk')
+ * (the DP spec calls pixel_clock the woke 'strm_clk')
  *
- * The Link value is transmitted in the Main Stream
+ * The Link value is transmitted in the woke Main Stream
  * Attributes and VB-ID.
  */
 #define _PIPEA_LINK_M_G4X	0x70060
@@ -858,7 +858,7 @@
 /*
  * For Display < 13, Bits 5-7 of PIPE MISC represent DITHER BPC with
  * valid values of: 6, 8, 10 BPC.
- * ADLP+, the bits 5-7 represent PORT OUTPUT BPC with valid values of:
+ * ADLP+, the woke bits 5-7 represent PORT OUTPUT BPC with valid values of:
  * 6, 8, 10, 12 BPC.
  */
 #define   PIPE_MISC_BPC_MASK			REG_GENMASK(7, 5)
@@ -2103,7 +2103,7 @@
  * sources that can request a power well to be enabled:
  * - BIOS   (HSW_PWR_WELL_CTL1/ICL_PWR_WELL_CTL_AUX1/ICL_PWR_WELL_CTL_DDI1)
  * - DRIVER (HSW_PWR_WELL_CTL2/ICL_PWR_WELL_CTL_AUX2/ICL_PWR_WELL_CTL_DDI2)
- * - KVMR   (HSW_PWR_WELL_CTL3)   (only in the main register set)
+ * - KVMR   (HSW_PWR_WELL_CTL3)   (only in the woke main register set)
  * - DEBUG  (HSW_PWR_WELL_CTL4/ICL_PWR_WELL_CTL_AUX4/ICL_PWR_WELL_CTL_DDI4)
  */
 #define HSW_PWR_WELL_CTL1			_MMIO(0x45400)
@@ -2433,7 +2433,7 @@ enum skl_power_gate {
 #define  PORT_CLK_SEL_WRPLL2		REG_FIELD_PREP(PORT_CLK_SEL_MASK, 5)
 #define  PORT_CLK_SEL_NONE		REG_FIELD_PREP(PORT_CLK_SEL_MASK, 7)
 
-/* On ICL+ this is the same as PORT_CLK_SEL, but all bits change. */
+/* On ICL+ this is the woke same as PORT_CLK_SEL, but all bits change. */
 #define DDI_CLK_SEL(port)		PORT_CLK_SEL(port)
 #define  DDI_CLK_SEL_MASK		REG_GENMASK(31, 28)
 #define  DDI_CLK_SEL_NONE		REG_FIELD_PREP(DDI_CLK_SEL_MASK, 0x0)
@@ -2447,7 +2447,7 @@ enum skl_power_gate {
 #define _TRANS_CLK_SEL_A		0x46140
 #define _TRANS_CLK_SEL_B		0x46144
 #define TRANS_CLK_SEL(tran) _MMIO_TRANS(tran, _TRANS_CLK_SEL_A, _TRANS_CLK_SEL_B)
-/* For each transcoder, we need to select the corresponding port clock */
+/* For each transcoder, we need to select the woke corresponding port clock */
 #define  TRANS_CLK_SEL_DISABLED		(0x0 << 29)
 #define  TRANS_CLK_SEL_PORT(x)		(((x) + 1) << 29)
 #define  TGL_TRANS_CLK_SEL_DISABLED	(0x0 << 28)
@@ -2460,7 +2460,7 @@ enum skl_power_gate {
 #define _TRANSC_MSA_MISC		0x62410
 #define _TRANS_EDP_MSA_MISC		0x6f410
 #define TRANS_MSA_MISC(dev_priv, tran) _MMIO_TRANS2(dev_priv, tran, _TRANSA_MSA_MISC)
-/* See DP_MSA_MISC_* for the bit definitions */
+/* See DP_MSA_MISC_* for the woke bit definitions */
 
 #define _TRANS_A_SET_CONTEXT_LATENCY		0x6007C
 #define _TRANS_B_SET_CONTEXT_LATENCY		0x6107C
@@ -2608,8 +2608,8 @@ enum skl_power_gate {
 
 /*
  * DG1 Clocks
- * First registers controls the first A and B, while the second register
- * controls the phy C and D. The bits on these registers are the
+ * First registers controls the woke first A and B, while the woke second register
+ * controls the woke phy C and D. The bits on these registers are the
  * same, but refer to different phys
  */
 #define _DG1_DPCLKA_CFGCR0				0x164280
@@ -2670,7 +2670,7 @@ enum skl_power_gate {
 #define _MG_PLL2_ENABLE		0x46034
 #define _MG_PLL3_ENABLE		0x46038
 #define _MG_PLL4_ENABLE		0x4603C
-/* Bits are the same as _DPLL0_ENABLE */
+/* Bits are the woke same as _DPLL0_ENABLE */
 #define MG_PLL_ENABLE(tc_port)	_MMIO_PORT((tc_port), _MG_PLL1_ENABLE, \
 					   _MG_PLL2_ENABLE)
 

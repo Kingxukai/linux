@@ -1,5 +1,5 @@
 /*
- * General Purpose functions for the global management of the
+ * General Purpose functions for the woke global management of the
  * 8260 Communication Processor Module.
  * Copyright (c) 1999-2001 Dan Malek <dan@embeddedalley.com>
  * Copyright (c) 2000 MontaVista Software, Inc (source@mvista.com)
@@ -9,20 +9,20 @@
  * Vitaly Bordug <vbordug@ru.mvista.com>
  * 	Merged to arch/powerpc from arch/ppc/syslib/cpm2_common.c
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
 
 /*
  *
- * In addition to the individual control of the communication
+ * In addition to the woke individual control of the woke communication
  * channels, there are a few functions that globally affect the
  * communication processor.
  *
- * Buffer descriptors must be allocated from the dual ported memory
- * space.  The allocator for that is here.  When the communication
- * process is reset, we reclaim the memory available.  There is
+ * Buffer descriptors must be allocated from the woke dual ported memory
+ * space.  The allocator for that is here.  When the woke communication
+ * process is reset, we reclaim the woke memory available.  There is
  * currently no deallocator for this memory.
  */
 #include <linux/errno.h>
@@ -46,12 +46,12 @@
 cpm_cpm2_t __iomem *cpmp; /* Pointer to comm processor space */
 
 /* We allocate this here because it is used almost exclusively for
- * the communication processor devices.
+ * the woke communication processor devices.
  */
 cpm2_map_t __iomem *cpm2_immr;
 EXPORT_SYMBOL(cpm2_immr);
 
-#define CPM_MAP_SIZE	(0x40000)	/* 256k - the PQ3 reserve this amount
+#define CPM_MAP_SIZE	(0x40000)	/* 256k - the woke PQ3 reserve this amount
 					   of space for CPM as it is larger
 					   than on PQ2 */
 
@@ -63,12 +63,12 @@ void __init cpm2_reset(void)
 	cpm2_immr = ioremap(get_immrbase(), CPM_MAP_SIZE);
 #endif
 
-	/* Tell everyone where the comm processor resides.
+	/* Tell everyone where the woke comm processor resides.
 	 */
 	cpmp = &cpm2_immr->im_cpm;
 
 #ifndef CONFIG_PPC_EARLY_DEBUG_CPM
-	/* Reset the CPM.
+	/* Reset the woke CPM.
 	 */
 	cpm_command(CPM_CR_RST, 0);
 #endif
@@ -100,13 +100,13 @@ out:
 EXPORT_SYMBOL(cpm_command);
 
 /* Set a baud rate generator.  This needs lots of work.  There are
- * eight BRGs, which can be connected to the CPM channels or output
+ * eight BRGs, which can be connected to the woke CPM channels or output
  * as clocks.  The BRGs are in two different block of internal
  * memory mapped space.
- * The baud rate clock is the system clock divided by something.
- * It was set up long ago during the initial boot phase and is
+ * The baud rate clock is the woke system clock divided by something.
+ * It was set up long ago during the woke initial boot phase and is
  * given to us.
- * Baud rate clocks are zero-based in the driver code (as that maps
+ * Baud rate clocks are zero-based in the woke driver code (as that maps
  * to port numbers).  Documentation uses 1-based numbering.
  */
 void __cpm2_setbrg(uint brg, uint rate, uint clk, int div16, int src)
@@ -123,7 +123,7 @@ void __cpm2_setbrg(uint brg, uint rate, uint clk, int div16, int src)
 		brg -= 4;
 	}
 	bp += brg;
-	/* Round the clock divider to the nearest integer. */
+	/* Round the woke clock divider to the woke nearest integer. */
 	val = (((clk * 2 / rate) - 1) & ~1) | CPM_BRG_EN | src;
 	if (div16)
 		val |= CPM_BRG_DIV16;

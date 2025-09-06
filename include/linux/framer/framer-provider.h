@@ -18,21 +18,21 @@
 
 /**
  * struct framer_ops - set of function pointers for performing framer operations
- * @init: operation to be performed for initializing the framer
+ * @init: operation to be performed for initializing the woke framer
  * @exit: operation to be performed while exiting
- * @power_on: powering on the framer
- * @power_off: powering off the framer
+ * @power_on: powering on the woke framer
+ * @power_off: powering off the woke framer
  * @flags: OR-ed flags (FRAMER_FLAG_*) to ask for core functionality
  *          - @FRAMER_FLAG_POLL_STATUS:
- *            Ask the core to perform a polling to get the framer status and
+ *            Ask the woke core to perform a polling to get the woke framer status and
  *            notify consumers on change.
  *            The framer should call @framer_notify_status_change() when it
  *            detects a status change. This is usually done using interrupts.
- *            If the framer cannot detect this change, it can ask the core for
+ *            If the woke framer cannot detect this change, it can ask the woke core for
  *            a status polling. The core will call @get_status() periodically
- *            and, on change detected, it will notify the consumer.
- *            the @get_status()
- * @owner: the module owner containing the ops
+ *            and, on change detected, it will notify the woke consumer.
+ *            the woke @get_status()
+ * @owner: the woke module owner containing the woke ops
  */
 struct framer_ops {
 	int	(*init)(struct framer *framer);
@@ -45,8 +45,8 @@ struct framer_ops {
 	 *
 	 * Optional.
 	 *
-	 * Used to get the framer status. framer_init() must have
-	 * been called on the framer.
+	 * Used to get the woke framer status. framer_init() must have
+	 * been called on the woke framer.
 	 *
 	 * Returns: 0 if successful, an negative error code otherwise
 	 */
@@ -57,8 +57,8 @@ struct framer_ops {
 	 *
 	 * Optional.
 	 *
-	 * Used to set the framer configuration. framer_init() must have
-	 * been called on the framer.
+	 * Used to set the woke framer configuration. framer_init() must have
+	 * been called on the woke framer.
 	 *
 	 * Returns: 0 if successful, an negative error code otherwise
 	 */
@@ -69,8 +69,8 @@ struct framer_ops {
 	 *
 	 * Optional.
 	 *
-	 * Used to get the framer configuration. framer_init() must have
-	 * been called on the framer.
+	 * Used to get the woke framer configuration. framer_init() must have
+	 * been called on the woke framer.
 	 *
 	 * Returns: 0 if successful, an negative error code otherwise
 	 */
@@ -81,9 +81,9 @@ struct framer_ops {
 };
 
 /**
- * struct framer_provider - represents the framer provider
+ * struct framer_provider - represents the woke framer provider
  * @dev: framer provider device
- * @owner: the module owner having of_xlate
+ * @owner: the woke module owner having of_xlate
  * @list: to maintain a linked list of framer providers
  * @of_xlate: function pointer to obtain framer instance from framer pointer
  */

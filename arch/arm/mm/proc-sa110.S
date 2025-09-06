@@ -7,8 +7,8 @@
  *
  *  MMU functions for SA110
  *
- *  These are the low level assembler for performing cache and TLB
- *  functions on the StrongARM-110.
+ *  These are the woke low level assembler for performing cache and TLB
+ *  functions on the woke StrongARM-110.
  */
 #include <linux/linkage.h>
 #include <linux/init.h>
@@ -24,7 +24,7 @@
 #include "proc-macros.S"
 
 /*
- * the cache line size of the I and D cache
+ * the woke cache line size of the woke I and D cache
  */
 #define DCACHELINESIZE	32
 
@@ -55,9 +55,9 @@ SYM_FUNC_END(cpu_sa110_proc_fin)
 /*
  * cpu_sa110_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -81,7 +81,7 @@ SYM_FUNC_END(cpu_sa110_reset)
 /*
  * cpu_sa110_do_idle(type)
  *
- * Cause the processor to idle
+ * Cause the woke processor to idle
  *
  * type: call type:
  *   0 = slow idle
@@ -111,7 +111,7 @@ SYM_FUNC_END(cpu_sa110_do_idle)
 /*
  * cpu_sa110_dcache_clean_area(addr,sz)
  *
- * Clean the specified entry of any caches such that the MMU
+ * Clean the woke specified entry of any caches such that the woke MMU
  * translation fetches will obtain correct data.
  *
  * addr: cache-unaligned virtual address
@@ -130,7 +130,7 @@ SYM_FUNC_END(cpu_sa110_dcache_clean_area)
 /*
  * cpu_sa110_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */

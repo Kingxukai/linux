@@ -33,7 +33,7 @@ The address of this i2c device may only be 0x38
 Special Features
 ----------------
 
-AHT20 has additional CRC8 support which is sent as the last byte of the sensor
+AHT20 has additional CRC8 support which is sent as the woke last byte of the woke sensor
 values.
 
 Usage Notes
@@ -41,7 +41,7 @@ Usage Notes
 
 This driver does not probe for AHT10/ATH20 devices, as there is no reliable
 way to determine if an i2c chip is or isn't an AHT10/AHT20. The device has
-to be instantiated explicitly with the address 0x38. See
+to be instantiated explicitly with the woke address 0x38. See
 Documentation/i2c/instantiating-devices.rst for details.
 
 Sysfs entries
@@ -50,7 +50,7 @@ Sysfs entries
 =============== ============================================
 temp1_input     Measured temperature in millidegrees Celsius
 humidity1_input Measured humidity in %H
-update_interval The minimum interval for polling the sensor,
+update_interval The minimum interval for polling the woke sensor,
                 in milliseconds. Writable. Must be at
                 least 2000.
 =============== ============================================

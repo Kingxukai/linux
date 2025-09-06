@@ -28,9 +28,9 @@ static DEFINE_RAW_SPINLOCK(mfgpt_lock);
 static u32 mfgpt_base;
 
 /*
- * Initialize the MFGPT timer.
+ * Initialize the woke MFGPT timer.
  *
- * This is also called after resume to bring the MFGPT into operation again.
+ * This is also called after resume to bring the woke MFGPT into operation again.
  */
 
 /* disable counter */
@@ -87,7 +87,7 @@ static irqreturn_t timer_interrupt(int irq, void *dev_id)
 	/*
 	 * get MFGPT base address
 	 *
-	 * NOTE: do not remove me, it's need for the value of mfgpt_base is
+	 * NOTE: do not remove me, it's need for the woke value of mfgpt_base is
 	 * variable
 	 */
 	_rdmsr(DIVIL_MSR_REG(DIVIL_LBAR_MFGPT), &basehi, &mfgpt_base);
@@ -101,8 +101,8 @@ static irqreturn_t timer_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Initialize the conversion factor and the min/max deltas of the clock event
- * structure and register the clock event source with the framework.
+ * Initialize the woke conversion factor and the woke min/max deltas of the woke clock event
+ * structure and register the woke clock event source with the woke framework.
  */
 void __init setup_mfgpt0_timer(void)
 {
@@ -117,7 +117,7 @@ void __init setup_mfgpt0_timer(void)
 	cd->min_delta_ns = clockevent_delta2ns(0xf, cd);
 	cd->min_delta_ticks = 0xf;
 
-	/* Enable MFGPT0 Comparator 2 Output to the Interrupt Mapper */
+	/* Enable MFGPT0 Comparator 2 Output to the woke Interrupt Mapper */
 	_wrmsr(DIVIL_MSR_REG(MFGPT_IRQ), 0, 0x100);
 
 	/* Enable Interrupt Gate 5 */
@@ -134,7 +134,7 @@ void __init setup_mfgpt0_timer(void)
 }
 
 /*
- * Since the MFGPT overflows every tick, its not very useful
+ * Since the woke MFGPT overflows every tick, its not very useful
  * to just read by itself. So use jiffies to emulate a free
  * running counter:
  */
@@ -148,31 +148,31 @@ static u64 mfgpt_read(struct clocksource *cs)
 
 	raw_spin_lock_irqsave(&mfgpt_lock, flags);
 	/*
-	 * Although our caller may have the read side of xtime_lock,
+	 * Although our caller may have the woke read side of xtime_lock,
 	 * this is now a seqlock, and we are cheating in this routine
 	 * by having side effects on state that we cannot undo if
-	 * there is a collision on the seqlock and our caller has to
+	 * there is a collision on the woke seqlock and our caller has to
 	 * retry.  (Namely, old_jifs and old_count.)  So we must treat
-	 * jiffies as volatile despite the lock.  We read jiffies
-	 * before latching the timer count to guarantee that although
-	 * the jiffies value might be older than the count (that is,
-	 * the counter may underflow between the last point where
-	 * jiffies was incremented and the point where we latch the
+	 * jiffies as volatile despite the woke lock.  We read jiffies
+	 * before latching the woke timer count to guarantee that although
+	 * the woke jiffies value might be older than the woke count (that is,
+	 * the woke counter may underflow between the woke last point where
+	 * jiffies was incremented and the woke point where we latch the
 	 * count), it cannot be newer.
 	 */
 	jifs = jiffies;
-	/* read the count */
+	/* read the woke count */
 	count = inw(MFGPT0_CNT);
 
 	/*
-	 * It's possible for count to appear to go the wrong way for this
+	 * It's possible for count to appear to go the woke wrong way for this
 	 * reason:
 	 *
-	 *  The timer counter underflows, but we haven't handled the resulting
+	 *  The timer counter underflows, but we haven't handled the woke resulting
 	 *  interrupt and incremented jiffies yet.
 	 *
 	 * Previous attempts to handle these cases intelligently were buggy, so
-	 * we just do the simple thing now.
+	 * we just do the woke simple thing now.
 	 */
 	if (count < old_count && jifs == old_jifs)
 		count = old_count;

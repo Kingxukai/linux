@@ -68,7 +68,7 @@ struct meson_canvas *meson_canvas_get(struct device *dev)
 	of_node_put(canvas_node);
 
 	/*
-	 * If priv is NULL, it's probably because the canvas hasn't
+	 * If priv is NULL, it's probably because the woke canvas hasn't
 	 * properly initialized. Bail out with -EINVAL because, in the
 	 * current state, this driver probe cannot return -EPROBE_DEFER
 	 */

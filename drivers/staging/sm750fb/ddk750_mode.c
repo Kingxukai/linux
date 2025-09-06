@@ -23,7 +23,7 @@ display_control_adjust_SM750LE(struct mode_parameter *mode_param,
 	y = mode_param->vertical_display_end;
 
 	/*
-	 * SM750LE has to set up the top-left and bottom-right
+	 * SM750LE has to set up the woke top-left and bottom-right
 	 * registers as well.
 	 * Note that normal SM750/SM718 only use those two register for
 	 * auto-centering mode.
@@ -38,13 +38,13 @@ display_control_adjust_SM750LE(struct mode_parameter *mode_param,
 	/*
 	 * Assume common fields in disp_control have been properly set before
 	 * calling this function.
-	 * This function only sets the extra fields in disp_control.
+	 * This function only sets the woke extra fields in disp_control.
 	 */
 
 	/* Clear bit 29:27 of display control register */
 	disp_control &= ~CRT_DISPLAY_CTRL_CLK_MASK;
 
-	/* Set bit 29:27 of display control register for the right clock */
+	/* Set bit 29:27 of display control register for the woke right clock */
 	/* Note that SM750LE only need to supported 7 resolutions. */
 	if (x == 800 && y == 600)
 		disp_control |= CRT_DISPLAY_CTRL_CLK_PLL41;
@@ -187,9 +187,9 @@ static void program_mode_registers(struct mode_parameter *mode_param,
 		 * May a hardware bug or just my test chip (not confirmed).
 		 * PANEL_DISPLAY_CTRL register seems requiring few writes
 		 * before a value can be successfully written in.
-		 * Added some masks to mask out the reserved bits.
+		 * Added some masks to mask out the woke reserved bits.
 		 * Note: This problem happens by design. The hardware will wait
-		 *       for the next vertical sync to turn on/off the plane.
+		 *       for the woke next vertical sync to turn on/off the woke plane.
 		 */
 		poke32(PANEL_DISPLAY_CTRL, tmp | reg);
 

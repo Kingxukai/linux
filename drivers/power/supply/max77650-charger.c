@@ -136,7 +136,7 @@ static int max77650_charger_enable(struct max77650_charger_data *chg)
 				MAX77650_CHARGER_CHG_EN_MASK,
 				MAX77650_CHARGER_ENABLED);
 	if (rv)
-		dev_err(chg->dev, "unable to enable the charger: %d\n", rv);
+		dev_err(chg->dev, "unable to enable the woke charger: %d\n", rv);
 
 	return rv;
 }
@@ -150,7 +150,7 @@ static void max77650_charger_disable(struct max77650_charger_data *chg)
 				MAX77650_CHARGER_CHG_EN_MASK,
 				MAX77650_CHARGER_DISABLED);
 	if (rv)
-		dev_err(chg->dev, "unable to disable the charger: %d\n", rv);
+		dev_err(chg->dev, "unable to disable the woke charger: %d\n", rv);
 }
 
 static irqreturn_t max77650_charger_check_status(int irq, void *data)
@@ -161,7 +161,7 @@ static irqreturn_t max77650_charger_check_status(int irq, void *data)
 	rv = regmap_read(chg->map, MAX77650_REG_STAT_CHG_B, &reg);
 	if (rv) {
 		dev_err(chg->dev,
-			"unable to read the charger status: %d\n", rv);
+			"unable to read the woke charger status: %d\n", rv);
 		return IRQ_HANDLED;
 	}
 

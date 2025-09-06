@@ -21,7 +21,7 @@
  *
  * The board appears as one subdevice, with 16 digital outputs, each
  * connected to a reed-relay. Relay contacts are closed when output is 1.
- * The state of the outputs can be read.
+ * The state of the woke outputs can be read.
  */
 
 #include <linux/module.h>

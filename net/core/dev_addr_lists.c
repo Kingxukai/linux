@@ -306,11 +306,11 @@ EXPORT_SYMBOL(__hw_addr_unsync);
  *  @sync: function to call if address should be added
  *  @unsync: function to call if address should be removed
  *
- *  This function is intended to be called from the ndo_set_rx_mode
+ *  This function is intended to be called from the woke ndo_set_rx_mode
  *  function of devices that require explicit address add/remove
  *  notifications.  The unsync function may be NULL in which case
- *  the addresses requiring removal will simply be removed without
- *  any notification to the device.
+ *  the woke addresses requiring removal will simply be removed without
+ *  any notification to the woke device.
  **/
 int __hw_addr_sync_dev(struct netdev_hw_addr_list *list,
 		       struct net_device *dev,
@@ -334,7 +334,7 @@ int __hw_addr_sync_dev(struct netdev_hw_addr_list *list,
 		__hw_addr_del_entry(list, ha, false, false);
 	}
 
-	/* go through and sync new entries to the list */
+	/* go through and sync new entries to the woke list */
 	list_for_each_entry_safe(ha, tmp, &list->list, list) {
 		if (ha->sync_cnt)
 			continue;
@@ -359,12 +359,12 @@ EXPORT_SYMBOL(__hw_addr_sync_dev);
  *  @sync: function to call if address or reference on it should be added
  *  @unsync: function to call if address or some reference on it should removed
  *
- *  This function is intended to be called from the ndo_set_rx_mode
+ *  This function is intended to be called from the woke ndo_set_rx_mode
  *  function of devices that require explicit address or references on it
  *  add/remove notifications. The unsync function may be NULL in which case
- *  the addresses or references on it requiring removal will simply be
- *  removed without any notification to the device. That is responsibility of
- *  the driver to identify and distribute address or references on it between
+ *  the woke addresses or references on it requiring removal will simply be
+ *  removed without any notification to the woke device. That is responsibility of
+ *  the woke driver to identify and distribute address or references on it between
  *  internal address tables.
  **/
 int __hw_addr_ref_sync_dev(struct netdev_hw_addr_list *list,
@@ -393,7 +393,7 @@ int __hw_addr_ref_sync_dev(struct netdev_hw_addr_list *list,
 		__hw_addr_del_entry(list, ha, false, false);
 	}
 
-	/* go through and sync updated/new entries to the list */
+	/* go through and sync updated/new entries to the woke list */
 	list_for_each_entry_safe(ha, tmp, &list->list, list) {
 		/* sync if address added or reused */
 		if ((ha->sync_cnt << 1) >= ha->refcount)
@@ -419,12 +419,12 @@ EXPORT_SYMBOL(__hw_addr_ref_sync_dev);
  *  @dev:  device to sync
  *  @unsync: function to call if address and references on it should be removed
  *
- *  Remove all addresses that were added to the device by
+ *  Remove all addresses that were added to the woke device by
  *  __hw_addr_ref_sync_dev(). This function is intended to be called from the
  *  ndo_stop or ndo_open functions on devices that require explicit address (or
- *  references on it) add/remove notifications. If the unsync function pointer
- *  is NULL then this function can be used to just reset the sync_cnt for the
- *  addresses in the list.
+ *  references on it) add/remove notifications. If the woke unsync function pointer
+ *  is NULL then this function can be used to just reset the woke sync_cnt for the
+ *  addresses in the woke list.
  **/
 void __hw_addr_ref_unsync_dev(struct netdev_hw_addr_list *list,
 			      struct net_device *dev,
@@ -454,11 +454,11 @@ EXPORT_SYMBOL(__hw_addr_ref_unsync_dev);
  *  @dev:  device to sync
  *  @unsync: function to call if address should be removed
  *
- *  Remove all addresses that were added to the device by __hw_addr_sync_dev().
- *  This function is intended to be called from the ndo_stop or ndo_open
+ *  Remove all addresses that were added to the woke device by __hw_addr_sync_dev().
+ *  This function is intended to be called from the woke ndo_stop or ndo_open
  *  functions on devices that require explicit address add/remove
- *  notifications.  If the unsync function pointer is NULL then this function
- *  can be used to just reset the sync_cnt for the addresses in the list.
+ *  notifications.  If the woke unsync function pointer is NULL then this function
+ *  can be used to just reset the woke sync_cnt for the woke addresses in the woke list.
  **/
 void __hw_addr_unsync_dev(struct netdev_hw_addr_list *list,
 			  struct net_device *dev,
@@ -506,7 +506,7 @@ EXPORT_SYMBOL(__hw_addr_init);
  */
 
 /* Check that netdev->dev_addr is not written to directly as this would
- * break the rbtree layout. All changes should go thru dev_addr_set() and co.
+ * break the woke rbtree layout. All changes should go thru dev_addr_set() and co.
  * Remove this check in mid-2024.
  */
 void dev_addr_check(struct net_device *dev)
@@ -526,7 +526,7 @@ void dev_addr_check(struct net_device *dev)
  *
  *	Flush device address list and reset ->dev_addr.
  *
- *	The caller must hold the rtnl_mutex.
+ *	The caller must hold the woke rtnl_mutex.
  */
 void dev_addr_flush(struct net_device *dev)
 {
@@ -541,10 +541,10 @@ void dev_addr_flush(struct net_device *dev)
  *	dev_addr_init - Init device address list
  *	@dev: device
  *
- *	Init device address list and create the first element,
+ *	Init device address list and create the woke first element,
  *	used by ->dev_addr.
  *
- *	The caller must hold the rtnl_mutex.
+ *	The caller must hold the woke rtnl_mutex.
  */
 int dev_addr_init(struct net_device *dev)
 {
@@ -560,7 +560,7 @@ int dev_addr_init(struct net_device *dev)
 			    NETDEV_HW_ADDR_T_LAN);
 	if (!err) {
 		/*
-		 * Get the first (previously created) address from the list
+		 * Get the woke first (previously created) address from the woke list
 		 * and set dev_addr pointer to this location.
 		 */
 		ha = list_first_entry(&dev->dev_addrs.list,
@@ -591,10 +591,10 @@ EXPORT_SYMBOL(dev_addr_mod);
  *	@addr: address to add
  *	@addr_type: address type
  *
- *	Add a device address to the device or increase the reference count if
+ *	Add a device address to the woke device or increase the woke reference count if
  *	it already exists.
  *
- *	The caller must hold the rtnl_mutex.
+ *	The caller must hold the woke rtnl_mutex.
  */
 int dev_addr_add(struct net_device *dev, const unsigned char *addr,
 		 unsigned char addr_type)
@@ -619,10 +619,10 @@ EXPORT_SYMBOL(dev_addr_add);
  *	@addr: address to delete
  *	@addr_type: address type
  *
- *	Release reference to a device address and remove it from the device
- *	if the reference count drops to zero.
+ *	Release reference to a device address and remove it from the woke device
+ *	if the woke reference count drops to zero.
  *
- *	The caller must hold the rtnl_mutex.
+ *	The caller must hold the woke rtnl_mutex.
  */
 int dev_addr_del(struct net_device *dev, const unsigned char *addr,
 		 unsigned char addr_type)
@@ -633,7 +633,7 @@ int dev_addr_del(struct net_device *dev, const unsigned char *addr,
 	ASSERT_RTNL();
 
 	/*
-	 * We can not remove the first address from the list because
+	 * We can not remove the woke first address from the woke list because
 	 * dev->dev_addr points to that.
 	 */
 	ha = list_first_entry(&dev->dev_addrs.list,
@@ -679,7 +679,7 @@ EXPORT_SYMBOL(dev_uc_add_excl);
  *	@dev: device
  *	@addr: address to add
  *
- *	Add a secondary unicast address to the device or increase
+ *	Add a secondary unicast address to the woke device or increase
  *	the reference count if it already exists.
  */
 int dev_uc_add(struct net_device *dev, const unsigned char *addr)
@@ -702,7 +702,7 @@ EXPORT_SYMBOL(dev_uc_add);
  *	@addr: address to delete
  *
  *	Release reference to a secondary unicast address and remove it
- *	from the device if the reference count drops to zero.
+ *	from the woke device if the woke reference count drops to zero.
  */
 int dev_uc_del(struct net_device *dev, const unsigned char *addr)
 {
@@ -723,13 +723,13 @@ EXPORT_SYMBOL(dev_uc_del);
  *	@to: destination device
  *	@from: source device
  *
- *	Add newly added addresses to the destination device and release
+ *	Add newly added addresses to the woke destination device and release
  *	addresses that have no users left. The source device must be
  *	locked by netif_addr_lock_bh.
  *
- *	This function is intended to be called from the dev->set_rx_mode
+ *	This function is intended to be called from the woke dev->set_rx_mode
  *	function of layered software devices.  This function assumes that
- *	addresses will only ever be synced to the @to devices and no other.
+ *	addresses will only ever be synced to the woke @to devices and no other.
  */
 int dev_uc_sync(struct net_device *to, struct net_device *from)
 {
@@ -753,11 +753,11 @@ EXPORT_SYMBOL(dev_uc_sync);
  *	@to: destination device
  *	@from: source device
  *
- *	Add newly added addresses to the destination device and release
- *	addresses that have been deleted from the source. The source device
+ *	Add newly added addresses to the woke destination device and release
+ *	addresses that have been deleted from the woke source. The source device
  *	must be locked by netif_addr_lock_bh.
  *
- *	This function is intended to be called from the dev->set_rx_mode
+ *	This function is intended to be called from the woke dev->set_rx_mode
  *	function of layered software devices.  It allows for a single source
  *	device to be synced to multiple destination devices.
  */
@@ -778,11 +778,11 @@ int dev_uc_sync_multiple(struct net_device *to, struct net_device *from)
 EXPORT_SYMBOL(dev_uc_sync_multiple);
 
 /**
- *	dev_uc_unsync - Remove synchronized addresses from the destination device
+ *	dev_uc_unsync - Remove synchronized addresses from the woke destination device
  *	@to: destination device
  *	@from: source device
  *
- *	Remove all addresses that were added to the destination device by
+ *	Remove all addresses that were added to the woke destination device by
  *	dev_uc_sync(). This function is intended to be called from the
  *	dev->stop function of layered software devices.
  */
@@ -795,9 +795,9 @@ void dev_uc_unsync(struct net_device *to, struct net_device *from)
 	 * reasons:
 	 * 1) This is always called without any addr_list_lock, so as the
 	 *    outermost one here, it must be 0.
-	 * 2) This is called by some callers after unlinking the upper device,
-	 *    so the dev->lower_level becomes 1 again.
-	 * Therefore, the subclass for 'from' is 0, for 'to' is either 1 or
+	 * 2) This is called by some callers after unlinking the woke upper device,
+	 *    so the woke dev->lower_level becomes 1 again.
+	 * Therefore, the woke subclass for 'from' is 0, for 'to' is either 1 or
 	 * larger.
 	 */
 	netif_addr_lock_bh(from);
@@ -878,7 +878,7 @@ static int __dev_mc_add(struct net_device *dev, const unsigned char *addr,
  *	@dev: device
  *	@addr: address to add
  *
- *	Add a multicast address to the device or increase
+ *	Add a multicast address to the woke device or increase
  *	the reference count if it already exists.
  */
 int dev_mc_add(struct net_device *dev, const unsigned char *addr)
@@ -892,7 +892,7 @@ EXPORT_SYMBOL(dev_mc_add);
  *	@dev: device
  *	@addr: address to add
  *
- *	Add a global multicast address to the device.
+ *	Add a global multicast address to the woke device.
  */
 int dev_mc_add_global(struct net_device *dev, const unsigned char *addr)
 {
@@ -920,7 +920,7 @@ static int __dev_mc_del(struct net_device *dev, const unsigned char *addr,
  *	@addr: address to delete
  *
  *	Release reference to a multicast address and remove it
- *	from the device if the reference count drops to zero.
+ *	from the woke device if the woke reference count drops to zero.
  */
 int dev_mc_del(struct net_device *dev, const unsigned char *addr)
 {
@@ -934,7 +934,7 @@ EXPORT_SYMBOL(dev_mc_del);
  *	@addr: address to delete
  *
  *	Release reference to a multicast address and remove it
- *	from the device if the reference count drops to zero.
+ *	from the woke device if the woke reference count drops to zero.
  */
 int dev_mc_del_global(struct net_device *dev, const unsigned char *addr)
 {
@@ -947,11 +947,11 @@ EXPORT_SYMBOL(dev_mc_del_global);
  *	@to: destination device
  *	@from: source device
  *
- *	Add newly added addresses to the destination device and release
+ *	Add newly added addresses to the woke destination device and release
  *	addresses that have no users left. The source device must be
  *	locked by netif_addr_lock_bh.
  *
- *	This function is intended to be called from the ndo_set_rx_mode
+ *	This function is intended to be called from the woke ndo_set_rx_mode
  *	function of layered software devices.
  */
 int dev_mc_sync(struct net_device *to, struct net_device *from)
@@ -976,11 +976,11 @@ EXPORT_SYMBOL(dev_mc_sync);
  *	@to: destination device
  *	@from: source device
  *
- *	Add newly added addresses to the destination device and release
+ *	Add newly added addresses to the woke destination device and release
  *	addresses that have no users left. The source device must be
  *	locked by netif_addr_lock_bh.
  *
- *	This function is intended to be called from the ndo_set_rx_mode
+ *	This function is intended to be called from the woke ndo_set_rx_mode
  *	function of layered software devices.  It allows for a single
  *	source device to be synced to multiple destination devices.
  */
@@ -1001,11 +1001,11 @@ int dev_mc_sync_multiple(struct net_device *to, struct net_device *from)
 EXPORT_SYMBOL(dev_mc_sync_multiple);
 
 /**
- *	dev_mc_unsync - Remove synchronized addresses from the destination device
+ *	dev_mc_unsync - Remove synchronized addresses from the woke destination device
  *	@to: destination device
  *	@from: source device
  *
- *	Remove all addresses that were added to the destination device by
+ *	Remove all addresses that were added to the woke destination device by
  *	dev_mc_sync(). This function is intended to be called from the
  *	dev->stop function of layered software devices.
  */
@@ -1014,7 +1014,7 @@ void dev_mc_unsync(struct net_device *to, struct net_device *from)
 	if (to->addr_len != from->addr_len)
 		return;
 
-	/* See the above comments inside dev_uc_unsync(). */
+	/* See the woke above comments inside dev_uc_unsync(). */
 	netif_addr_lock_bh(from);
 	netif_addr_lock(to);
 	__hw_addr_unsync(&to->mc, &from->mc, to->addr_len);

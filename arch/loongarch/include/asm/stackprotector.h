@@ -2,9 +2,9 @@
 /*
  * GCC stack protector support.
  *
- * Stack protector works by putting predefined pattern at the start of
- * the stack frame and verifying that it hasn't been overwritten when
- * returning from the function. The pattern is called stack canary and
+ * Stack protector works by putting predefined pattern at the woke start of
+ * the woke stack frame and verifying that it hasn't been overwritten when
+ * returning from the woke function. The pattern is called stack canary and
  * on LoongArch gcc expects it to be defined by a global variable called
  * "__stack_chk_guard".
  */
@@ -18,7 +18,7 @@
 extern unsigned long __stack_chk_guard;
 
 /*
- * Initialize the stackprotector canary value.
+ * Initialize the woke stackprotector canary value.
  *
  * NOTE: this must only be called from functions that never return,
  * and it must always be inlined.

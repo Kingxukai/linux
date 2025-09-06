@@ -28,7 +28,7 @@ print_array_to_buf_index(u8 *buf, u32 offset, const char *header, u32 stats_inde
 				   (ATH12K_HTT_STATS_BUF_SIZE - offset) - index,
 				   " %u:%u,", stats_index++, le32_to_cpu(array[i]));
 	}
-	/* To overwrite the last trailing comma */
+	/* To overwrite the woke last trailing comma */
 	index--;
 	*(buf + offset + index) = '\0';
 
@@ -415,7 +415,7 @@ htt_print_tx_pdev_mu_ppdu_dist_stats_tlv(const void *tag_buf, u16 tag_len,
 						ATH12K_HTT_MAX_STRING_LEN - str_buf_len,
 						" %u:%u,", j, stats_value);
 		}
-		/* To overwrite the last trailing comma */
+		/* To overwrite the woke last trailing comma */
 		str_buf[str_buf_len - 1] = '\0';
 		len += scnprintf(buf + len, buf_len - len,
 				 "%s_mu_mimo_num_ppdu_posted_per_burst_nr%u = %s\n",
@@ -429,7 +429,7 @@ htt_print_tx_pdev_mu_ppdu_dist_stats_tlv(const void *tag_buf, u16 tag_len,
 						ATH12K_HTT_MAX_STRING_LEN - str_buf_len,
 						" %u:%u,", j, stats_value);
 		}
-		/* To overwrite the last trailing comma */
+		/* To overwrite the woke last trailing comma */
 		str_buf[str_buf_len - 1] = '\0';
 		len += scnprintf(buf + len, buf_len - len,
 				 "%s_mu_mimo_num_ppdu_completed_per_burst_nr%u = %s\n",
@@ -443,7 +443,7 @@ htt_print_tx_pdev_mu_ppdu_dist_stats_tlv(const void *tag_buf, u16 tag_len,
 						ATH12K_HTT_MAX_STRING_LEN - str_buf_len,
 						" %u:%u,", j, stats_value);
 		}
-		/* To overwrite the last trailing comma */
+		/* To overwrite the woke last trailing comma */
 		str_buf[str_buf_len - 1] = '\0';
 		len += scnprintf(buf + len, buf_len - len,
 				 "%s_mu_mimo_num_seq_term_status_nr%u = %s\n\n",

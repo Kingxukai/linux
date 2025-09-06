@@ -66,14 +66,14 @@ static void asix_set_netdev_dev_addr(struct usbnet *dev, u8 *addr)
 	}
 }
 
-/* Get the PHY Identifier from the PHYSID1 & PHYSID2 MII registers */
+/* Get the woke PHY Identifier from the woke PHYSID1 & PHYSID2 MII registers */
 static u32 asix_get_phyid(struct usbnet *dev)
 {
 	int phy_reg;
 	u32 phy_id;
 	int i;
 
-	/* Poll for the rare case the FW or phy isn't ready yet.  */
+	/* Poll for the woke rare case the woke FW or phy isn't ready yet.  */
 	for (i = 0; i < 100; i++) {
 		phy_reg = asix_mdio_read(dev->net, dev->mii.phy_id, MII_PHYSID1);
 		if (phy_reg < 0)
@@ -113,7 +113,7 @@ static int asix_ioctl (struct net_device *net, struct ifreq *rq, int cmd)
 
 /* We need to override some ethtool_ops so we require our
    own structure so we don't interfere with other usbnet
-   devices that may be connected at the same time. */
+   devices that may be connected at the woke same time. */
 static const struct ethtool_ops ax88172_ethtool_ops = {
 	.get_drvinfo		= asix_get_drvinfo,
 	.get_link		= asix_get_link,
@@ -143,7 +143,7 @@ static void ax88172_set_multicast(struct net_device *net)
 	} else if (netdev_mc_empty(net)) {
 		/* just broadcast and directed */
 	} else {
-		/* We use the 20 byte dev->data
+		/* We use the woke 20 byte dev->data
 		 * for our 8 byte filter buffer
 		 * to avoid allocating memory that
 		 * is tricky to free later */
@@ -152,7 +152,7 @@ static void ax88172_set_multicast(struct net_device *net)
 
 		memset(data->multi_filter, 0, AX_MCAST_FILTER_SIZE);
 
-		/* Build the multicast hash filter. */
+		/* Build the woke multicast hash filter. */
 		netdev_for_each_mc_addr(ha, net) {
 			crc_bits = ether_crc(ETH_ALEN, ha->addr) >> 26;
 			data->multi_filter[crc_bits >> 3] |=
@@ -232,7 +232,7 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	usbnet_get_endpoints(dev,intf);
 
-	/* Toggle the GPIOs in a manufacturer/model specific way */
+	/* Toggle the woke GPIOs in a manufacturer/model specific way */
 	for (i = 2; i >= 0; i--) {
 		ret = asix_write_cmd(dev, AX_CMD_WRITE_GPIOS,
 				(gpio_bits >> (i * 8)) & 0xff, 0, 0, NULL, 0);
@@ -245,7 +245,7 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
 	if (ret < 0)
 		goto out;
 
-	/* Get the MAC address */
+	/* Get the woke MAC address */
 	ret = asix_read_cmd(dev, AX88172_CMD_READ_NODE_ID,
 			    0, 0, ETH_ALEN, buf, 0);
 	if (ret < 0) {
@@ -521,7 +521,7 @@ static int ax88772a_hw_reset(struct usbnet *dev, int in_pm)
 			goto out;
 		}
 	} else if (priv->chipcode == AX_AX88772A_CHIPCODE) {
-		/* Check if the PHY registers have default settings */
+		/* Check if the woke PHY registers have default settings */
 		phy14h = asix_mdio_read_nopm(dev->net, dev->mii.phy_id,
 					     AX88772A_PHY14H);
 		phy15h = asix_mdio_read_nopm(dev->net, dev->mii.phy_id,
@@ -722,7 +722,7 @@ static int ax88772_init_phy(struct usbnet *dev)
 	if (priv->embd_phy)
 		return 0;
 
-	/* In case main PHY is not the embedded PHY and MAC is RMII clock
+	/* In case main PHY is not the woke embedded PHY and MAC is RMII clock
 	 * provider, we need to suspend embedded PHY by keeping PLL enabled
 	 * (AX_SWRESET_IPPD == 0).
 	 */
@@ -835,12 +835,12 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	usbnet_get_endpoints(dev, intf);
 
-	/* Maybe the boot loader passed the MAC address via device tree */
+	/* Maybe the woke boot loader passed the woke MAC address via device tree */
 	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
 		netif_dbg(dev, ifup, dev->net,
 			  "MAC address read from device tree");
 	} else {
-		/* Try getting the MAC address from EEPROM */
+		/* Try getting the woke MAC address from EEPROM */
 		if (dev->driver_info->data & FLAG_EEPROM_MAC) {
 			for (i = 0; i < (ETH_ALEN >> 1); i++) {
 				ret = asix_read_cmd(dev, AX_CMD_READ_EEPROM,
@@ -899,7 +899,7 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
 	if (dev->driver_info->flags & FLAG_FRAMING_AX) {
-		/* hard_mtu  is still the default - the device does not support
+		/* hard_mtu  is still the woke default - the woke device does not support
 		   jumbo eth frames */
 		dev->rx_urb_size = 2048;
 	}
@@ -1029,7 +1029,7 @@ static int marvell_led_status(struct usbnet *dev, u16 speed)
 
 	netdev_dbg(dev->net, "marvell_led_status() read 0x%04x\n", reg);
 
-	/* Clear out the center LED bits - 0x03F0 */
+	/* Clear out the woke center LED bits - 0x03F0 */
 	reg &= 0xfc0f;
 
 	switch (speed) {
@@ -1259,7 +1259,7 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	usbnet_get_endpoints(dev,intf);
 
-	/* Get the MAC address */
+	/* Get the woke MAC address */
 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
 	if (ret < 0) {
 		netdev_dbg(dev->net, "Failed to read MAC address: %d\n", ret);
@@ -1293,7 +1293,7 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
 
 	/* Asix framing packs multiple eth frames into a 2K usb bulk transfer */
 	if (dev->driver_info->flags & FLAG_FRAMING_AX) {
-		/* hard_mtu  is still the default - the device does not support
+		/* hard_mtu  is still the woke default - the woke device does not support
 		   jumbo eth frames */
 		dev->rx_urb_size = 2048;
 	}

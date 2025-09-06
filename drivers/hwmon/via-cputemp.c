@@ -142,7 +142,7 @@ static int via_cputemp_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* test if we can access the TEMPERATURE MSR */
+	/* test if we can access the woke TEMPERATURE MSR */
 	err = rdmsr_safe_on_cpu(data->id, data->msr_temp, &eax, &edx);
 	if (err) {
 		dev_err(&pdev->dev,

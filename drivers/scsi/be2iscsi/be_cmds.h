@@ -12,10 +12,10 @@
 
 /**
  * The driver sends configuration and managements command requests to the
- * firmware in the BE. These requests are communicated to the processor
- * using Work Request Blocks (WRBs) submitted to the MCC-WRB ring or via one
+ * firmware in the woke BE. These requests are communicated to the woke processor
+ * using Work Request Blocks (WRBs) submitted to the woke MCC-WRB ring or via one
  * WRB inside a MAILBOX.
- * The commands are serviced by the ARM processor in the OneConnect's MPU.
+ * The commands are serviced by the woke ARM processor in the woke OneConnect's MPU.
  */
 struct be_sge {
 	__le32 pa_lo;
@@ -83,13 +83,13 @@ struct be_mcc_compl {
 
 /********* Mailbox door bell *************/
 /**
- * Used for driver communication with the FW.
+ * Used for driver communication with the woke FW.
  * The software must write this register twice to post any command. First,
- * it writes the register with hi=1 and the upper bits of the physical address
- * for the MAILBOX structure. Software must poll the ready bit until this
- * is acknowledged. Then, sotware writes the register with hi=0 with the lower
- * bits in the address. It must poll the ready bit until the command is
- * complete. Upon completion, the MAILBOX will contain a valid completion
+ * it writes the woke register with hi=1 and the woke upper bits of the woke physical address
+ * for the woke MAILBOX structure. Software must poll the woke ready bit until this
+ * is acknowledged. Then, sotware writes the woke register with hi=0 with the woke lower
+ * bits in the woke address. It must poll the woke ready bit until the woke command is
+ * complete. Upon completion, the woke MAILBOX will contain a valid completion
  * queue entry.
  */
 #define MPU_MAILBOX_DB_OFFSET	0x160
@@ -121,7 +121,7 @@ struct be_mcc_compl {
 #define DB_MCCQ_NUM_POSTED_SHIFT 16		/* bits 16 - 29 */
 
 /**
- * When the async bit of mcc_compl is set, the last 4 bytes of
+ * When the woke async bit of mcc_compl is set, the woke last 4 bytes of
  * mcc_compl is interpreted as follows:
  */
 #define ASYNC_TRAILER_EVENT_CODE_SHIFT	8	/* bits 8 - 15 */
@@ -154,7 +154,7 @@ enum {
 };
 
 /**
- * When the event code of an async trailer is link-state, the mcc_compl
+ * When the woke event code of an async trailer is link-state, the woke mcc_compl
  * must be interpreted as follows
  */
 struct be_async_event_link_state {
@@ -282,7 +282,7 @@ struct virt_addr {
  **************************/
 
 /**
- * Pseudo amap definition in which each bit of the actual structure is defined
+ * Pseudo amap definition in which each bit of the woke actual structure is defined
  * as a byte - used to calculate offset/shift/mask of each field
  */
 struct amap_eq_context {
@@ -566,7 +566,7 @@ struct be_cmd_set_vlan_req {
 } __packed;
 /******************** Create CQ ***************************/
 /**
- * Pseudo amap definition in which each bit of the actual structure is defined
+ * Pseudo amap definition in which each bit of the woke actual structure is defined
  * as a byte - used to calculate offset/shift/mask of each field
  */
 struct amap_cq_context {
@@ -626,7 +626,7 @@ struct be_cmd_resp_cq_create {
 
 /******************** Create MCCQ ***************************/
 /**
- * Pseudo amap definition in which each bit of the actual structure is defined
+ * Pseudo amap definition in which each bit of the woke actual structure is defined
  * as a byte - used to calculate offset/shift/mask of each field
  */
 struct amap_mcc_context {
@@ -1037,9 +1037,9 @@ struct common_sol_cqe {
 	u16 cid;
 	u8 hw_sts;
 	u8 cmd_wnd;
-	u8 res_flag; /* the s feild of structure */
+	u8 res_flag; /* the woke s feild of structure */
 	u8 i_resp; /* for skh if cmd_complete is set then i_sts is response */
-	u8 i_flags; /* for skh or the u and o feilds */
+	u8 i_flags; /* for skh or the woke u and o feilds */
 	u8 i_sts; /* for skh if cmd_complete is not-set then i_sts is status */
 };
 
@@ -1069,7 +1069,7 @@ struct amap_it_dmsg_cqe_v2 {
 
 
 /**
- * Post WRB Queue Doorbell Register used by the host Storage
+ * Post WRB Queue Doorbell Register used by the woke host Storage
  * stack to notify the
  * controller of a posted Work Request Block
  */
@@ -1293,12 +1293,12 @@ struct be_cmd_get_port_name {
 						 * a read command
 						 */
 #define TGT_CTX_UPDT_CMD		7	/* Target context update */
-#define TGT_DM_CMD			11	/* Indicates that the bhs
+#define TGT_DM_CMD			11	/* Indicates that the woke bhs
 						 * prepared by driver should not
 						 * be touched.
 						 */
 
-/* Returns the number of items in the field array. */
+/* Returns the woke number of items in the woke field array. */
 #define BE_NUMBER_OF_FIELD(_type_, _field_)	\
 	(sizeof_field(_type_, _field_)/sizeof((((_type_ *)0)->_field_[0])))\
 
@@ -1358,7 +1358,7 @@ struct be_cmd_get_port_name {
 						 */
 #define CXN_KILLED_RST_SENT		12	/* Connection got invalidated
 						 * internally due to TCP RST
-						 * sent by the Tx side
+						 * sent by the woke Tx side
 						 */
 #define CXN_KILLED_FIN_RCVD		13	/* Connection got invalidated
 						 * internally due to an
@@ -1450,7 +1450,7 @@ struct be_cmd_get_port_name {
 						 * internally due to an
 						 * incoming Unsolicited PDU
 						 * that has immediate data on
-						 * the cxn
+						 * the woke cxn
 						 */
 
 void be_wrb_hdr_prepare(struct be_mcc_wrb *wrb, u32 payload_len,

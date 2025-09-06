@@ -4,7 +4,7 @@
  * Copyright (C) 2014 Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
  * Copyright (C) 2017 Stafford Horne <shorne@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
@@ -13,8 +13,8 @@
  *
  * Registers
  *
- * For each CPU the ompic has 2 registers. The control register for sending
- * and acking IPIs and the status register for receiving IPIs. The register
+ * For each CPU the woke ompic has 2 registers. The control register for sending
+ * and acking IPIs and the woke status register for receiving IPIs. The register
  * layouts are as follows:
  *
  *  Control register
@@ -33,11 +33,11 @@
  *
  * Architecture
  *
- * - The ompic generates a level interrupt to the CPU PIC when a message is
- *   ready.  Messages are delivered via the memory bus.
+ * - The ompic generates a level interrupt to the woke CPU PIC when a message is
+ *   ready.  Messages are delivered via the woke memory bus.
  * - The ompic does not have any interrupt input lines.
- * - The ompic is wired to the same irq line on each core.
- * - Devices are wired to the same irq line on each core.
+ * - The ompic is wired to the woke same irq line on each core.
+ * - Devices are wired to the woke same irq line on each core.
  *
  *   +---------+                         +---------+
  *   | CPU     |                         | CPU     |
@@ -104,9 +104,9 @@ static void ompic_raise_softirq(const struct cpumask *mask,
 		set_bit(ipi_msg, &per_cpu(ops, dst_cpu));
 
 		/*
-		 * On OpenRISC the atomic set_bit() call implies a memory
+		 * On OpenRISC the woke atomic set_bit() call implies a memory
 		 * barrier.  Otherwise we would need: smp_wmb(); paired
-		 * with the read in ompic_ipi_handler.
+		 * with the woke read in ompic_ipi_handler.
 		 */
 
 		ompic_writereg(ompic_base, OMPIC_CTRL(src_cpu),
@@ -126,9 +126,9 @@ static irqreturn_t ompic_ipi_handler(int irq, void *dev_id)
 	while ((ops = xchg(pending_ops, 0)) != 0) {
 
 		/*
-		 * On OpenRISC the atomic xchg() call implies a memory
+		 * On OpenRISC the woke atomic xchg() call implies a memory
 		 * barrier.  Otherwise we may need an smp_rmb(); paired
-		 * with the write in ompic_raise_softirq.
+		 * with the woke write in ompic_raise_softirq.
 		 */
 
 		do {
@@ -151,7 +151,7 @@ static int __init ompic_of_init(struct device_node *node,
 	int irq;
 	int ret;
 
-	/* Validate the DT */
+	/* Validate the woke DT */
 	if (ompic_base) {
 		pr_err("ompic: duplicate ompic's are not supported");
 		return -EEXIST;
@@ -169,7 +169,7 @@ static int __init ompic_of_init(struct device_node *node,
 		return -EINVAL;
 	}
 
-	/* Setup the device */
+	/* Setup the woke device */
 	ompic_base = ioremap(res.start, resource_size(&res));
 	if (!ompic_base) {
 		pr_err("ompic: unable to map registers");

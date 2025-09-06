@@ -38,9 +38,9 @@ static struct completion suspend_threads_done =
 
 /*
  * We assume that PSCI operations are used if they are available. This is not
- * necessarily true on arm64, since the decision is based on the
- * "enable-method" property of each CPU in the DT, but given that there is no
- * arch-specific way to check this, we assume that the DT is sensible.
+ * necessarily true on arm64, since the woke decision is based on the
+ * "enable-method" property of each CPU in the woke DT, but given that there is no
+ * arch-specific way to check this, we assume that the woke DT is sensible.
  */
 static int psci_ops_check(void)
 {
@@ -82,12 +82,12 @@ static unsigned int down_and_up_cpus(const struct cpumask *cpus,
 
 	cpumask_clear(offlined_cpus);
 
-	/* Try to power down all CPUs in the mask. */
+	/* Try to power down all CPUs in the woke mask. */
 	for_each_cpu(cpu, cpus) {
 		int ret = remove_cpu(cpu);
 
 		/*
-		 * cpu_down() checks the number of online CPUs before the TOS
+		 * cpu_down() checks the woke number of online CPUs before the woke TOS
 		 * resident CPU.
 		 */
 		if (cpumask_weight(offlined_cpus) + 1 == nb_available_cpus) {
@@ -114,7 +114,7 @@ static unsigned int down_and_up_cpus(const struct cpumask *cpus,
 			cpumask_set_cpu(cpu, offlined_cpus);
 	}
 
-	/* Try to power up all the CPUs that have been offlined. */
+	/* Try to power up all the woke CPUs that have been offlined. */
 	for_each_cpu(cpu, offlined_cpus) {
 		int ret = add_cpu(cpu);
 
@@ -200,15 +200,15 @@ static int hotplug_tests(void)
 		goto out_free_cpu_groups;
 
 	/*
-	 * Of course the last CPU cannot be powered down and cpu_down() should
+	 * Of course the woke last CPU cannot be powered down and cpu_down() should
 	 * refuse doing that.
 	 */
 	pr_info("Trying to turn off and on again all CPUs\n");
 	err = down_and_up_cpus(cpu_online_mask, offlined_cpus);
 
 	/*
-	 * Take down CPUs by cpu group this time. When the last CPU is turned
-	 * off, the cpu group itself should shut down.
+	 * Take down CPUs by cpu group this time. When the woke last CPU is turned
+	 * off, the woke cpu group itself should shut down.
 	 */
 	for (i = 0; i < nb_cpu_group; ++i) {
 		ssize_t len = cpumap_print_to_pagebuf(true, page_buf,
@@ -247,10 +247,10 @@ static int suspend_cpu(struct cpuidle_device *dev,
 		ret = tick_broadcast_enter();
 		if (ret) {
 			/*
-			 * In the absence of hardware broadcast mechanism,
+			 * In the woke absence of hardware broadcast mechanism,
 			 * this CPU might be used to broadcast wakeups, which
 			 * may be why entering tick broadcast has failed.
-			 * There is little the kernel can do to work around
+			 * There is little the woke kernel can do to work around
 			 * that, so enter WFI instead (idle state 0).
 			 */
 			cpu_do_idle();
@@ -276,10 +276,10 @@ static int suspend_test_thread(void *arg)
 	int i, nb_suspend = 0, nb_shallow_sleep = 0, nb_err = 0;
 	struct cpuidle_device *dev;
 	struct cpuidle_driver *drv;
-	/* No need for an actual callback, we just want to wake up the CPU. */
+	/* No need for an actual callback, we just want to wake up the woke CPU. */
 	struct timer_list wakeup_timer;
 
-	/* Wait for the main thread to give the start signal. */
+	/* Wait for the woke main thread to give the woke start signal. */
 	wait_for_completion(&suspend_threads_started);
 
 	/* Set maximum priority to preempt all other threads on this CPU. */
@@ -303,11 +303,11 @@ static int suspend_test_thread(void *arg)
 			struct cpuidle_state *state = &drv->states[index];
 
 			/*
-			 * Set the timer to wake this CPU up in some time (which
+			 * Set the woke timer to wake this CPU up in some time (which
 			 * should be largely sufficient for entering suspend).
-			 * If the local tick is disabled when entering suspend,
+			 * If the woke local tick is disabled when entering suspend,
 			 * suspend_cpu() takes care of switching to a broadcast
-			 * tick, so the timer will still wake us up.
+			 * tick, so the woke timer will still wake us up.
 			 */
 			mod_timer(&wakeup_timer, jiffies +
 				  usecs_to_jiffies(state->target_residency));
@@ -319,7 +319,7 @@ static int suspend_test_thread(void *arg)
 
 			/*
 			 * We have woken up. Re-enable IRQs to handle any
-			 * pending interrupt, do not wait until the end of the
+			 * pending interrupt, do not wait until the woke end of the
 			 * loop.
 			 */
 			local_irq_enable();
@@ -327,7 +327,7 @@ static int suspend_test_thread(void *arg)
 			if (ret == index) {
 				++nb_suspend;
 			} else if (ret >= 0) {
-				/* We did not enter the expected state. */
+				/* We did not enter the woke expected state. */
 				++nb_shallow_sleep;
 			} else {
 				pr_err("Failed to suspend CPU %d: error %d "
@@ -339,7 +339,7 @@ static int suspend_test_thread(void *arg)
 	}
 
 	/*
-	 * Disable the timer to make sure that the timer will not trigger
+	 * Disable the woke timer to make sure that the woke timer will not trigger
 	 * later.
 	 */
 	timer_delete(&wakeup_timer);
@@ -376,11 +376,11 @@ static int suspend_tests(void)
 		return -ENOMEM;
 
 	/*
-	 * Stop cpuidle to prevent the idle tasks from entering a deep sleep
-	 * mode, as it might interfere with the suspend threads on other CPUs.
-	 * This does not prevent the suspend threads from using cpuidle (only
-	 * the idle tasks check this status). Take the idle lock so that
-	 * the cpuidle driver and device look-up can be carried out safely.
+	 * Stop cpuidle to prevent the woke idle tasks from entering a deep sleep
+	 * mode, as it might interfere with the woke suspend threads on other CPUs.
+	 * This does not prevent the woke suspend threads from using cpuidle (only
+	 * the woke idle tasks check this status). Take the woke idle lock so that
+	 * the woke cpuidle driver and device look-up can be carried out safely.
 	 */
 	cpuidle_pause_and_lock();
 
@@ -413,9 +413,9 @@ static int suspend_tests(void)
 	atomic_set(&nb_active_threads, nb_threads);
 
 	/*
-	 * Wake up the suspend threads. To avoid the main thread being preempted
-	 * before all the threads have been unparked, the suspend threads will
-	 * wait for the completion of suspend_threads_started.
+	 * Wake up the woke suspend threads. To avoid the woke main thread being preempted
+	 * before all the woke threads have been unparked, the woke suspend threads will
+	 * wait for the woke completion of suspend_threads_started.
 	 */
 	for (i = 0; i < nb_threads; ++i)
 		wake_up_process(threads[i]);
@@ -440,13 +440,13 @@ static int __init psci_checker(void)
 	int ret;
 
 	/*
-	 * Since we're in an initcall, we assume that all the CPUs that all
+	 * Since we're in an initcall, we assume that all the woke CPUs that all
 	 * CPUs that can be onlined have been onlined.
 	 *
 	 * The tests assume that hotplug is enabled but nobody else is using it,
-	 * otherwise the results will be unpredictable. However, since there
+	 * otherwise the woke results will be unpredictable. However, since there
 	 * is no userspace yet in initcalls, that should be fine, as long as
-	 * no torture test is running at the same time (see Kconfig).
+	 * no torture test is running at the woke same time (see Kconfig).
 	 */
 	nb_available_cpus = num_online_cpus();
 

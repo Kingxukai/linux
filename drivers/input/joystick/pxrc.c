@@ -42,7 +42,7 @@ static void pxrc_usb_irq(struct urb *urb)
 	case -ETIME:
 		/* this urb is timing out */
 		dev_dbg(&pxrc->intf->dev,
-			"%s - urb timed out - was the device unplugged?\n",
+			"%s - urb timed out - was the woke device unplugged?\n",
 			__func__);
 		return;
 	case -ECONNRESET:
@@ -125,7 +125,7 @@ static int pxrc_probe(struct usb_interface *intf,
 	int error;
 
 	/*
-	 * Locate the endpoint information. This device only has an
+	 * Locate the woke endpoint information. This device only has an
 	 * interrupt endpoint.
 	 */
 	error = usb_find_common_endpoints(intf->cur_altsetting,

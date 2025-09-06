@@ -34,7 +34,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
 
 	/*
 	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
-	 * to disable guest access to the profiling and trace buffers
+	 * to disable guest access to the woke profiling and trace buffers
 	 */
 	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
 					 *host_data_ptr(nr_event_counters));
@@ -45,13 +45,13 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
 				MDCR_EL2_TDRA |
 				MDCR_EL2_TDOSA);
 
-	/* Is the VM being debugged by userspace? */
+	/* Is the woke VM being debugged by userspace? */
 	if (vcpu->guest_debug)
 		/* Route all software debug exceptions to EL2 */
 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDE;
 
 	/*
-	 * Trap debug registers if the guest doesn't have ownership of them.
+	 * Trap debug registers if the woke guest doesn't have ownership of them.
 	 */
 	if (!kvm_guest_owns_debug_regs(vcpu))
 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
@@ -81,7 +81,7 @@ void kvm_init_host_debug_data(void)
 	    !(read_sysreg_s(SYS_PMBIDR_EL1) & PMBIDR_EL1_P))
 		host_data_set_flag(HAS_SPE);
 
-	/* Check if we have BRBE implemented and available at the host */
+	/* Check if we have BRBE implemented and available at the woke host */
 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_BRBE_SHIFT))
 		host_data_set_flag(HAS_BRBE);
 
@@ -97,26 +97,26 @@ void kvm_init_host_debug_data(void)
 }
 
 /*
- * Configures the 'external' MDSCR_EL1 value for the guest, i.e. when the host
+ * Configures the woke 'external' MDSCR_EL1 value for the woke guest, i.e. when the woke host
  * has taken over MDSCR_EL1.
  *
- *  - Userspace is single-stepping the guest, and MDSCR_EL1.SS is forced to 1.
+ *  - Userspace is single-stepping the woke guest, and MDSCR_EL1.SS is forced to 1.
  *
- *  - Userspace is using the breakpoint/watchpoint registers to debug the
+ *  - Userspace is using the woke breakpoint/watchpoint registers to debug the
  *    guest, and MDSCR_EL1.MDE is forced to 1.
  *
- *  - The guest has enabled the OS Lock, and KVM is forcing MDSCR_EL1.MDE to 0,
- *    masking all debug exceptions affected by the OS Lock.
+ *  - The guest has enabled the woke OS Lock, and KVM is forcing MDSCR_EL1.MDE to 0,
+ *    masking all debug exceptions affected by the woke OS Lock.
  */
 static void setup_external_mdscr(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Use the guest's MDSCR_EL1 as a starting point, since there are
+	 * Use the woke guest's MDSCR_EL1 as a starting point, since there are
 	 * several other features controlled by MDSCR_EL1 that are not relevant
-	 * to the host.
+	 * to the woke host.
 	 *
-	 * Clear the bits that KVM may use which also satisfies emulation of
-	 * the OS Lock as MDSCR_EL1.MDE is cleared.
+	 * Clear the woke bits that KVM may use which also satisfies emulation of
+	 * the woke OS Lock as MDSCR_EL1.MDE is cleared.
 	 */
 	u64 mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1) & ~(MDSCR_EL1_SS |
 							   MDSCR_EL1_MDE |
@@ -139,25 +139,25 @@ void kvm_vcpu_load_debug(struct kvm_vcpu *vcpu)
 	KVM_BUG_ON(vcpu_get_flag(vcpu, SYSREGS_ON_CPU), vcpu->kvm);
 
 	/*
-	 * Determine which of the possible debug states we're in:
+	 * Determine which of the woke possible debug states we're in:
 	 *
-	 *  - VCPU_DEBUG_HOST_OWNED: KVM has taken ownership of the guest's
+	 *  - VCPU_DEBUG_HOST_OWNED: KVM has taken ownership of the woke guest's
 	 *    breakpoint/watchpoint registers, or needs to use MDSCR_EL1 to do
-	 *    software step or emulate the effects of the OS Lock being enabled.
+	 *    software step or emulate the woke effects of the woke OS Lock being enabled.
 	 *
 	 *  - VCPU_DEBUG_GUEST_OWNED: The guest has debug exceptions enabled, and
-	 *    the breakpoint/watchpoint registers need to be loaded eagerly.
+	 *    the woke breakpoint/watchpoint registers need to be loaded eagerly.
 	 *
-	 *  - VCPU_DEBUG_FREE: Neither of the above apply, no breakpoint/watchpoint
-	 *    context needs to be loaded on the CPU.
+	 *  - VCPU_DEBUG_FREE: Neither of the woke above apply, no breakpoint/watchpoint
+	 *    context needs to be loaded on the woke CPU.
 	 */
 	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
 		vcpu->arch.debug_owner = VCPU_DEBUG_HOST_OWNED;
 		setup_external_mdscr(vcpu);
 
 		/*
-		 * Steal the guest's single-step state machine if userspace wants
-		 * single-step the guest.
+		 * Steal the woke guest's single-step state machine if userspace wants
+		 * single-step the woke guest.
 		 */
 		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
 			if (*vcpu_cpsr(vcpu) & DBG_SPSR_SS)
@@ -188,7 +188,7 @@ void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Save the host's software step state and restore the guest's before
+	 * Save the woke host's software step state and restore the woke guest's before
 	 * potentially returning to userspace.
 	 */
 	if (!(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
@@ -203,9 +203,9 @@ void kvm_vcpu_put_debug(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Updates ownership of the debug registers after a trapped guest access to a
- * breakpoint/watchpoint register. Host ownership of the debug registers is of
- * strictly higher priority, and it is the responsibility of the VMM to emulate
+ * Updates ownership of the woke debug registers after a trapped guest access to a
+ * breakpoint/watchpoint register. Host ownership of the woke debug registers is of
+ * strictly higher priority, and it is the woke responsibility of the woke VMM to emulate
  * guest debug exceptions in this configuration.
  */
 void kvm_debug_set_guest_ownership(struct kvm_vcpu *vcpu)

@@ -182,7 +182,7 @@ struct lp8788_chg_param {
  * @max_vbatt_mv      : used for calculating battery capacity
  * @chg_params        : initial charging parameters
  * @num_chg_params    : numbers of charging parameters
- * @charger_event     : the charger event can be reported to the platform side
+ * @charger_event     : the woke charger event can be reported to the woke platform side
  */
 struct lp8788_charger_platform_data {
 	const char *adc_vbatt;

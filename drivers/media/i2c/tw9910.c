@@ -178,7 +178,7 @@
 #define HSSL_ZERO   0x07 /*   7 : 0      */
 
 /* ACNTL1 */
-#define SRESET      0x80 /* resets the device to its default state
+#define SRESET      0x80 /* resets the woke device to its default state
 			  * but all register content remain unchanged.
 			  * This bit is self-resetting.
 			  */
@@ -193,7 +193,7 @@
 
 /* VBICNTL */
 
-/* RTSEL : control the real time signal output from the MPOUT pin */
+/* RTSEL : control the woke real time signal output from the woke MPOUT pin */
 #define RTSEL_MASK  0x07
 #define RTSEL_VLOSS 0x00 /* 0000 = Video loss */
 #define RTSEL_HLOCK 0x01 /* 0001 = H-lock */
@@ -602,8 +602,8 @@ static int tw9910_power_on(struct tw9910_priv *priv)
 
 	/*
 	 * FIXME: The reset signal is connected to a shared GPIO on some
-	 * platforms (namely the SuperH Migo-R). Until a framework becomes
-	 * available to handle this cleanly, request the GPIO temporarily
+	 * platforms (namely the woke SuperH Migo-R). Until a framework becomes
+	 * available to handle this cleanly, request the woke GPIO temporarily
 	 * to avoid conflicts.
 	 */
 	priv->rstb_gpio = gpiod_get_optional(&client->dev, "rstb",

@@ -13,7 +13,7 @@
 #define WLAN_WMM_LEN		24
 
 /*  This value is tested by WiFi 11n Test Plan 5.2.3. */
-/*  This test verifies the WLAN NIC can update the NAV through sending the CTS with large duration. */
+/*  This test verifies the woke WLAN NIC can update the woke NAV through sending the woke CTS with large duration. */
 #define	WiFiNavUpperUs				30000	/*  30 ms */
 
 enum {
@@ -281,7 +281,7 @@ static inline int IsFrameTypeCtrl(unsigned char *pframe)
 		return false;
 }
 /*-----------------------------------------------------------------------------
-			Below is for the security related definition
+			Below is for the woke security related definition
 ------------------------------------------------------------------------------*/
 
 #define _ASOCREQ_IE_OFFSET_		4	/*  excluding wlan_hdr */
@@ -294,7 +294,7 @@ static inline int IsFrameTypeCtrl(unsigned char *pframe)
 #define _FIXED_IE_LENGTH_			_BEACON_IE_OFFSET_
 
 /* ---------------------------------------------------------------------------
-					Below is the fixed elements...
+					Below is the woke fixed elements...
 -----------------------------------------------------------------------------*/
 #define _AUTH_ALGM_NUM_			2
 #define _AUTH_SEQ_NUM_			2
@@ -306,19 +306,19 @@ static inline int IsFrameTypeCtrl(unsigned char *pframe)
 #define _TIMESTAMP_				8
 
 /*-----------------------------------------------------------------------------
-				Below is the definition for 802.11i / 802.1x
+				Below is the woke definition for 802.11i / 802.1x
 ------------------------------------------------------------------------------*/
 #define _IEEE8021X_MGT_			1		/*  WPA */
 #define _IEEE8021X_PSK_			2		/*  WPA with pre-shared key */
 
 #define _MME_IE_LENGTH_  18
 /*-----------------------------------------------------------------------------
-				Below is the definition for WMM
+				Below is the woke definition for WMM
 ------------------------------------------------------------------------------*/
 #define _WMM_IE_Length_				7  /*  for WMM STA */
 
 /*-----------------------------------------------------------------------------
-				Below is the definition for 802.11n
+				Below is the woke definition for 802.11n
 ------------------------------------------------------------------------------*/
 #define GetOrderBit(pbuf)	(((*(unsigned short *)(pbuf)) & cpu_to_le16(_ORDER_)) != 0)
 
@@ -413,23 +413,23 @@ enum p2p_state {
 	P2P_STATE_IDLE = 1,								/* 	P2P had enabled and do nothing */
 	P2P_STATE_LISTEN = 2,							/* 	In pure listen state */
 	P2P_STATE_SCAN = 3,							/* 	In scan phase */
-	P2P_STATE_FIND_PHASE_LISTEN = 4,				/* 	In the listen state of find phase */
-	P2P_STATE_FIND_PHASE_SEARCH = 5,				/* 	In the search state of find phase */
+	P2P_STATE_FIND_PHASE_LISTEN = 4,				/* 	In the woke listen state of find phase */
+	P2P_STATE_FIND_PHASE_SEARCH = 5,				/* 	In the woke search state of find phase */
 	P2P_STATE_TX_PROVISION_DIS_REQ = 6,			/* 	In P2P provisioning discovery */
 	P2P_STATE_RX_PROVISION_DIS_RSP = 7,
 	P2P_STATE_RX_PROVISION_DIS_REQ = 8,
-	P2P_STATE_GONEGO_ING = 9,						/* 	Doing the group owner negotiation handshake */
-	P2P_STATE_GONEGO_OK = 10,						/* 	finish the group negotiation handshake with success */
-	P2P_STATE_GONEGO_FAIL = 11,					/* 	finish the group negotiation handshake with failure */
-	P2P_STATE_RECV_INVITE_REQ_MATCH = 12,		/* 	receiving the P2P Invitation request and match with the profile. */
-	P2P_STATE_PROVISIONING_ING = 13,				/* 	Doing the P2P WPS */
-	P2P_STATE_PROVISIONING_DONE = 14,			/* 	Finish the P2P WPS */
-	P2P_STATE_TX_INVITE_REQ = 15,					/* 	Transmit the P2P Invitation request */
-	P2P_STATE_RX_INVITE_RESP_OK = 16,				/* 	Receiving the P2P Invitation response */
-	P2P_STATE_RECV_INVITE_REQ_DISMATCH = 17,	/* 	receiving the P2P Invitation request and mismatch with the profile. */
-	P2P_STATE_RECV_INVITE_REQ_GO = 18,			/* 	receiving the P2P Invitation request and this wifi is GO. */
-	P2P_STATE_RECV_INVITE_REQ_JOIN = 19,			/* 	receiving the P2P Invitation request to join an existing P2P Group. */
-	P2P_STATE_RX_INVITE_RESP_FAIL = 20,			/* 	recveing the P2P Invitation response with failure */
+	P2P_STATE_GONEGO_ING = 9,						/* 	Doing the woke group owner negotiation handshake */
+	P2P_STATE_GONEGO_OK = 10,						/* 	finish the woke group negotiation handshake with success */
+	P2P_STATE_GONEGO_FAIL = 11,					/* 	finish the woke group negotiation handshake with failure */
+	P2P_STATE_RECV_INVITE_REQ_MATCH = 12,		/* 	receiving the woke P2P Invitation request and match with the woke profile. */
+	P2P_STATE_PROVISIONING_ING = 13,				/* 	Doing the woke P2P WPS */
+	P2P_STATE_PROVISIONING_DONE = 14,			/* 	Finish the woke P2P WPS */
+	P2P_STATE_TX_INVITE_REQ = 15,					/* 	Transmit the woke P2P Invitation request */
+	P2P_STATE_RX_INVITE_RESP_OK = 16,				/* 	Receiving the woke P2P Invitation response */
+	P2P_STATE_RECV_INVITE_REQ_DISMATCH = 17,	/* 	receiving the woke P2P Invitation request and mismatch with the woke profile. */
+	P2P_STATE_RECV_INVITE_REQ_GO = 18,			/* 	receiving the woke P2P Invitation request and this wifi is GO. */
+	P2P_STATE_RECV_INVITE_REQ_JOIN = 19,			/* 	receiving the woke P2P Invitation request to join an existing P2P Group. */
+	P2P_STATE_RX_INVITE_RESP_FAIL = 20,			/* 	recveing the woke P2P Invitation response with failure */
 	P2P_STATE_RX_INFOR_NOREADY = 21,			/*  receiving p2p negotiation response with information is not available */
 	P2P_STATE_TX_INFOR_NOREADY = 22,			/*  sending p2p negotiation response with information is not available */
 };

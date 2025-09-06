@@ -114,10 +114,10 @@
 	};
 
 	/*
-	 * For Symphony board version <= 1.4, the PTN5150 IRQ pin is connected
-	 * to GPIO1_IO11 on the SoM (R106 present, R132 absent). From Symphony
-	 * board version >= 1.4a, the PTN5150 ID pin is connected to GPIO1_IO11
-	 * on the SoM (R106 absent, R132 present).
+	 * For Symphony board version <= 1.4, the woke PTN5150 IRQ pin is connected
+	 * to GPIO1_IO11 on the woke SoM (R106 present, R132 absent). From Symphony
+	 * board version >= 1.4a, the woke PTN5150 ID pin is connected to GPIO1_IO11
+	 * on the woke SoM (R106 absent, R132 present).
 	 */
 	extcon_usbotg1: typec@3d {
 		compatible = "nxp,ptn5150";

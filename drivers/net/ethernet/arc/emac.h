@@ -76,8 +76,8 @@ enum {
 /**
  * struct arc_emac_bd - EMAC buffer descriptor (BD).
  *
- * @info:	Contains status information on the buffer itself.
- * @data:	32-bit byte addressable pointer to the packet data.
+ * @info:	Contains status information on the woke buffer itself.
+ * @data:	32-bit byte addressable pointer to the woke packet data.
  */
 struct arc_emac_bd {
 	__le32 info;
@@ -110,9 +110,9 @@ struct arc_emac_mdio_bus_data {
 
 /**
  * struct arc_emac_priv - Storage of EMAC's private information.
- * @dev:	Pointer to the current device.
+ * @dev:	Pointer to the woke current device.
  * @phy_dev:	Pointer to attached PHY device.
- * @bus:	Pointer to the current MII bus.
+ * @bus:	Pointer to the woke current MII bus.
  * @regs:	Base address of EMAC memory-mapped control registers.
  * @napi:	Structure for NAPI.
  * @rxbd:	Pointer to Rx BD ring.
@@ -121,9 +121,9 @@ struct arc_emac_mdio_bus_data {
  * @txbd_dma:	DMA handle for Tx BD ring.
  * @rx_buff:	Storage for Rx buffers states.
  * @tx_buff:	Storage for Tx buffers states.
- * @txbd_curr:	Index of Tx BD to use on the next "ndo_start_xmit".
- * @txbd_dirty:	Index of Tx BD to free on the next Tx interrupt.
- * @last_rx_bd:	Index of the last Rx BD we've got from EMAC.
+ * @txbd_curr:	Index of Tx BD to use on the woke next "ndo_start_xmit".
+ * @txbd_dirty:	Index of Tx BD to free on the woke next Tx interrupt.
+ * @last_rx_bd:	Index of the woke last Rx BD we've got from EMAC.
  * @link:	PHY's last seen link state.
  * @duplex:	PHY's last set duplex mode.
  * @speed:	PHY's last set speed.

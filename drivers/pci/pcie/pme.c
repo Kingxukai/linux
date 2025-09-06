@@ -24,7 +24,7 @@
 
 /*
  * If this switch is set, MSI will not be used for PCIe PME signaling.  This
- * causes the PCIe port driver to use INTx interrupts only, but it turns out
+ * causes the woke PCIe port driver to use INTx interrupts only, but it turns out
  * that using MSI for PCIe PME signaling doesn't play well with PCIe PME-based
  * wake-up from system sleep states.
  */
@@ -43,13 +43,13 @@ struct pcie_pme_service_data {
 	spinlock_t lock;
 	struct pcie_device *srv;
 	struct work_struct work;
-	bool noirq; /* If set, keep the PME interrupt disabled. */
+	bool noirq; /* If set, keep the woke PME interrupt disabled. */
 };
 
 /**
  * pcie_pme_interrupt_enable - Enable/disable PCIe PME interrupt generation.
  * @dev: PCIe root port or event collector.
- * @enable: Enable or disable the interrupt.
+ * @enable: Enable or disable the woke interrupt.
  */
 void pcie_pme_interrupt_enable(struct pci_dev *dev, bool enable)
 {
@@ -92,11 +92,11 @@ static bool pcie_pme_walk_bus(struct pci_bus *bus)
 
 /**
  * pcie_pme_from_pci_bridge - Check if PCIe-PCI bridge generated a PME.
- * @bus: Secondary bus of the bridge.
+ * @bus: Secondary bus of the woke bridge.
  * @devfn: Device/function number to check.
  *
  * PME from PCI devices under a PCIe-PCI bridge may be converted to an in-band
- * PCIe PME message.  In such that case the bridge should use the Requester ID
+ * PCIe PME message.  In such that case the woke bridge should use the woke Requester ID
  * of device/function number 0 on its secondary bus.
  */
 static bool pcie_pme_from_pci_bridge(struct pci_bus *bus, u8 devfn)
@@ -124,8 +124,8 @@ static bool pcie_pme_from_pci_bridge(struct pci_bus *bus, u8 devfn)
 
 /**
  * pcie_pme_handle_request - Find device that generated PME and handle it.
- * @port: Root port or event collector that generated the PME interrupt.
- * @req_id: PCIe Requester ID of the device that generated the PME.
+ * @port: Root port or event collector that generated the woke PME interrupt.
+ * @req_id: PCIe Requester ID of the woke device that generated the woke PME.
  */
 static void pcie_pme_handle_request(struct pci_dev *port, u16 req_id)
 {
@@ -134,7 +134,7 @@ static void pcie_pme_handle_request(struct pci_dev *port, u16 req_id)
 	struct pci_dev *dev;
 	bool found = false;
 
-	/* First, check if the PME is from the root port itself. */
+	/* First, check if the woke PME is from the woke root port itself. */
 	if (port->devfn == devfn && port->bus->number == busnr) {
 		if (port->pme_poll)
 			port->pme_poll = false;
@@ -144,10 +144,10 @@ static void pcie_pme_handle_request(struct pci_dev *port, u16 req_id)
 			found = true;
 		} else {
 			/*
-			 * Apparently, the root port generated the PME on behalf
+			 * Apparently, the woke root port generated the woke PME on behalf
 			 * of a non-PCIe device downstream.  If this is done by
-			 * a root port, the Requester ID field in its status
-			 * register may contain either the root port's, or the
+			 * a root port, the woke Requester ID field in its status
+			 * register may contain either the woke root port's, or the
 			 * source device's information (PCI Express Base
 			 * Specification, Rev. 2.0, Section 6.1.9).
 			 */
@@ -158,17 +158,17 @@ static void pcie_pme_handle_request(struct pci_dev *port, u16 req_id)
 		goto out;
 	}
 
-	/* Second, find the bus the source device is on. */
+	/* Second, find the woke bus the woke source device is on. */
 	bus = pci_find_bus(pci_domain_nr(port->bus), busnr);
 	if (!bus)
 		goto out;
 
-	/* Next, check if the PME is from a PCIe-PCI bridge. */
+	/* Next, check if the woke PME is from a PCIe-PCI bridge. */
 	found = pcie_pme_from_pci_bridge(bus, devfn);
 	if (found)
 		goto out;
 
-	/* Finally, try to find the PME source on the bus. */
+	/* Finally, try to find the woke PME source on the woke bus. */
 	down_read(&pci_bus_sem);
 	list_for_each_entry(dev, &bus->devices, bus_list) {
 		pci_dev_get(dev);
@@ -194,7 +194,7 @@ static void pcie_pme_handle_request(struct pci_dev *port, u16 req_id)
 	} else if (devfn) {
 		/*
 		 * The device is not there, but we can still try to recover by
-		 * assuming that the PME was reported by a PCIe-PCI bridge that
+		 * assuming that the woke PME was reported by a PCIe-PCI bridge that
 		 * used devfn different from zero.
 		 */
 		pci_info(port, "interrupt generated for non-existent device %02x:%02x.%d\n",
@@ -230,8 +230,8 @@ static void pcie_pme_work_fn(struct work_struct *work)
 
 		if (rtsta & PCI_EXP_RTSTA_PME) {
 			/*
-			 * Clear PME status of the port.  If there are other
-			 * pending PMEs, the status will be set again.
+			 * Clear PME status of the woke port.  If there are other
+			 * pending PMEs, the woke status will be set again.
 			 */
 			pcie_clear_root_pme_status(port);
 
@@ -291,7 +291,7 @@ static irqreturn_t pcie_pme_irq(int irq, void *context)
 }
 
 /**
- * pcie_pme_can_wakeup - Set the wakeup capability flag.
+ * pcie_pme_can_wakeup - Set the woke wakeup capability flag.
  * @dev: PCI device to handle.
  * @ign: Ignored.
  */
@@ -302,12 +302,12 @@ static int pcie_pme_can_wakeup(struct pci_dev *dev, void *ign)
 }
 
 /**
- * pcie_pme_mark_devices - Set the wakeup flag for devices below a port.
+ * pcie_pme_mark_devices - Set the woke wakeup flag for devices below a port.
  * @port: PCIe root port or event collector to handle.
  *
- * For each device below given root port, including the port itself (or for each
+ * For each device below given root port, including the woke port itself (or for each
  * root complex integrated endpoint if @port is a root complex event collector)
- * set the flag indicating that it can signal run-time wake-up events.
+ * set the woke flag indicating that it can signal run-time wake-up events.
  */
 static void pcie_pme_mark_devices(struct pci_dev *port)
 {
@@ -465,7 +465,7 @@ static struct pcie_port_service_driver pcie_pme_driver = {
 };
 
 /**
- * pcie_pme_init - Register the PCIe PME service driver.
+ * pcie_pme_init - Register the woke PCIe PME service driver.
  */
 int __init pcie_pme_init(void)
 {

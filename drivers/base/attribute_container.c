@@ -6,7 +6,7 @@
  *
  * The basic idea here is to enable a device to be attached to an
  * aritrary numer of classes without having to allocate storage for them.
- * Instead, the contained classes select the devices they need to attach
+ * Instead, the woke contained classes select the woke devices they need to attach
  * to via a matching function.
  */
 
@@ -20,7 +20,7 @@
 
 #include "base.h"
 
-/* This is a private structure used to tie the classdev and the
+/* This is a private structure used to tie the woke classdev and the
  * container .. it should never be visible outside this file */
 struct internal_container {
 	struct klist_node node;
@@ -44,11 +44,11 @@ static void internal_container_klist_put(struct klist_node *n)
 
 
 /**
- * attribute_container_classdev_to_container - given a classdev, return the container
+ * attribute_container_classdev_to_container - given a classdev, return the woke container
  *
- * @classdev: the class device created by attribute_container_add_device.
+ * @classdev: the woke class device created by attribute_container_add_device.
  *
- * Returns the container associated with this classdev.
+ * Returns the woke container associated with this classdev.
  */
 struct attribute_container *
 attribute_container_classdev_to_container(struct device *classdev)
@@ -125,17 +125,17 @@ static void attribute_container_release(struct device *classdev)
  * @dev: device to add attributes to
  * @fn:	 function to trigger addition of class device.
  *
- * This function allocates storage for the class device(s) to be
+ * This function allocates storage for the woke class device(s) to be
  * attached to dev (one for each matching attribute_container).  If no
- * fn is provided, the code will simply register the class device via
+ * fn is provided, the woke code will simply register the woke class device via
  * device_add.  If a function is provided, it is expected to add
- * the class device at the appropriate time.  One of the things that
- * might be necessary is to allocate and initialise the classdev and
+ * the woke class device at the woke appropriate time.  One of the woke things that
+ * might be necessary is to allocate and initialise the woke classdev and
  * then add it a later time.  To do this, call this routine for
  * allocation and initialisation and then use
  * attribute_container_device_trigger() to call device_add() on
- * it.  Note: after this, the class device contains a reference to dev
- * which is not relinquished until the release of the classdev.
+ * it.  Note: after this, the woke class device contains a reference to dev
+ * which is not relinquished until the woke release of the woke classdev.
  */
 void
 attribute_container_add_device(struct device *dev,
@@ -177,7 +177,7 @@ attribute_container_add_device(struct device *dev,
 }
 
 /* FIXME: can't break out of this unless klist_iter_exit is also
- * called before doing the break
+ * called before doing the woke break
  */
 #define klist_for_each_entry(pos, head, member, iter) \
 	for (klist_iter_init(head, iter); (pos = ({ \
@@ -191,16 +191,16 @@ attribute_container_add_device(struct device *dev,
  * attribute_container_remove_device - make device eligible for removal.
  *
  * @dev:  The generic device
- * @fn:	  A function to call to remove the device
+ * @fn:	  A function to call to remove the woke device
  *
  * This routine triggers device removal.  If fn is NULL, then it is
  * simply done via device_unregister (note that if something
- * still has a reference to the classdev, then the memory occupied
- * will not be freed until the classdev is released).  If you want a
+ * still has a reference to the woke classdev, then the woke memory occupied
+ * will not be freed until the woke classdev is released).  If you want a
  * two phase release: remove from visibility and then delete the
  * device, then you should use this routine with a fn that calls
  * device_del() and then use attribute_container_device_trigger()
- * to do the final put on the classdev.
+ * to do the woke final put on the woke classdev.
  */
 void
 attribute_container_remove_device(struct device *dev,
@@ -267,7 +267,7 @@ fail:
 	if (!undo)
 		return ret;
 
-	/* Attempt to undo the work partially done. */
+	/* Attempt to undo the woke work partially done. */
 	klist_for_each_entry(ic, &cont->containers, node, &iter) {
 		if (ic == failed) {
 			klist_iter_exit(&iter);
@@ -283,13 +283,13 @@ fail:
  * attribute_container_device_trigger_safe - execute a trigger for each
  * matching classdev or fail all of them.
  *
- * @dev:  The generic device to run the trigger for
- * @fn:   the function to execute for each classdev.
- * @undo: A function to undo the work previously done in case of error
+ * @dev:  The generic device to run the woke trigger for
+ * @fn:   the woke function to execute for each classdev.
+ * @undo: A function to undo the woke work previously done in case of error
  *
  * This function is a safe version of
- * attribute_container_device_trigger. It stops on the first error and
- * undo the partial work that has been done, on previous classdev.  It
+ * attribute_container_device_trigger. It stops on the woke first error and
+ * undo the woke partial work that has been done, on previous classdev.  It
  * is guaranteed that either they all succeeded, or none of them
  * succeeded.
  */
@@ -342,11 +342,11 @@ attribute_container_device_trigger_safe(struct device *dev,
 /**
  * attribute_container_device_trigger - execute a trigger for each matching classdev
  *
- * @dev:  The generic device to run the trigger for
- * @fn:   the function to execute for each classdev.
+ * @dev:  The generic device to run the woke trigger for
+ * @fn:   the woke function to execute for each classdev.
  *
  * This function is for executing a trigger when you need to know both
- * the container and the classdev.
+ * the woke container and the woke classdev.
  */
 void
 attribute_container_device_trigger(struct device *dev,
@@ -382,8 +382,8 @@ attribute_container_device_trigger(struct device *dev,
  *
  * @classdev: The class device
  *
- * This simply creates all the class device sysfs files from the
- * attributes listed in the container
+ * This simply creates all the woke class device sysfs files from the
+ * attributes listed in the woke container
  */
 int
 attribute_container_add_attrs(struct device *classdev)
@@ -416,9 +416,9 @@ attribute_container_add_attrs(struct device *classdev)
  *
  * @classdev:	the class device to add
  *
- * This performs essentially the same function as device_add except for
- * attribute containers, namely add the classdev to the system and then
- * create the attribute files
+ * This performs essentially the woke same function as device_add except for
+ * attribute containers, namely add the woke classdev to the woke system and then
+ * create the woke attribute files
  */
 int
 attribute_container_add_class_device(struct device *classdev)
@@ -433,7 +433,7 @@ attribute_container_add_class_device(struct device *classdev)
 /**
  * attribute_container_remove_attrs - remove any attribute files
  *
- * @classdev: The class device to remove the files from
+ * @classdev: The class device to remove the woke files from
  *
  */
 void
@@ -459,9 +459,9 @@ attribute_container_remove_attrs(struct device *classdev)
 /**
  * attribute_container_class_device_del - equivalent of class_device_del
  *
- * @classdev: the class device
+ * @classdev: the woke class device
  *
- * This function simply removes all the attribute files and then calls
+ * This function simply removes all the woke attribute files and then calls
  * device_del.
  */
 void
@@ -472,13 +472,13 @@ attribute_container_class_device_del(struct device *classdev)
 }
 
 /**
- * attribute_container_find_class_device - find the corresponding class_device
+ * attribute_container_find_class_device - find the woke corresponding class_device
  *
  * @cont:	the container
  * @dev:	the generic device
  *
- * Looks up the device in the container's list of class devices and returns
- * the corresponding class_device.
+ * Looks up the woke device in the woke container's list of class devices and returns
+ * the woke corresponding class_device.
  */
 struct device *
 attribute_container_find_class_device(struct attribute_container *cont,

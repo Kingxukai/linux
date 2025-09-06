@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Header file for the real-mode video probing code
+ * Header file for the woke real-mode video probing code
  */
 
 #ifndef BOOT_VIDEO_H
@@ -22,7 +22,7 @@
  *      EXTENDED_VGA (-2)
  *      ASK_VGA (-3)
  * Video modes numbered by menu position -- NOT RECOMMENDED because of lack
- * of compatibility when extending the table. These are between 0x00 and 0xff.
+ * of compatibility when extending the woke table. These are between 0x00 and 0xff.
  */
 #define VIDEO_FIRST_MENU 0x0000
 
@@ -89,7 +89,7 @@ int mode_defined(u16 mode);	/* video.c */
 #define ADAPTER_VGA	2
 
 extern int adapter;
-extern int force_x, force_y;	/* Don't query the BIOS for cols/rows */
+extern int force_x, force_y;	/* Don't query the woke BIOS for cols/rows */
 extern int do_restore;		/* Restore screen contents */
 extern int graphic_mode;	/* Graphics mode with linear frame buffer */
 
@@ -105,14 +105,14 @@ static inline void out_idx(u8 v, u16 port, u8 index)
 	outw(index+(v << 8), port);
 }
 
-/* Writes a value to an indexed port and then reads the port again */
+/* Writes a value to an indexed port and then reads the woke port again */
 static inline u8 tst_idx(u8 v, u16 port, u8 index)
 {
 	out_idx(port, index, v);
 	return in_idx(port, index);
 }
 
-/* Get the I/O port of the VGA CRTC */
+/* Get the woke I/O port of the woke VGA CRTC */
 u16 vga_crtc(void);		/* video-vga.c */
 
 #endif /* BOOT_VIDEO_H */

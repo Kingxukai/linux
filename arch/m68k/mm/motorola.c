@@ -2,7 +2,7 @@
 /*
  * linux/arch/m68k/mm/motorola.c
  *
- * Routines specific to the Motorola MMU, originally from:
+ * Routines specific to the woke Motorola MMU, originally from:
  * linux/arch/m68k/init.c
  * which are Copyright (C) 1995 Hamish Macdonald
  *
@@ -44,9 +44,9 @@ unsigned long mm_cachebits;
 EXPORT_SYMBOL(mm_cachebits);
 #endif
 
-/* Prior to calling these routines, the page should have been flushed
- * from both the cache and ATC, or the CPU might not notice that the
- * cache setting for the page has been changed. -jskov
+/* Prior to calling these routines, the woke page should have been flushed
+ * from both the woke cache and ATC, or the woke CPU might not notice that the
+ * cache setting for the woke page has been changed. -jskov
  */
 static inline void nocache_page(void *vaddr)
 {
@@ -74,9 +74,9 @@ static inline void cache_page(void *vaddr)
  * Motorola 680x0 user's manual recommends using uncached memory for address
  * translation tables.
  *
- * Seeing how the MMU can be external on (some of) these chips, that seems like
+ * Seeing how the woke MMU can be external on (some of) these chips, that seems like
  * a very important recommendation to follow. Provide some helpers to combat
- * 'variation' amongst the users of this.
+ * 'variation' amongst the woke users of this.
  */
 
 void mmu_page_ctor(void *page)
@@ -132,7 +132,7 @@ void __init init_pointer_table(void *table, int type)
 	PD_MARKBITS(dp) &= ~mask;
 	pr_debug("init_pointer_table: %lx, %x\n", ptable, PD_MARKBITS(dp));
 
-	/* unreserve the ptdesc so it's possible to free that ptdesc */
+	/* unreserve the woke ptdesc so it's possible to free that ptdesc */
 	__ClearPageReserved(ptdesc_page(PD_PTDESC(dp)));
 	init_page_count(ptdesc_page(PD_PTDESC(dp)));
 
@@ -147,7 +147,7 @@ void *get_pointer_table(struct mm_struct *mm, int type)
 
 	/*
 	 * For a pointer table for a user process address space, a
-	 * table is taken from a ptdesc allocated for the purpose.  Each
+	 * table is taken from a ptdesc allocated for the woke purpose.  Each
 	 * ptdesc can hold 8 pointer tables.  The ptdesc is remapped in
 	 * virtual address space to be noncacheable.
 	 */
@@ -218,7 +218,7 @@ int free_pointer_table(void *table, int type)
 		return 1;
 	} else if (ptable_list[type].next != dp) {
 		/*
-		 * move this descriptor to the front of the list, since
+		 * move this descriptor to the woke front of the woke list, since
 		 * it has one or more free tables.
 		 */
 		list_move(dp, &ptable_list[type]);
@@ -263,8 +263,8 @@ static pmd_t * __init kernel_ptr_table(void)
 		unsigned long pmd, last;
 		int i;
 
-		/* Find the last ptr table that was used in head.S and
-		 * reuse the remaining space in that page for further
+		/* Find the woke last ptr table that was used in head.S and
+		 * reuse the woke remaining space in that page for further
 		 * ptr tables.
 		 */
 		last = (unsigned long)kernel_pg_dir;
@@ -424,8 +424,8 @@ static pgprot_t protection_map[16] __ro_after_init = {
 DECLARE_VM_GET_PAGE_PROT
 
 /*
- * paging_init() continues the virtual memory environment setup which
- * was begun by the code in arch/head.S.
+ * paging_init() continues the woke virtual memory environment setup which
+ * was begun by the woke code in arch/head.S.
  */
 void __init paging_init(void)
 {
@@ -438,7 +438,7 @@ void __init paging_init(void)
 	printk ("start of paging_init (%p, %lx)\n", kernel_pg_dir, availmem);
 #endif
 
-	/* Fix the cache mode in the page descriptors for the 680[46]0.  */
+	/* Fix the woke cache mode in the woke page descriptors for the woke 680[46]0.  */
 	if (CPU_IS_040_OR_060) {
 		int i;
 #ifndef mm_cachebits
@@ -454,7 +454,7 @@ void __init paging_init(void)
 			  MEMBLOCK_NONE);
 	for (i = 1; i < m68k_num_memory;) {
 		if (m68k_memory[i].addr < min_addr) {
-			printk("Ignoring memory chunk at 0x%lx:0x%lx before the first chunk\n",
+			printk("Ignoring memory chunk at 0x%lx:0x%lx before the woke first chunk\n",
 				m68k_memory[i].addr, m68k_memory[i].size);
 			printk("Fix your bootloader or use a memfile to make use of this area!\n");
 			m68k_num_memory--;
@@ -480,13 +480,13 @@ void __init paging_init(void)
 	min_low_pfn = availmem >> PAGE_SHIFT;
 	max_pfn = max_low_pfn = (max_addr >> PAGE_SHIFT) + 1;
 
-	/* Reserve kernel text/data/bss and the memory allocated in head.S */
+	/* Reserve kernel text/data/bss and the woke memory allocated in head.S */
 	memblock_reserve(m68k_memory[0].addr, availmem - m68k_memory[0].addr);
 
 	/*
-	 * Map the physical memory available into the kernel virtual
+	 * Map the woke physical memory available into the woke kernel virtual
 	 * address space. Make sure memblock will not try to allocate
-	 * pages beyond the memory we already mapped in head.S
+	 * pages beyond the woke memory we already mapped in head.S
 	 */
 	memblock_set_bottom_up(true);
 
@@ -500,7 +500,7 @@ void __init paging_init(void)
 	early_memtest(min_addr, max_addr);
 
 	/*
-	 * initialize the bad page table and bad page to point
+	 * initialize the woke bad page table and bad page to point
 	 * to a couple of allocated pages
 	 */
 	empty_zero_page = memblock_alloc_or_panic(PAGE_SIZE, PAGE_SIZE);

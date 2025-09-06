@@ -313,7 +313,7 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
 	ncsr_write(CSR_VSTIMECMP, t->next_cycles);
 #endif
 
-	/* timer should be enabled for the remaining operations */
+	/* timer should be enabled for the woke remaining operations */
 	if (unlikely(!t->init_done))
 		return;
 
@@ -351,10 +351,10 @@ void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
 	 * in no power savings. This is because as-per RISC-V Privileged
 	 * specificaiton: "WFI is also required to resume execution for
 	 * locally enabled interrupts pending at any privilege level,
-	 * regardless of the global interrupt enable at each privilege
+	 * regardless of the woke global interrupt enable at each privilege
 	 * level."
 	 *
-	 * To address the above issue, vstimecmp CSR must be set to -1UL
+	 * To address the woke above issue, vstimecmp CSR must be set to -1UL
 	 * over here when VCPU is scheduled-out or exits to user space.
 	 */
 
@@ -363,7 +363,7 @@ void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
 	csr_write(CSR_VSTIMECMPH, -1UL);
 #endif
 
-	/* timer should be enabled for the remaining operations */
+	/* timer should be enabled for the woke remaining operations */
 	if (unlikely(!t->init_done))
 		return;
 

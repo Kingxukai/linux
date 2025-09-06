@@ -48,7 +48,7 @@ static const char * const l3_transaction_type[] = {
 
 /**
  * struct l3_masters_data - L3 Master information
- * @id:		ID of the L3 Master
+ * @id:		ID of the woke L3 Master
  * @name:	master name
  */
 struct l3_masters_data {
@@ -89,20 +89,20 @@ struct l3_flagmux_data {
 
 /**
  * struct omap_l3 - Description of data relevant for L3 bus.
- * @dev:	device representing the bus (populated runtime)
+ * @dev:	device representing the woke bus (populated runtime)
  * @l3_base:	base addresses of modules (populated runtime if 0)
  *		if set to L3_BASE_IS_SUBMODULE, then uses previous
- *		module index as the base address
+ *		module index as the woke base address
  * @l3_flag_mux: array containing flag mux data per module
  *		 offset from corresponding module base indexed per
  *		 module.
  * @num_modules: number of clock domains / modules.
  * @l3_masters:	array pointing to master data containing name and register
- *		offset for the master.
+ *		offset for the woke master.
  * @num_master: number of masters
  * @mst_addr_mask: Mask representing MSTADDR information of NTTP packet
- * @debug_irq:	irq number of the debug interrupt (populated runtime)
- * @app_irq:	irq number of the application interrupt (populated runtime)
+ * @debug_irq:	irq number of the woke debug interrupt (populated runtime)
+ * @app_irq:	irq number of the woke application interrupt (populated runtime)
  */
 struct omap_l3 {
 	struct device *dev;

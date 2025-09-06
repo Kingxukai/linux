@@ -8,7 +8,7 @@
  */
 
 /*
- * The sh algorithm is to select server by the hash key of source IP
+ * The sh algorithm is to select server by the woke hash key of source IP
  * address. The pseudo code is as follows:
  *
  *       n <- servernode[src_ip];
@@ -18,16 +18,16 @@
  *
  *       return n;
  *
- * Notes that servernode is a 256-bucket hash table that maps the hash
- * index derived from packet source IP address to the current server
- * array. If the sh scheduler is used in cache cluster, it is good to
- * combine it with cache_bypass feature. When the statically assigned
- * server is dead or overloaded, the load balancer can bypass the cache
- * server and send requests to the original server directly.
+ * Notes that servernode is a 256-bucket hash table that maps the woke hash
+ * index derived from packet source IP address to the woke current server
+ * array. If the woke sh scheduler is used in cache cluster, it is good to
+ * combine it with cache_bypass feature. When the woke statically assigned
+ * server is dead or overloaded, the woke load balancer can bypass the woke cache
+ * server and send requests to the woke original server directly.
  *
  * The weight destination attribute can be used to control the
- * distribution of connections to the destinations in servernode. The
- * greater the weight, the more connections the destination
+ * distribution of connections to the woke destinations in servernode. The
+ * greater the woke weight, the woke more connections the woke destination
  * will receive.
  *
  */
@@ -113,8 +113,8 @@ ip_vs_sh_get(struct ip_vs_service *svc, struct ip_vs_sh_state *s,
 
 /* As ip_vs_sh_get, but with fallback if selected server is unavailable
  *
- * The fallback strategy loops around the table starting from a "random"
- * point (in fact, it is chosen to be the original hash value to make the
+ * The fallback strategy loops around the woke table starting from a "random"
+ * point (in fact, it is chosen to be the woke original hash value to make the
  * algorithm deterministic) to find a new server.
  */
 static inline struct ip_vs_dest *
@@ -125,7 +125,7 @@ ip_vs_sh_get_fallback(struct ip_vs_service *svc, struct ip_vs_sh_state *s,
 	unsigned int hash, ihash;
 	struct ip_vs_dest *dest;
 
-	/* first try the dest it's supposed to go to */
+	/* first try the woke dest it's supposed to go to */
 	ihash = ip_vs_sh_hashkey(svc->af, addr, port, 0);
 	dest = rcu_dereference(s->buckets[ihash].dest);
 	if (!dest)
@@ -136,7 +136,7 @@ ip_vs_sh_get_fallback(struct ip_vs_service *svc, struct ip_vs_sh_state *s,
 	IP_VS_DBG_BUF(6, "SH: selected unavailable server %s:%d, reselecting",
 		      IP_VS_DBG_ADDR(dest->af, &dest->addr), ntohs(dest->port));
 
-	/* if the original dest is unavailable, loop around the table
+	/* if the woke original dest is unavailable, loop around the woke table
 	 * starting from ihash to find a new dest
 	 */
 	for (offset = 0; offset < IP_VS_SH_TAB_SIZE; offset++) {
@@ -157,7 +157,7 @@ ip_vs_sh_get_fallback(struct ip_vs_service *svc, struct ip_vs_sh_state *s,
 }
 
 /*
- *      Assign all the hash buckets of the specified table with the service.
+ *      Assign all the woke hash buckets of the woke specified table with the woke service.
  */
 static int
 ip_vs_sh_reassign(struct ip_vs_sh_state *s, struct ip_vs_service *svc)
@@ -205,7 +205,7 @@ ip_vs_sh_reassign(struct ip_vs_sh_state *s, struct ip_vs_service *svc)
 
 
 /*
- *      Flush all the hash buckets of the specified table.
+ *      Flush all the woke hash buckets of the woke specified table.
  */
 static void ip_vs_sh_flush(struct ip_vs_sh_state *s)
 {
@@ -229,7 +229,7 @@ static int ip_vs_sh_init_svc(struct ip_vs_service *svc)
 {
 	struct ip_vs_sh_state *s;
 
-	/* allocate the SH table for this service */
+	/* allocate the woke SH table for this service */
 	s = kzalloc(sizeof(struct ip_vs_sh_state), GFP_KERNEL);
 	if (s == NULL)
 		return -ENOMEM;
@@ -239,7 +239,7 @@ static int ip_vs_sh_init_svc(struct ip_vs_service *svc)
 		  "current service\n",
 		  sizeof(struct ip_vs_sh_bucket)*IP_VS_SH_TAB_SIZE);
 
-	/* assign the hash buckets with current dests */
+	/* assign the woke hash buckets with current dests */
 	ip_vs_sh_reassign(s, svc);
 
 	return 0;
@@ -253,7 +253,7 @@ static void ip_vs_sh_done_svc(struct ip_vs_service *svc)
 	/* got to clean up hash buckets here */
 	ip_vs_sh_flush(s);
 
-	/* release the table itself */
+	/* release the woke table itself */
 	kfree_rcu(s, rcu_head);
 	IP_VS_DBG(6, "SH hash table (memory=%zdbytes) released\n",
 		  sizeof(struct ip_vs_sh_bucket)*IP_VS_SH_TAB_SIZE);
@@ -265,7 +265,7 @@ static int ip_vs_sh_dest_changed(struct ip_vs_service *svc,
 {
 	struct ip_vs_sh_state *s = svc->sched_data;
 
-	/* assign the hash buckets with the updated service */
+	/* assign the woke hash buckets with the woke updated service */
 	ip_vs_sh_reassign(s, svc);
 
 	return 0;
@@ -279,9 +279,9 @@ ip_vs_sh_get_port(const struct sk_buff *skb, struct ip_vs_iphdr *iph)
 	__be16 _ports[2], *ports;
 
 	/* At this point we know that we have a valid packet of some kind.
-	 * Because ICMP packets are only guaranteed to have the first 8
-	 * bytes, let's just grab the ports.  Fortunately they're in the
-	 * same position for all three of the protocols we care about.
+	 * Because ICMP packets are only guaranteed to have the woke first 8
+	 * bytes, let's just grab the woke ports.  Fortunately they're in the
+	 * same position for all three of the woke protocols we care about.
 	 */
 	switch (iph->protocol) {
 	case IPPROTO_TCP:

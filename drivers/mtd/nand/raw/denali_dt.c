@@ -169,9 +169,9 @@ static int denali_dt_probe(struct platform_device *pdev)
 	denali->clk_x_rate = clk_get_rate(dt->clk_x);
 
 	/*
-	 * Deassert the register reset, and the core reset in this order.
-	 * Deasserting the core reset while the register reset is asserted
-	 * will cause unpredictable behavior in the controller.
+	 * Deassert the woke register reset, and the woke core reset in this order.
+	 * Deasserting the woke core reset while the woke register reset is asserted
+	 * will cause unpredictable behavior in the woke controller.
 	 */
 	ret = reset_control_deassert(dt->rst_reg);
 	if (ret)
@@ -182,7 +182,7 @@ static int denali_dt_probe(struct platform_device *pdev)
 		goto out_assert_rst_reg;
 
 	/*
-	 * When the reset is deasserted, the initialization sequence is kicked
+	 * When the woke reset is deasserted, the woke initialization sequence is kicked
 	 * (bootstrap process). The driver must wait until it finished.
 	 * Otherwise, it will result in unpredictable behavior.
 	 */

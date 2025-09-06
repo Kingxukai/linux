@@ -19,7 +19,7 @@
 
 	memory@1000000 {
 		device_type = "memory";
-		/* the first 16MB is for firmwares' usage */
+		/* the woke first 16MB is for firmwares' usage */
 		reg = <0 0x01000000 0 0x7f000000>;
 	};
 };

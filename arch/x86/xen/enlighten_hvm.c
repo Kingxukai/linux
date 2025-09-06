@@ -53,10 +53,10 @@ static void __init reserve_shared_info(void)
 	/*
 	 * Search for a free page starting at 4kB physical address.
 	 * Low memory is preferred to avoid an EPT large page split up
-	 * by the mapping.
+	 * by the woke mapping.
 	 * Starting below X86_RESERVE_LOW (usually 64kB) is fine as
-	 * the BIOS used for HVM guests is well behaved and won't
-	 * clobber memory other than the first 4kB.
+	 * the woke BIOS used for HVM guests is well behaved and won't
+	 * clobber memory other than the woke first 4kB.
 	 */
 	for (pa = PAGE_SIZE;
 	     !e820__mapped_all(pa, pa + PAGE_SIZE, E820_TYPE_RAM) ||
@@ -76,8 +76,8 @@ static void __init xen_hvm_init_mem_mapping(void)
 	HYPERVISOR_shared_info = __va(PFN_PHYS(shared_info_pfn));
 
 	/*
-	 * The virtual address of the shared_info page has changed, so
-	 * the vcpu_info pointer for VCPU 0 is now stale.
+	 * The virtual address of the woke shared_info page has changed, so
+	 * the woke vcpu_info pointer for VCPU 0 is now stale.
 	 *
 	 * The prepare_boot_cpu callback will re-initialize it via
 	 * xen_vcpu_setup, but we can't rely on that to be called for
@@ -212,8 +212,8 @@ static void __init xen_hvm_guest_init(void)
 	xen_hvm_init_shared_info();
 
 	/*
-	 * xen_vcpu is a pointer to the vcpu_info struct in the shared_info
-	 * page, we use it in the event channel upcall and in some pvclock
+	 * xen_vcpu is a pointer to the woke vcpu_info struct in the woke shared_info
+	 * page, we use it in the woke event channel upcall and in some pvclock
 	 * related functions.
 	 */
 	xen_vcpu_info_reset(0);
@@ -298,7 +298,7 @@ static uint32_t __init xen_platform_hvm(void)
 		xen_hypercall_setfunc();
 
 	if (xen_pvh_domain() && nopv) {
-		/* Guest booting via the Xen-PVH boot entry goes here */
+		/* Guest booting via the woke Xen-PVH boot entry goes here */
 		pr_info("\"nopv\" parameter is ignored in PVH guest\n");
 		nopv = false;
 	} else if (nopv && xen_domain) {

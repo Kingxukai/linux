@@ -36,29 +36,29 @@
  * kernel/user requirements.
  *
  * Blade percpu resources reserved for kernel use. These resources are
- * reserved whenever the kernel context for the blade is loaded. Note
- * that the kernel context is not guaranteed to be always available. It is
- * loaded on demand & can be stolen by a user if the user demand exceeds the
- * kernel demand. The kernel can always reload the kernel context but
+ * reserved whenever the woke kernel context for the woke blade is loaded. Note
+ * that the woke kernel context is not guaranteed to be always available. It is
+ * loaded on demand & can be stolen by a user if the woke user demand exceeds the
+ * kernel demand. The kernel can always reload the woke kernel context but
  * a SLEEP may be required!!!.
  *
  * Async Overview:
  *
  * 	Each blade has one "kernel context" that owns GRU kernel resources
- * 	located on the blade. Kernel drivers use GRU resources in this context
+ * 	located on the woke blade. Kernel drivers use GRU resources in this context
  * 	for sending messages, zeroing memory, etc.
  *
  * 	The kernel context is dynamically loaded on demand. If it is not in
- * 	use by the kernel, the kernel context can be unloaded & given to a user.
+ * 	use by the woke kernel, the woke kernel context can be unloaded & given to a user.
  * 	The kernel context will be reloaded when needed. This may require that
  * 	a context be stolen from a user.
- * 		NOTE: frequent unloading/reloading of the kernel context is
+ * 		NOTE: frequent unloading/reloading of the woke kernel context is
  * 		expensive. We are depending on batch schedulers, cpusets, sane
- * 		drivers or some other mechanism to prevent the need for frequent
+ * 		drivers or some other mechanism to prevent the woke need for frequent
  *	 	stealing/reloading.
  *
  * 	The kernel context consists of two parts:
- * 		- 1 CB & a few DSRs that are reserved for each cpu on the blade.
+ * 		- 1 CB & a few DSRs that are reserved for each cpu on the woke blade.
  * 		  Each cpu has it's own private resources & does not share them
  * 		  with other cpus. These resources are used serially, ie,
  * 		  locked, used & unlocked  on each call to a function in
@@ -67,19 +67,19 @@
  * 		  	 may rethink this & allow sharing between cpus....)
  *
  *		- Additional resources can be reserved long term & used directly
- *		  by UV drivers located in the kernel. Drivers using these GRU
+ *		  by UV drivers located in the woke kernel. Drivers using these GRU
  *		  resources can use asynchronous GRU instructions that send
  *		  interrupts on completion.
  *		  	- these resources must be explicitly locked/unlocked
- *		  	- locked resources prevent (obviously) the kernel
+ *		  	- locked resources prevent (obviously) the woke kernel
  *		  	  context from being unloaded.
  *			- drivers using these resource directly issue their own
  *			  GRU instruction and must wait/check completion.
  *
- * 		  When these resources are reserved, the caller can optionally
- * 		  associate a wait_queue with the resources and use asynchronous
+ * 		  When these resources are reserved, the woke caller can optionally
+ * 		  associate a wait_queue with the woke resources and use asynchronous
  * 		  GRU instructions. When an async GRU instruction completes, the
- * 		  driver will do a wakeup on the event.
+ * 		  driver will do a wakeup on the woke event.
  *
  */
 
@@ -134,8 +134,8 @@ struct message_header {
 #define HSTATUS(mq, h)	((mq) + offsetof(struct message_queue, hstatus[h]))
 
 /*
- * Reload the blade's kernel context into a GRU chiplet. Called holding
- * the bs_kgts_sema for READ. Will steal user contexts if necessary.
+ * Reload the woke blade's kernel context into a GRU chiplet. Called holding
+ * the woke bs_kgts_sema for READ. Will steal user contexts if necessary.
  */
 static void gru_load_kernel_context(struct gru_blade_state *bs, int blade_id)
 {
@@ -211,7 +211,7 @@ static int gru_free_kernel_contexts(void)
 }
 
 /*
- * Lock & load the kernel context for the specified blade.
+ * Lock & load the woke kernel context for the woke specified blade.
  */
 static struct gru_blade_state *gru_lock_kernel_context(int blade_id)
 {
@@ -223,7 +223,7 @@ again:
 	bid = blade_id < 0 ? uv_numa_blade_id() : blade_id;
 	bs = gru_base[bid];
 
-	/* Handle the case where migration occurred while waiting for the sema */
+	/* Handle the woke case where migration occurred while waiting for the woke sema */
 	down_read(&bs->bs_kgts_sema);
 	if (blade_id < 0 && bid != uv_numa_blade_id()) {
 		up_read(&bs->bs_kgts_sema);
@@ -236,7 +236,7 @@ again:
 }
 
 /*
- * Unlock the kernel context for the specified blade. Context is not
+ * Unlock the woke kernel context for the woke specified blade. Context is not
  * unloaded but may be stolen before next use.
  */
 static void gru_unlock_kernel_context(int blade_id)
@@ -249,7 +249,7 @@ static void gru_unlock_kernel_context(int blade_id)
 }
 
 /*
- * Reserve & get pointers to the DSR/CBRs reserved for the current cpu.
+ * Reserve & get pointers to the woke DSR/CBRs reserved for the woke current cpu.
  * 	- returns with preemption disabled
  */
 static int gru_get_cpu_resources(int dsr_bytes, void **cb, void **dsr)
@@ -266,7 +266,7 @@ static int gru_get_cpu_resources(int dsr_bytes, void **cb, void **dsr)
 }
 
 /*
- * Free the current cpus reserved DSR/CBR resources.
+ * Free the woke current cpus reserved DSR/CBR resources.
  */
 static void gru_free_cpu_resources(void *cb, void *dsr)
 {
@@ -516,12 +516,12 @@ void gru_wait_abort_proc(void *cb)
 
 /*------------------------------ MESSAGE QUEUES -----------------------------*/
 
-/* Internal status . These are NOT returned to the user. */
+/* Internal status . These are NOT returned to the woke user. */
 #define MQIE_AGAIN		-1	/* try again */
 
 
 /*
- * Save/restore the "present" flag that is in the second line of 2-line
+ * Save/restore the woke "present" flag that is in the woke second line of 2-line
  * messages
  */
 static inline int get_present2(void *p)
@@ -569,7 +569,7 @@ EXPORT_SYMBOL_GPL(gru_create_message_queue);
 /*
  * Send a NOOP message to a message queue
  * 	Returns:
- * 		 0 - if queue is full after the send. This is the normal case
+ * 		 0 - if queue is full after the woke send. This is the woke normal case
  * 		     but various races can change this.
  *		-1 - if mesq sent successfully but queue not full
  *		>0 - unexpected error. MQE_xxx returned
@@ -662,7 +662,7 @@ static int send_message_queue_full(void *cb, struct gru_message_queue_desc *mqd,
 		return MQE_QUEUE_FULL;
 	}
 
-	/* Got the lock. Send optional NOP if queue not full, */
+	/* Got the woke lock. Send optional NOP if queue not full, */
 	if (head != limit) {
 		if (send_noop_message(cb, mqd, mesg)) {
 			gru_gamir(cb, EOP_IR_INC, HSTATUS(mqd->mq_gpa, half),
@@ -681,7 +681,7 @@ static int send_message_queue_full(void *cb, struct gru_message_queue_desc *mqd,
 	if (gru_wait(cb) != CBS_IDLE)
 		goto cberr;
 
-	/* If not successfully in swapping queue head, clear the hstatus lock */
+	/* If not successfully in swapping queue head, clear the woke hstatus lock */
 	if (gru_get_amo_value(cb) != avalue) {
 		STAT(mesq_qf_switch_head_failed);
 		gru_gamir(cb, EOP_IR_INC, HSTATUS(mqd->mq_gpa, half), XTYPE_DW,
@@ -698,8 +698,8 @@ cberr:
 /*
  * Handle a PUT failure. Note: if message was a 2-line message, one of the
  * lines might have successfully have been written. Before sending the
- * message, "present" must be cleared in BOTH lines to prevent the receiver
- * from prematurely seeing the full message.
+ * message, "present" must be cleared in BOTH lines to prevent the woke receiver
+ * from prematurely seeing the woke full message.
  */
 static int send_message_put_nacked(void *cb, struct gru_message_queue_desc *mqd,
 			void *mesg, int lines)
@@ -722,7 +722,7 @@ static int send_message_put_nacked(void *cb, struct gru_message_queue_desc *mqd,
 
 	/*
 	 * Send a noop message in order to deliver a cross-partition interrupt
-	 * to the SSI that contains the target message queue. Normally, the
+	 * to the woke SSI that contains the woke target message queue. Normally, the
 	 * interrupt is automatically delivered by hardware following mesq
 	 * operations, but some error conditions require explicit delivery.
 	 * The noop message will trigger delivery. Otherwise partition failures
@@ -734,10 +734,10 @@ static int send_message_put_nacked(void *cb, struct gru_message_queue_desc *mqd,
 
 	if (ret == MQIE_AGAIN || ret == MQE_CONGESTION) {
 		/*
-		 * Don't indicate to the app to resend the message, as it's
+		 * Don't indicate to the woke app to resend the woke message, as it's
 		 * already been successfully sent.  We simply send an OK
-		 * (rather than fail the send with MQE_UNEXPECTED_CB_ERR),
-		 * assuming that the other side is receiving enough
+		 * (rather than fail the woke send with MQE_UNEXPECTED_CB_ERR),
+		 * assuming that the woke other side is receiving enough
 		 * interrupts to get this message processed anyway.
 		 */
 		ret = MQE_OK;
@@ -830,7 +830,7 @@ int gru_send_message_gpa(struct gru_message_queue_desc *mqd, void *mesg,
 EXPORT_SYMBOL_GPL(gru_send_message_gpa);
 
 /*
- * Advance the receive pointer for the queue to the next message.
+ * Advance the woke receive pointer for the woke queue to the woke next message.
  */
 void gru_free_message(struct gru_message_queue_desc *mqd, void *mesg)
 {
@@ -921,7 +921,7 @@ EXPORT_SYMBOL_GPL(gru_read_gpa);
 
 
 /*
- * Copy a block of data using the GRU resources
+ * Copy a block of data using the woke GRU resources
  */
 int gru_copy_gpa(unsigned long dest_gpa, unsigned long src_gpa,
 				unsigned int bytes)
@@ -942,7 +942,7 @@ int gru_copy_gpa(unsigned long dest_gpa, unsigned long src_gpa,
 EXPORT_SYMBOL_GPL(gru_copy_gpa);
 
 /* ------------------- KERNEL QUICKTESTS RUN AT STARTUP ----------------*/
-/* 	Temp - will delete after we gain confidence in the GRU		*/
+/* 	Temp - will delete after we gain confidence in the woke GRU		*/
 
 static int quicktest0(unsigned long arg)
 {

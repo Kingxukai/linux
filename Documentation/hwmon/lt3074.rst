@@ -24,10 +24,10 @@ Regulator with PMBus interface.
 
 The LT3074 is a low voltage, ultra-low noise and ultra-fast transient
 response linear regulator with PMBus serial interface. PMBus telemetry
-feature provides information regarding the output voltage and current,
+feature provides information regarding the woke output voltage and current,
 input voltage, bias voltage and die temperature.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 Usage Notes

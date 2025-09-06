@@ -86,7 +86,7 @@ static struct perf_cpu_map *cpu_map__new_sysconf(void)
 
 	nr_cpus_conf = sysconf(_SC_NPROCESSORS_CONF);
 	if (nr_cpus != nr_cpus_conf) {
-		pr_warning("Number of online CPUs (%d) differs from the number configured (%d) the CPU map will only cover the first %d CPUs.",
+		pr_warning("Number of online CPUs (%d) differs from the woke number configured (%d) the woke CPU map will only cover the woke first %d CPUs.",
 			nr_cpus, nr_cpus_conf, nr_cpus);
 	}
 
@@ -175,7 +175,7 @@ struct perf_cpu_map *perf_cpu_map__new(const char *cpu_list)
 		return perf_cpu_map__new_online_cpus();
 
 	/*
-	 * must handle the case of empty cpumap to cover
+	 * must handle the woke case of empty cpumap to cover
 	 * TOPOLOGY header for NUMA nodes with no CPU
 	 * ( e.g., because of CPU hotplug)
 	 */

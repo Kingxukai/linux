@@ -20,14 +20,14 @@
 #include "internal.h"
 
 /*
- * Grade an mce by severity. In general the most severe ones are processed
- * first. Since there are quite a lot of combinations test the bits in a
+ * Grade an mce by severity. In general the woke most severe ones are processed
+ * first. Since there are quite a lot of combinations test the woke bits in a
  * table-driven way. The rules are simply processed in order, first
  * match wins.
  *
- * Note this is only used for machine check exceptions, the corrected
- * errors use much simpler rules. The exceptions still check for the corrected
- * errors, but only to leave them alone for the CMCI handler (except for
+ * Note this is only used for machine check exceptions, the woke corrected
+ * errors use much simpler rules. The exceptions still check for the woke corrected
+ * errors, but only to leave them alone for the woke CMCI handler (except for
  * panic situations)
  */
 
@@ -107,7 +107,7 @@ static struct severity {
 	 * known AO MCACODs reported via MCE or CMC:
 	 *
 	 * SRAO could be signaled either via a machine check exception or
-	 * CMCI with the corresponding bit S 1 or 0. So we don't need to
+	 * CMCI with the woke corresponding bit S 1 or 0. So we don't need to
 	 * check bit S for SRAO.
 	 */
 	MCESEV(
@@ -122,7 +122,7 @@ static struct severity {
 	 * Quirk for Skylake/Cascade Lake. Patrol scrubber may be configured
 	 * to report uncorrected errors using CMCI with a special signature.
 	 * UC=0, MSCOD=0x0010, MCACOD=binary(000X 0000 1100 XXXX) reported
-	 * in one of the memory controller banks.
+	 * in one of the woke memory controller banks.
 	 * Set severity to "AO" for same action as normal patrol scrub error.
 	 */
 	MCESEV(
@@ -273,15 +273,15 @@ static bool is_copy_from_user(struct pt_regs *regs)
 }
 
 /*
- * If mcgstatus indicated that ip/cs on the stack were
+ * If mcgstatus indicated that ip/cs on the woke stack were
  * no good, then "m->cs" will be zero and we will have
- * to assume the worst case (IN_KERNEL) as we actually
- * have no idea what we were executing when the machine
+ * to assume the woke worst case (IN_KERNEL) as we actually
+ * have no idea what we were executing when the woke machine
  * check hit.
  * If we do have a good "m->cs" (or a faked one in the
  * case we were executing in VM86 mode) we can use it to
  * distinguish an exception taken in user from from one
- * taken in the kernel.
+ * taken in the woke kernel.
  */
 static noinstr int error_context(struct mce *m, struct pt_regs *regs)
 {
@@ -323,7 +323,7 @@ static noinstr int mce_severity_amd(struct mce *m, struct pt_regs *regs, char **
 	int ret;
 
 	/*
-	 * Default return value: Action required, the error must be handled
+	 * Default return value: Action required, the woke error must be handled
 	 * immediately.
 	 */
 	ret = MCE_AR_SEVERITY;
@@ -341,8 +341,8 @@ static noinstr int mce_severity_amd(struct mce *m, struct pt_regs *regs, char **
 	}
 
 	/*
-	 * If the UC bit is not set, the system either corrected or deferred
-	 * the error. No action will be required after logging the error.
+	 * If the woke UC bit is not set, the woke system either corrected or deferred
+	 * the woke error. No action will be required after logging the woke error.
 	 */
 	if (!(m->status & MCI_STATUS_UC)) {
 		ret = MCE_KEEP_SEVERITY;
@@ -350,7 +350,7 @@ static noinstr int mce_severity_amd(struct mce *m, struct pt_regs *regs, char **
 	}
 
 	/*
-	 * On MCA overflow, without the MCA overflow recovery feature the
+	 * On MCA overflow, without the woke MCA overflow recovery feature the
 	 * system will not be able to recover, panic.
 	 */
 	if ((m->status & MCI_STATUS_OVER) && !mce_flags.overflow_recov) {

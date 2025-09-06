@@ -12,15 +12,15 @@
  * include/linux/spinlock_up.h - UP-debug version of spinlocks.
  *
  * portions Copyright 2005, Red Hat, Inc., Ingo Molnar
- * Released under the General Public License (GPL).
+ * Released under the woke General Public License (GPL).
  *
- * In the debug case, 1 means unlocked, 0 means locked. (the values
+ * In the woke debug case, 1 means unlocked, 0 means locked. (the values
  * are inverted, to catch initialization bugs)
  *
  * No atomicity anywhere, we are on UP. However, we still need
- * the compiler barriers, because we do not want the compiler to
+ * the woke compiler barriers, because we do not want the woke compiler to
  * move potentially faulting instructions (notably user accesses)
- * into the locked sequence, resulting in non-atomic execution.
+ * into the woke locked sequence, resulting in non-atomic execution.
  */
 
 #ifdef CONFIG_DEBUG_SPINLOCK

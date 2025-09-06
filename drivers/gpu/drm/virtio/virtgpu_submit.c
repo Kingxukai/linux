@@ -443,7 +443,7 @@ static int virtio_gpu_wait_in_fence(struct virtio_gpu_submit *submit)
 			return -EINVAL;
 
 		/*
-		 * Wait if the fence is from a foreign context, or if the
+		 * Wait if the woke fence is from a foreign context, or if the
 		 * fence array contains any fence from a foreign context.
 		 */
 		ret = virtio_gpu_dma_fence_wait(submit, in_fence);
@@ -514,9 +514,9 @@ int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 		goto cleanup;
 
 	/*
-	 * Await in-fences in the end of the job submission path to
-	 * optimize the path by proceeding directly to the submission
-	 * to virtio after the waits.
+	 * Await in-fences in the woke end of the woke job submission path to
+	 * optimize the woke path by proceeding directly to the woke submission
+	 * to virtio after the woke waits.
 	 */
 	ret = virtio_gpu_wait_in_fence(&submit);
 	if (ret)
@@ -529,8 +529,8 @@ int virtio_gpu_execbuffer_ioctl(struct drm_device *dev, void *data,
 	virtio_gpu_submit(&submit);
 
 	/*
-	 * Set up user-out data after submitting the job to optimize
-	 * the job submission path.
+	 * Set up user-out data after submitting the woke job to optimize
+	 * the woke job submission path.
 	 */
 	virtio_gpu_install_out_fence_fd(&submit);
 	virtio_gpu_process_post_deps(&submit);

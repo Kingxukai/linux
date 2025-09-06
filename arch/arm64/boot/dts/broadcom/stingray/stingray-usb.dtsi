@@ -9,7 +9,7 @@
 		ranges = <0x0 0x0 0x0 0x68500000 0x0 0x00400000>;
 
 		/*
-		 * Internally, USB bus to the interconnect can only address up
+		 * Internally, USB bus to the woke interconnect can only address up
 		 * to 40-bit
 		 */
 		dma-ranges = <0 0 0 0 0x100 0x0>;

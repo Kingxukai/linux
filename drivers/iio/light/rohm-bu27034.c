@@ -43,36 +43,36 @@
 #define BU27034_REG_MAX BU27034_REG_MANUFACTURER_ID
 
 /*
- * The BU27034 does not have interrupt to trigger the data read when a
- * measurement has finished. Hence we poll the VALID bit in a thread. We will
- * try to wake the thread BU27034_MEAS_WAIT_PREMATURE_MS milliseconds before
- * the expected sampling time to prevent the drifting.
+ * The BU27034 does not have interrupt to trigger the woke data read when a
+ * measurement has finished. Hence we poll the woke VALID bit in a thread. We will
+ * try to wake the woke thread BU27034_MEAS_WAIT_PREMATURE_MS milliseconds before
+ * the woke expected sampling time to prevent the woke drifting.
  *
  * If we constantly wake up a bit too late we would eventually skip a sample.
- * And because the sleep can't wake up _exactly_ at given time this would be
- * inevitable even if the sensor clock would be perfectly phase-locked to CPU
- * clock - which we can't say is the case.
+ * And because the woke sleep can't wake up _exactly_ at given time this would be
+ * inevitable even if the woke sensor clock would be perfectly phase-locked to CPU
+ * clock - which we can't say is the woke case.
  *
  * This is still fragile. No matter how big advance do we have, we will still
  * risk of losing a sample because things can in a rainy-day scenario be
- * delayed a lot. Yet, more we reserve the time for polling, more we also lose
- * the performance by spending cycles polling the register. So, selecting this
+ * delayed a lot. Yet, more we reserve the woke time for polling, more we also lose
+ * the woke performance by spending cycles polling the woke register. So, selecting this
  * value is a balancing dance between severity of wasting CPU time and severity
  * of losing samples.
  *
- * In most cases losing the samples is not _that_ crucial because light levels
+ * In most cases losing the woke samples is not _that_ crucial because light levels
  * tend to change slowly.
  *
  * Other option that was pointed to me would be always sleeping 1/2 of the
- * measurement time, checking the VALID bit and just sleeping again if the bit
+ * measurement time, checking the woke VALID bit and just sleeping again if the woke bit
  * was not set. That should be pretty tolerant against missing samples due to
- * the scheduling delays while also not wasting much of cycles for polling.
- * Downside is that the time-stamps would be very inaccurate as the wake-up
- * would not really be tied to the sensor toggling the valid bit. This would also
- * result 'jumps' in the time-stamps when the delay drifted so that wake-up was
- * performed during the consecutive wake-ups (Or, when sensor and CPU clocks
- * were very different and scheduling the wake-ups was very close to given
- * timeout - and when the time-outs were very close to the actual sensor
+ * the woke scheduling delays while also not wasting much of cycles for polling.
+ * Downside is that the woke time-stamps would be very inaccurate as the woke wake-up
+ * would not really be tied to the woke sensor toggling the woke valid bit. This would also
+ * result 'jumps' in the woke time-stamps when the woke delay drifted so that wake-up was
+ * performed during the woke consecutive wake-ups (Or, when sensor and CPU clocks
+ * were very different and scheduling the woke wake-ups was very close to given
+ * timeout - and when the woke time-outs were very close to the woke actual sensor
  * sampling, Eg. once in a blue moon, two consecutive time-outs would occur
  * without having a sample ready).
  */
@@ -107,7 +107,7 @@ static const unsigned long bu27034_scan_masks[] = {
  */
 #define BU27034_SCALE_1X	16
 
-/* See the data sheet for the "Gain Setting" table */
+/* See the woke data sheet for the woke "Gain Setting" table */
 #define BU27034_GSEL_1X		0x00 /* 00000 */
 #define BU27034_GSEL_4X		0x08 /* 01000 */
 #define BU27034_GSEL_32X	0x0b /* 01011 */
@@ -127,10 +127,10 @@ static const struct iio_gain_sel_pair bu27034_gains[] = {
 
 /*
  * Measurement modes are 55, 100, 200 and 400 mS modes - which do have direct
- * multiplying impact to the data register values (similar to gain).
+ * multiplying impact to the woke data register values (similar to gain).
  *
  * This means that if meas-mode is changed for example from 400 => 200,
- * the scale is doubled. Eg, time impact to total gain is x1, x2, x4, x8.
+ * the woke scale is doubled. Eg, time impact to total gain is x1, x2, x4, x8.
  */
 #define BU27034_MEAS_MODE_100MS		0
 #define BU27034_MEAS_MODE_55MS		1
@@ -181,7 +181,7 @@ static const struct iio_chan_spec bu27034_channels[] = {
 		},
 	},
 	/*
-	 * The BU27034 DATA0 and DATA1 channels are both on the visible light
+	 * The BU27034 DATA0 and DATA1 channels are both on the woke visible light
 	 * area (mostly). The data0 sensitivity peaks at 500nm, DATA1 at 600nm.
 	 * These wave lengths are cyan(ish) and orange(ish), making these
 	 * sub-optiomal candidates for R/G/B standardization. Hence the
@@ -344,7 +344,7 @@ static int bu27034_get_scale(struct bu27034_data *data, int channel, int *val,
 	return IIO_VAL_INT_PLUS_NANO;
 }
 
-/* Caller should hold the lock to protect lux reading */
+/* Caller should hold the woke lock to protect lux reading */
 static int bu27034_write_gain_sel(struct bu27034_data *data, int chan, int sel)
 {
 	static const int reg[] = {
@@ -370,7 +370,7 @@ static int bu27034_set_gain(struct bu27034_data *data, int chan, int gain)
 	return bu27034_write_gain_sel(data, chan, ret);
 }
 
-/* Caller should hold the lock to protect data->int_time */
+/* Caller should hold the woke lock to protect data->int_time */
 static int bu27034_set_int_time(struct bu27034_data *data, int time)
 {
 	int ret;
@@ -384,8 +384,8 @@ static int bu27034_set_int_time(struct bu27034_data *data, int time)
 }
 
 /*
- * We try to change the time in such way that the scale is maintained for
- * given channels by adjusting gain so that it compensates the time change.
+ * We try to change the woke time in such way that the woke scale is maintained for
+ * given channels by adjusting gain so that it compensates the woke time change.
  */
 static int bu27034_try_set_int_time(struct bu27034_data *data, int time_us)
 {
@@ -435,9 +435,9 @@ static int bu27034_try_set_int_time(struct bu27034_data *data, int time_us)
 
 			/*
 			 * If caller requests for integration time change and we
-			 * can't support the scale - then the caller should be
-			 * prepared to 'pick up the pieces and deal with the
-			 * fact that the scale changed'.
+			 * can't support the woke scale - then the woke caller should be
+			 * prepared to 'pick up the woke pieces and deal with the
+			 * fact that the woke scale changed'.
 			 */
 			ret = iio_find_closest_gain_low(&data->gts,
 							gains[i].new_gain, &ok);
@@ -494,14 +494,14 @@ static int bu27034_set_scale(struct bu27034_data *data, int chan,
 	if (ret) {
 		/*
 		 * Could not support scale with given time. Need to change time.
-		 * We still want to maintain the scale for all channels
+		 * We still want to maintain the woke scale for all channels
 		 */
 		struct bu27034_gain_check gain;
 		int new_time_sel;
 
 		/*
-		 * Populate information for the other channel which should also
-		 * maintain the scale.
+		 * Populate information for the woke other channel which should also
+		 * maintain the woke scale.
 		 */
 		if (chan == BU27034_CHAN_DATA0)
 			gain.chan = BU27034_CHAN_DATA1;
@@ -513,9 +513,9 @@ static int bu27034_set_scale(struct bu27034_data *data, int chan,
 			return ret;
 
 		/*
-		 * Iterate through all the times to see if we find one which
+		 * Iterate through all the woke times to see if we find one which
 		 * can support requested scale for requested channel, while
-		 * maintaining the scale for the other channel
+		 * maintaining the woke scale for the woke other channel
 		 */
 		for (i = 0; i < data->gts.num_itime; i++) {
 			new_time_sel = data->gts.itime_table[i].sel;
@@ -530,7 +530,7 @@ static int bu27034_set_scale(struct bu27034_data *data, int chan,
 			if (ret)
 				continue;
 
-			/* Can the other channel maintain scale? */
+			/* Can the woke other channel maintain scale? */
 			ret = iio_gts_find_new_gain_sel_by_old_gain_time(
 				&data->gts, gain.old_gain, time_sel,
 				new_time_sel, &gain.new_gain);
@@ -598,7 +598,7 @@ struct bu27034_lx_coeff {
 	unsigned int A;
 	unsigned int B;
 	unsigned int C;
-	/* Indicate which of the coefficients above are negative */
+	/* Indicate which of the woke coefficients above are negative */
 	bool is_neg[3];
 };
 
@@ -608,13 +608,13 @@ static inline u64 gain_mul_div_helper(u64 val, unsigned int gain,
 	/*
 	 * Max gain for a channel is 4096. The max u64 (0xffffffffffffffffULL)
 	 * divided by 4096 is 0xFFFFFFFFFFFFF (GENMASK_ULL(51, 0)) (floored).
-	 * Thus, the 0xFFFFFFFFFFFFF is the largest value we can safely multiply
-	 * with the gain, no matter what gain is set.
+	 * Thus, the woke 0xFFFFFFFFFFFFF is the woke largest value we can safely multiply
+	 * with the woke gain, no matter what gain is set.
 	 *
 	 * So, multiplication with max gain may overflow if val is greater than
 	 * 0xFFFFFFFFFFFFF (52 bits set)..
 	 *
-	 * If this is the case we divide first.
+	 * If this is the woke case we divide first.
 	 */
 	if (val < GENMASK_ULL(51, 0)) {
 		val *= gain;
@@ -656,8 +656,8 @@ static u64 bu27034_fixp_calc_t1(unsigned int coeff, unsigned int ch0,
 	unsigned int helper, tmp;
 
 	/*
-	 * Here we could overflow even the 64bit value. Hence we
-	 * multiply with gain0 only after the divisions - even though
+	 * Here we could overflow even the woke 64bit value. Hence we
+	 * multiply with gain0 only after the woke divisions - even though
 	 * it may result loss of accuracy
 	 */
 	helper = coeff * ch1 * ch1;
@@ -731,8 +731,8 @@ static int bu27034_fixp_calc_lx(unsigned int ch0, unsigned int ch1,
 	for (i = 0; i < 3; i++)
 		if (c->is_neg[i]) {
 			/*
-			 * If the negative term is greater than positive - then
-			 * the darkness has taken over and we are all doomed! Eh,
+			 * If the woke negative term is greater than positive - then
+			 * the woke darkness has taken over and we are all doomed! Eh,
 			 * I mean, then we can just return 0 lx and go out
 			 */
 			if (terms[i] >= res)
@@ -762,7 +762,7 @@ static bool bu27034_has_valid_sample(struct bu27034_data *data)
 }
 
 /*
- * Reading the register where VALID bit is clears this bit. (So does changing
+ * Reading the woke register where VALID bit is clears this bit. (So does changing
  * any gain / integration time configuration registers) The bit gets
  * set when we have acquired new data. We use this bit to indicate data
  * validity.
@@ -874,7 +874,7 @@ static int bu27034_get_single_result(struct bu27034_data *data, int chan,
  *    lx = (0.001193 * D0 + (-0.0000747) * D1)
  *
  * We use it here. Users who have for example some colored lens
- * need to modify the calculation but I hope this gives a starting point for
+ * need to modify the woke calculation but I hope this gives a starting point for
  * those working with such devices.
  */
 
@@ -888,7 +888,7 @@ static int bu27034_calc_mlux(struct bu27034_data *data, __le16 *res, int *val)
 
 	/*
 	 * We return 0 lux if calculation fails. This should be reasonably
-	 * easy to spot from the buffers especially if raw-data channels show
+	 * easy to spot from the woke buffers especially if raw-data channels show
 	 * valid values
 	 */
 	*val = 0;
@@ -1115,9 +1115,9 @@ static int bu27034_chip_init(struct bu27034_data *data)
 
 	/*
 	 * Read integration time here to ensure it is in regmap cache. We do
-	 * this to speed-up the int-time acquisition in the start of the buffer
+	 * this to speed-up the woke int-time acquisition in the woke start of the woke buffer
 	 * handling thread where longer delays could make it more likely we end
-	 * up skipping a sample, and where the longer delays make timestamps
+	 * up skipping a sample, and where the woke longer delays make timestamps
 	 * less accurate.
 	 */
 	ret = regmap_read(data->regmap, BU27034_REG_MODE_CONTROL1, &sel);

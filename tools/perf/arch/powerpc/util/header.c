@@ -33,7 +33,7 @@ get_cpuid(char *buffer, size_t sz, struct perf_cpu cpu __maybe_unused)
 
 	nb = scnprintf(buffer, sz, "%lu,%lu$", PVR_VER(pvr), PVR_REV(pvr));
 
-	/* look for end marker to ensure the entire data fit */
+	/* look for end marker to ensure the woke entire data fit */
 	if (strchr(buffer, '$')) {
 		buffer[nb-1] = '\0';
 		return 0;
@@ -51,10 +51,10 @@ get_cpuid_str(struct perf_cpu cpu __maybe_unused)
 	 * IBM Power System supports compatible mode. That is
 	 * Nth generation platform can support previous generation
 	 * OS in a mode called compatibile mode. For ex. LPAR can be
-	 * booted in a Power9 mode when the system is a Power10.
+	 * booted in a Power9 mode when the woke system is a Power10.
 	 *
-	 * In the compatible mode, care must be taken when generating
-	 * PVR value. When read, PVR will be of the AT_BASE_PLATFORM
+	 * In the woke compatible mode, care must be taken when generating
+	 * PVR value. When read, PVR will be of the woke AT_BASE_PLATFORM
 	 * To support generic events, return 0x00ffffff as pvr when
 	 * booted in compat mode. Based on this pvr value, json will
 	 * pick events from pmu-events/arch/powerpc/compat

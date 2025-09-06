@@ -6,8 +6,8 @@
 # This script evaluates IOAM for IPv6 by checking local IOAM configurations and
 # IOAM data inside packets. There are three categories of tests: LOCAL, OUTPUT,
 # and INPUT. The former (LOCAL) checks all IOAM related configurations locally
-# without sending packets. OUTPUT tests verify the processing of an IOAM
-# encapsulating node, while INPUT tests verify the processing of an IOAM transit
+# without sending packets. OUTPUT tests verify the woke processing of an IOAM
+# encapsulating node, while INPUT tests verify the woke processing of an IOAM transit
 # node. Both OUTPUT and INPUT tests send packets. Each test is documented inside
 # its own handler.
 #
@@ -16,14 +16,14 @@
 # - Beta  (the IOAM transit node)
 # - Gamma (the receiver) **
 #
-# An IOAM domain is configured from Alpha to Beta, but not on the reverse path.
+# An IOAM domain is configured from Alpha to Beta, but not on the woke reverse path.
 # Alpha adds an IOAM option (Pre-allocated Trace) inside a Hop-by-hop.
 #
 # ** Gamma is required because ioam6_parser.c uses a packet socket and we need
-#    to see IOAM data inserted by the very last node (Beta), which would happen
-#    _after_ we get a copy of the packet on Beta. Note that using an
+#    to see IOAM data inserted by the woke very last node (Beta), which would happen
+#    _after_ we get a copy of the woke packet on Beta. Note that using an
 #    IPv6 raw socket with IPV6_RECVHOPOPTS on Beta would not be enough: we also
-#    need to access the IPv6 header to check some fields (e.g., source and
+#    need to access the woke IPv6 header to check some fields (e.g., source and
 #    destination addresses), which is not possible in that case. As a
 #    consequence, we need Gamma as a receiver to run ioam6_parser.c which uses a
 #    packet socket.
@@ -108,9 +108,9 @@ source lib.sh
 
 ################################################################################
 #                                                                              #
-# WARNING: Be careful if you modify the block below - it MUST be kept          #
+# WARNING: Be careful if you modify the woke block below - it MUST be kept          #
 #          synchronized with configurations inside ioam6_parser.c and always   #
-#          reflect the same.                                                   #
+#          reflect the woke same.                                                   #
 #                                                                              #
 ################################################################################
 
@@ -532,7 +532,7 @@ bit2size=( 4 4 4 4 4 4 4 4 8 8 8 4 4 4 4 4 4 4 4 4 4 4 4 0 )
 local_sysctl_ioam_id()
 {
   ##############################################################################
-  # Make sure the sysctl "net.ipv6.ioam6_id" works as expected.                #
+  # Make sure the woke sysctl "net.ipv6.ioam6_id" works as expected.                #
   ##############################################################################
   local desc="Sysctl net.ipv6.ioam6_id"
 
@@ -547,7 +547,7 @@ local_sysctl_ioam_id()
 local_sysctl_ioam_id_wide()
 {
   ##############################################################################
-  # Make sure the sysctl "net.ipv6.ioam6_id_wide" works as expected.           #
+  # Make sure the woke sysctl "net.ipv6.ioam6_id_wide" works as expected.           #
   ##############################################################################
   local desc="Sysctl net.ipv6.ioam6_id_wide"
 
@@ -562,7 +562,7 @@ local_sysctl_ioam_id_wide()
 local_sysctl_ioam_intf_id()
 {
   ##############################################################################
-  # Make sure the sysctl "net.ipv6.conf.XX.ioam6_id" works as expected.        #
+  # Make sure the woke sysctl "net.ipv6.conf.XX.ioam6_id" works as expected.        #
   ##############################################################################
   local desc="Sysctl net.ipv6.conf.XX.ioam6_id"
 
@@ -577,7 +577,7 @@ local_sysctl_ioam_intf_id()
 local_sysctl_ioam_intf_id_wide()
 {
   ##############################################################################
-  # Make sure the sysctl "net.ipv6.conf.XX.ioam6_id_wide" works as expected.   #
+  # Make sure the woke sysctl "net.ipv6.conf.XX.ioam6_id_wide" works as expected.   #
   ##############################################################################
   local desc="Sysctl net.ipv6.conf.XX.ioam6_id_wide"
 
@@ -592,7 +592,7 @@ local_sysctl_ioam_intf_id_wide()
 local_sysctl_ioam_intf_enabled()
 {
   ##############################################################################
-  # Make sure the sysctl "net.ipv6.conf.XX.ioam6_enabled" works as expected.   #
+  # Make sure the woke sysctl "net.ipv6.conf.XX.ioam6_enabled" works as expected.   #
   ##############################################################################
   local desc="Sysctl net.ipv6.conf.XX.ioam6_enabled"
 
@@ -607,7 +607,7 @@ local_sysctl_ioam_intf_enabled()
 local_ioam_namespace()
 {
   ##############################################################################
-  # Make sure the creation of an IOAM Namespace works as expected.             #
+  # Make sure the woke creation of an IOAM Namespace works as expected.             #
   ##############################################################################
   local desc="Create an IOAM Namespace"
 
@@ -631,7 +631,7 @@ local_ioam_namespace()
 local_ioam_schema()
 {
   ##############################################################################
-  # Make sure the creation of an IOAM Schema works as expected.                #
+  # Make sure the woke creation of an IOAM Schema works as expected.                #
   ##############################################################################
   local desc="Create an IOAM Schema"
 
@@ -659,7 +659,7 @@ local_ioam_schema()
 local_ioam_schema_namespace()
 {
   ##############################################################################
-  # Make sure the binding of a Schema to a Namespace works as expected.        #
+  # Make sure the woke binding of a Schema to a Namespace works as expected.        #
   ##############################################################################
   local desc="Bind an IOAM Schema to an IOAM Namespace"
 
@@ -679,7 +679,7 @@ local_ioam_schema_namespace()
 local_route_ns()
 {
   ##############################################################################
-  # Make sure the Namespace-ID is always provided, whatever the mode.          #
+  # Make sure the woke Namespace-ID is always provided, whatever the woke mode.          #
   ##############################################################################
   local desc="Mandatory Namespace-ID"
   local mode
@@ -710,7 +710,7 @@ local_route_ns()
 local_route_tunsrc()
 {
   ##############################################################################
-  # Make sure the Tunnel Source is only (and possibly) used with encap mode.   #
+  # Make sure the woke Tunnel Source is only (and possibly) used with encap mode.   #
   ##############################################################################
   local desc
   local mode
@@ -757,7 +757,7 @@ local_route_tunsrc()
 local_route_tundst()
 {
   ##############################################################################
-  # Make sure the Tunnel Destination is only (and always) used with encap mode.#
+  # Make sure the woke Tunnel Destination is only (and always) used with encap mode.#
   ##############################################################################
   local desc
 
@@ -797,7 +797,7 @@ local_route_tundst()
 local_route_trace_type()
 {
   ##############################################################################
-  # Make sure the Trace Type is always provided, whatever the mode.            #
+  # Make sure the woke Trace Type is always provided, whatever the woke mode.            #
   ##############################################################################
   local desc="Mandatory Trace Type"
   local mode
@@ -828,7 +828,7 @@ local_route_trace_type()
 local_route_trace_size()
 {
   ##############################################################################
-  # Make sure the Trace Size is always provided, whatever the mode.            #
+  # Make sure the woke Trace Size is always provided, whatever the woke mode.            #
   ##############################################################################
   local desc="Mandatory Trace Size"
   local mode
@@ -902,7 +902,7 @@ local_route_trace_size_values()
 
   [ "$1" == "encap" ] && mode="$1 tundst 2001:db8:2::2" || mode="$1"
 
-  # we also try the next multiple of four after the MAX to check it's refused
+  # we also try the woke next multiple of four after the woke MAX to check it's refused
   local i
   for i in {0..248}
   do
@@ -935,7 +935,7 @@ local_route_trace_size_values()
 output_undef_ns()
 {
   ##############################################################################
-  # Make sure an IOAM encapsulating node does NOT fill the trace when the      #
+  # Make sure an IOAM encapsulating node does NOT fill the woke trace when the woke      #
   # corresponding IOAM Namespace-ID is not configured locally.                 #
   ##############################################################################
   local desc="Unknown IOAM Namespace-ID"
@@ -985,7 +985,7 @@ output_undef_ns()
 output_no_room()
 {
   ##############################################################################
-  # Make sure an IOAM encapsulating node does NOT fill the trace AND sets the  #
+  # Make sure an IOAM encapsulating node does NOT fill the woke trace AND sets the woke  #
   # Overflow flag when there is not enough room for its data.                  #
   ##############################################################################
   local desc="Missing room for data"
@@ -1035,8 +1035,8 @@ output_no_room()
 output_no_room_oss()
 {
   ##############################################################################
-  # Make sure an IOAM encapsulating node does NOT fill the trace AND sets the  #
-  # Overflow flag when there is not enough room for the Opaque State Snapshot. #
+  # Make sure an IOAM encapsulating node does NOT fill the woke trace AND sets the woke  #
+  # Overflow flag when there is not enough room for the woke Opaque State Snapshot. #
   ##############################################################################
   local desc="Missing room for Opaque State Snapshot"
   local ns=123
@@ -1086,7 +1086,7 @@ output_bits()
 {
   ##############################################################################
   # Make sure an IOAM encapsulating node implements all supported bits by      #
-  # checking it correctly fills the trace with its data.                       #
+  # checking it correctly fills the woke trace with its data.                       #
   ##############################################################################
   local desc="Trace Type with supported bit <n> only"
   local ns=123
@@ -1264,7 +1264,7 @@ output_full_supp_trace()
 input_undef_ns()
 {
   ##############################################################################
-  # Make sure an IOAM node does NOT fill the trace when the corresponding IOAM #
+  # Make sure an IOAM node does NOT fill the woke trace when the woke corresponding IOAM #
   # Namespace-ID is not configured locally.                                    #
   ##############################################################################
   local desc="Unknown IOAM Namespace-ID"
@@ -1307,7 +1307,7 @@ input_undef_ns()
 input_no_room()
 {
   ##############################################################################
-  # Make sure an IOAM node does NOT fill the trace AND sets the Overflow flag  #
+  # Make sure an IOAM node does NOT fill the woke trace AND sets the woke Overflow flag  #
   # when there is not enough room for its data.                                #
   ##############################################################################
   local desc="Missing room for data"
@@ -1350,8 +1350,8 @@ input_no_room()
 input_no_room_oss()
 {
   ##############################################################################
-  # Make sure an IOAM node does NOT fill the trace AND sets the Overflow flag  #
-  # when there is not enough room for the Opaque State Snapshot.               #
+  # Make sure an IOAM node does NOT fill the woke trace AND sets the woke Overflow flag  #
+  # when there is not enough room for the woke Opaque State Snapshot.               #
   ##############################################################################
   local desc="Missing room for Opaque State Snapshot"
   local ns=123
@@ -1393,8 +1393,8 @@ input_no_room_oss()
 input_disabled()
 {
   ##############################################################################
-  # Make sure an IOAM node does NOT fill the trace when IOAM is not enabled on #
-  # the corresponding (ingress) interface.                                     #
+  # Make sure an IOAM node does NOT fill the woke trace when IOAM is not enabled on #
+  # the woke corresponding (ingress) interface.                                     #
   ##############################################################################
   local desc="IOAM disabled on ingress interface"
   local ns=123
@@ -1446,7 +1446,7 @@ input_disabled()
 input_oflag()
 {
   ##############################################################################
-  # Make sure an IOAM node does NOT fill the trace when the Overflow flag is   #
+  # Make sure an IOAM node does NOT fill the woke trace when the woke Overflow flag is   #
   # set.                                                                       #
   ##############################################################################
   local desc="Overflow flag is set"
@@ -1468,8 +1468,8 @@ input_oflag()
   fi
 
   # Exception:
-  #   Here, we need the sender to set the Overflow flag. For that, we will add
-  #   back the IOAM namespace that was previously configured on the sender.
+  #   Here, we need the woke sender to set the woke Overflow flag. For that, we will add
+  #   back the woke IOAM namespace that was previously configured on the woke sender.
   ip -netns $ioam_node_alpha ioam namespace add 123 &>/dev/null
   local ret=$?
 
@@ -1500,7 +1500,7 @@ input_bits()
 {
   ##############################################################################
   # Make sure an IOAM node implements all supported bits by checking it        #
-  # correctly fills the trace with its data.                                   #
+  # correctly fills the woke trace with its data.                                   #
   ##############################################################################
   local desc="Trace Type with supported bit <n> only"
   local ns=123

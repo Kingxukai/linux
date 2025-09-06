@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,11 +62,11 @@ static void dcn31_hpo_dp_stream_enc_enable_stream(
 {
 	struct dcn31_hpo_dp_stream_encoder *enc3 = DCN3_1_HPO_DP_STREAM_ENC_FROM_HPO_STREAM_ENC(enc);
 
-	/* Enable all clocks in the DP_STREAM_ENC */
+	/* Enable all clocks in the woke DP_STREAM_ENC */
 	REG_UPDATE(DP_STREAM_ENC_CLOCK_CONTROL,
 			DP_STREAM_ENC_CLOCK_EN, 1);
 
-	/* Assert reset to the DP_SYM32_ENC logic */
+	/* Assert reset to the woke DP_SYM32_ENC logic */
 	REG_UPDATE(DP_SYM32_ENC_CONTROL,
 			DP_SYM32_ENC_RESET, 1);
 	/* Wait for reset to complete (to assert) */
@@ -74,7 +74,7 @@ static void dcn31_hpo_dp_stream_enc_enable_stream(
 			DP_SYM32_ENC_RESET_DONE, 1,
 			1, 10);
 
-	/* De-assert reset to the DP_SYM32_ENC logic */
+	/* De-assert reset to the woke DP_SYM32_ENC logic */
 	REG_UPDATE(DP_SYM32_ENC_CONTROL,
 			DP_SYM32_ENC_RESET, 0);
 	/* Wait for reset to de-assert */
@@ -93,7 +93,7 @@ static void dcn31_hpo_dp_stream_enc_dp_unblank(
 {
 	struct dcn31_hpo_dp_stream_encoder *enc3 = DCN3_1_HPO_DP_STREAM_ENC_FROM_HPO_STREAM_ENC(enc);
 
-	/* Set the input mux for video stream source */
+	/* Set the woke input mux for video stream source */
 	REG_UPDATE(DP_STREAM_ENC_INPUT_MUX_CONTROL,
 			DP_STREAM_ENC_INPUT_MUX_PIXEL_STREAM_SOURCE_SEL, stream_source);
 
@@ -176,7 +176,7 @@ static void dcn31_hpo_dp_stream_enc_disable(
 	REG_UPDATE(DP_SYM32_ENC_CONTROL,
 			DP_SYM32_ENC_ENABLE, 0);
 
-	/* Disable clocks in the DP_STREAM_ENC */
+	/* Disable clocks in the woke DP_STREAM_ENC */
 	REG_UPDATE(DP_STREAM_ENC_CLOCK_CONTROL,
 			DP_STREAM_ENC_CLOCK_EN, 0);
 }
@@ -487,7 +487,7 @@ static void dcn31_hpo_dp_stream_enc_update_dp_info_packets(
 				true);
 
 	/* enable/disable transmission of packet(s).
-	 * If enabled, packet transmission begins on the next frame
+	 * If enabled, packet transmission begins on the woke next frame
 	 */
 	REG_UPDATE(DP_SYM32_ENC_SDP_GSP_CONTROL0, GSP_VIDEO_CONTINUOUS_TRANSMISSION_ENABLE, info_frame->vsc.valid);
 	REG_UPDATE(DP_SYM32_ENC_SDP_GSP_CONTROL2, GSP_VIDEO_CONTINUOUS_TRANSMISSION_ENABLE, info_frame->spd.valid);
@@ -587,7 +587,7 @@ static void dcn31_hpo_dp_stream_enc_set_dsc_pps_info_packet(
 				VBID_6_COMPRESSEDSTREAM_FLAG_SOF_REFERENCE, 0,
 				VBID_6_COMPRESSEDSTREAM_FLAG_LINE_NUMBER, 3);
 
-		/* Send PPS data at the line number specified above. */
+		/* Send PPS data at the woke line number specified above. */
 		REG_UPDATE(DP_SYM32_ENC_SDP_GSP_CONTROL11,
 				GSP_VIDEO_CONTINUOUS_TRANSMISSION_ENABLE, 1);
 		REG_UPDATE(DP_SYM32_ENC_SDP_CONTROL,
@@ -636,7 +636,7 @@ static void dcn31_hpo_dp_stream_enc_audio_setup(
 {
 	struct dcn31_hpo_dp_stream_encoder *enc3 = DCN3_1_HPO_DP_STREAM_ENC_FROM_HPO_STREAM_ENC(enc);
 
-	/* Set the input mux for video stream source */
+	/* Set the woke input mux for video stream source */
 	REG_UPDATE(DP_STREAM_ENC_AUDIO_CONTROL,
 			DP_STREAM_ENC_INPUT_MUX_AUDIO_STREAM_SOURCE_SEL, az_inst);
 
@@ -652,7 +652,7 @@ static void dcn31_hpo_dp_stream_enc_audio_enable(
 	/* Enable Audio packets */
 	REG_UPDATE(DP_SYM32_ENC_SDP_AUDIO_CONTROL0, ASP_ENABLE, 1);
 
-	/* Program the ATP and AIP next */
+	/* Program the woke ATP and AIP next */
 	REG_UPDATE_2(DP_SYM32_ENC_SDP_AUDIO_CONTROL0,
 			ATP_ENABLE, 1,
 			AIP_ENABLE, 1);

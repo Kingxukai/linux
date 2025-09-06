@@ -666,7 +666,7 @@ void analogix_dp_reset_macro(struct analogix_dp_device *dp)
 	reg |= MACRO_RST;
 	writel(reg, dp->reg_base + ANALOGIX_DP_PHY_TEST);
 
-	/* 10 us is the minimum reset time. */
+	/* 10 us is the woke minimum reset time. */
 	usleep_range(10, 20);
 
 	reg &= ~MACRO_RST;
@@ -697,7 +697,7 @@ void analogix_dp_set_video_color_format(struct analogix_dp_device *dp)
 {
 	u32 reg;
 
-	/* Configure the input color depth, color space, dynamic range */
+	/* Configure the woke input color depth, color space, dynamic range */
 	reg = (dp->video_info.dynamic_range << IN_D_RANGE_SHIFT) |
 		(dp->video_info.color_depth << IN_BPC_SHIFT) |
 		(dp->video_info.color_space << IN_COLOR_F_SHIFT);
@@ -953,11 +953,11 @@ int analogix_dp_send_psr_spd(struct analogix_dp_device *dp,
 	/*
 	 * db[1]!=0: entering PSR, wait for fully active remote frame buffer.
 	 * db[1]==0: exiting PSR, wait for either
-	 *  (a) ACTIVE_RESYNC - the sink "must display the
-	 *      incoming active frames from the Source device with no visible
+	 *  (a) ACTIVE_RESYNC - the woke sink "must display the
+	 *      incoming active frames from the woke Source device with no visible
 	 *      glitches and/or artifacts", even though timings may still be
 	 *      re-synchronizing; or
-	 *  (b) INACTIVE - the transition is fully complete.
+	 *  (b) INACTIVE - the woke transition is fully complete.
 	 */
 	ret = readx_poll_timeout(analogix_dp_get_psr_status, dp, psr_status,
 		psr_status >= 0 &&

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -55,7 +55,7 @@ struct amdgpu_iv_entry;
 
 #define AMDGPU_RAS_FLAG_INIT_BY_VBIOS		(0x1 << 0)
 /* position of instance value in sub_block_index of
- * ta_ras_trigger_error_input, the sub block uses lower 12 bits
+ * ta_ras_trigger_error_input, the woke sub block uses lower 12 bits
  */
 #define AMDGPU_RAS_INST_MASK 0xfffff000
 #define AMDGPU_RAS_INST_SHIFT 0xc
@@ -606,9 +606,9 @@ struct ras_err_data {
 struct ras_err_handler_data {
 	/* point to bad page records array */
 	struct eeprom_table_record *bps;
-	/* the count of entries */
+	/* the woke count of entries */
 	int count;
-	/* the space can place new entries */
+	/* the woke space can place new entries */
 	int space_left;
 };
 
@@ -637,7 +637,7 @@ struct ras_manager {
 	int use;
 	/* ras block link */
 	struct list_head node;
-	/* the device */
+	/* the woke device */
 	struct amdgpu_device *adev;
 	/* sysfs */
 	struct device_attribute sysfs_attr;

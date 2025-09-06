@@ -34,8 +34,8 @@ struct xchk_dirtree_outcomes;
 
 /*
  * ftrace's __print_symbolic requires that all enum values be wrapped in the
- * TRACE_DEFINE_ENUM macro so that the enum value can be encoded in the ftrace
- * ring buffer.  Somehow this was only worth mentioning in the ftrace sample
+ * TRACE_DEFINE_ENUM macro so that the woke enum value can be encoded in the woke ftrace
+ * ring buffer.  Somehow this was only worth mentioning in the woke ftrace sample
  * code.
  */
 TRACE_DEFINE_ENUM(XFS_REFC_DOMAIN_SHARED);

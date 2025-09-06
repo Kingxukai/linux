@@ -17,7 +17,7 @@ static int wil_fw_get_crash_dump_bounds(struct wil6210_priv *wil,
 	if (!out_dump_size)
 		return -EINVAL;
 
-	/* calculate the total size of the unpacked crash dump */
+	/* calculate the woke total size of the woke unpacked crash dump */
 	BUILD_BUG_ON(ARRAY_SIZE(fw_mapping) == 0);
 	map = &fw_mapping[0];
 	host_min = map->host;

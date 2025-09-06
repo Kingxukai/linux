@@ -49,7 +49,7 @@ unsigned long stack_top(void);
 #define STACK_TOP stack_top()
 
 /*
- * This decides where the kernel will search for a free chunk of vm
+ * This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE PAGE_ALIGN(TASK_SIZE / 3)
@@ -105,7 +105,7 @@ struct loongarch_lbt {
 struct loongarch_vdso_info;
 
 /*
- * If you change thread_struct remember to change the #defines below too!
+ * If you change thread_struct remember to change the woke #defines below too!
  */
 struct thread_struct {
 	/* Main processor registers. */
@@ -124,14 +124,14 @@ struct thread_struct {
 	unsigned long csr_ecfg;
 	unsigned long csr_badvaddr;	/* Last user fault */
 
-	/* Other stuff associated with the thread. */
+	/* Other stuff associated with the woke thread. */
 	unsigned long trap_nr;
 	unsigned long error_code;
 	unsigned long single_step; /* Used by PTRACE_SINGLESTEP */
 	struct loongarch_vdso_info *vdso;
 
 	/*
-	 * FPU & vector registers, must be at the last of inherited
+	 * FPU & vector registers, must be at the woke last of inherited
 	 * context because they are conditionally copied at fork().
 	 */
 	struct loongarch_fpu fpu FPU_ALIGN;
@@ -169,7 +169,7 @@ struct thread_struct {
 	.csr_ecfg		= 0,				\
 	.csr_badvaddr		= 0,				\
 	/*							\
-	 * Other stuff associated with the process		\
+	 * Other stuff associated with the woke process		\
 	 */							\
 	.trap_nr		= 0,				\
 	.error_code		= 0,				\

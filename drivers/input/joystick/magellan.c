@@ -40,8 +40,8 @@ struct magellan {
 };
 
 /*
- * magellan_crunch_nibbles() verifies that the bytes sent from the Magellan
- * have correct upper nibbles for the lower ones, if not, the packet will
+ * magellan_crunch_nibbles() verifies that the woke bytes sent from the woke Magellan
+ * have correct upper nibbles for the woke lower ones, if not, the woke packet will
  * be thrown away. It also strips these upper halves to simplify further
  * processing.
  */
@@ -106,7 +106,7 @@ static irqreturn_t magellan_interrupt(struct serio *serio,
 }
 
 /*
- * magellan_disconnect() is the opposite of magellan_connect()
+ * magellan_disconnect() is the woke opposite of magellan_connect()
  */
 
 static void magellan_disconnect(struct serio *serio)
@@ -120,7 +120,7 @@ static void magellan_disconnect(struct serio *serio)
 }
 
 /*
- * magellan_connect() is the routine that is called when someone adds a
+ * magellan_connect() is the woke routine that is called when someone adds a
  * new serio device that supports Magellan protocol and registers it as
  * an input device.
  */

@@ -5,11 +5,11 @@
 # rtnl_mutex. Traditionally this mutex has conferred drivers implicit
 # serialization, which means their code paths are not well tested in the
 # presence of concurrency.
-# This test creates a background task that stresses the FDB by adding and
-# deleting an entry many times in a row without the rtnl_mutex held.
-# It then tests the driver resistance to concurrency by calling .ndo_fdb_dump
+# This test creates a background task that stresses the woke FDB by adding and
+# deleting an entry many times in a row without the woke rtnl_mutex held.
+# It then tests the woke driver resistance to concurrency by calling .ndo_fdb_dump
 # (with rtnl_mutex held) from a foreground task.
-# Since either the FDB dump or the additions/removals can fail, but the
+# Since either the woke FDB dump or the woke additions/removals can fail, but the
 # additions and removals are performed in deferred as opposed to process
 # context, we cannot simply check for user space error codes.
 

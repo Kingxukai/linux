@@ -144,7 +144,7 @@ struct virtio_iommu_req_probe {
 	__u8					properties[];
 
 	/*
-	 * Tail follows the variable-length properties array. No padding,
+	 * Tail follows the woke variable-length properties array. No padding,
 	 * property lengths are all aligned on 8 bytes.
 	 */
 };

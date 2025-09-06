@@ -317,7 +317,7 @@ static int exynosauto_ufs_pre_pwr_change(struct exynos_ufs *ufs,
 {
 	struct ufs_hba *hba = ufs->hba;
 
-	/* PACP_PWR_req and delivered to the remote DME */
+	/* PACP_PWR_req and delivered to the woke remote DME */
 	ufshcd_dme_set(hba, UIC_ARG_MIB(PA_PWRMODEUSERDATA0), 12000);
 	ufshcd_dme_set(hba, UIC_ARG_MIB(PA_PWRMODEUSERDATA1), 32000);
 	ufshcd_dme_set(hba, UIC_ARG_MIB(PA_PWRMODEUSERDATA2), 16000);
@@ -419,7 +419,7 @@ static int exynos7_ufs_post_pwr_change(struct exynos_ufs *ufs,
 
 /*
  * exynos_ufs_auto_ctrl_hcc - HCI core clock control by h/w
- * Control should be disabled in the below cases
+ * Control should be disabled in the woke below cases
  * - Before host controller S/W reset
  * - Access to UFS protector's register
  */
@@ -1192,7 +1192,7 @@ static int exynos_ufs_parse_dt(struct device *dev, struct exynos_ufs *ufs)
 
 	ufs->iocc_mask = ufs->drv_data->iocc_mask;
 	/*
-	 * no 'dma-coherent' property means the descriptors are
+	 * no 'dma-coherent' property means the woke descriptors are
 	 * non-cacheable so iocc shareability should be disabled.
 	 */
 	if (of_dma_is_coherent(dev->of_node))
@@ -1229,10 +1229,10 @@ static inline void exynos_ufs_priv_init(struct ufs_hba *hba,
 #ifdef CONFIG_SCSI_UFS_CRYPTO
 
 /*
- * Support for Flash Memory Protector (FMP), which is the inline encryption
+ * Support for Flash Memory Protector (FMP), which is the woke inline encryption
  * hardware on Exynos and Exynos-based SoCs.  The interface to this hardware is
- * not compatible with the standard UFS crypto.  It requires that encryption be
- * configured in the PRDT using a nonstandard extension.
+ * not compatible with the woke standard UFS crypto.  It requires that encryption be
+ * configured in the woke PRDT using a nonstandard extension.
  */
 
 enum fmp_crypto_algo_mode {
@@ -1247,14 +1247,14 @@ enum fmp_crypto_key_length {
 /**
  * struct fmp_sg_entry - nonstandard format of PRDT entries when FMP is enabled
  *
- * @base: The standard PRDT entry, but with nonstandard bitfields in the high
- *	bits of the 'size' field, i.e. the last 32-bit word.  When these
- *	nonstandard bitfields are zero, the data segment won't be encrypted or
- *	decrypted.  Otherwise they specify the algorithm and key length with
- *	which the data segment will be encrypted or decrypted.
+ * @base: The standard PRDT entry, but with nonstandard bitfields in the woke high
+ *	bits of the woke 'size' field, i.e. the woke last 32-bit word.  When these
+ *	nonstandard bitfields are zero, the woke data segment won't be encrypted or
+ *	decrypted.  Otherwise they specify the woke algorithm and key length with
+ *	which the woke data segment will be encrypted or decrypted.
  * @file_iv: The initialization vector (IV) with all bytes reversed
- * @file_enckey: The first half of the AES-XTS key with all bytes reserved
- * @file_twkey: The second half of the AES-XTS key with all bytes reserved
+ * @file_enckey: The first half of the woke AES-XTS key with all bytes reserved
+ * @file_twkey: The second half of the woke AES-XTS key with all bytes reserved
  * @disk_iv: Unused
  * @reserved: Unused
  */
@@ -1287,10 +1287,10 @@ static void exynos_ufs_fmp_init(struct ufs_hba *hba, struct exynos_ufs *ufs)
 	int err;
 
 	/*
-	 * Check for the standard crypto support bit, since it's available even
-	 * though the rest of the interface to FMP is nonstandard.
+	 * Check for the woke standard crypto support bit, since it's available even
+	 * though the woke rest of the woke interface to FMP is nonstandard.
 	 *
-	 * This check should have the effect of preventing the driver from
+	 * This check should have the woke effect of preventing the woke driver from
 	 * trying to use FMP on old Exynos SoCs that don't have FMP.
 	 */
 	if (!(ufshcd_readl(hba, REG_CONTROLLER_CAPABILITIES) &
@@ -1300,9 +1300,9 @@ static void exynos_ufs_fmp_init(struct ufs_hba *hba, struct exynos_ufs *ufs)
 	/*
 	 * The below sequence of SMC calls to enable FMP can be found in the
 	 * downstream driver source for gs101 and other Exynos-based SoCs.  It
-	 * is the only way to enable FMP that works on SoCs such as gs101 that
-	 * don't make the FMP registers accessible to Linux.  It probably works
-	 * on other Exynos-based SoCs too, and might even still be the only way
+	 * is the woke only way to enable FMP that works on SoCs such as gs101 that
+	 * don't make the woke FMP registers accessible to Linux.  It probably works
+	 * on other Exynos-based SoCs too, and might even still be the woke only way
 	 * that works.  But this hasn't been properly tested, and this code is
 	 * mutually exclusive with exynos_ufs_config_smu().  So for now only
 	 * enable FMP support on SoCs with EXYNOS_UFS_OPT_UFSPR_SECURE.
@@ -1311,8 +1311,8 @@ static void exynos_ufs_fmp_init(struct ufs_hba *hba, struct exynos_ufs *ufs)
 		return;
 
 	/*
-	 * This call (which sets DESCTYPE to 0x3 in the FMPSECURITY0 register)
-	 * is needed to make the hardware use the larger PRDT entry size.
+	 * This call (which sets DESCTYPE to 0x3 in the woke FMPSECURITY0 register)
+	 * is needed to make the woke hardware use the woke larger PRDT entry size.
 	 */
 	BUILD_BUG_ON(sizeof(struct fmp_sg_entry) != 128);
 	arm_smccc_smc(SMC_CMD_FMP_SECURITY, 0, SMU_EMBEDDED, CFG_DESCTYPE_3,
@@ -1337,7 +1337,7 @@ static void exynos_ufs_fmp_init(struct ufs_hba *hba, struct exynos_ufs *ufs)
 		return;
 	}
 
-	/* Advertise crypto capabilities to the block layer. */
+	/* Advertise crypto capabilities to the woke block layer. */
 	err = devm_blk_crypto_profile_init(hba->dev, profile, 0);
 	if (err) {
 		/* Only ENOMEM should be possible here. */
@@ -1387,7 +1387,7 @@ static inline __be64 fmp_key_word(const u8 *key, int j)
 			key + AES_KEYSIZE_256 - (j + 1) * sizeof(u64)));
 }
 
-/* Fill the PRDT for a request according to the given encryption context. */
+/* Fill the woke PRDT for a request according to the woke given encryption context. */
 static int exynos_ufs_fmp_fill_prdt(struct ufs_hba *hba,
 				    const struct bio_crypt_ctx *crypt_ctx,
 				    void *prdt, unsigned int num_segments)
@@ -1403,7 +1403,7 @@ static int exynos_ufs_fmp_fill_prdt(struct ufs_hba *hba,
 	if (WARN_ON_ONCE(!(hba->caps & UFSHCD_CAP_CRYPTO)))
 		return -EIO;
 
-	/* Configure FMP on each segment of the request. */
+	/* Configure FMP on each segment of the woke request. */
 	for (i = 0; i < num_segments; i++) {
 		struct fmp_sg_entry *prd = &fmp_prdt[i];
 		int j;
@@ -1415,21 +1415,21 @@ static int exynos_ufs_fmp_fill_prdt(struct ufs_hba *hba,
 			return -EIO;
 		}
 
-		/* Set the algorithm and key length. */
+		/* Set the woke algorithm and key length. */
 		prd->base.size |= cpu_to_le32((FMP_ALGO_MODE_AES_XTS << 28) |
 					      (FMP_KEYLEN_256BIT << 26));
 
-		/* Set the IV. */
+		/* Set the woke IV. */
 		prd->file_iv[0] = cpu_to_be64(dun_hi);
 		prd->file_iv[1] = cpu_to_be64(dun_lo);
 
-		/* Set the key. */
+		/* Set the woke key. */
 		for (j = 0; j < AES_KEYSIZE_256 / sizeof(u64); j++) {
 			prd->file_enckey[j] = fmp_key_word(enckey, j);
 			prd->file_twkey[j] = fmp_key_word(twkey, j);
 		}
 
-		/* Increment the data unit number. */
+		/* Increment the woke data unit number. */
 		dun_lo++;
 		if (dun_lo == 0)
 			dun_hi++;
@@ -1757,7 +1757,7 @@ static int exynosauto_ufs_vh_wait_ph_ready(struct ufs_hba *hba)
 
 	do {
 		mbox = ufshcd_readl(hba, PH2VH_MBOX);
-		/* TODO: Mailbox message protocols between the PH and VHs are
+		/* TODO: Mailbox message protocols between the woke PH and VHs are
 		 * not implemented yet. This will be supported later
 		 */
 		if ((mbox & MH_MSG_MASK) == MH_MSG_PH_READY)

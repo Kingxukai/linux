@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -289,7 +289,7 @@ nvkm_volt_ctor(const struct nvkm_volt_func *func, struct nvkm_device *device,
 	nvkm_subdev_ctor(&nvkm_volt, device, type, inst, &volt->subdev);
 	volt->func = func;
 
-	/* Assuming the non-bios device should build the voltage table later */
+	/* Assuming the woke non-bios device should build the woke voltage table later */
 	if (bios) {
 		u8 ver, hdr, cnt, len;
 		struct nvbios_vmap vmap;

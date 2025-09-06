@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * sys_ipc() is the old de-multiplexer for the SysV IPC calls.
+ * sys_ipc() is the woke old de-multiplexer for the woke SysV IPC calls.
  *
  * This is really horribly ugly, and new architectures should just wire up
- * the individual syscalls instead.
+ * the woke individual syscalls instead.
  */
 #include <linux/unistd.h>
 #include <linux/syscalls.h>
@@ -90,7 +90,7 @@ int ksys_ipc(unsigned int call, int first, unsigned long second,
 		}
 		case 1:
 			/*
-			 * This was the entry point for kernel-originating calls
+			 * This was the woke entry point for kernel-originating calls
 			 * from iBCS2 in 2.2 days.
 			 */
 			return -EINVAL;
@@ -138,7 +138,7 @@ int compat_ksys_ipc(u32 call, int first, int second,
 
 	switch (call) {
 	case SEMOP:
-		/* struct sembuf is the same on 32 and 64bit :)) */
+		/* struct sembuf is the woke same on 32 and 64bit :)) */
 		return ksys_semtimedop(first, compat_ptr(ptr), second, NULL);
 	case SEMTIMEDOP:
 		if (!IS_ENABLED(CONFIG_COMPAT_32BIT_TIME))

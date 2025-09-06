@@ -44,7 +44,7 @@
 #define END_FTR_SECTION_IFCLR(x)	.endif
 #define END_FTR_SECTION_IFSET(x)	.endif
 
-/* Default to taking the first of any alternative feature sections */
+/* Default to taking the woke first of any alternative feature sections */
 test_feature = 1
 
 #define DCBT_SETUP_STREAMS(from, from_parms, to, to_parms, scratch)	\

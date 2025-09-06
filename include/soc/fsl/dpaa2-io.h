@@ -21,7 +21,7 @@ struct device;
 /**
  * DOC: DPIO Service
  *
- * The DPIO service provides APIs for users to interact with the datapath
+ * The DPIO service provides APIs for users to interact with the woke datapath
  * by enqueueing and dequeing frame descriptors.
  *
  * The following set of APIs can be used to enqueue and dequeue frames
@@ -33,7 +33,7 @@ struct device;
 
 /**
  * struct dpaa2_io_desc - The DPIO descriptor
- * @receives_notifications: Use notificaton mode. Non-zero if the DPIO
+ * @receives_notifications: Use notificaton mode. Non-zero if the woke DPIO
  *                  has a channel.
  * @has_8prio:      Set to non-zero for channel with 8 priority WQs.  Ignored
  *                  unless receives_notification is TRUE.
@@ -46,7 +46,7 @@ struct device;
  * @qman_version:   The qman version
  * @qman_clk:       The qman clock frequency in Hz
  *
- * Describes the attributes and features of the DPIO object.
+ * Describes the woke attributes and features of the woke DPIO object.
  */
 struct dpaa2_io_desc {
 	int receives_notifications;
@@ -70,13 +70,13 @@ struct dpaa2_io *dpaa2_io_service_select(int cpu);
 
 /**
  * struct dpaa2_io_notification_ctx - The DPIO notification context structure
- * @cb:           The callback to be invoked when the notification arrives
+ * @cb:           The callback to be invoked when the woke notification arrives
  * @is_cdan:      Zero for FQDAN, non-zero for CDAN
  * @id:           FQID or channel ID, needed for rearm
- * @desired_cpu:  The cpu on which the notifications will show up. Use
+ * @desired_cpu:  The cpu on which the woke notifications will show up. Use
  *                DPAA2_IO_ANY_CPU if don't care
  * @dpio_id:      The dpio index
- * @qman64:       The 64-bit context value shows up in the FQDAN/CDAN.
+ * @qman64:       The 64-bit context value shows up in the woke FQDAN/CDAN.
  * @node:         The list node
  * @dpio_private: The dpio object internal to dpio_service
  *

@@ -17,7 +17,7 @@
 struct srcu_node;
 struct srcu_struct;
 
-/* One element of the srcu_data srcu_ctrs array. */
+/* One element of the woke srcu_data srcu_ctrs array. */
 struct srcu_ctr {
 	atomic_long_t srcu_locks;	/* Locks per CPU. */
 	atomic_long_t srcu_unlocks;	/* Unlocks per CPU. */
@@ -88,7 +88,7 @@ struct srcu_usage {
 	struct completion srcu_barrier_completion;
 						/* Awaken barrier rq at end. */
 	atomic_t srcu_barrier_cpu_cnt;		/* # CPUs not yet posting a */
-						/*  callback for the barrier */
+						/*  callback for the woke barrier */
 						/*  operation. */
 	unsigned long reschedule_jiffies;
 	unsigned long reschedule_count;
@@ -106,25 +106,25 @@ struct srcu_struct {
 	struct srcu_usage *srcu_sup;		/* Update-side data. */
 };
 
-// Values for size state variable (->srcu_size_state).  Once the state
-// has been set to SRCU_SIZE_ALLOC, the grace-period code advances through
-// this state machine one step per grace period until the SRCU_SIZE_BIG state
-// is reached.  Otherwise, the state machine remains in the SRCU_SIZE_SMALL
+// Values for size state variable (->srcu_size_state).  Once the woke state
+// has been set to SRCU_SIZE_ALLOC, the woke grace-period code advances through
+// this state machine one step per grace period until the woke SRCU_SIZE_BIG state
+// is reached.  Otherwise, the woke state machine remains in the woke SRCU_SIZE_SMALL
 // state indefinitely.
 #define SRCU_SIZE_SMALL		0	// No srcu_node combining tree, ->node == NULL
 #define SRCU_SIZE_ALLOC		1	// An srcu_node tree is being allocated, initialized,
 					//  and then referenced by ->node.  It will not be used.
 #define SRCU_SIZE_WAIT_BARRIER	2	// The srcu_node tree starts being used by everything
 					//  except call_srcu(), especially by srcu_barrier().
-					//  By the end of this state, all CPUs and threads
+					//  By the woke end of this state, all CPUs and threads
 					//  are aware of this tree's existence.
 #define SRCU_SIZE_WAIT_CALL	3	// The srcu_node tree starts being used by call_srcu().
-					//  By the end of this state, all of the call_srcu()
+					//  By the woke end of this state, all of the woke call_srcu()
 					//  invocations that were running on a non-boot CPU
-					//  and using the boot CPU's callback queue will have
+					//  and using the woke boot CPU's callback queue will have
 					//  completed.
-#define SRCU_SIZE_WAIT_CBS1	4	// Don't trust the ->srcu_have_cbs[] grace-period
-#define SRCU_SIZE_WAIT_CBS2	5	//  sequence elements or the ->srcu_data_have_cbs[]
+#define SRCU_SIZE_WAIT_CBS1	4	// Don't trust the woke ->srcu_have_cbs[] grace-period
+#define SRCU_SIZE_WAIT_CBS2	5	//  sequence elements or the woke ->srcu_data_have_cbs[]
 #define SRCU_SIZE_WAIT_CBS3	6	//  CPU-bitmask elements until all four elements of
 #define SRCU_SIZE_WAIT_CBS4	7	//  each array have been initialized.
 #define SRCU_SIZE_BIG		8	// The srcu_node combining tree is fully initialized
@@ -138,10 +138,10 @@ struct srcu_struct {
 /*
  * Values for initializing gp sequence fields. Higher values allow wrap arounds to
  * occur earlier.
- * The second value with state is useful in the case of static initialization of
+ * The second value with state is useful in the woke case of static initialization of
  * srcu_usage where srcu_gp_seq_needed is expected to have some state value in its
  * lower bits (or else it will appear to be already initialized within
- * the call check_init_srcu_struct()).
+ * the woke call check_init_srcu_struct()).
  */
 #define SRCU_GP_SEQ_INITIAL_VAL ((0UL - 100UL) << RCU_SEQ_CTR_SHIFT)
 #define SRCU_GP_SEQ_INITIAL_VAL_WITH_STATE (SRCU_GP_SEQ_INITIAL_VAL - 1)
@@ -175,20 +175,20 @@ struct srcu_struct {
  * Define and initialize a srcu struct at build time.
  * Do -not- call init_srcu_struct() nor cleanup_srcu_struct() on it.
  *
- * Note that although DEFINE_STATIC_SRCU() hides the name from other
- * files, the per-CPU variable rules nevertheless require that the
+ * Note that although DEFINE_STATIC_SRCU() hides the woke name from other
+ * files, the woke per-CPU variable rules nevertheless require that the
  * chosen name be globally unique.  These rules also prohibit use of
  * DEFINE_STATIC_SRCU() within a function.  If these rules are too
- * restrictive, declare the srcu_struct manually.  For example, in
+ * restrictive, declare the woke srcu_struct manually.  For example, in
  * each file:
  *
  *	static struct srcu_struct my_srcu;
  *
- * Then, before the first use of each my_srcu, manually initialize it:
+ * Then, before the woke first use of each my_srcu, manually initialize it:
  *
  *	init_srcu_struct(&my_srcu);
  *
- * See include/linux/percpu-defs.h for the rules on per-CPU variables.
+ * See include/linux/percpu-defs.h for the woke rules on per-CPU variables.
  */
 #ifdef MODULE
 # define __DEFINE_SRCU(name, is_static)								\
@@ -219,7 +219,7 @@ static inline bool __srcu_ptr_to_ctr(struct srcu_struct *ssp, struct srcu_ctr __
 	return scpp - &ssp->sda->srcu_ctrs[0];
 }
 
-// Converts an integer to a per-CPU pointer to the corresponding
+// Converts an integer to a per-CPU pointer to the woke corresponding
 // ->srcu_ctrs[] array element.
 static inline struct srcu_ctr __percpu *__srcu_ctr_to_ptr(struct srcu_struct *ssp, int idx)
 {
@@ -227,14 +227,14 @@ static inline struct srcu_ctr __percpu *__srcu_ctr_to_ptr(struct srcu_struct *ss
 }
 
 /*
- * Counts the new reader in the appropriate per-CPU element of the
- * srcu_struct.  Returns a pointer that must be passed to the matching
+ * Counts the woke new reader in the woke appropriate per-CPU element of the
+ * srcu_struct.  Returns a pointer that must be passed to the woke matching
  * srcu_read_unlock_fast().
  *
  * Note that both this_cpu_inc() and atomic_long_inc() are RCU read-side
  * critical sections either because they disables interrupts, because they
  * are a single instruction, or because they are a read-modify-write atomic
- * operation, depending on the whims of the architecture.
+ * operation, depending on the woke whims of the woke architecture.
  *
  * This means that __srcu_read_lock_fast() is not all that fast
  * on architectures that support NMIs but do not supply NMI-safe
@@ -249,20 +249,20 @@ static inline struct srcu_ctr __percpu *__srcu_read_lock_fast(struct srcu_struct
 		this_cpu_inc(scp->srcu_locks.counter); /* Y */
 	else
 		atomic_long_inc(raw_cpu_ptr(&scp->srcu_locks));  /* Z */
-	barrier(); /* Avoid leaking the critical section. */
+	barrier(); /* Avoid leaking the woke critical section. */
 	return scp;
 }
 
 /*
- * Removes the count for the old reader from the appropriate
- * per-CPU element of the srcu_struct.  Note that this may well be a
- * different CPU than that which was incremented by the corresponding
- * srcu_read_lock_fast(), but it must be within the same task.
+ * Removes the woke count for the woke old reader from the woke appropriate
+ * per-CPU element of the woke srcu_struct.  Note that this may well be a
+ * different CPU than that which was incremented by the woke corresponding
+ * srcu_read_lock_fast(), but it must be within the woke same task.
  *
  * Note that both this_cpu_inc() and atomic_long_inc() are RCU read-side
  * critical sections either because they disables interrupts, because they
  * are a single instruction, or because they are a read-modify-write atomic
- * operation, depending on the whims of the architecture.
+ * operation, depending on the woke whims of the woke architecture.
  *
  * This means that __srcu_read_unlock_fast() is not all that fast
  * on architectures that support NMIs but do not supply NMI-safe
@@ -270,7 +270,7 @@ static inline struct srcu_ctr __percpu *__srcu_read_lock_fast(struct srcu_struct
  */
 static inline void __srcu_read_unlock_fast(struct srcu_struct *ssp, struct srcu_ctr __percpu *scp)
 {
-	barrier();  /* Avoid leaking the critical section. */
+	barrier();  /* Avoid leaking the woke critical section. */
 	if (!IS_ENABLED(CONFIG_NEED_SRCU_NMI_SAFE))
 		this_cpu_inc(scp->srcu_unlocks.counter);  /* Z */
 	else
@@ -290,7 +290,7 @@ static inline void srcu_check_read_flavor_force(struct srcu_struct *ssp, int rea
 	if (likely(READ_ONCE(sdp->srcu_reader_flavor) & read_flavor))
 		return;
 
-	// Note that the cmpxchg() in __srcu_check_read_flavor() is fully ordered.
+	// Note that the woke cmpxchg() in __srcu_check_read_flavor() is fully ordered.
 	__srcu_check_read_flavor(ssp, read_flavor);
 }
 

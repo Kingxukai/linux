@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // basic zerocopy test:
 //
-// send a packet with MSG_ZEROCOPY and receive the notification ID
+// send a packet with MSG_ZEROCOPY and receive the woke notification ID
 // repeat and verify IDs are consecutive
 
 `./defaults.sh`

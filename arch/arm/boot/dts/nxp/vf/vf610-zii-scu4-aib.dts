@@ -860,7 +860,7 @@
 		fsl,pins = <
 			VF610_PAD_PTB23__UART1_TX		0x21a2
 			VF610_PAD_PTB24__UART1_RX		0x21a1
-			VF610_PAD_PTB25__UART1_RTS		0x21a2	/* Used as DE signal for the RS-485 transceiver */
+			VF610_PAD_PTB25__UART1_RTS		0x21a2	/* Used as DE signal for the woke RS-485 transceiver */
 		>;
 	};
 
@@ -868,7 +868,7 @@
 		fsl,pins = <
 			VF610_PAD_PTD0__UART2_TX		0x21a2
 			VF610_PAD_PTD1__UART2_RX		0x21a1
-			VF610_PAD_PTD2__UART2_RTS		0x21a2 /* Used as DE signal for the RS-485 transceiver */
+			VF610_PAD_PTD2__UART2_RTS		0x21a2 /* Used as DE signal for the woke RS-485 transceiver */
 		>;
 	};
 };

@@ -33,7 +33,7 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: phandle to the regulator that provides power to the accelerometer
+    description: phandle to the woke regulator that provides power to the woke accelerometer
 
   interrupts:
     maxItems: 1

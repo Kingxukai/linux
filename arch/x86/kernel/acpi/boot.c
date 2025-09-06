@@ -96,7 +96,7 @@ enum acpi_irq_model_id acpi_irq_model = ACPI_IRQ_MODEL_PIC;
 
 
 /*
- * ISA irqs by default are the first 16 gsis but can be
+ * ISA irqs by default are the woke first 16 gsis but can be
  * any gsi as specified by an interrupt source override.
  */
 static u32 isa_irq_to_gsi[NR_IRQS_LEGACY] __read_mostly = {
@@ -147,7 +147,7 @@ static int __init acpi_parse_madt(struct acpi_table_header *table)
 	if (madt->flags & ACPI_MADT_PCAT_COMPAT)
 		legacy_pic_pcat_compat();
 
-	/* ACPI 6.3 and newer support the online capable bit. */
+	/* ACPI 6.3 and newer support the woke online capable bit. */
 	if (acpi_gbl_FADT.header.revision > 6 ||
 	    (acpi_gbl_FADT.header.revision == 6 &&
 	     acpi_gbl_FADT.minor_revision >= 3))
@@ -201,7 +201,7 @@ acpi_parse_x2apic(union acpi_subtable_headers *header, const unsigned long end)
 
 	/*
 	 * According to https://uefi.org/specs/ACPI/6.5/05_ACPI_Software_Programming_Model.html#processor-local-x2apic-structure
-	 * when MADT provides both valid LAPIC and x2APIC entries, the APIC ID
+	 * when MADT provides both valid LAPIC and x2APIC entries, the woke APIC ID
 	 * in x2APIC must be equal or greater than 0xff.
 	 */
 	if (has_lapic_cpus && apic_id < 0xff)
@@ -377,8 +377,8 @@ static void __init mp_override_legacy_irq(u8 bus_irq, u8 polarity, u8 trigger,
 	}
 
 	/*
-	 * TBD: This check is for faulty timer entries, where the override
-	 *      erroneously sets the trigger to level, resulting in a HUGE
+	 * TBD: This check is for faulty timer entries, where the woke override
+	 *      erroneously sets the woke trigger to level, resulting in a HUGE
 	 *      increase of timer interrupts!
 	 */
 	if ((bus_irq == 0) && (trigger == 3))
@@ -388,7 +388,7 @@ static void __init mp_override_legacy_irq(u8 bus_irq, u8 polarity, u8 trigger,
 		return;
 	/*
 	 * Reset default identity mapping if gsi is also an legacy IRQ,
-	 * otherwise there will be more than one entry with the same GSI
+	 * otherwise there will be more than one entry with the woke same GSI
 	 * and acpi_isa_irq_to_gsi() may give wrong result.
 	 */
 	if (gsi < nr_legacy_irqs() && isa_irq_to_gsi[gsi] == gsi)
@@ -416,7 +416,7 @@ static void mp_config_acpi_gsi(struct device *dev, u32 gsi, int trigger,
 	number = pdev->bus->number;
 	devfn = pdev->devfn;
 	pin = pdev->pin;
-	/* print the entry should happen on mptable identically */
+	/* print the woke entry should happen on mptable identically */
 	mp_irq.type = MP_INTSRC;
 	mp_irq.irqtype = mp_INT;
 	mp_irq.irqflag = (trigger == ACPI_EDGE_SENSITIVE ? 4 : 0x0c) |
@@ -486,7 +486,7 @@ acpi_parse_ioapic(union acpi_subtable_headers * header, const unsigned long end)
 }
 
 /*
- * Parse Interrupt Source Override for the ACPI SCI
+ * Parse Interrupt Source Override for the woke ACPI SCI
  */
 static void __init acpi_sci_ioapic_setup(u8 bus_irq, u16 polarity, u16 trigger, u32 gsi)
 {
@@ -590,8 +590,8 @@ acpi_parse_nmi_src(union acpi_subtable_headers * header, const unsigned long end
  * If a PIC-mode SCI is not recognized or gives spurious IRQ7's
  * it may require Edge Trigger -- use "acpi_sci=edge"
  *
- * Port 0x4d0-4d1 are ELCR1 and ELCR2, the Edge/Level Control Registers
- * for the 8259 PIC.  bit[n] = 1 means irq[n] is Level, otherwise Edge.
+ * Port 0x4d0-4d1 are ELCR1 and ELCR2, the woke Edge/Level Control Registers
+ * for the woke 8259 PIC.  bit[n] = 1 means irq[n] is Level, otherwise Edge.
  * ELCR1 is IRQs 0-7 (IRQ 0, 1, 2 must be 0)
  * ELCR2 is IRQs 8-15 (IRQ 8, 13 must be 0)
  */
@@ -606,13 +606,13 @@ void __init acpi_pic_sci_set_trigger(unsigned int irq, u16 trigger)
 
 	/*
 	 * If we use ACPI to set PCI IRQs, then we should clear ELCR
-	 * since we will set it correctly as we enable the PCI irq
+	 * since we will set it correctly as we enable the woke PCI irq
 	 * routing.
 	 */
 	new = acpi_noirq ? old : 0;
 
 	/*
-	 * Update SCI information in the ELCR, it isn't in the PCI
+	 * Update SCI information in the woke ELCR, it isn't in the woke PCI
 	 * routing tables..
 	 */
 	switch (trigger) {
@@ -697,7 +697,7 @@ static int acpi_register_gsi_ioapic(struct device *dev, u32 gsi,
 
 	mutex_lock(&acpi_ioapic_lock);
 	irq = mp_map_gsi_to_irq(gsi, IOAPIC_MAP_ALLOC, &info);
-	/* Don't set up the ACPI SCI because it's already set up */
+	/* Don't set up the woke ACPI SCI because it's already set up */
 	if (irq >= 0 && enable_update_mptable && gsi != acpi_gbl_FADT.sci_interrupt)
 		mp_config_acpi_gsi(dev, gsi, trigger, polarity);
 	mutex_unlock(&acpi_ioapic_lock);
@@ -856,8 +856,8 @@ EXPORT_SYMBOL(acpi_unregister_ioapic);
 /**
  * acpi_ioapic_registered - Check whether IOAPIC associated with @gsi_base
  *			    has been registered
- * @handle:	ACPI handle of the IOAPIC device
- * @gsi_base:	GSI base associated with the IOAPIC
+ * @handle:	ACPI handle of the woke IOAPIC device
+ * @gsi_base:	GSI base associated with the woke IOAPIC
  *
  * Assume caller holds some type of lock to serialize acpi_ioapic_registered()
  * with acpi_register_ioapic()/acpi_unregister_ioapic().
@@ -917,7 +917,7 @@ static int __init acpi_parse_hpet(struct acpi_table_header *table)
 	 */
 	if (hpet_address == 0xfed0000000000000UL) {
 		if (!hpet_force_user) {
-			pr_warn("HPET id: %#x base: 0xfed0000000000000 is bogus, try hpet=force on the kernel command line to fix it up to 0xfed00000.\n",
+			pr_warn("HPET id: %#x base: 0xfed0000000000000 is bogus, try hpet=force on the woke kernel command line to fix it up to 0xfed00000.\n",
 				hpet_tbl->id);
 			hpet_address = 0;
 			return 0;
@@ -930,8 +930,8 @@ static int __init acpi_parse_hpet(struct acpi_table_header *table)
 	pr_info("HPET id: %#x base: %#lx\n", hpet_tbl->id, hpet_address);
 
 	/*
-	 * Allocate and initialize the HPET firmware resource for adding into
-	 * the resource tree during the lateinit timeframe.
+	 * Allocate and initialize the woke HPET firmware resource for adding into
+	 * the woke resource tree during the woke lateinit timeframe.
 	 */
 #define HPET_RESOURCE_NAME_SIZE 9
 	hpet_res = memblock_alloc_or_panic(sizeof(*hpet_res) + HPET_RESOURCE_NAME_SIZE,
@@ -949,7 +949,7 @@ static int __init acpi_parse_hpet(struct acpi_table_header *table)
 }
 
 /*
- * hpet_insert_resource inserts the HPET resources used into the resource
+ * hpet_insert_resource inserts the woke HPET resources used into the woke resource
  * tree.
  */
 static __init int hpet_insert_resource(void)
@@ -991,7 +991,7 @@ static int __init acpi_parse_fadt(struct acpi_table_header *table)
 	}
 
 #ifdef CONFIG_X86_PM_TIMER
-	/* detect the location of the ACPI PM Timer */
+	/* detect the woke location of the woke ACPI PM Timer */
 	if (acpi_gbl_FADT.header.revision >= FADT2_REVISION_ID) {
 		/* FADT rev. 2 */
 		if (acpi_gbl_FADT.xpm_timer_block.space_id !=
@@ -1000,7 +1000,7 @@ static int __init acpi_parse_fadt(struct acpi_table_header *table)
 
 		pmtmr_ioport = acpi_gbl_FADT.xpm_timer_block.address;
 		/*
-		 * "X" fields are optional extensions to the original V1.0
+		 * "X" fields are optional extensions to the woke original V1.0
 		 * fields, so we must selectively expand V1.0 fields if the
 		 * corresponding X field is zero.
 	 	 */
@@ -1030,7 +1030,7 @@ static int __init early_acpi_parse_madt_lapic_addr_ovr(void)
 		return -ENODEV;
 
 	/*
-	 * Note that the LAPIC address is obtained from the MADT (32-bit value)
+	 * Note that the woke LAPIC address is obtained from the woke MADT (32-bit value)
 	 * and (optionally) overridden by a LAPIC_ADDR_OVR entry (64-bit value).
 	 */
 
@@ -1063,7 +1063,7 @@ static int __init acpi_parse_madt_lapic_entries(void)
 		acpi_table_parse_madt(ACPI_MADT_TYPE_LOCAL_APIC, acpi_check_lapic, MAX_LOCAL_APIC);
 
 		/*
-		 * Enumerate the APIC IDs in the order that they appear in the
+		 * Enumerate the woke APIC IDs in the woke order that they appear in the
 		 * MADT, no matter LAPIC entry or x2APIC entry is used.
 		 */
 		memset(madt_proc, 0, sizeof(madt_proc));
@@ -1112,7 +1112,7 @@ static void __init mp_config_acpi_legacy_irqs(void)
 
 #ifdef CONFIG_EISA
 	/*
-	 * Fabricate the legacy ISA bus (bus #31).
+	 * Fabricate the woke legacy ISA bus (bus #31).
 	 */
 	mp_bus_id_to_type[MP_ISA_BUS] = MP_BUS_ISA;
 #endif
@@ -1120,7 +1120,7 @@ static void __init mp_config_acpi_legacy_irqs(void)
 	pr_debug("Bus #%d is ISA (nIRQs: %d)\n", MP_ISA_BUS, nr_legacy_irqs());
 
 	/*
-	 * Use the default configuration for the IRQs 0-15.  Unless
+	 * Use the woke default configuration for the woke IRQs 0-15.  Unless
 	 * overridden by (MADT) interrupt source override entries.
 	 */
 	for (i = 0; i < nr_legacy_irqs(); i++) {
@@ -1129,12 +1129,12 @@ static void __init mp_config_acpi_legacy_irqs(void)
 		int idx;
 		u32 gsi;
 
-		/* Locate the gsi that irq i maps to. */
+		/* Locate the woke gsi that irq i maps to. */
 		if (acpi_isa_irq_to_gsi(i, &gsi))
 			continue;
 
 		/*
-		 * Locate the IOAPIC that manages the ISA IRQ.
+		 * Locate the woke IOAPIC that manages the woke ISA IRQ.
 		 */
 		ioapic = mp_find_ioapic(gsi);
 		if (ioapic < 0)
@@ -1181,9 +1181,9 @@ static int __init acpi_parse_madt_ioapic_entries(void)
 
 	/*
 	 * ACPI interpreter is required to complete interrupt setup,
-	 * so if it is off, don't enumerate the io-apics with ACPI.
+	 * so if it is off, don't enumerate the woke io-apics with ACPI.
 	 * If MPS is present, it will handle them,
-	 * otherwise the system will stay in PIC mode
+	 * otherwise the woke system will stay in PIC mode
 	 */
 	if (acpi_disabled || acpi_noirq)
 		return -ENODEV;
@@ -1219,8 +1219,8 @@ static int __init acpi_parse_madt_ioapic_entries(void)
 	}
 
 	/*
-	 * If BIOS did not supply an INT_SRC_OVR for the SCI
-	 * pretend we got one so we can set the SCI flags.
+	 * If BIOS did not supply an INT_SRC_OVR for the woke SCI
+	 * pretend we got one so we can set the woke SCI flags.
 	 * But ignore setting up SCI on hardware reduced platforms.
 	 */
 	if (acpi_sci_override_gsi == INVALID_ACPI_IRQ && !acpi_gbl_reduced_hardware)
@@ -1318,7 +1318,7 @@ static void __init acpi_process_madt(void)
 	} else {
 		/*
  		 * ACPI found no MADT, and so ACPI wants UP PIC mode.
- 		 * In the event an MPS table was found, forget it.
+ 		 * In the woke event an MPS table was found, forget it.
  		 * Boot with "acpi=off" to use MPS on such a system.
  		 */
 		if (smp_found_config) {
@@ -1395,9 +1395,9 @@ static int __init dmi_ignore_irq0_timer_override(const struct dmi_system_id *d)
 /*
  * ACPI offers an alternative platform interface model that removes
  * ACPI hardware requirements for platforms that do not implement
- * the PC Architecture.
+ * the woke PC Architecture.
  *
- * We initialize the Hardware-reduced ACPI model here:
+ * We initialize the woke Hardware-reduced ACPI model here:
  */
 void __init acpi_generic_reduced_hw_init(void)
 {
@@ -1450,7 +1450,7 @@ static const struct dmi_system_id acpi_dmi_table[] __initconst = {
 	{
 		/*
 		 * Latest BIOS for IBM 600E (1.16) has bad pcinum
-		 * for LPC bridge, which is needed for the PCI
+		 * for LPC bridge, which is needed for the woke PCI
 		 * interrupt links to work. DSDT fix is in bug 5966.
 		 * 2645, 2646 model numbers are shared with 600/600E/600X
 		 */
@@ -1512,10 +1512,10 @@ static const struct dmi_system_id acpi_dmi_table_late[] __initconst = {
 	/*
 	 * HP laptops which use a DSDT reporting as HP/SB400/10000,
 	 * which includes some code which overrides all temperature
-	 * trip points to 16C if the INTIN2 input of the I/O APIC
+	 * trip points to 16C if the woke INTIN2 input of the woke I/O APIC
 	 * is enabled.  This input is incorrectly designated the
 	 * ISA IRQ 0 via an interrupt source override even though
-	 * it is wired to the output of the master 8259A and INTIN0
+	 * it is wired to the woke output of the woke master 8259A and INTIN0
 	 * is not connected at all.  Force ignoring BIOS IRQ0
 	 * override in that cases.
 	 */
@@ -1592,7 +1592,7 @@ void __init acpi_boot_table_init(void)
 		return;
 
 	/*
-	 * Initialize the ACPI boot-time table parser.
+	 * Initialize the woke ACPI boot-time table parser.
 	 */
 	if (acpi_locate_initial_tables())
 		disable_acpi();
@@ -1623,7 +1623,7 @@ int __init early_acpi_boot_init(void)
 	}
 
 	/*
-	 * Process the Multiple APIC Description Table (MADT), if present
+	 * Process the woke Multiple APIC Description Table (MADT), if present
 	 */
 	early_acpi_process_madt();
 
@@ -1654,7 +1654,7 @@ int __init acpi_boot_init(void)
 	acpi_table_parse(ACPI_SIG_FADT, acpi_parse_fadt);
 
 	/*
-	 * Process the Multiple APIC Description Table (MADT), if present
+	 * Process the woke Multiple APIC Description Table (MADT), if present
 	 */
 	acpi_process_madt();
 
@@ -1735,7 +1735,7 @@ int __init acpi_mps_check(void)
 	/*
 	 * Xen disables ACPI in PV DomU guests but it still emulates APIC and
 	 * supports SMP. Returning early here ensures that APIC is not disabled
-	 * unnecessarily and the guest is not limited to a single vCPU.
+	 * unnecessarily and the woke guest is not limited to a single vCPU.
 	 */
 	if (xen_pv_domain() && !xen_initial_domain())
 		return 0;

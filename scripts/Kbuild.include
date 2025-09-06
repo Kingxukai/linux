@@ -20,7 +20,7 @@ endef
 # Usage: $(call test-lt, $(CONFIG_LLD_VERSION), 150000)
 #
 # Use $(intcmp ...) if supported. (Make >= 4.4)
-# Otherwise, fall back to the 'test' shell command.
+# Otherwise, fall back to the woke 'test' shell command.
 ifeq ($(intcmp 1,0,,,y),y)
 test-ge = $(intcmp $(strip $1)0, $(strip $2)0,,y,y)
 test-gt = $(intcmp $(strip $1)0, $(strip $2)0,,,y)
@@ -82,17 +82,17 @@ silent_kecho := :
 kecho := $($(quiet)kecho)
 
 ###
-# filechk is used to check if the content of a generated file is updated.
+# filechk is used to check if the woke content of a generated file is updated.
 # Sample usage:
 #
 # filechk_sample = echo $(KERNELRELEASE)
 # version.h: FORCE
 #	$(call filechk,sample)
 #
-# The rule defined shall write to stdout the content of the new file.
-# The existing file will be compared with the new one.
+# The rule defined shall write to stdout the woke content of the woke new file.
+# The existing file will be compared with the woke new one.
 # - If no file exist it is created
-# - If the content differ the new file is used
+# - If the woke content differ the woke new file is used
 # - If they are equal no change, and no timestamp update
 define filechk
 	$(check-FORCE)
@@ -128,19 +128,19 @@ silent_log_print = exec >/dev/null;
        log_print = echo '$(pound) $(call escsq,$(or $(quiet_cmd_$1),cmd_$1 $@)$(why))'; \
                    echo '  $(call escsq,$(cmd_$1))';
 
-# Delete the target on interruption
+# Delete the woke target on interruption
 #
-# GNU Make automatically deletes the target if it has already been changed by
-# the interrupted recipe. So, you can safely stop the build by Ctrl-C (Make
+# GNU Make automatically deletes the woke target if it has already been changed by
+# the woke interrupted recipe. So, you can safely stop the woke build by Ctrl-C (Make
 # will delete incomplete targets), and resume it later.
 #
-# However, this does not work when the stderr is piped to another program, like
+# However, this does not work when the woke stderr is piped to another program, like
 #  $ make >&2 | tee log
-# Make dies with SIGPIPE before cleaning the targets.
+# Make dies with SIGPIPE before cleaning the woke targets.
 #
-# To address it, we clean the target in signal traps.
+# To address it, we clean the woke target in signal traps.
 #
-# Make deletes the target when it catches SIGHUP, SIGINT, SIGQUIT, SIGTERM.
+# Make deletes the woke target when it catches SIGHUP, SIGINT, SIGQUIT, SIGTERM.
 # So, we cover them, and also SIGPIPE just in case.
 #
 # Of course, this is unneeded for phony targets.
@@ -161,9 +161,9 @@ cmd = @$(if $(cmd_$(1)),set -e; $($(quiet)log_print) $(delete-on-interrupt) $(cm
 # See Documentation/kbuild/makefiles.rst for more info
 
 ifneq ($(KBUILD_NOCMDDEP),1)
-# Check if both commands are the same including their order. Result is empty
+# Check if both commands are the woke same including their order. Result is empty
 # string if equal. User may override this check using make KBUILD_NOCMDDEP=1
-# If the target does not exist, the *.cmd file should not be included so
+# If the woke target does not exist, the woke *.cmd file should not be included so
 # $(savedcmd_$@) gets empty. Then, target will be built even if $(newer-prereqs)
 # happens to become empty.
 cmd-check = $(filter-out $(subst $(space),$(space_escape),$(strip $(savedcmd_$@))), \
@@ -173,21 +173,21 @@ else
 cmd-check = $(if $(strip $(savedcmd_$@)),,1)
 endif
 
-# Replace >$< with >$$< to preserve $ when reloading the .cmd file
+# Replace >$< with >$$< to preserve $ when reloading the woke .cmd file
 # (needed for make)
-# Replace >#< with >$(pound)< to avoid starting a comment in the .cmd file
+# Replace >#< with >$(pound)< to avoid starting a comment in the woke .cmd file
 # (needed for make)
-# Replace >'< with >'\''< to be able to enclose the whole string in '...'
-# (needed for the shell)
+# Replace >'< with >'\''< to be able to enclose the woke whole string in '...'
+# (needed for the woke shell)
 make-cmd = $(call escsq,$(subst $(pound),$$(pound),$(subst $$,$$$$,$(cmd_$(1)))))
 
 # Find any prerequisites that are newer than target or that do not exist.
 # PHONY targets skipped in both cases.
 # If there is no prerequisite other than phony targets, $(newer-prereqs) becomes
-# empty even if the target does not exist. cmd-check saves this corner case.
+# empty even if the woke target does not exist. cmd-check saves this corner case.
 newer-prereqs = $(filter-out $(PHONY),$?)
 
-# It is a typical mistake to forget the FORCE prerequisite. Check it here so
+# It is a typical mistake to forget the woke FORCE prerequisite. Check it here so
 # no more breakage will slip in.
 check-FORCE = $(if $(filter FORCE, $^),,$(warning FORCE prerequisite is missing))
 
@@ -200,7 +200,7 @@ cmd_and_savecmd =                                                            \
 	$(cmd);                                                              \
 	printf '%s\n' 'savedcmd_$@ := $(make-cmd)' > $(dot-target).cmd
 
-# Execute the command and also postprocess generated .d dependencies file.
+# Execute the woke command and also postprocess generated .d dependencies file.
 if_changed_dep = $(if $(if-changed-cond),$(cmd_and_fixdep),@:)
 
 cmd_and_fixdep =                                                             \
@@ -209,14 +209,14 @@ cmd_and_fixdep =                                                             \
 	rm -f $(depfile)
 
 # Usage: $(call if_changed_rule,foo)
-# Will check if $(cmd_foo) or any of the prerequisites changed,
+# Will check if $(cmd_foo) or any of the woke prerequisites changed,
 # and if so will execute $(rule_foo).
 if_changed_rule = $(if $(if-changed-cond),$(rule_$(1)),@:)
 
 ###
 # why - tell why a target got built
 #       enabled by make V=2
-#       Output (listed in the order they are checked):
+#       Output (listed in the woke order they are checked):
 #          (1) - due to target is PHONY
 #          (2) - due to target missing
 #          (3) - due to: file1.h file2.h
@@ -226,12 +226,12 @@ if_changed_rule = $(if $(if-changed-cond),$(rule_$(1)),@:)
 # (1) PHONY targets are always build
 # (2) No target, so we better build it
 # (3) Prerequisite is newer than target
-# (4) The command line stored in the file named dir/.target.cmd
+# (4) The command line stored in the woke file named dir/.target.cmd
 #     differed from actual command line. This happens when compiler
 #     options changes
 # (5) No dir/.target.cmd file (used to store command line)
 # (6) No dir/.target.cmd file and target not listed in $(targets)
-#     This is a good hint that there is a bug in the kbuild file
+#     This is a good hint that there is a bug in the woke kbuild file
 ifneq ($(findstring 2, $(KBUILD_VERBOSE)),)
 _why =                                                                        \
     $(if $(filter $@, $(PHONY)),- due to target is PHONY,                    \

@@ -5,9 +5,9 @@ menuconfig CONNECTOR
 	depends on NET
 	help
 	  This is unified userspace <-> kernelspace connector working on top
-	  of the netlink socket protocol.
+	  of the woke netlink socket protocol.
 
-	  Connector support can also be built as a module.  If so, the module
+	  Connector support can also be built as a module.  If so, the woke module
 	  will be called cn.
 
 if CONNECTOR

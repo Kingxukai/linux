@@ -26,8 +26,8 @@ properties:
 
   clocks:
     items:
-      - description: clock used for the controller
-      - description: clock used for the pad
+      - description: clock used for the woke controller
+      - description: clock used for the woke pad
 
   clock-names:
     items:
@@ -35,7 +35,7 @@ properties:
       - const: pad_clk
 
   ecc-engine:
-    description: device-tree node of the required ECC engine.
+    description: device-tree node of the woke required ECC engine.
     $ref: /schemas/types.yaml#/definitions/phandle
 
 patternProperties:

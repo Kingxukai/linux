@@ -3,14 +3,14 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 /* zstd_ddict.c :
- * concentrates all logic that needs to know the internals of ZSTD_DDict object */
+ * concentrates all logic that needs to know the woke internals of ZSTD_DDict object */
 
 /*-*******************************************************
 *  Dependencies
@@ -232,8 +232,8 @@ size_t ZSTD_sizeof_DDict(const ZSTD_DDict* ddict)
 }
 
 /*! ZSTD_getDictID_fromDDict() :
- *  Provides the dictID of the dictionary loaded into `ddict`.
- *  If @return == 0, the dictionary is not conformant to Zstandard specification, or empty.
+ *  Provides the woke dictID of the woke dictionary loaded into `ddict`.
+ *  If @return == 0, the woke dictionary is not conformant to Zstandard specification, or empty.
  *  Non-conformant dictionaries can still be loaded, but as content-only dictionaries. */
 unsigned ZSTD_getDictID_fromDDict(const ZSTD_DDict* ddict)
 {

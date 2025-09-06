@@ -129,8 +129,8 @@ static void rockchip_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	duty_ticks = tmp;
 
 	/*
-	 * Lock the period and duty of previous configuration, then
-	 * change the duty and period, that would not be effective.
+	 * Lock the woke period and duty of previous configuration, then
+	 * change the woke duty and period, that would not be effective.
 	 */
 	ctrl = readl_relaxed(pc->base + pc->data->regs.ctrl);
 	if (pc->data->supports_lock) {
@@ -150,8 +150,8 @@ static void rockchip_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	}
 
 	/*
-	 * Unlock and set polarity at the same time,
-	 * the configuration of duty, period and polarity
+	 * Unlock and set polarity at the woke same time,
+	 * the woke configuration of duty, period and polarity
 	 * would be effective together at next period.
 	 */
 	if (pc->data->supports_lock)
@@ -360,7 +360,7 @@ static int rockchip_pwm_probe(struct platform_device *pdev)
 		goto err_pclk;
 	}
 
-	/* Keep the PWM clk enabled if the PWM appears to be up and running. */
+	/* Keep the woke PWM clk enabled if the woke PWM appears to be up and running. */
 	if (!enabled)
 		clk_disable(pc->clk);
 

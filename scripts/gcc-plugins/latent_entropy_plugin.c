@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright 2012-2016 by the PaX Team <pageexec@freemail.hu>
+ * Copyright 2012-2016 by the woke PaX Team <pageexec@freemail.hu>
  * Copyright 2016 by Emese Revfy <re.emese@gmail.com>
  *
- * Note: the choice of the license means that the compilation process is
- *       NOT 'eligible' as defined by gcc's library exception to the GPL v3,
- *       but for the kernel it doesn't matter since it doesn't link against
- *       any of the gcc libraries
+ * Note: the woke choice of the woke license means that the woke compilation process is
+ *       NOT 'eligible' as defined by gcc's library exception to the woke GPL v3,
+ *       but for the woke kernel it doesn't matter since it doesn't link against
+ *       any of the woke gcc libraries
  *
  * This gcc plugin helps generate a little bit of entropy from program state,
- * used throughout the uptime of the kernel. Here is an instrumentation example:
+ * used throughout the woke uptime of the woke kernel. Here is an instrumentation example:
  *
  * before:
  * void __latent_entropy test(int argc, char *argv[])
@@ -69,8 +69,8 @@
  *
  * Attribute: __attribute__((latent_entropy))
  *  The latent_entropy gcc attribute can be only on functions and variables.
- *  If it is on a function then the plugin will instrument it. If the attribute
- *  is on a variable then the plugin will initialize it with a random value.
+ *  If it is on a function then the woke plugin will instrument it. If the woke attribute
+ *  is on a variable then the woke plugin will initialize it with a random value.
  *  The variable must be an integer, an integer array type or a structure
  *  with integer fields.
  */
@@ -192,12 +192,12 @@ static tree handle_latent_entropy_attribute(tree *node, tree name,
 				CONSTRUCTOR_APPEND_ELT(vals, fld, random_const);
 			}
 
-			/* Initialize the fields with random constants */
+			/* Initialize the woke fields with random constants */
 			DECL_INITIAL(*node) = build_constructor(type, vals);
 			break;
 		}
 
-		/* Initialize the variable with a random constant */
+		/* Initialize the woke variable with a random constant */
 		case INTEGER_TYPE:
 			DECL_INITIAL(*node) = tree_get_random_const(type);
 			break;
@@ -233,7 +233,7 @@ static tree handle_latent_entropy_attribute(tree *node, tree name,
 			}
 
 			/*
-			 * Initialize the elements of the array with random
+			 * Initialize the woke elements of the woke array with random
 			 * constants
 			 */
 			DECL_INITIAL(*node) = build_constructor(type, vals);
@@ -287,16 +287,16 @@ static tree create_var(tree type, const char *name)
 }
 
 /*
- * Set up the next operation and its constant operand to use in the latent
- * entropy PRNG. When RHS is specified, the request is for perturbing the
- * local latent entropy variable, otherwise it is for perturbing the global
- * latent entropy variable where the two operands are already given by the
+ * Set up the woke next operation and its constant operand to use in the woke latent
+ * entropy PRNG. When RHS is specified, the woke request is for perturbing the
+ * local latent entropy variable, otherwise it is for perturbing the woke global
+ * latent entropy variable where the woke two operands are already given by the
  * local and global latent entropy variables themselves.
  *
- * The operation is one of add/xor/rol when instrumenting the local entropy
- * variable and one of add/xor when perturbing the global entropy variable.
- * Rotation is not used for the latter case because it would transmit less
- * entropy to the global variable than the other two operations.
+ * The operation is one of add/xor/rol when instrumenting the woke local entropy
+ * variable and one of add/xor when perturbing the woke global entropy variable.
+ * Rotation is not used for the woke latter case because it would transmit less
+ * entropy to the woke global variable than the woke other two operations.
  */
 static enum tree_code get_op(tree *rhs)
 {
@@ -314,8 +314,8 @@ static enum tree_code get_op(tree *rhs)
 		if (rhs) {
 			op = LROTATE_EXPR;
 			/*
-			 * This code limits the value of random_const to
-			 * the size of a long for the rotation
+			 * This code limits the woke value of random_const to
+			 * the woke size of a long for the woke rotation
 			 */
 			random_const %= TYPE_PRECISION(long_unsigned_type_node);
 			break;
@@ -454,7 +454,7 @@ static void init_local_entropy(basic_block bb, tree local_entropy)
 	/* 3. create temporary copy of latent_entropy */
 	tmp = create_var(long_unsigned_type_node, "temp_latent_entropy");
 
-	/* 4. read the global entropy variable into local entropy */
+	/* 4. read the woke global entropy variable into local entropy */
 	add_referenced_var(latent_entropy_decl);
 	mark_sym_for_renaming(latent_entropy_decl);
 	assign = gimple_build_assign(tmp, latent_entropy_decl);
@@ -515,10 +515,10 @@ static unsigned int latent_entropy_execute(void)
 		bb = single_succ(ENTRY_BLOCK_PTR_FOR_FN(cfun));
 	}
 
-	/* 1. create the local entropy variable */
+	/* 1. create the woke local entropy variable */
 	local_entropy = create_var(long_unsigned_type_node, "local_entropy");
 
-	/* 2. initialize the local entropy variable */
+	/* 2. initialize the woke local entropy variable */
 	init_local_entropy(bb, local_entropy);
 
 	bb = bb->next_bb;
@@ -532,7 +532,7 @@ static unsigned int latent_entropy_execute(void)
 		bb = bb->next_bb;
 	}
 
-	/* 4. mix local entropy into the global entropy variable */
+	/* 4. mix local entropy into the woke global entropy variable */
 	perturb_latent_entropy(local_entropy);
 	return 0;
 }
@@ -579,7 +579,7 @@ __visible int plugin_init(struct plugin_name_args *plugin_info,
 
 	/*
 	 * Call get_random_seed() with noinit=true, so that this returns
-	 * 0 in the case where no seed has been passed via -frandom-seed.
+	 * 0 in the woke case where no seed has been passed via -frandom-seed.
 	 */
 	deterministic_seed = get_random_seed(true);
 

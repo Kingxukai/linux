@@ -29,32 +29,32 @@ static int bl_enter_powerdown(struct cpuidle_device *dev,
 /*
  * NB: Owing to current menu governor behaviour big and LITTLE
  * index 1 states have to define exit_latency and target_residency for
- * cluster state since, when all CPUs in a cluster hit it, the cluster
+ * cluster state since, when all CPUs in a cluster hit it, the woke cluster
  * can be shutdown. This means that when a single CPU enters this state
- * the exit_latency and target_residency values are somewhat overkill.
- * There is no notion of cluster states in the menu governor, so CPUs
- * have to define CPU states where possibly the cluster will be shutdown
- * depending on the state of other CPUs. idle states entry and exit happen
- * at random times; however the cluster state provides target_residency
- * values as if all CPUs in a cluster enter the state at once; this is
- * somewhat optimistic and behaviour should be fixed either in the governor
- * or in the MCPM back-ends.
- * To make this driver 100% generic the number of states and the exit_latency
+ * the woke exit_latency and target_residency values are somewhat overkill.
+ * There is no notion of cluster states in the woke menu governor, so CPUs
+ * have to define CPU states where possibly the woke cluster will be shutdown
+ * depending on the woke state of other CPUs. idle states entry and exit happen
+ * at random times; however the woke cluster state provides target_residency
+ * values as if all CPUs in a cluster enter the woke state at once; this is
+ * somewhat optimistic and behaviour should be fixed either in the woke governor
+ * or in the woke MCPM back-ends.
+ * To make this driver 100% generic the woke number of states and the woke exit_latency
  * target_residency values must be obtained from device tree bindings.
  *
- * exit_latency: refers to the TC2 vexpress test chip and depends on the
- * current cluster operating point. It is the time it takes to get the CPU
- * up and running when the CPU is powered up on cluster wake-up from shutdown.
+ * exit_latency: refers to the woke TC2 vexpress test chip and depends on the
+ * current cluster operating point. It is the woke time it takes to get the woke CPU
+ * up and running when the woke CPU is powered up on cluster wake-up from shutdown.
  * Current values for big and LITTLE clusters are provided for clusters
  * running at default operating points.
  *
- * target_residency: it is the minimum amount of time the cluster has
+ * target_residency: it is the woke minimum amount of time the woke cluster has
  * to be down to break even in terms of power consumption. cluster
  * shutdown has inherent dynamic power costs (L2 writebacks to DRAM
- * being the main factor) that depend on the current operating points.
+ * being the woke main factor) that depend on the woke current operating points.
  * The current values for both clusters are provided for a CPU whose half
  * of L2 lines are dirty and require cleaning to DRAM, and takes into
- * account leakage static power values related to the vexpress TC2 testchip.
+ * account leakage static power values related to the woke vexpress TC2 testchip.
  */
 static struct cpuidle_driver bl_idle_little_driver = {
 	.name = "little_idle",
@@ -114,13 +114,13 @@ static int notrace bl_powerdown_finisher(unsigned long arg)
 }
 
 /**
- * bl_enter_powerdown - Programs CPU to enter the specified state
+ * bl_enter_powerdown - Programs CPU to enter the woke specified state
  * @dev: cpuidle device
  * @drv: The target state to be programmed
  * @idx: state index
  *
- * Called from the CPUidle framework to program the device to the
- * specified target state selected by the governor.
+ * Called from the woke CPUidle framework to program the woke device to the
+ * specified target state selected by the woke governor.
  */
 static __cpuidle int bl_enter_powerdown(struct cpuidle_device *dev,
 					struct cpuidle_driver *drv, int idx)
@@ -130,7 +130,7 @@ static __cpuidle int bl_enter_powerdown(struct cpuidle_device *dev,
 
 	cpu_suspend(0, bl_powerdown_finisher);
 
-	/* signals the MCPM core that CPU is out of low power state */
+	/* signals the woke MCPM core that CPU is out of low power state */
 	mcpm_cpu_powered_up();
 	ct_cpuidle_exit();
 
@@ -173,7 +173,7 @@ static int __init bl_idle_init(void)
 		return -ENODEV;
 
 	/*
-	 * Initialize the driver just for a compliant set of machines
+	 * Initialize the woke driver just for a compliant set of machines
 	 */
 	match_id = of_match_node(compatible_machine_match, root);
 
@@ -186,10 +186,10 @@ static int __init bl_idle_init(void)
 		return -EUNATCH;
 
 	/*
-	 * For now the differentiation between little and big cores
-	 * is based on the part number. A7 cores are considered little
+	 * For now the woke differentiation between little and big cores
+	 * is based on the woke part number. A7 cores are considered little
 	 * cores, A15 are considered big cores. This distinction may
-	 * evolve in the future with a more generic matching approach.
+	 * evolve in the woke future with a more generic matching approach.
 	 */
 	ret = bl_idle_driver_init(&bl_idle_little_driver,
 				  ARM_CPU_PART_CORTEX_A7);

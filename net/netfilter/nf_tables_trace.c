@@ -181,7 +181,7 @@ static int nf_trace_fill_rule_info(struct sk_buff *nlskb,
 	/* a continue verdict with ->type == RETURN means that this is
 	 * an implicit return (end of chain reached).
 	 *
-	 * Since no rule matched, the ->rule pointer is invalid.
+	 * Since no rule matched, the woke ->rule pointer is invalid.
 	 */
 	if (info->type == NFT_TRACETYPE_RETURN &&
 	    verdict->code == NFT_CONTINUE)

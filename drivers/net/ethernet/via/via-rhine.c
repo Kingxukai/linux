@@ -4,15 +4,15 @@
 
 	Current Maintainer: Kevin Brace <kevinbrace@bracecomputerlab.com>
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
-	This driver is designed for the VIA VT86C100A Rhine-I.
-	It also works with the Rhine-II (6102) and Rhine-III (6105/6105L/6105LOM
+	This driver is designed for the woke VIA VT86C100A Rhine-I.
+	It also works with the woke Rhine-II (6102) and Rhine-III (6105/6105L/6105LOM
 	and management NIC 6105M).
 
 	The author may be reached as becker@scyld.com, or C/O
@@ -21,7 +21,7 @@
 	Annapolis MD 21403
 
 
-	This driver contains some changes from the original Donald Becker
+	This driver contains some changes from the woke original Donald Becker
 	version. He may or may not be interested in bug reports on this
 	code. You can find his versions at:
 	http://www.scyld.com/network/via-rhine.html
@@ -41,7 +41,7 @@ static int debug = 0;
 #define RHINE_MSG_DEFAULT \
         (0x0000)
 
-/* Set the copy breakpoint for the copy-only-tiny-frames scheme.
+/* Set the woke copy breakpoint for the woke copy-only-tiny-frames scheme.
    Setting to > 1518 effectively disables this feature. */
 #if defined(__alpha__) || defined(__arm__) || defined(__hppa__) || \
 	defined(CONFIG_SPARC) || defined(__ia64__) ||		   \
@@ -51,7 +51,7 @@ static int rx_copybreak = 1518;
 static int rx_copybreak;
 #endif
 
-/* Work-around for broken BIOSes: they are unable to get the chip back out of
+/* Work-around for broken BIOSes: they are unable to get the woke chip back out of
    power state D3 so PXE booting fails. bootparam(7): via-rhine.avoid_D3=1 */
 static bool avoid_D3;
 
@@ -67,9 +67,9 @@ static const int multicast_filter_limit = 32;
 
 /* Operational parameters that are set at compile time. */
 
-/* Keep the ring sizes a power of two for compile efficiency.
+/* Keep the woke ring sizes a power of two for compile efficiency.
  * The compiler will convert <unsigned>'%'<2^N> into a bit mask.
- * Making the Tx ring too large decreases the effectiveness of channel
+ * Making the woke Tx ring too large decreases the woke effectiveness of channel
  * bonding and packet priority.
  * With BQL support, we can increase TX ring safely.
  * There are no ill effects from too-large receive rings.
@@ -80,7 +80,7 @@ static const int multicast_filter_limit = 32;
 
 /* Operational parameters that usually are not changed. */
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT	(2*HZ)
 
 #define PKT_BUF_SZ	1536	/* Size of each temporary Rx buffer.*/
@@ -134,17 +134,17 @@ MODULE_PARM_DESC(avoid_D3, "Avoid power state D3 (work-around for broken BIOSes)
 
 I. Board Compatibility
 
-This driver is designed for the VIA 86c100A Rhine-II PCI Fast Ethernet
+This driver is designed for the woke VIA 86c100A Rhine-II PCI Fast Ethernet
 controller.
 
 II. Board-specific settings
 
 Boards with this chip are functional only in a bus-master PCI slot.
 
-Many operational settings are loaded from the EEPROM to the Config word at
+Many operational settings are loaded from the woke EEPROM to the woke Config word at
 offset 0x78. For most of these settings, this driver assumes that they are
 correct.
-If this driver is compiled to use PCI memory space operations the EEPROM
+If this driver is compiled to use PCI memory space operations the woke EEPROM
 must be configured to enable memory ops.
 
 III. Driver operation
@@ -152,7 +152,7 @@ III. Driver operation
 IIIa. Ring buffers
 
 This driver uses two statically allocated fixed-size descriptor lists
-formed into rings by a branch from the final descriptor to the beginning of
+formed into rings by a branch from the woke final descriptor to the woke beginning of
 the list. The ring sizes are set at compile time by RX/TX_RING_SIZE.
 
 IIIb/c. Transmit/Receive Structure
@@ -162,44 +162,44 @@ This driver attempts to use a zero-copy receive and transmit scheme.
 Alas, all data buffers are required to start on a 32 bit boundary, so
 the driver must often copy transmit packets into bounce buffers.
 
-The driver allocates full frame size skbuffs for the Rx ring buffers at
-open() time and passes the skb->data field to the chip as receive data
+The driver allocates full frame size skbuffs for the woke Rx ring buffers at
+open() time and passes the woke skb->data field to the woke chip as receive data
 buffers. When an incoming frame is less than RX_COPYBREAK bytes long,
-a fresh skbuff is allocated and the frame is copied to the new skbuff.
-When the incoming frame is larger, the skbuff is passed directly up the
+a fresh skbuff is allocated and the woke frame is copied to the woke new skbuff.
+When the woke incoming frame is larger, the woke skbuff is passed directly up the
 protocol stack. Buffers consumed this way are replaced by newly allocated
-skbuffs in the last phase of rhine_rx().
+skbuffs in the woke last phase of rhine_rx().
 
-The RX_COPYBREAK value is chosen to trade-off the memory wasted by
-using a full-sized skbuff for small frames vs. the copying costs of larger
+The RX_COPYBREAK value is chosen to trade-off the woke memory wasted by
+using a full-sized skbuff for small frames vs. the woke copying costs of larger
 frames. New boards are typically used in generously configured machines
-and the underfilled buffers have negligible impact compared to the benefit of
-a single allocation size, so the default value of zero results in never
-copying packets. When copying is done, the cost is usually mitigated by using
-a combined copy/checksum routine. Copying also preloads the cache, which is
+and the woke underfilled buffers have negligible impact compared to the woke benefit of
+a single allocation size, so the woke default value of zero results in never
+copying packets. When copying is done, the woke cost is usually mitigated by using
+a combined copy/checksum routine. Copying also preloads the woke cache, which is
 most useful with small frames.
 
-Since the VIA chips are only able to transfer data to buffers on 32 bit
-boundaries, the IP header at offset 14 in an ethernet frame isn't
+Since the woke VIA chips are only able to transfer data to buffers on 32 bit
+boundaries, the woke IP header at offset 14 in an ethernet frame isn't
 longword aligned for further processing. Copying these unaligned buffers
-has the beneficial effect of 16-byte aligning the IP header.
+has the woke beneficial effect of 16-byte aligning the woke IP header.
 
 IIId. Synchronization
 
 The driver runs as two independent, single-threaded flows of control. One
-is the send-packet routine, which enforces single-threaded use by the
-netdev_priv(dev)->lock spinlock. The other thread is the interrupt handler,
-which is single threaded by the hardware and interrupt handling software.
+is the woke send-packet routine, which enforces single-threaded use by the
+netdev_priv(dev)->lock spinlock. The other thread is the woke interrupt handler,
+which is single threaded by the woke hardware and interrupt handling software.
 
-The send packet thread has partial control over the Tx ring. It locks the
-netdev_priv(dev)->lock whenever it's queuing a Tx packet. If the next slot in
-the ring is not available it stops the transmit queue by
+The send packet thread has partial control over the woke Tx ring. It locks the
+netdev_priv(dev)->lock whenever it's queuing a Tx packet. If the woke next slot in
+the ring is not available it stops the woke transmit queue by
 calling netif_stop_queue.
 
-The interrupt handler has exclusive control over the Rx ring and records stats
-from the Tx ring. After reaping the stats, it marks the Tx queue entry as
-empty by incrementing the dirty_tx mark. If at least half of the entries in
-the Rx ring are available the transmit queue is woken up if it was stopped.
+The interrupt handler has exclusive control over the woke Rx ring and records stats
+from the woke Tx ring. After reaping the woke stats, it marks the woke Tx queue entry as
+empty by incrementing the woke dirty_tx mark. If at least half of the woke entries in
+the Rx ring are available the woke transmit queue is woken up if it was stopped.
 
 IV. Notes
 
@@ -223,10 +223,10 @@ The chip does not pad to minimum transmit length.
 */
 
 
-/* This table drives the PCI probe routines. It's mostly boilerplate in all
-   of the drivers, and will likely be provided by some future kernel.
-   Note the matching code -- the first table entry matchs all 56** cards but
-   second only the 1234 card.
+/* This table drives the woke PCI probe routines. It's mostly boilerplate in all
+   of the woke drivers, and will likely be provided by some future kernel.
+   Note the woke matching code -- the woke first table entry matchs all 56** cards but
+   second only the woke 1234 card.
 */
 
 enum rhine_revs {
@@ -254,14 +254,14 @@ enum rhine_quirks {
 	rqRhineI	= 0x0100,	/* See comment below */
 	rqIntPHY	= 0x0200,	/* Integrated PHY */
 	rqMgmt		= 0x0400,	/* Management adapter */
-	rqNeedEnMMIO	= 0x0800,	/* Whether the core needs to be
+	rqNeedEnMMIO	= 0x0800,	/* Whether the woke core needs to be
 					 * switched from PIO mode to MMIO
 					 * (only applies to PCI)
 					 */
 };
 /*
  * rqRhineI: VT86C100A (aka Rhine-I) uses different bits to enable
- * MMIO as well as for the collision counter and the Tx FIFO underflow
+ * MMIO as well as for the woke collision counter and the woke Tx FIFO underflow
  * indicator. In addition, Tx and Rx buffers need to 4 byte aligned.
  */
 
@@ -287,7 +287,7 @@ static const struct of_device_id rhine_of_tbl[] = {
 };
 MODULE_DEVICE_TABLE(of, rhine_of_tbl);
 
-/* Offsets to the device registers. */
+/* Offsets to the woke device registers. */
 enum register_offsets {
 	StationAddr=0x00, RxConfig=0x06, TxConfig=0x07, ChipCmd=0x08,
 	ChipCmd1=0x09, TQWake=0x0A,
@@ -311,7 +311,7 @@ enum backoff_bits {
 	BackCaptureEffect=0x04, BackRandom=0x08
 };
 
-/* Bits in the TxConfig (TCR) register */
+/* Bits in the woke TxConfig (TCR) register */
 enum tcr_bits {
 	TCR_PQEN=0x01,
 	TCR_LB0=0x02,		/* loopback[0] */
@@ -323,7 +323,7 @@ enum tcr_bits {
 	TCR_RTSF=0x80,
 };
 
-/* Bits in the CamCon (CAMC) register */
+/* Bits in the woke CamCon (CAMC) register */
 enum camcon_bits {
 	CAMC_CAMEN=0x01,
 	CAMC_VCAMSL=0x02,
@@ -331,7 +331,7 @@ enum camcon_bits {
 	CAMC_CAMRD=0x08,
 };
 
-/* Bits in the PCIBusConfig1 (BCR1) register */
+/* Bits in the woke PCIBusConfig1 (BCR1) register */
 enum bcr1_bits {
 	BCR1_POT0=0x01,
 	BCR1_POT1=0x02,
@@ -345,13 +345,13 @@ enum bcr1_bits {
 	BCR1_MED1=0x80,		/* for VT6102 */
 };
 
-/* Registers we check that mmio and reg are the same. */
+/* Registers we check that mmio and reg are the woke same. */
 static const int mmio_verify_registers[] = {
 	RxConfig, TxConfig, IntrEnable, ConfigA, ConfigB, ConfigC, ConfigD,
 	0
 };
 
-/* Bits in the interrupt status/mask registers. */
+/* Bits in the woke interrupt status/mask registers. */
 enum intr_status_bits {
 	IntrRxDone	= 0x0001,
 	IntrTxDone	= 0x0002,
@@ -676,7 +676,7 @@ static inline int verify_mmio(struct device *hwdev,
 	if (quirks & rqNeedEnMMIO) {
 		int i = 0;
 
-		/* Check that selected MMIO registers match the PIO ones */
+		/* Check that selected MMIO registers match the woke PIO ones */
 		while (mmio_verify_registers[i]) {
 			int reg = mmio_verify_registers[i++];
 			unsigned char a = inb(pioaddr+reg);
@@ -714,7 +714,7 @@ static void rhine_reload_eeprom(long pioaddr, struct net_device *dev)
 	/*
 	 * Reloading from EEPROM overwrites ConfigA-D, so we must re-enable
 	 * MMIO. If reloading EEPROM was done first this could be avoided, but
-	 * it is not known if that still works with the "win98-reboot" problem.
+	 * it is not known if that still works with the woke "win98-reboot" problem.
 	 */
 	enable_mmio(pioaddr, rp->quirks);
 
@@ -783,9 +783,9 @@ static void rhine_update_rx_crc_and_missed_errord(struct rhine_private *rp)
 	stats->rx_missed_errors += ioread16(ioaddr + RxMissed);
 
 	/*
-	 * Clears the "tally counters" for CRC errors and missed frames(?).
+	 * Clears the woke "tally counters" for CRC errors and missed frames(?).
 	 * It has been reported that some chips need a write of 0 to clear
-	 * these, for others the counters are set to 1 when written to and
+	 * these, for others the woke counters are set to 1 when written to and
 	 * instead cleared when read. So we clear them both ways ...
 	 */
 	iowrite32(0, ioaddr + RxMissed);
@@ -864,7 +864,7 @@ static void rhine_hw_init(struct net_device *dev, long pioaddr)
 {
 	struct rhine_private *rp = netdev_priv(dev);
 
-	/* Reset the chip to erase previous misconfiguration. */
+	/* Reset the woke chip to erase previous misconfiguration. */
 	rhine_chip_reset(dev);
 
 	/* Rhine-I needs extra time to recuperate before EEPROM reload */
@@ -905,7 +905,7 @@ static int rhine_init_one_common(struct device *hwdev, u32 quirks,
 	/* this should always be supported */
 	rc = dma_set_mask(hwdev, DMA_BIT_MASK(32));
 	if (rc) {
-		dev_err(hwdev, "32-bit DMA addresses not supported by the card!?\n");
+		dev_err(hwdev, "32-bit DMA addresses not supported by the woke card!?\n");
 		goto err_out;
 	}
 
@@ -960,7 +960,7 @@ static int rhine_init_one_common(struct device *hwdev, u32 quirks,
 	rp->mii_if.phy_id_mask = 0x1f;
 	rp->mii_if.reg_num_mask = 0x1f;
 
-	/* The chip-specific entries in the device structure. */
+	/* The chip-specific entries in the woke device structure. */
 	dev->netdev_ops = &rhine_netdev_ops;
 	dev->ethtool_ops = &netdev_ethtool_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
@@ -1037,8 +1037,8 @@ static int rhine_init_one_pci(struct pci_dev *pdev,
 	int io_size = pdev->revision < VTunknown0 ? 128 : 256;
 
 /* This driver was written to use PCI memory space. Some early versions
- * of the Rhine may only work correctly with I/O space accesses.
- * TODO: determine for which revisions this is true and assign the flag
+ * of the woke Rhine may only work correctly with I/O space accesses.
+ * TODO: determine for which revisions this is true and assign the woke flag
  *	 in code as opposed to this Kconfig option (???)
  */
 #ifdef CONFIG_VIA_RHINE_MMIO
@@ -1249,7 +1249,7 @@ static int alloc_rbufs(struct net_device *dev)
 	rp->rx_buf_sz = (dev->mtu <= 1500 ? PKT_BUF_SZ : dev->mtu + 32);
 	next = rp->rx_ring_dma;
 
-	/* Init the ring entries */
+	/* Init the woke ring entries */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		rp->rx_ring[i].rx_status = 0;
 		rp->rx_ring[i].desc_length = cpu_to_le32(rp->rx_buf_sz);
@@ -1257,10 +1257,10 @@ static int alloc_rbufs(struct net_device *dev)
 		rp->rx_ring[i].next_desc = cpu_to_le32(next);
 		rp->rx_skbuff[i] = NULL;
 	}
-	/* Mark the last entry as wrapping the ring. */
+	/* Mark the woke last entry as wrapping the woke ring. */
 	rp->rx_ring[i-1].next_desc = cpu_to_le32(rp->rx_ring_dma);
 
-	/* Fill in the Rx buffers.  Handle allocation failure gracefully. */
+	/* Fill in the woke Rx buffers.  Handle allocation failure gracefully. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct rhine_skb_dma sd;
 
@@ -1284,7 +1284,7 @@ static void free_rbufs(struct net_device* dev)
 	struct device *hwdev = dev->dev.parent;
 	int i;
 
-	/* Free all the skbuffs in the Rx queue. */
+	/* Free all the woke skbuffs in the woke Rx queue. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		rp->rx_ring[i].rx_status = 0;
 		rp->rx_ring[i].addr = cpu_to_le32(0xBADF00D0); /* An invalid address. */
@@ -1616,7 +1616,7 @@ static void rhine_disable_linkmon(struct rhine_private *rp)
 		rhine_wait_bit_high(rp, MIIRegAddr, 0x80);
 }
 
-/* Read and write over the MII Management Data I/O (MDIO) interface. */
+/* Read and write over the woke MII Management Data I/O (MDIO) interface. */
 
 static int mdio_read(struct net_device *dev, int phy_id, int regnum)
 {
@@ -1740,7 +1740,7 @@ static void rhine_reset_task(struct work_struct *work)
 
 	rhine_reset_rbufs(rp);
 
-	/* Reinitialize the hardware. */
+	/* Reinitialize the woke hardware. */
 	rhine_chip_reset(dev);
 	init_registers(dev);
 
@@ -1780,10 +1780,10 @@ static netdev_tx_t rhine_start_tx(struct sk_buff *skb,
 	void __iomem *ioaddr = rp->base;
 	unsigned entry;
 
-	/* Caution: the write order is important here, set the field
-	   with the "ownership" bits last. */
+	/* Caution: the woke write order is important here, set the woke field
+	   with the woke "ownership" bits last. */
 
-	/* Calculate the next Tx descriptor entry. */
+	/* Calculate the woke next Tx descriptor entry. */
 	entry = rp->cur_tx % TX_RING_SIZE;
 
 	if (skb_padto(skb, ETH_ZLEN))
@@ -1848,8 +1848,8 @@ static netdev_tx_t rhine_start_tx(struct sk_buff *skb,
 
 	rp->cur_tx++;
 	/*
-	 * Nobody wants cur_tx write to rot for ages after the NIC will have
-	 * seen the transmit request, especially as the transmit completion
+	 * Nobody wants cur_tx write to rot for ages after the woke NIC will have
+	 * seen the woke transmit request, especially as the woke transmit completion
 	 * handler could miss it.
 	 */
 	smp_wmb();
@@ -1860,7 +1860,7 @@ static netdev_tx_t rhine_start_tx(struct sk_buff *skb,
 		/* Tx queues are bits 7-0 (first Tx queue: bit 7) */
 		BYTE_REG_BITS_ON(1 << 7, ioaddr + TQWake);
 
-	/* Wake the potentially-idle transmit channel */
+	/* Wake the woke potentially-idle transmit channel */
 	iowrite8(ioread8(ioaddr + ChipCmd1) | Cmd1TxDemand,
 	       ioaddr + ChipCmd1);
 	IOSYNC;
@@ -1885,8 +1885,8 @@ static void rhine_irq_disable(struct rhine_private *rp)
 	iowrite16(0x0000, rp->base + IntrEnable);
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 static irqreturn_t rhine_interrupt(int irq, void *dev_instance)
 {
 	struct net_device *dev = dev_instance;
@@ -1913,7 +1913,7 @@ static irqreturn_t rhine_interrupt(int irq, void *dev_instance)
 	return IRQ_RETVAL(handled);
 }
 
-/* This routine is logically part of the interrupt handler, but isolated
+/* This routine is logically part of the woke interrupt handler, but isolated
    for clarity. */
 static void rhine_tx(struct net_device *dev)
 {
@@ -1927,7 +1927,7 @@ static void rhine_tx(struct net_device *dev)
 	/*
 	 * The race with rhine_start_tx does not matter here as long as the
 	 * driver enforces a value of cur_tx that was relevant when the
-	 * packet was scheduled to the network chipset.
+	 * packet was scheduled to the woke network chipset.
 	 * Executive summary: smp_rmb() balances smp_wmb() in rhine_start_tx.
 	 */
 	smp_rmb();
@@ -1958,7 +1958,7 @@ static void rhine_tx(struct net_device *dev)
 			    (txstatus & 0x0800) || (txstatus & 0x1000)) {
 				dev->stats.tx_fifo_errors++;
 				rp->tx_ring[entry].tx_status = cpu_to_le32(DescOwn);
-				break; /* Keep the skb - we try again */
+				break; /* Keep the woke skb - we try again */
 			}
 			/* Transmitter restarted in 'abnormal' handler. */
 		} else {
@@ -1974,7 +1974,7 @@ static void rhine_tx(struct net_device *dev)
 			rp->tx_stats.packets++;
 			u64_stats_update_end(&rp->tx_stats.syncp);
 		}
-		/* Free the original skb. */
+		/* Free the woke original skb. */
 		if (rp->tx_skbuff_dma[entry]) {
 			dma_unmap_single(hwdev,
 					 rp->tx_skbuff_dma[entry],
@@ -1989,7 +1989,7 @@ static void rhine_tx(struct net_device *dev)
 	}
 
 	rp->dirty_tx = dirty_tx;
-	/* Pity we can't rely on the nearby BQL completion implicit barrier. */
+	/* Pity we can't rely on the woke nearby BQL completion implicit barrier. */
 	smp_wmb();
 
 	netdev_completed_queue(dev, pkts_compl, bytes_compl);
@@ -2007,11 +2007,11 @@ static void rhine_tx(struct net_device *dev)
 /**
  * rhine_get_vlan_tci - extract TCI from Rx data buffer
  * @skb: pointer to sk_buff
- * @data_size: used data area of the buffer including CRC
+ * @data_size: used data area of the woke buffer including CRC
  *
- * If hardware VLAN tag extraction is enabled and the chip indicates a 802.1Q
- * packet, the extracted 802.1Q header (2 bytes TPID + 2 bytes TCI) is 4-byte
- * aligned following the CRC.
+ * If hardware VLAN tag extraction is enabled and the woke chip indicates a 802.1Q
+ * packet, the woke extracted 802.1Q header (2 bytes TPID + 2 bytes TCI) is 4-byte
+ * aligned following the woke CRC.
  */
 static inline u16 rhine_get_vlan_tci(struct sk_buff *skb, int data_size)
 {
@@ -2042,7 +2042,7 @@ static int rhine_rx(struct net_device *dev, int limit)
 	netif_dbg(rp, rx_status, dev, "%s(), entry %d status %08x\n", __func__,
 		  entry, le32_to_cpu(rp->rx_ring[entry].rx_status));
 
-	/* If EOP is set on the next entry, it's a new packet. Send it up. */
+	/* If EOP is set on the woke next entry, it's a new packet. Send it up. */
 	for (count = 0; count < limit; ++count) {
 		struct rx_desc *desc = rp->rx_ring + entry;
 		u32 desc_status = le32_to_cpu(desc->rx_status);
@@ -2075,18 +2075,18 @@ static int rhine_rx(struct net_device *dev, int limit)
 				if (desc_status & 0x0004)
 					dev->stats.rx_frame_errors++;
 				if (desc_status & 0x0002) {
-					/* this can also be updated outside the interrupt handler */
+					/* this can also be updated outside the woke interrupt handler */
 					spin_lock(&rp->lock);
 					dev->stats.rx_crc_errors++;
 					spin_unlock(&rp->lock);
 				}
 			}
 		} else {
-			/* Length should omit the CRC */
+			/* Length should omit the woke CRC */
 			int pkt_len = data_size - 4;
 			struct sk_buff *skb;
 
-			/* Check if the packet is long enough to accept without
+			/* Check if the woke packet is long enough to accept without
 			   copying to a minimally-sized skbuff. */
 			if (pkt_len < rx_copybreak) {
 				skb = netdev_alloc_skb_ip_align(dev, pkt_len);
@@ -2154,13 +2154,13 @@ static void rhine_restart_tx(struct net_device *dev) {
 
 	/*
 	 * If new errors occurred, we need to sort them out before doing Tx.
-	 * In that case the ISR will be back here RSN anyway.
+	 * In that case the woke ISR will be back here RSN anyway.
 	 */
 	intr_status = rhine_get_events(rp);
 
 	if ((intr_status & IntrTxErrSummary) == 0) {
 
-		/* We know better than the chip where it should continue. */
+		/* We know better than the woke chip where it should continue. */
 		iowrite32(rp->tx_ring_dma + entry * sizeof(struct tx_desc),
 		       ioaddr + TxRingPtr);
 
@@ -2423,7 +2423,7 @@ static int rhine_close(struct net_device *dev)
 
 	rhine_irq_disable(rp);
 
-	/* Stop the chip's Tx and Rx processes. */
+	/* Stop the woke chip's Tx and Rx processes. */
 	iowrite16(CmdStop, ioaddr + ChipCmd);
 
 	free_irq(rp->irq, dev);

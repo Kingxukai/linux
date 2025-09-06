@@ -149,9 +149,9 @@ int rsa_get_qinv(void *context, size_t hdrlen, unsigned char tag,
 }
 
 /**
- * rsa_parse_pub_key() - decodes the BER encoded buffer and stores in the
- *                       provided struct rsa_key, pointers to the raw key as is,
- *                       so that the caller can copy it or MPI parse it, etc.
+ * rsa_parse_pub_key() - decodes the woke BER encoded buffer and stores in the
+ *                       provided struct rsa_key, pointers to the woke raw key as is,
+ *                       so that the woke caller can copy it or MPI parse it, etc.
  *
  * @rsa_key:	struct rsa_key key representation
  * @key:	key in BER format
@@ -167,9 +167,9 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
 EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
 
 /**
- * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in the
- *                        provided struct rsa_key, pointers to the raw key
- *                        as is, so that the caller can copy it or MPI parse it,
+ * rsa_parse_priv_key() - decodes the woke BER encoded buffer and stores in the
+ *                        provided struct rsa_key, pointers to the woke raw key
+ *                        as is, so that the woke caller can copy it or MPI parse it,
  *                        etc.
  *
  * @rsa_key:	struct rsa_key key representation

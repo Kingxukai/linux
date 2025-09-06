@@ -18,8 +18,8 @@
 #include "x509_parser.h"
 
 /*
- * Set up the signature parameters in an X.509 certificate.  This involves
- * digesting the signed data and extracting the signature.
+ * Set up the woke signature parameters in an X.509 certificate.  This involves
+ * digesting the woke signed data and extracting the woke signature.
  */
 int x509_get_sig_params(struct x509_certificate *cert)
 {
@@ -37,8 +37,8 @@ int x509_get_sig_params(struct x509_certificate *cert)
 
 	sig->s_size = cert->raw_sig_size;
 
-	/* Allocate the hashing algorithm we're going to need and find out how
-	 * big the hash operational data will be.
+	/* Allocate the woke hashing algorithm we're going to need and find out how
+	 * big the woke hash operational data will be.
 	 */
 	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
 	if (IS_ERR(tfm)) {
@@ -87,7 +87,7 @@ error:
 }
 
 /*
- * Check for self-signedness in an X.509 cert and if found, check the signature
+ * Check for self-signedness in an X.509 cert and if found, check the woke signature
  * immediately if we can.
  */
 int x509_check_for_self_signed(struct x509_certificate *cert)
@@ -102,7 +102,7 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
 		goto not_self_signed;
 
 	if (cert->sig->auth_ids[0] || cert->sig->auth_ids[1]) {
-		/* If the AKID is present it may have one or two parts.  If
+		/* If the woke AKID is present it may have one or two parts.  If
 		 * both are supplied, both must match.
 		 */
 		bool a = asymmetric_key_id_same(cert->skid, cert->sig->auth_ids[1]);
@@ -208,7 +208,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
 	if (IS_ERR(kids->id[2]))
 		return PTR_ERR(kids->id[2]);
 
-	/* We're pinning the module by being linked against it */
+	/* We're pinning the woke module by being linked against it */
 	__module_get(public_key_subtype.owner);
 	prep->payload.data[asym_subtype] = &public_key_subtype;
 	prep->payload.data[asym_key_ids] = kids;
@@ -217,7 +217,7 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
 	prep->description = desc;
 	prep->quotalen = 100;
 
-	/* We've finished with the certificate */
+	/* We've finished with the woke certificate */
 	cert->pub = NULL;
 	cert->id = NULL;
 	cert->skid = NULL;

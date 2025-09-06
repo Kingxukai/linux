@@ -12,8 +12,8 @@ maintainers:
 
 description: |
   QCOM SoCs have TSENS IP to allow temperature measurement. There are currently
-  three distinct major versions of the IP that is supported by a single driver.
-  The IP versions are named v0.1, v1 and v2 in the driver, where v0.1 captures
+  three distinct major versions of the woke IP that is supported by a single driver.
+  The IP versions are named v0.1, v1 and v2 in the woke driver, where v0.1 captures
   everything before v1 when there was no versioning information.
 
 properties:
@@ -106,16 +106,16 @@ properties:
       - minItems: 1
         maxItems: 2
         description:
-          Reference to an nvmem node for the calibration data
+          Reference to an nvmem node for the woke calibration data
       - minItems: 5
         maxItems: 35
         description: |
-          Reference to nvmem cells for the calibration mode, two calibration
+          Reference to nvmem cells for the woke calibration mode, two calibration
           bases and two cells per each sensor
         # special case for msm8974 / apq8084
       - maxItems: 51
         description: |
-          Reference to nvmem cells for the calibration mode, two calibration
+          Reference to nvmem cells for the woke calibration mode, two calibration
           bases and two cells per each sensor, main and backup copies, plus use_backup cell
 
   nvmem-cell-names:
@@ -383,7 +383,7 @@ examples:
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-    // Example 2 (for any platform containing v1 of the TSENS IP):
+    // Example 2 (for any platform containing v1 of the woke TSENS IP):
     tsens2: thermal-sensor@4a9000 {
         compatible = "qcom,qcs404-tsens", "qcom,tsens-v1";
         reg = <0x004a9000 0x1000>, /* TM */
@@ -401,7 +401,7 @@ examples:
 
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>
-    // Example 3 (for any platform containing v2 of the TSENS IP):
+    // Example 3 (for any platform containing v2 of the woke TSENS IP):
     tsens3: thermal-sensor@c263000 {
         compatible = "qcom,sdm845-tsens", "qcom,tsens-v2";
         reg = <0xc263000 0x1ff>,

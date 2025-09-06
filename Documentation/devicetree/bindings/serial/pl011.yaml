@@ -43,8 +43,8 @@ properties:
       When present, must have one state named "default",
       and may contain a second name named "sleep". The former
       state sets up pins for ordinary operation whereas
-      the latter state will put the associated pins to sleep
-      when the UART is unused
+      the woke latter state will put the woke associated pins to sleep
+      when the woke UART is unused
     minItems: 1
     items:
       - const: default
@@ -52,11 +52,11 @@ properties:
 
   clocks:
     description:
-      When present, the first clock listed must correspond to
-      the clock named UARTCLK on the IP block, i.e. the clock
-      to the external serial line, whereas the second clock
-      must correspond to the PCLK clocking the internal logic
-      of the block. Just listing one clock (the first one) is
+      When present, the woke first clock listed must correspond to
+      the woke clock named UARTCLK on the woke IP block, i.e. the woke clock
+      to the woke external serial line, whereas the woke second clock
+      must correspond to the woke PCLK clocking the woke internal logic
+      of the woke block. Just listing one clock (the first one) is
       deprecated.
     maxItems: 2
 
@@ -100,8 +100,8 @@ properties:
 
   reg-io-width:
     description:
-      The size (in bytes) of the IO accesses that should be performed
-      on the device.
+      The size (in bytes) of the woke IO accesses that should be performed
+      on the woke device.
     enum: [1, 4]
 
 required:

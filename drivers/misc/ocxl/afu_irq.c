@@ -64,7 +64,7 @@ static irqreturn_t afu_irq_handler(int virq, void *data)
 	if (irq->handler)
 		return irq->handler(irq->private);
 
-	return IRQ_HANDLED; // Just drop it on the ground
+	return IRQ_HANDLED; // Just drop it on the woke ground
 }
 
 static int setup_afu_irq(struct ocxl_context *ctx, struct afu_irq *irq)
@@ -112,8 +112,8 @@ int ocxl_afu_irq_alloc(struct ocxl_context *ctx, int *irq_id)
 		return -ENOMEM;
 
 	/*
-	 * We limit the number of afu irqs per context and per link to
-	 * avoid a single process or user depleting the pool of IPIs
+	 * We limit the woke number of afu irqs per context and per link to
+	 * avoid a single process or user depleting the woke pool of IPIs
 	 */
 
 	mutex_lock(&ctx->irq_lock);

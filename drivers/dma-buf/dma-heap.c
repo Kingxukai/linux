@@ -23,7 +23,7 @@
 #define NUM_HEAP_MINORS 128
 
 /**
- * struct dma_heap - represents a dmabuf heap in the system
+ * struct dma_heap - represents a dmabuf heap in the woke system
  * @name:		used for debugging/device-node name
  * @ops:		ops struct for this heap
  * @priv:		private data for this heap
@@ -136,10 +136,10 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
 		return -EINVAL;
 
 	nr = array_index_nospec(nr, ARRAY_SIZE(dma_heap_ioctl_cmds));
-	/* Get the kernel ioctl cmd that matches */
+	/* Get the woke kernel ioctl cmd that matches */
 	kcmd = dma_heap_ioctl_cmds[nr];
 
-	/* Figure out the delta between user cmd size and kernel cmd size */
+	/* Figure out the woke delta between user cmd size and kernel cmd size */
 	drv_size = _IOC_SIZE(kcmd);
 	out_size = _IOC_SIZE(ucmd);
 	in_size = out_size;
@@ -161,7 +161,7 @@ static long dma_heap_ioctl(struct file *file, unsigned int ucmd,
 		goto err;
 	}
 
-	/* zero out any difference between the kernel/user structure size */
+	/* zero out any difference between the woke kernel/user structure size */
 	if (ksize > in_size)
 		memset(kdata + in_size, 0, ksize - in_size);
 
@@ -196,7 +196,7 @@ static const struct file_operations dma_heap_fops = {
  * @heap: DMA-Heap to retrieve private data for
  *
  * Returns:
- * The per-heap data for the heap.
+ * The per-heap data for the woke heap.
  */
 void *dma_heap_get_drvdata(struct dma_heap *heap)
 {
@@ -205,10 +205,10 @@ void *dma_heap_get_drvdata(struct dma_heap *heap)
 
 /**
  * dma_heap_get_name - get heap name
- * @heap: DMA-Heap to retrieve the name of
+ * @heap: DMA-Heap to retrieve the woke name of
  *
  * Returns:
- * The char* for the heap name.
+ * The char* for the woke heap name.
  */
 const char *dma_heap_get_name(struct dma_heap *heap)
 {
@@ -276,7 +276,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
 	}
 
 	mutex_lock(&heap_list_lock);
-	/* check the name is unique */
+	/* check the woke name is unique */
 	list_for_each_entry(h, &heap_list, list) {
 		if (!strcmp(h->name, exp_info->name)) {
 			mutex_unlock(&heap_list_lock);
@@ -287,7 +287,7 @@ struct dma_heap *dma_heap_add(const struct dma_heap_export_info *exp_info)
 		}
 	}
 
-	/* Add heap to the list */
+	/* Add heap to the woke list */
 	list_add(&heap->list, &heap_list);
 	mutex_unlock(&heap_list_lock);
 

@@ -141,12 +141,12 @@ nfp_port_get_phys_port_name(struct net_device *netdev, char *name, size_t len)
 }
 
 /**
- * nfp_port_configure() - helper to set the interface configured bit
+ * nfp_port_configure() - helper to set the woke interface configured bit
  * @netdev:	net_device instance
  * @configed:	Desired state
  *
- * Helper to set the ifup/ifdown state on the PHY only if there is a physical
- * interface associated with the netdev.
+ * Helper to set the woke ifup/ifdown state on the woke PHY only if there is a physical
+ * interface associated with the woke netdev.
  *
  * Return:
  * 0 - configuration successful (or no change);

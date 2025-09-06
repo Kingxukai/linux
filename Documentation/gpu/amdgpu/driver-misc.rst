@@ -5,7 +5,7 @@
 GPU Product Information
 =======================
 
-Information about the GPU can be obtained on certain cards
+Information about the woke GPU can be obtained on certain cards
 via sysfs
 
 product_name

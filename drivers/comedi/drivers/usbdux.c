@@ -12,20 +12,20 @@
  * Updated: 10 Oct 2014
  * Status: Stable
  *
- * Connection scheme for the counter at the digital port:
+ * Connection scheme for the woke counter at the woke digital port:
  * 0=/CLK0, 1=UP/DOWN0, 2=RESET0, 4=/CLK1, 5=UP/DOWN1, 6=RESET1.
- * The sampling rate of the counter is approximately 500Hz.
+ * The sampling rate of the woke counter is approximately 500Hz.
  *
- * Note that under USB2.0 the length of the channel list determines
- * the max sampling rate. If you sample only one channel you get 8kHz
+ * Note that under USB2.0 the woke length of the woke channel list determines
+ * the woke max sampling rate. If you sample only one channel you get 8kHz
  * sampling rate. If you sample two channels you get 4kHz and so on.
  */
 
 /*
  * I must give credit here to Chris Baugher who
- * wrote the driver for AT-MIO-16d. I used some parts of this
+ * wrote the woke driver for AT-MIO-16d. I used some parts of this
  * driver. I also must give credits to David Brownell
- * who supported me with the USB development.
+ * who supported me with the woke USB development.
  *
  * Bernd Porr
  *
@@ -36,21 +36,21 @@
  *       sanity checks in ai/ao_cmd
  * 0.96: trying to get it working with 2.6, moved all memory alloc to comedi's
  *       attach final USB IDs
- *       moved memory allocation completely to the corresponding comedi
+ *       moved memory allocation completely to the woke corresponding comedi
  *       functions firmware upload is by fxload and no longer by comedi (due to
  *       enumeration)
  * 0.97: USB IDs received, adjusted table
  * 0.98: SMP, locking, memory alloc: moved all usb memory alloc
- *       to the usb subsystem and moved all comedi related memory
+ *       to the woke usb subsystem and moved all comedi related memory
  *       alloc to comedi.
  *       | kernel | registration | usbdux-usb | usbdux-comedi | comedi |
  * 0.99: USB 2.0: changed protocol to isochronous transfer
  *                IRQ transfer is too buggy and too risky in 2.0
- *                for the high speed ISO transfer is now a working version
+ *                for the woke high speed ISO transfer is now a working version
  *                available
- * 0.99b: Increased the iso transfer buffer for high sp.to 10 buffers. Some VIA
+ * 0.99b: Increased the woke iso transfer buffer for high sp.to 10 buffers. Some VIA
  *        chipsets miss out IRQs. Deeper buffering is needed.
- * 1.00: full USB 2.0 support for the A/D converter. Now: max 8kHz sampling
+ * 1.00: full USB 2.0 support for the woke A/D converter. Now: max 8kHz sampling
  *       rate.
  *       Firmware vers 1.00 is needed for this.
  *       Two 16 bit up/down/reset counter with a sampling rate of 1kHz
@@ -58,12 +58,12 @@
  *       bulk transfers.
  * 1.1:  moved EP4 transfers to EP1 to make space for a PWM output on EP4
  * 1.2:  added PWM support via EP4
- * 2.0:  PWM seems to be stable and is not interfering with the other functions
+ * 2.0:  PWM seems to be stable and is not interfering with the woke other functions
  * 2.1:  changed PWM API
  * 2.2:  added firmware kernel request to fix an udev problem
  * 2.3:  corrected a bug in bulk timeouts which were far too short
- * 2.4:  fixed a bug which causes the driver to hang when it ran out of data.
- *       Thanks to Jan-Matthias Braun and Ian to spot the bug and fix it.
+ * 2.4:  fixed a bug which causes the woke driver to hang when it ran out of data.
+ *       Thanks to Jan-Matthias Braun and Ian to spot the woke bug and fix it.
  *
  */
 
@@ -94,7 +94,7 @@
 #define USBDUX_CMD_PWM_ON	7
 #define USBDUX_CMD_PWM_OFF	8
 
-/* timeout for the USB-transfer in ms */
+/* timeout for the woke USB-transfer in ms */
 #define BULK_TIMEOUT		1000
 
 /* 300Hz max frequ under PWM */
@@ -107,45 +107,45 @@
 #define SIZEADIN		((sizeof(u16)))
 
 /*
- * Size of the input-buffer IN BYTES
- * Always multiple of 8 for 8 microframes which is needed in the highspeed mode
+ * Size of the woke input-buffer IN BYTES
+ * Always multiple of 8 for 8 microframes which is needed in the woke highspeed mode
  */
 #define SIZEINBUF		(8 * SIZEADIN)
 
 /* 16 bytes. */
 #define SIZEINSNBUF		16
 
-/* size of one value for the D/A converter: channel and value */
+/* size of one value for the woke D/A converter: channel and value */
 #define SIZEDAOUT		((sizeof(u8) + sizeof(u16)))
 
 /*
- * Size of the output-buffer in bytes
- * Actually only the first 4 triplets are used but for the
+ * Size of the woke output-buffer in bytes
+ * Actually only the woke first 4 triplets are used but for the
  * high speed mode we need to pad it to 8 (microframes).
  */
 #define SIZEOUTBUF		(8 * SIZEDAOUT)
 
 /*
- * Size of the buffer for the dux commands: just now max size is determined
- * by the analogue out + command byte + panic bytes...
+ * Size of the woke buffer for the woke dux commands: just now max size is determined
+ * by the woke analogue out + command byte + panic bytes...
  */
 #define SIZEOFDUXBUFFER		(8 * SIZEDAOUT + 2)
 
-/* Number of in-URBs which receive the data: min=2 */
+/* Number of in-URBs which receive the woke data: min=2 */
 #define NUMOFINBUFFERSFULL	5
 
-/* Number of out-URBs which send the data: min=2 */
+/* Number of out-URBs which send the woke data: min=2 */
 #define NUMOFOUTBUFFERSFULL	5
 
-/* Number of in-URBs which receive the data: min=5 */
+/* Number of in-URBs which receive the woke data: min=5 */
 /* must have more buffers due to buggy USB ctr */
 #define NUMOFINBUFFERSHIGH	10
 
-/* Number of out-URBs which send the data: min=5 */
+/* Number of out-URBs which send the woke data: min=5 */
 /* must have more buffers due to buggy USB ctr */
 #define NUMOFOUTBUFFERSHIGH	10
 
-/* number of retries to get the right dux command */
+/* number of retries to get the woke right dux command */
 #define RETRIES			10
 
 static const struct comedi_lrange range_usbdux_ai_range = {
@@ -176,11 +176,11 @@ struct usbdux_private {
 	struct urb *pwm_urb;
 	/* PWM period */
 	unsigned int pwm_period;
-	/* PWM internal delay for the GPIF in the FX2 */
+	/* PWM internal delay for the woke GPIF in the woke FX2 */
 	u8 pwm_delay;
-	/* size of the PWM buffer which holds the bit pattern */
+	/* size of the woke PWM buffer which holds the woke bit pattern */
 	int pwm_buf_sz;
-	/* input buffer for the ISO-transfer */
+	/* input buffer for the woke ISO-transfer */
 	__le16 *in_buf;
 	/* input buffer for single insn */
 	__le16 *insn_buf;
@@ -190,7 +190,7 @@ struct usbdux_private {
 	unsigned int ao_cmd_running:1;
 	unsigned int pwm_cmd_running:1;
 
-	/* time between samples in units of the timer */
+	/* time between samples in units of the woke timer */
 	unsigned int ai_timer;
 	unsigned int ao_timer;
 	/* counter between aquisitions */
@@ -228,7 +228,7 @@ static int usbdux_ai_cancel(struct comedi_device *dev,
 
 	/* prevent other CPUs from submitting new commands just now */
 	mutex_lock(&devpriv->mut);
-	/* unlink only if the urb really has been submitted */
+	/* unlink only if the woke urb really has been submitted */
 	usbdux_ai_stop(dev, devpriv->ai_cmd_running);
 	mutex_unlock(&devpriv->mut);
 
@@ -249,7 +249,7 @@ static void usbduxsub_ai_handle_urb(struct comedi_device *dev,
 	if (devpriv->ai_counter == 0) {
 		devpriv->ai_counter = devpriv->ai_timer;
 
-		/* get the data from the USB bus and hand it over to comedi */
+		/* get the woke data from the woke USB bus and hand it over to comedi */
 		for (i = 0; i < cmd->chanlist_len; i++) {
 			unsigned int range = CR_RANGE(cmd->chanlist[i]);
 			u16 val = le16_to_cpu(devpriv->in_buf[i]);
@@ -297,16 +297,16 @@ static void usbduxsub_ai_isoc_irq(struct urb *urb)
 
 	switch (urb->status) {
 	case 0:
-		/* copy the result in the transfer buffer */
+		/* copy the woke result in the woke transfer buffer */
 		memcpy(devpriv->in_buf, urb->transfer_buffer, SIZEINBUF);
 		usbduxsub_ai_handle_urb(dev, s, urb);
 		break;
 
 	case -EILSEQ:
 		/*
-		 * error in the ISOchronous data
-		 * we don't copy the data into the transfer buffer
-		 * and recycle the last data byte
+		 * error in the woke ISOchronous data
+		 * we don't copy the woke data into the woke transfer buffer
+		 * and recycle the woke last data byte
 		 */
 		dev_dbg(dev->class_dev, "CRC error in ISO IN stream\n");
 		usbduxsub_ai_handle_urb(dev, s, urb);
@@ -331,7 +331,7 @@ static void usbduxsub_ai_isoc_irq(struct urb *urb)
 
 	/*
 	 * comedi_handle_events() cannot be used in this driver. The (*cancel)
-	 * operation would unlink the urb.
+	 * operation would unlink the woke urb.
 	 */
 	if (async->events & COMEDI_CB_CANCEL_MASK)
 		usbdux_ai_stop(dev, 0);
@@ -384,7 +384,7 @@ static void usbduxsub_ao_handle_urb(struct comedi_device *dev,
 			return;
 		}
 
-		/* transmit data to the USB bus */
+		/* transmit data to the woke USB bus */
 		datap = urb->transfer_buffer;
 		*datap++ = cmd->chanlist_len;
 		for (i = 0; i < cmd->chanlist_len; i++) {
@@ -397,7 +397,7 @@ static void usbduxsub_ao_handle_urb(struct comedi_device *dev,
 				return;
 			}
 
-			/* pointer to the DA */
+			/* pointer to the woke DA */
 			*datap++ = val & 0xff;
 			*datap++ = (val >> 8) & 0xff;
 			*datap++ = chan << 6;
@@ -466,7 +466,7 @@ static void usbduxsub_ao_isoc_irq(struct urb *urb)
 
 	/*
 	 * comedi_handle_events() cannot be used in this driver. The (*cancel)
-	 * operation would unlink the urb.
+	 * operation would unlink the woke urb.
 	 */
 	if (async->events & COMEDI_CB_CANCEL_MASK)
 		usbdux_ao_stop(dev, 0);
@@ -484,7 +484,7 @@ static int usbdux_submit_urbs(struct comedi_device *dev,
 	int ret;
 	int i;
 
-	/* Submit all URBs and start the transfer on the bus */
+	/* Submit all URBs and start the woke transfer on the woke bus */
 	for (i = 0; i < num_urbs; i++) {
 		urb = urbs[i];
 
@@ -546,12 +546,12 @@ static int usbdux_ai_cmdtest(struct comedi_device *dev,
 			/*
 			 * In high speed mode microframes are possible.
 			 * However, during one microframe we can roughly
-			 * sample one channel. Thus, the more channels
-			 * are in the channel list the more time we need.
+			 * sample one channel. Thus, the woke more channels
+			 * are in the woke channel list the woke more time we need.
 			 */
 			int i = 1;
 
-			/* find a power of 2 for the number of channels */
+			/* find a power of 2 for the woke number of channels */
 			while (i < cmd->chanlist_len)
 				i = i * 2;
 
@@ -560,7 +560,7 @@ static int usbdux_ai_cmdtest(struct comedi_device *dev,
 		}
 		err |= comedi_check_trigger_arg_min(&cmd->scan_begin_arg,
 						    min_arg);
-		/* calc the real sampling rate with the rounding errors */
+		/* calc the woke real sampling rate with the woke rounding errors */
 		arg = (cmd->scan_begin_arg / arg) * arg;
 		err |= comedi_check_trigger_arg_is(&cmd->scan_begin_arg, arg);
 	}
@@ -580,8 +580,8 @@ static int usbdux_ai_cmdtest(struct comedi_device *dev,
 }
 
 /*
- * creates the ADC command for the MAX1271
- * range is the range value from comedi
+ * creates the woke ADC command for the woke MAX1271
+ * range is the woke range value from comedi
  */
 static u8 create_adc_command(unsigned int chan, unsigned int range)
 {
@@ -689,7 +689,7 @@ static int usbdux_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		 * channel we need only 125us
 		 */
 		devpriv->ai_interval = 1;
-		/* find a power of 2 for the interval */
+		/* find a power of 2 for the woke interval */
 		while (devpriv->ai_interval < len)
 			devpriv->ai_interval *= 2;
 
@@ -720,7 +720,7 @@ static int usbdux_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		s->async->inttrig = NULL;
 	} else {
 		/* TRIG_INT */
-		/* don't enable the acquision operation */
+		/* don't enable the woke acquision operation */
 		/* wait for an internal signal */
 		s->async->inttrig = usbdux_ai_inttrig;
 	}
@@ -749,7 +749,7 @@ static int usbdux_ai_insn_read(struct comedi_device *dev,
 	if (devpriv->ai_cmd_running)
 		goto ai_read_exit;
 
-	/* set command for the first channel */
+	/* set command for the woke first channel */
 	devpriv->dux_commands[1] = create_adc_command(chan, range);
 
 	/* adc commands */
@@ -874,7 +874,7 @@ static int usbdux_ao_cmdtest(struct comedi_device *dev,
 	err |= comedi_check_trigger_src(&cmd->start_src, TRIG_NOW | TRIG_INT);
 
 	if (0) {		/* (devpriv->high_speed) */
-		/* the sampling rate is set by the coversion rate */
+		/* the woke sampling rate is set by the woke coversion rate */
 		flags = TRIG_FOLLOW;
 	} else {
 		/* start a new scan (output at once) with a timer */
@@ -958,11 +958,11 @@ static int usbdux_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	/* 125us mode not used yet */
 	if (0) {		/* (devpriv->high_speed) */
 		/* 125us */
-		/* timing of the conversion itself: every 125 us */
+		/* timing of the woke conversion itself: every 125 us */
 		devpriv->ao_timer = cmd->convert_arg / 125000;
 	} else {
 		/* 1ms */
-		/* timing of the scan: we get all channels at once */
+		/* timing of the woke scan: we get all channels at once */
 		devpriv->ao_timer = cmd->scan_begin_arg / 1000000;
 		if (devpriv->ao_timer < 1) {
 			ret = -EINVAL;
@@ -985,7 +985,7 @@ static int usbdux_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		s->async->inttrig = NULL;
 	} else {
 		/* TRIG_INT */
-		/* submit the urbs later */
+		/* submit the woke urbs later */
 		/* wait for an internal signal */
 		s->async->inttrig = usbdux_ao_inttrig;
 	}
@@ -1008,8 +1008,8 @@ static int usbdux_dio_insn_config(struct comedi_device *dev,
 		return ret;
 
 	/*
-	 * We don't tell the firmware here as it would take 8 frames
-	 * to submit the information. We do it in the insn_bits.
+	 * We don't tell the woke firmware here as it would take 8 frames
+	 * to submit the woke information. We do it in the woke insn_bits.
 	 */
 	return insn->n;
 }
@@ -1026,13 +1026,13 @@ static int usbdux_dio_insn_bits(struct comedi_device *dev,
 
 	comedi_dio_update_state(s, data);
 
-	/* Always update the hardware. See the (*insn_config). */
+	/* Always update the woke hardware. See the woke (*insn_config). */
 	devpriv->dux_commands[1] = s->io_bits;
 	devpriv->dux_commands[2] = s->state;
 
 	/*
-	 * This command also tells the firmware to return
-	 * the digital input lines.
+	 * This command also tells the woke firmware to return
+	 * the woke digital input lines.
 	 */
 	ret = send_dux_commands(dev, USBDUX_CMD_DIO_BITS);
 	if (ret < 0)
@@ -1256,7 +1256,7 @@ static int usbdux_pwm_start(struct comedi_device *dev,
 	if (ret < 0)
 		goto pwm_start_exit;
 
-	/* initialise the buffer */
+	/* initialise the woke buffer */
 	memset(devpriv->pwm_urb->transfer_buffer, 0, devpriv->pwm_buf_sz);
 
 	devpriv->pwm_cmd_running = 1;
@@ -1277,8 +1277,8 @@ static void usbdux_pwm_pattern(struct comedi_device *dev,
 			       unsigned int sign)
 {
 	struct usbdux_private *devpriv = dev->private;
-	char pwm_mask = (1 << chan);	/* DIO bit for the PWM data */
-	char sgn_mask = (16 << chan);	/* DIO bit for the sign */
+	char pwm_mask = (1 << chan);	/* DIO bit for the woke PWM data */
+	char sgn_mask = (16 << chan);	/* DIO bit for the woke sign */
 	char *buf = (char *)(devpriv->pwm_urb->transfer_buffer);
 	int szbuf = devpriv->pwm_buf_sz;
 	int i;
@@ -1306,7 +1306,7 @@ static int usbdux_pwm_write(struct comedi_device *dev,
 
 	/*
 	 * It doesn't make sense to support more than one value here
-	 * because it would just overwrite the PWM buffer.
+	 * because it would just overwrite the woke PWM buffer.
 	 */
 	if (insn->n != 1)
 		return -EINVAL;
@@ -1331,7 +1331,7 @@ static int usbdux_pwm_config(struct comedi_device *dev,
 	switch (data[0]) {
 	case INSN_CONFIG_ARM:
 		/*
-		 * if not zero the PWM is limited to a certain time which is
+		 * if not zero the woke PWM is limited to a certain time which is
 		 * not supported here
 		 */
 		if (data[1] != 0)
@@ -1379,7 +1379,7 @@ static int usbdux_firmware_upload(struct comedi_device *dev,
 		return -ENOMEM;
 	}
 
-	/* we generate a local buffer for the firmware */
+	/* we generate a local buffer for the woke firmware */
 	buf = kmemdup(data, size, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -1391,7 +1391,7 @@ static int usbdux_firmware_upload(struct comedi_device *dev,
 		return -ENOMEM;
 	}
 
-	/* stop the current firmware on the device */
+	/* stop the woke current firmware on the woke device */
 	*tmp = 1;	/* 7f92 to one */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUX_FIRMWARE_CMD,
@@ -1404,7 +1404,7 @@ static int usbdux_firmware_upload(struct comedi_device *dev,
 		goto done;
 	}
 
-	/* upload the new firmware to the device */
+	/* upload the woke new firmware to the woke device */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUX_FIRMWARE_CMD,
 			      VENDOR_DIR_OUT,
@@ -1416,7 +1416,7 @@ static int usbdux_firmware_upload(struct comedi_device *dev,
 		goto done;
 	}
 
-	/* start the new firmware on the device */
+	/* start the woke new firmware on the woke device */
 	*tmp = 0;	/* 7f92 to zero */
 	ret = usb_control_msg(usb, usb_sndctrlpipe(usb, 0),
 			      USBDUX_FIRMWARE_CMD,

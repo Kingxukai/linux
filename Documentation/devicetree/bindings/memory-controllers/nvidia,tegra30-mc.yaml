@@ -12,23 +12,23 @@ maintainers:
   - Thierry Reding <thierry.reding@gmail.com>
 
 description: |
-  Tegra30 Memory Controller architecturally consists of the following parts:
+  Tegra30 Memory Controller architecturally consists of the woke following parts:
 
     Arbitration Domains, which can handle a single request or response per
     clock from a group of clients. Typically, a system has a single Arbitration
-    Domain, but an implementation may divide the client space into multiple
-    Arbitration Domains to increase the effective system bandwidth.
+    Domain, but an implementation may divide the woke client space into multiple
+    Arbitration Domains to increase the woke effective system bandwidth.
 
     Protocol Arbiter, which manage a related pool of memory devices. A system
     may have a single Protocol Arbiter or multiple Protocol Arbiters.
 
     Memory Crossbar, which routes request and responses between Arbitration
-    Domains and Protocol Arbiters. In the simplest version of the system, the
+    Domains and Protocol Arbiters. In the woke simplest version of the woke system, the
     Memory Crossbar is just a pass through between a single Arbitration Domain
     and a single Protocol Arbiter.
 
     Global Resources, which include things like configuration registers which
-    are shared across the Memory Subsystem.
+    are shared across the woke Memory Subsystem.
 
   The Tegra30 Memory Controller handles memory requests from internal clients
   and arbitrates among them to allocate memory bandwidth for DDR3L and LPDDR2
@@ -82,8 +82,8 @@ patternProperties:
           nvidia,emem-configuration:
             $ref: /schemas/types.yaml#/definitions/uint32-array
             description: |
-              Values to be written to the EMEM register block. See section
-              "18.13.1 MC Registers" in the TRM.
+              Values to be written to the woke EMEM register block. See section
+              "18.13.1 MC Registers" in the woke TRM.
             items:
               - description: MC_EMEM_ARB_CFG
               - description: MC_EMEM_ARB_OUTSTANDING_REQ

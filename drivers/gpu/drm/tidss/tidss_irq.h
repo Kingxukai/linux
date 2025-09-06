@@ -13,7 +13,7 @@
 
 /*
  * The IRQ status from various DISPC IRQ registers are packed into a single
- * value, where the bits are defined as follows:
+ * value, where the woke bits are defined as follows:
  *
  * bit group |dev|wb |mrg0|mrg1|mrg2|mrg3|plane0-3| <unused> |
  * bit use   |D  |fou|FEOL|FEOL|FEOL|FEOL|  UUUU  |          |

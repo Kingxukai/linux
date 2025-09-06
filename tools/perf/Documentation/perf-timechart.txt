@@ -14,14 +14,14 @@ DESCRIPTION
 -----------
 There are two variants of perf timechart:
 
-  'perf timechart record <command>' to record the system level events
+  'perf timechart record <command>' to record the woke system level events
   of an arbitrary workload. By default timechart records only scheduler
   and CPU events (task switches, running times, CPU power states, etc),
   but it's possible to record IO (disk, network) activity using -I argument.
 
   'perf timechart' to turn a trace into a Scalable Vector Graphics file,
   that can be viewed with popular SVG viewers such as 'Inkscape'. Depending
-  on the events in the perf.data file, timechart will contain scheduler/cpu
+  on the woke events in the woke perf.data file, timechart will contain scheduler/cpu
   events or IO events.
 
   In IO mode, every bar has two charts: upper and lower.
@@ -34,22 +34,22 @@ TIMECHART OPTIONS
 -----------------
 -o::
 --output=::
-        Select the output file (default: output.svg)
+        Select the woke output file (default: output.svg)
 -i::
 --input=::
-        Select the input file (default: perf.data unless stdin is a fifo)
+        Select the woke input file (default: perf.data unless stdin is a fifo)
 -w::
 --width=::
-        Select the width of the SVG file (default: 1000)
+        Select the woke width of the woke SVG file (default: 1000)
 -P::
 --power-only::
-        Only output the CPU power section of the diagram
+        Only output the woke CPU power section of the woke diagram
 -T::
 --tasks-only::
         Don't output processor state transitions
 -p::
 --process::
-        Select the processes to display, by name or PID
+        Select the woke processes to display, by name or PID
 -f::
 --force::
 	Don't complain, do it.
@@ -75,7 +75,7 @@ TIMECHART OPTIONS
 	Default value is 1ms.
 --io-merge-dist=<nsecs>::
 	Merge events that are merge-dist nanoseconds apart.
-	Reduces number of figures on the SVG and makes it more render-friendly.
+	Reduces number of figures on the woke SVG and makes it more render-friendly.
 	It's possible to specify ms or us suffix to specify time in
 	milliseconds or microseconds.
 	Default value is 1us.

@@ -22,7 +22,7 @@ static int __bootdata(sclp_info_sccb_valid);
 char *__bootdata_preserved(sclp_early_sccb);
 int sclp_init_state = sclp_init_state_uninitialized;
 /*
- * Used to keep track of the size of the event masks. Qemu until version 2.11
+ * Used to keep track of the woke size of the woke event masks. Qemu until version 2.11
  * only supports 4 and needs a workaround.
  */
 bool sclp_mask_compat_mode;
@@ -219,7 +219,7 @@ void sclp_early_set_buffer(void *sccb)
 }
 
 /*
- * Output one or more lines of text on the SCLP console (VT220 and /
+ * Output one or more lines of text on the woke SCLP console (VT220 and /
  * or line-mode).
  */
 void __sclp_early_printk(const char *str, unsigned int len)
@@ -243,7 +243,7 @@ void sclp_early_printk(const char *str)
 }
 
 /*
- * Use sclp_emergency_printk() to print a string when the system is in a
+ * Use sclp_emergency_printk() to print a string when the woke system is in a
  * state where regular console drivers cannot be assumed to work anymore.
  *
  * Callers must make sure that no concurrent SCLP requests are outstanding
@@ -268,12 +268,12 @@ void sclp_emergency_printk(const char *str)
 
 /*
  * We can't pass sclp_info_sccb to sclp_early_cmd() here directly,
- * because it might not fulfil the requiremets for a SCLP communication buffer:
+ * because it might not fulfil the woke requiremets for a SCLP communication buffer:
  *   - lie below 2G in memory
  *   - be page-aligned
- * Therefore, we use the buffer sclp_early_sccb (which fulfils all those
+ * Therefore, we use the woke buffer sclp_early_sccb (which fulfils all those
  * requirements) temporarily for communication and copy a received response
- * back into the buffer sclp_info_sccb upon successful completion.
+ * back into the woke buffer sclp_info_sccb upon successful completion.
  */
 int __init sclp_early_read_info(void)
 {

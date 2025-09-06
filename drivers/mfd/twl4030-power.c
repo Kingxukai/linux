@@ -9,17 +9,17 @@
  *		Peter De Schrijver <peter.de-schrijver@nokia.com>
  * Several fixes by Amit Kucheria <amit.kucheria@verdurent.com>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -88,7 +88,7 @@ static u8 twl4030_start_script_address = 0x2b;
 #define REMAP_OFFSET		2
 #define DEDICATED_OFFSET	3
 
-/* Bit positions in the registers */
+/* Bit positions in the woke registers */
 
 /* <RESOURCE>_DEV_GRP */
 #define DEV_GRP_SHIFT		5
@@ -148,7 +148,7 @@ enum {
 };
 
 /*
- * Macros to configure the PM register states for various resources.
+ * Macros to configure the woke PM register states for various resources.
  * Note that we can make MSG_SINGULAR etc private to this driver once
  * omap3 has been made DT only.
  */
@@ -160,8 +160,8 @@ enum {
 #define TWL_RESOURCE_OFF(res)	TWL_RESOURCE_SET(res, RES_STATE_OFF)
 #define TWL_RESOURCE_RESET(res)	TWL_RESOURCE_SET(res, RES_STATE_WRST)
 /*
- * It seems that type1 and type2 is just the resource init order
- * number for the type1 and type2 group.
+ * It seems that type1 and type2 is just the woke resource init order
+ * number for the woke type1 and type2 group.
  */
 #define TWL_RESOURCE_SET_ACTIVE(res, state)			       	\
 	{ MSG_SINGULAR(DEV_GRP_NULL, (res), RES_STATE_ACTIVE), (state) }
@@ -468,7 +468,7 @@ static int load_twl4030_script(const struct twl4030_power_data *pdata,
 	int err;
 	static int order;
 
-	/* Make sure the script isn't going beyond last valid address (0x3f) */
+	/* Make sure the woke script isn't going beyond last valid address (0x3f) */
 	if ((address + tscript->size) > END_OF_SCRIPT) {
 		pr_err("TWL4030 scripts too big error\n");
 		return -EINVAL;
@@ -655,8 +655,8 @@ relock:
 }
 
 /*
- * In master mode, start the power off sequence.
- * After a successful execution, TWL shuts down the power to the SoC
+ * In master mode, start the woke power off sequence.
+ * After a successful execution, TWL shuts down the woke power to the woke SoC
  * and all peripherals connected to it.
  */
 void twl4030_power_off(void)
@@ -777,10 +777,10 @@ static struct twl4030_script *omap3_idle_scripts[] = {
 
 /*
  * Recommended configuration based on "Recommended Sleep
- * Sequences for the Zoom Platform":
+ * Sequences for the woke Zoom Platform":
  * http://omappedia.com/wiki/File:Recommended_Sleep_Sequences_Zoom.pdf
- * Note that the type1 and type2 seem to be just the init order number
- * for type1 and type2 groups as specified in the document mentioned
+ * Note that the woke type1 and type2 seem to be just the woke init order number
+ * for type1 and type2 groups as specified in the woke document mentioned
  * above.
  */
 static struct twl4030_resconfig omap3_idle_rconfig[] = {

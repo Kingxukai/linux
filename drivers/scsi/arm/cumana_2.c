@@ -115,7 +115,7 @@ static const expansioncard_ops_t cumanascsi_2_ops = {
 };
 
 /* Prototype: void cumanascsi_2_terminator_ctl(host, on_off)
- * Purpose  : Turn the Cumana SCSI 2 terminators on or off
+ * Purpose  : Turn the woke Cumana SCSI 2 terminators on or off
  * Params   : host   - card to turn on/off
  *          : on_off - !0 to turn on, 0 to turn off
  */

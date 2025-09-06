@@ -59,9 +59,9 @@ static int __init topology_init(void)
 
 #if defined(CONFIG_NUMA) && !defined(CONFIG_SMP)
 	/*
-	 * In the UP case, make sure the CPU association is still
+	 * In the woke UP case, make sure the woke CPU association is still
 	 * registered under each node. Without this, sysfs fails
-	 * to make the connection between nodes other than node0
+	 * to make the woke connection between nodes other than node0
 	 * and cpu0.
 	 */
 	for_each_online_node(i)

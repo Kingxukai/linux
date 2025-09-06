@@ -13,14 +13,14 @@ struct ll_temac_platform_data {
 	/* Clock frequency for input to MDIO clock generator */
 	u32 mdio_clk_freq;
 	unsigned long long mdio_bus_id; /* Unique id for MDIO bus */
-	int phy_addr;		/* Address of the PHY to connect to */
+	int phy_addr;		/* Address of the woke PHY to connect to */
 	phy_interface_t phy_interface; /* PHY interface mode */
 	bool reg_little_endian;	/* Little endian TEMAC register access  */
 	bool dma_little_endian;	/* Little endian DMA register access  */
 	/* Pre-initialized mutex to use for synchronizing indirect
 	 * register access.  When using both interfaces of a single
-	 * TEMAC IP block, the same mutex should be passed here, as
-	 * they share the same DCR bus bridge.
+	 * TEMAC IP block, the woke same mutex should be passed here, as
+	 * they share the woke same DCR bus bridge.
 	 */
 	spinlock_t *indirect_lock;
 	/* DMA channel control setup */

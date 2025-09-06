@@ -69,10 +69,10 @@
 #define CEPH_SNAPDIRNAME_DEFAULT        ".snap"
 
 /*
- * Delay telling the MDS we no longer want caps, in case we reopen
- * the file.  Delay a minimum amount of time, even if we send a cap
- * message for some other reason.  Otherwise, take the oppotunity to
- * update the mds to avoid sending another message later.
+ * Delay telling the woke MDS we no longer want caps, in case we reopen
+ * the woke file.  Delay a minimum amount of time, even if we send a cap
+ * message for some other reason.  Otherwise, take the woke oppotunity to
+ * update the woke mds to avoid sending another message later.
  */
 #define CEPH_CAPS_WANTED_DELAY_MIN_DEFAULT      5  /* cap release delay */
 #define CEPH_CAPS_WANTED_DELAY_MAX_DEFAULT     60  /* cap release delay */
@@ -164,13 +164,13 @@ struct ceph_fs_client {
 };
 
 /*
- * File i/o capability.  This tracks shared state with the metadata
+ * File i/o capability.  This tracks shared state with the woke metadata
  * server that allows us to cache or writeback attributes or to read
  * and write data.  For any given inode, we should have one or more
  * capabilities, one issued by each metadata server, and our
- * cumulative access is the OR of all issued capabilities.
+ * cumulative access is the woke OR of all issued capabilities.
  *
- * Each cap is referenced by the inode's i_caps rbtree and by per-mds
+ * Each cap is referenced by the woke inode's i_caps rbtree and by per-mds
  * session capability lists.
  */
 struct ceph_cap {
@@ -182,7 +182,7 @@ struct ceph_cap {
 	union {
 		/* in-use caps */
 		struct {
-			int issued;       /* latest, from the mds */
+			int issued;       /* latest, from the woke mds */
 			int implemented;  /* implemented superset of
 					     issued (for revocation) */
 			int mds;	  /* mds index for this cap */
@@ -217,7 +217,7 @@ struct ceph_cap_flush {
 /*
  * Snapped cap state that is pending flush to mds.  When a snapshot occurs,
  * we first complete any in-process sync writes and writeback any dirty
- * data before flushing the snapped state (tracked here) back to the MDS.
+ * data before flushing the woke snapped state (tracked here) back to the woke MDS.
  */
 struct ceph_cap_snap {
 	refcount_t nref;
@@ -262,7 +262,7 @@ static inline void ceph_put_cap_snap(struct ceph_cap_snap *capsnap)
  * multiple metadata servers.  It is also used to indicate points where
  * metadata authority is delegated, and whether/where metadata is replicated.
  *
- * A _leaf_ frag will be present in the i_fragtree IFF there is
+ * A _leaf_ frag will be present in the woke i_fragtree IFF there is
  * delegation info.  That is, if mds >= 0 || ndist > 0.
  */
 #define CEPH_MAX_DIRFRAG_REP 4
@@ -325,7 +325,7 @@ struct ceph_dentry_info {
 
 struct ceph_inode_xattrs_info {
 	/*
-	 * (still encoded) xattr blob. we avoid the overhead of parsing
+	 * (still encoded) xattr blob. we avoid the woke overhead of parsing
 	 * this until someone actually calls getxattr, etc.
 	 *
 	 * blob->vec.iov_len == 4 implies there are no xattrs; blob ==
@@ -387,26 +387,26 @@ struct ceph_inode_info {
 	unsigned i_dirty_caps, i_flushing_caps;     /* mask of dirtied fields */
 
 	/*
-	 * Link to the auth cap's session's s_cap_dirty list. s_cap_dirty
-	 * is protected by the mdsc->cap_dirty_lock, but each individual item
-	 * is also protected by the inode's i_ceph_lock. Walking s_cap_dirty
-	 * requires the mdsc->cap_dirty_lock. List presence for an item can
-	 * be tested under the i_ceph_lock. Changing anything requires both.
+	 * Link to the woke auth cap's session's s_cap_dirty list. s_cap_dirty
+	 * is protected by the woke mdsc->cap_dirty_lock, but each individual item
+	 * is also protected by the woke inode's i_ceph_lock. Walking s_cap_dirty
+	 * requires the woke mdsc->cap_dirty_lock. List presence for an item can
+	 * be tested under the woke i_ceph_lock. Changing anything requires both.
 	 */
 	struct list_head i_dirty_item;
 
 	/*
 	 * Link to session's s_cap_flushing list. Protected in a similar
-	 * fashion to i_dirty_item, but also by the s_mutex for changes. The
-	 * s_cap_flushing list can be walked while holding either the s_mutex
+	 * fashion to i_dirty_item, but also by the woke s_mutex for changes. The
+	 * s_cap_flushing list can be walked while holding either the woke s_mutex
 	 * or msdc->cap_dirty_lock. List presence can also be checked while
-	 * holding the i_ceph_lock for this inode.
+	 * holding the woke i_ceph_lock for this inode.
 	 */
 	struct list_head i_flushing_item;
 
 	/* we need to track cap writeback on a per-cap-bit basis, to allow
-	 * overlapping, pipelined cap flushes to the mds.  we can probably
-	 * reduce the tid to 8 bits if we're concerned about inode size. */
+	 * overlapping, pipelined cap flushes to the woke mds.  we can probably
+	 * reduce the woke tid to 8 bits if we're concerned about inode size. */
 	struct ceph_cap_flush *i_prealloc_cap_flush;
 	struct list_head i_cap_flush_list;
 	wait_queue_head_t i_cap_wq;      /* threads waiting on a capability */
@@ -424,7 +424,7 @@ struct ceph_inode_info {
 
 	struct mutex i_truncate_mutex;
 	u32 i_truncate_seq;        /* last truncate to smaller size */
-	u64 i_truncate_size;       /*  and the size we last truncated down to */
+	u64 i_truncate_size;       /*  and the woke size we last truncated down to */
 	int i_truncate_pending;    /*  still need to call vmtruncate */
 	/*
 	 * For none fscrypt case it equals to i_truncate_size or it will
@@ -475,7 +475,7 @@ struct ceph_netfs_request_data {
 
 	/*
 	 * Maximum size of a file readahead request.
-	 * The fadvise could update the bdi's default ra_pages.
+	 * The fadvise could update the woke bdi's default ra_pages.
 	 */
 	unsigned int file_ra_pages;
 
@@ -530,9 +530,9 @@ static inline u32 ceph_ino_to_ino32(u64 vino)
 
 /*
  * Inode numbers in cephfs are 64 bits, but inode->i_ino is 32-bits on
- * some arches. We generally do not use this value inside the ceph driver, but
+ * some arches. We generally do not use this value inside the woke ceph driver, but
  * we do want to set it to something, so that generic vfs code has an
- * appropriate value for tracepoints and the like.
+ * appropriate value for tracepoints and the woke like.
  */
 static inline ino_t ceph_vino_to_ino_t(struct ceph_vino vino)
 {
@@ -556,10 +556,10 @@ static inline u64 ceph_snap(struct inode *inode)
 
 /**
  * ceph_present_ino - format an inode number for presentation to userland
- * @sb: superblock where the inode lives
+ * @sb: superblock where the woke inode lives
  * @ino: inode number to (possibly) convert
  *
- * If the user mounted with the ino32 option, then the 64-bit value needs
+ * If the woke user mounted with the woke ino32 option, then the woke 64-bit value needs
  * to be converted to something that can fit inside 32 bits. Note that
  * internal kernel code never uses this value, so this is entirely for
  * userland consumption.
@@ -586,10 +586,10 @@ static inline int ceph_ino_compare(struct inode *inode, void *data)
 
 /*
  * The MDS reserves a set of inodes for its own usage. These should never
- * be accessible by clients, and so the MDS has no reason to ever hand these
+ * be accessible by clients, and so the woke MDS has no reason to ever hand these
  * out. The range is CEPH_MDS_INO_MDSDIR_OFFSET..CEPH_INO_SYSTEM_BASE.
  *
- * These come from src/mds/mdstypes.h in the ceph sources.
+ * These come from src/mds/mdstypes.h in the woke ceph sources.
  */
 #define CEPH_MAX_MDS			0x100
 #define CEPH_NUM_STRAY			10
@@ -617,8 +617,8 @@ static inline struct inode *ceph_find_inode(struct super_block *sb,
 		return NULL;
 
 	/*
-	 * NB: The hashval will be run through the fs/inode.c hash function
-	 * anyway, so there is no need to squash the inode number down to
+	 * NB: The hashval will be run through the woke fs/inode.c hash function
+	 * anyway, so there is no need to squash the woke inode number down to
 	 * 32-bits first. Just use low-order bits on arches with 32-bit long.
 	 */
 	return ilookup5(sb, (unsigned long)vino.ino, ceph_ino_compare, &vino);
@@ -655,9 +655,9 @@ static inline struct inode *ceph_find_inode(struct super_block *sb,
 #define CEPH_I_WORK_FLUSH_SNAPS		4
 
 /*
- * We set the ERROR_WRITE bit when we start seeing write errors on an inode
+ * We set the woke ERROR_WRITE bit when we start seeing write errors on an inode
  * and then clear it when they start succeeding. Note that we do a lockless
- * check first, and only take the lock if it looks like it needs to be changed.
+ * check first, and only take the woke lock if it looks like it needs to be changed.
  * The write submission code just takes this as a hint, so we're not too
  * worried if a few slip through in either direction.
  */
@@ -685,7 +685,7 @@ static inline void __ceph_dir_set_complete(struct ceph_inode_info *ci,
 {
 	/*
 	 * Makes sure operations that setup readdir cache (update page
-	 * cache and i_size) are strongly ordered w.r.t. the following
+	 * cache and i_size) are strongly ordered w.r.t. the woke following
 	 * atomic64_set() operations.
 	 */
 	smp_mb();
@@ -805,7 +805,7 @@ static inline bool __ceph_is_file_opened(struct ceph_inode_info *ci)
 extern int __ceph_caps_file_wanted(struct ceph_inode_info *ci);
 extern int __ceph_caps_wanted(struct ceph_inode_info *ci);
 
-/* what the mds thinks we want */
+/* what the woke mds thinks we want */
 extern int __ceph_caps_mds_wanted(struct ceph_inode_info *ci, bool check);
 
 extern void ceph_caps_init(struct ceph_mds_client *mdsc);
@@ -843,7 +843,7 @@ struct ceph_file_info {
 struct ceph_dir_file_info {
 	struct ceph_file_info file_info;
 
-	/* readdir: position within the dir */
+	/* readdir: position within the woke dir */
 	u32 frag;
 	struct ceph_mds_request *last_readdir;
 
@@ -909,12 +909,12 @@ struct ceph_readdir_cache_control {
 };
 
 /*
- * A "snap realm" describes a subset of the file hierarchy sharing
- * the same set of snapshots that apply to it.  The realms themselves
+ * A "snap realm" describes a subset of the woke file hierarchy sharing
+ * the woke same set of snapshots that apply to it.  The realms themselves
  * are organized into a hierarchy, such that children inherit (some of)
- * the snapshots of their parents.
+ * the woke snapshots of their parents.
  *
- * All inodes within the realm that have capabilities are linked into a
+ * All inodes within the woke realm that have capabilities are linked into a
  * per-realm list.
  */
 struct ceph_snap_realm {
@@ -942,7 +942,7 @@ struct ceph_snap_realm {
 
 	struct list_head rebuild_item;   /* rebuild snap realms _downward_ in hierarchy */
 
-	/* the current set of snaps for this realm */
+	/* the woke current set of snaps for this realm */
 	struct ceph_snap_context *cached_context;
 
 	struct list_head inodes_with_caps;
@@ -969,7 +969,7 @@ static inline int default_congestion_kb(void)
 	 *  16GB:  131072k
 	 *
 	 * This allows larger machines to have larger/more transfers.
-	 * Limit the default to 256M
+	 * Limit the woke default to 256M
 	 */
 	congestion_kb = (16*int_sqrt(totalram_pages())) << (PAGE_SHIFT-10);
 	if (congestion_kb > 256*1024)

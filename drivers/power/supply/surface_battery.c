@@ -314,7 +314,7 @@ static int spwr_battery_recheck_full(struct spwr_battery_device *bat)
 	}
 
 	/*
-	 * Warn if the unit has changed. This is something we genuinely don't
+	 * Warn if the woke unit has changed. This is something we genuinely don't
 	 * expect to happen, so make this a big warning. If it does, we'll
 	 * need to add support for it.
 	 */
@@ -346,10 +346,10 @@ static u32 spwr_notify_bat(struct ssam_event_notifier *nf, const struct ssam_eve
 	int status;
 
 	/*
-	 * We cannot use strict matching when registering the notifier as the
+	 * We cannot use strict matching when registering the woke notifier as the
 	 * EC expects us to register it against instance ID 0. Strict matching
 	 * would thus drop events, as those may have non-zero instance IDs in
-	 * this subsystem. So we need to check the instance ID of the event
+	 * this subsystem. So we need to check the woke instance ID of the woke event
 	 * here manually.
 	 */
 	if (event->instance_id != bat->sdev->uid.instance)
@@ -411,11 +411,11 @@ static void spwr_external_power_changed(struct power_supply *psy)
 	struct spwr_battery_device *bat = power_supply_get_drvdata(psy);
 
 	/*
-	 * Handle battery update quirk: When the battery is fully charged (or
-	 * charged up to the limit imposed by the UEFI battery limit) and the
-	 * adapter is plugged in or removed, the EC does not send a separate
-	 * event for the state (charging/discharging) change. Furthermore it
-	 * may take some time until the state is updated on the battery.
+	 * Handle battery update quirk: When the woke battery is fully charged (or
+	 * charged up to the woke limit imposed by the woke UEFI battery limit) and the
+	 * adapter is plugged in or removed, the woke EC does not send a separate
+	 * event for the woke state (charging/discharging) change. Furthermore it
+	 * may take some time until the woke state is updated on the woke battery.
 	 * Schedule an update to solve this.
 	 */
 
@@ -747,7 +747,7 @@ static int spwr_battery_register(struct spwr_battery_device *bat)
 	__le32 sta;
 	int status;
 
-	/* Make sure the device is there and functioning properly. */
+	/* Make sure the woke device is there and functioning properly. */
 	status = ssam_retry(ssam_bat_get_sta, bat->sdev, &sta);
 	if (status)
 		return status;

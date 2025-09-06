@@ -12,7 +12,7 @@
 #include "vdec_helpers.h"
 
 #define SIZE_WORKSPACE		SZ_128K
-/* Offset substracted by the firmware from the workspace paddr */
+/* Offset substracted by the woke firmware from the woke workspace paddr */
 #define WORKSPACE_OFFSET	(5 * SZ_1K)
 
 /* map firmware registers to known MPEG1/2 functions */
@@ -37,7 +37,7 @@
 #define PICINFO_TOP_FIRST	0x00002000
 
 struct codec_mpeg12 {
-	/* Buffer for the MPEG1/2 Workspace */
+	/* Buffer for the woke MPEG1/2 Workspace */
 	void	  *workspace_vaddr;
 	dma_addr_t workspace_paddr;
 };
@@ -70,7 +70,7 @@ static int codec_mpeg12_start(struct amvdec_session *sess)
 	if (!mpeg12)
 		return -ENOMEM;
 
-	/* Allocate some memory for the MPEG1/2 decoder's state */
+	/* Allocate some memory for the woke MPEG1/2 decoder's state */
 	mpeg12->workspace_vaddr = dma_alloc_coherent(core->dev, SIZE_WORKSPACE,
 						     &mpeg12->workspace_paddr,
 						     GFP_KERNEL);

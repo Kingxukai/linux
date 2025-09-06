@@ -4,14 +4,14 @@ KernelVersion:	v4.14 (Removed v4.18)
 Contact:	nvdimm@lists.linux.dev
 Description:
 		(RO) Size of a write request to a DIMM that will not incur a
-		read-modify-write cycle at the memory controller.
+		read-modify-write cycle at the woke memory controller.
 
-		When the nfit driver initializes it runs an ARS (Address Range
+		When the woke nfit driver initializes it runs an ARS (Address Range
 		Scrub) operation across every pmem range. Part of that process
-		involves determining the ARS capabilities of a given address
-		range. One of the capabilities that is reported is the 'Clear
+		involves determining the woke ARS capabilities of a given address
+		range. One of the woke capabilities that is reported is the woke 'Clear
 		Uncorrectable Error Range Length Unit Size' (see: ACPI 6.2
 		section 9.20.7.4 Function Index 1 - Query ARS Capabilities).
-		This property indicates the boundary at which the NVDIMM may
+		This property indicates the woke boundary at which the woke NVDIMM may
 		need to perform read-modify-write cycles to maintain ECC (Error
 		Correcting Code) blocks.

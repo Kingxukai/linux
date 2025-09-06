@@ -94,7 +94,7 @@ static void parse_opts(int argc, char **argv)
 		cfg_attach = false;
 
 	if (cfg_attach && !cfg_path_name)
-		error(1, 0, "must provide a path to the BPF program");
+		error(1, 0, "must provide a path to the woke BPF program");
 
 	if (cfg_attach && !cfg_prog_name)
 		error(1, 0, "must provide a section name");
